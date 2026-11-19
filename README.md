@@ -6,8 +6,9 @@ correct, run by certified procedures, and explored by hand. Lean 4, core
 Lean only (no Mathlib).
 
 **Status, 2026-11-19.** This repository continues lean-certify under a wider
-name. `LeanCertify` is unchanged. `ProofTools.Audit` is new here. The proof
-explorer is planned and not built. No release of `proof-tools` is tagged
+name. `LeanCertify` is unchanged. `ProofTools.Audit`, `ProofTools.Zipper`
+and `ProofTools.Explore` are new here; the explorer has its tests' example
+calculus as its only instance so far. No release of `proof-tools` is tagged
 yet; lean-certify's tags (v0.1.0 to v0.3.0) are in this history.
 
 ## The parts
@@ -16,7 +17,8 @@ yet; lean-certify's tags (v0.1.0 to v0.3.0) are in this history.
 |---|---|---|
 | `LeanCertify` | Certified computation: an untrusted fast producer computes a certificate, and a checker proved sound certifies it in the kernel. | Released as lean-certify v0.3.0. `docs/lean-certify.md`; the procedure as a Claude skill, `SKILL.md`. |
 | `ProofTools.Audit` | Commands that audit a development: what axioms a declaration may depend on and where one enters, the same for a whole file or for whole libraries, an inductive family printed as inference figures, and a check for computed indices. | Carried in from lax-logic-in-lean, 2026-11-19. `ProofTools/Audit.lean`. |
-| `ProofTools.Explore` | A proof explorer for any calculus given as a type of judgments, a type of moves, and a step function proved sound: derivations and unfinished derivations as data, one tactic, scripts. | Not built. |
+| `ProofTools.Zipper` | The zipper of an indexed family of trees: paths, moves and their laws, stated once. | New, 2026-11-19. `ProofTools/Zipper.lean`. |
+| `ProofTools.Explore` | A proof explorer for any calculus given as a type of judgments, a type of moves, and a step function proved sound: derivations and unfinished derivations as data, scripts and their `run`, the two checkers as certifiers, one tactic (`apply_move`), and tactics of the calculus built from tactics. | New, 2026-11-19. `docs/explore.md`. |
 | The method | How the parts are used on one calculus, in five stages. | Draft: `docs/campaign.md`. |
 
 Related, and kept elsewhere:
@@ -58,8 +60,9 @@ with a theorem. `docs/campaign.md` has the detail.
     git = "https://github.com/fairflow/proof-tools"
     rev = "<a tag or a commit>"
 
-Then `import LeanCertify`, or `import ProofTools.Audit`. A project that
-imports one library does not build the other.
+Then `import LeanCertify`, `import ProofTools.Audit` or
+`import ProofTools.Explore`. A project that imports `LeanCertify` alone
+does not build the rest.
 
 Build with `lake build`; the tests with `lake build LeanCertifyTest
 ProofToolsTest` (a few seconds each; the lints, gates and audit commands
