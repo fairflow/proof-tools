@@ -166,7 +166,8 @@ theorem swap_valid : Valid ([] ⊢ (p ⋏ q) ⟶ (q ⋏ p)) := Der.sound sound s
 * **Patterns.** `apply_move andL` (arguments left out) or
   `apply_move andL _ q` (holes) is matched against the moves the instance
   proposes at the goal. One match is made, and shown as "Try this"; several
-  are offered; none is an error.
+  are offered; none is an error. The line shown keeps each argument as it
+  was typed, and fills the holes and the arguments left out.
 * **Queries.** `apply_move` alone offers the moves that apply;
   `apply_move an` those whose names begin with `an`. A query makes no move.
 * A move one of whose premises adds nothing to its conclusion is set aside

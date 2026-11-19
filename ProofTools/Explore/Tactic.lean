@@ -324,6 +324,34 @@ def moveText (m : Cand) (ns : Option Name) : TacticM String :=
     let stx ← PrettyPrinter.delab m.1
     return (← PrettyPrinter.ppTerm stx).pretty 100
 
+/-- Is there a hole (`_`, `?_`, `?x`) in the term? -/
+def hasHole (stx : Syntax) : Bool :=
+  (stx.find? fun s =>
+    s.isOfKind ``Lean.Parser.Term.hole || s.isOfKind ``Lean.Parser.Term.syntheticHole).isSome
+
+/-- A piece of syntax as its source text. -/
+def srcText (stx : Syntax) : Option String :=
+  stx.reprint.map fun s => s.trimAscii.toString
+
+/-- **A line as it was typed, with its holes filled.**  `f` and `args` are
+the head and the arguments typed, `full` the source text of the move made.
+An argument typed without a hole is kept as typed; a hole, an argument with
+a hole in it, and an argument left out take the move's.  Where the typed
+line and the move's text do not line up, the answer is the move's text. -/
+def filledText (f : Syntax) (args : Array Syntax) (full : String) : CoreM String := do
+  let .ok stx := Parser.runParserCategory (← getEnv) `term full | return full
+  let (_, vals) := headArgs stx
+  if vals.size < args.size then return full
+  let some h := srcText f | return full
+  let mut out := h
+  for i in [0:vals.size] do
+    let typed? := match args[i]? with
+      | some a => if hasHole a then none else srcText a
+      | none => none
+    let some t := typed? <|> srcText vals[i]! | return full
+    out := out ++ " " ++ t
+  return out
+
 /-- The line `tac m`, at goal `k` if it is not the first. -/
 def lineText (tac : String) (m : String) (k : Nat) : String :=
   if k == 0 then s!"{tac} {m}" else s!"{tac} {m} at {k}"
@@ -395,7 +423,13 @@ def applyMoveCore (tac : String) (sys? : Option Name) (ref : Syntax) (line? : Op
         throw e
     if r.1.isNone then saved.restore (restoreInfo := true)
     return r
-  let usePattern (stx : Syntax) : TacticM Unit := do
+  -- the line a pattern is filled to: what was typed, with its holes filled
+  let filled (typed : Option (Syntax × Array Syntax)) (m : Cand) : TacticM String := do
+    let full ← moveText m ns
+    match typed with
+    | some (f, args) => return lineText tac (← filledText f args full) k
+    | none => return lineText tac full k
+  let usePattern (stx : Syntax) (typed : Option (Syntax × Array Syntax)) : TacticM Unit := do
     match ← matchPattern stx with
     | (some m, _) => make m
     | (none, []) =>
@@ -403,11 +437,10 @@ def applyMoveCore (tac : String) (sys? : Option Name) (ref : Syntax) (line? : Op
         arguments out, or `{tac}` alone to see the moves that apply"
     | (none, [m]) =>
       if apply_move.tryThis.get (← getOptions) then
-        Lean.Meta.Tactic.TryThis.addSuggestion ref
-          { suggestion := .string (lineText tac (← moveText m ns) k) }
+        Lean.Meta.Tactic.TryThis.addSuggestion ref { suggestion := .string (← filled typed m) }
       make m.1
     | (none, ms) =>
-      let lines ← ms.toArray.mapM fun m => do return lineText tac (← moveText m ns) k
+      let lines ← ms.toArray.mapM (filled typed)
       offer ref s!"{tac}: {ms.length} moves of this form apply at goal {k}; no move is made. \
         Try these:" lines
   match line? with
@@ -423,16 +456,17 @@ def applyMoveCore (tac : String) (sys? : Option Name) (ref : Syntax) (line? : Op
         for _ in [args.size:arity] do as := as.push (← `(_))
         let head := mkIdentFrom f (`_root_ ++ c)
         let stx : Syntax := if as.isEmpty then head else Syntax.mkApp ⟨head⟩ (as.map (⟨·⟩))
-        usePattern stx
+        usePattern stx (some (f, args))
       else
         let withPrefix := cs.filter fun c => c.getString!.startsWith txt
-        if withPrefix.isEmpty || (← g.withContext (namesMove f gi.moveTy ns)) then usePattern line
+        if withPrefix.isEmpty || (← g.withContext (namesMove f gi.moveTy ns)) then
+          usePattern line (some (f, args))
         else
           -- the start of a name: a query
           let names := withPrefix.map (·.getString!)
           let ms := (← applicable).filter fun (m, _) => (headName m.1).any (names.contains ·)
           offerAll (setAside ms) (some txt)
-    | _, _ => usePattern line
+    | _, _ => usePattern line none
 
 /-- The goal number of a line. -/
 def goalNum (k? : Option Syntax) : Nat :=
@@ -453,7 +487,8 @@ of a proof by `apply_move` are the lines of a script.
 
 The move may be written without its namespace; arguments may be holes `_`
 or `?_`, and trailing ones may be left out: the line is then matched against
-the moves the instance proposes.  A line that does not settle its move makes
+the moves the instance proposes, and the line it is filled to keeps the
+arguments as they were typed.  A line that does not settle its move makes
 none, and offers what it could be: `apply_move` alone offers the moves that
 apply, `apply_move im` those whose names begin with `im`. -/
 syntax (name := applyMoveTac) "apply_move" applyMoveArgs : tactic
