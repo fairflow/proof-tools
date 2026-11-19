@@ -220,7 +220,8 @@ compiles against 0.3.x compiles unchanged.
    only): `#axiom_path`, `#choice_path`, `#choice_sources`, `#axiom_pin`,
    `#axioms_within`, `#axioms_within_pin`, `#cf_search`, `#axiom_sweep`,
    `#rules`, `#slime`, carried in from lax-logic-in-lean's `Meta/` at
-   79d83611. A project with its own copy of those files drops the copy when
+   79d83611, and one command written here, `#axioms_within_file`, which
+   bounds every declaration of the file it stands in. A project with its own copy of those files drops the copy when
    it imports this one, since both declare the same commands. Tests:
    `ProofToolsTest/`.
 3. **`#axioms_within` and R4.** Two commands now bound a declaration's

@@ -1,5 +1,6 @@
 -- From fairflow/lax-logic-in-lean, Meta/Sweep.lean at commit 79d83611 (carried in 2026-11-19);
 -- namespace `Audit` became `ProofTools.Audit`.  This is now the maintained copy.
+-- `isNoise` and `resolveIdent` are no longer private: `FileBound.lean` uses them.
 /-
 # Estate-level axiom sweep
 
@@ -36,7 +37,7 @@ namespace ProofTools.Audit
 
 /-- Declarations Lean generates for its own bookkeeping.  They are not
 mathematical content and would swamp the report. -/
-private def isNoise (n : Name) : Bool :=
+def isNoise (n : Name) : Bool :=
   n.isInternal
     || n.isImplementationDetail
     || (`_example).isPrefixOf n
@@ -74,7 +75,7 @@ syntax (name := axiomSweepCmd)
   (" except " "[" ident,* "]")?
   " allowing " "[" ident,* "]" : command
 
-private def resolveIdent (id : Syntax) : CommandElabM Name := do
+def resolveIdent (id : Syntax) : CommandElabM Name := do
   match ← liftCoreM <| realizeGlobalConstWithInfos id with
   | n :: _ => return n
   | [] => throwError "unknown constant"

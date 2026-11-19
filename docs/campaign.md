@@ -81,10 +81,14 @@ its plan. It depends on the calculus and on the part of the work.
   files: **each theory file states the axioms its declarations may depend
   on.** Files of code (producers, printers, tactics) carry no bound, since
   nothing they compute is trusted.
-- A bound is an upper bound (`#axioms_within`, `#axiom_sweep`): a proof may
-  use fewer axioms than its file allows, and must use none outside them.
-  An exact list is not pinned, so a proof that gets cleaner breaks nothing.
-- Exceptions are the reviewer's to grant, one declaration at a time.
+- A bound is an upper bound: a proof may use fewer axioms than its file
+  allows, and must use none outside them. An exact list is not pinned, so a
+  proof that gets cleaner breaks nothing. The commands:
+  `#axioms_within_file [...]` at the end of a theory file, for that file;
+  `#axioms_within d [...]` for one declaration; `#axiom_sweep` for whole
+  libraries, from a file that imports them.
+- Exceptions are the reviewer's to grant, one declaration at a time
+  (`#axioms_within_file [...] except [d]`).
 
 ## Countermodels
 

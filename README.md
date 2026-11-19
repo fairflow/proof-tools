@@ -15,7 +15,7 @@ yet; lean-certify's tags (v0.1.0 to v0.3.0) are in this history.
 | Part | What it is | Status |
 |---|---|---|
 | `LeanCertify` | Certified computation: an untrusted fast producer computes a certificate, and a checker proved sound certifies it in the kernel. | Released as lean-certify v0.3.0. `docs/lean-certify.md`; the procedure as a Claude skill, `SKILL.md`. |
-| `ProofTools.Audit` | Commands that audit a development: what axioms a declaration may depend on and where one enters, the same over whole libraries, an inductive family printed as inference figures, and a check for computed indices. | Carried in from lax-logic-in-lean, 2026-11-19. `ProofTools/Audit.lean`. |
+| `ProofTools.Audit` | Commands that audit a development: what axioms a declaration may depend on and where one enters, the same for a whole file or for whole libraries, an inductive family printed as inference figures, and a check for computed indices. | Carried in from lax-logic-in-lean, 2026-11-19. `ProofTools/Audit.lean`. |
 | `ProofTools.Explore` | A proof explorer for any calculus given as a type of judgments, a type of moves, and a step function proved sound: derivations and unfinished derivations as data, one tactic, scripts. | Not built. |
 | The method | How the parts are used on one calculus, in five stages. | Draft: `docs/campaign.md`. |
 
