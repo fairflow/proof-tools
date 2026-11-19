@@ -88,8 +88,5 @@ def engine (hS : S.Sound D) (E : Evaluator S D)
 
 end ProofTools.Explore
 
--- The bound on the axioms of this file: an upper bound.  Only `derives_script`
--- needs `Classical.choice` (through `run_script`); `derives_sound`, `certifier`
--- and `engine` are within `[propext, Quot.sound]`
--- (`ProofToolsTest/Explore/Audit.lean`).
-#axioms_within_file [propext, Classical.choice, Quot.sound]
+-- The bound on the axioms of this file: an upper bound.
+#axioms_within_file [propext, Quot.sound]

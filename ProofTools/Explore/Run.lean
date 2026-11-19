@@ -262,6 +262,5 @@ theorem Att.runFrom_append {j : S.Judg} (n : Nat) (d : Att S true j) (ls ls' : S
 
 end ProofTools.Explore
 
--- The bound on the axioms of this file: an upper bound.  `Classical.choice` comes
--- with the theorems of `Cursor`.
-#axioms_within_file [propext, Classical.choice, Quot.sound]
+-- The bound on the axioms of this file: an upper bound.
+#axioms_within_file [propext, Quot.sound]

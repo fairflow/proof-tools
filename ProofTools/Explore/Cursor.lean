@@ -202,7 +202,7 @@ theorem Atts.seekIn_inr {t : S.Judg} (m : S.Move) {s : S.Judg} : {o : Bool} →
         simp only [Sum.inr.injEq] at hx
         subst hx
         simp only [Atts.goals_cons, List.length_append]
-        omega
+        exact ⟨by omega, by omega⟩
 end
 
 mutual
@@ -336,7 +336,7 @@ theorem Atts.seekLeftIn_inr {t : S.Judg} (m : S.Move) {s : S.Judg} : {o : Bool} 
     split at hx
     · next hn =>
       obtain ⟨-, l⟩ := Att.seekIn_inr e _ _ hx
-      omega
+      exact ⟨by omega, by omega⟩
     · next hn =>
       split at hx
       · cases hx
@@ -346,7 +346,7 @@ theorem Atts.seekLeftIn_inr {t : S.Judg} (m : S.Move) {s : S.Judg} : {o : Bool} 
         simp only [Sum.inr.injEq] at hx
         subst hx
         simp only [Atts.goalsRev_cons, List.length_append]
-        omega
+        exact ⟨by omega, by omega⟩
 
 theorem Path.seekLeft_some {o : Bool} {t : S.Judg} : {ds : List Nat} → {s : S.Judg} →
     (p : Path S o ds s t) → (d : Att S o s) → (n : Nat) → {x : Pos S o t} →
@@ -464,6 +464,7 @@ theorem Cursor.seek_none {j : S.Judg} {k : Nat} {c : Cursor S j} (hc : c.Ok)
 
 end ProofTools.Explore
 
--- The bound on the axioms of this file: an upper bound.  `Classical.choice` enters
--- through `omega`, in the proofs about numbers of goals; no definition uses it.
-#axioms_within_file [propext, Classical.choice, Quot.sound]
+-- The bound on the axioms of this file: an upper bound.  `omega` is given one
+-- comparison at a time: asked for a conjunction it negates it with
+-- `Classical.propDecidable`, and `Classical.choice` comes in.
+#axioms_within_file [propext, Quot.sound]

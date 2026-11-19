@@ -283,6 +283,5 @@ theorem Tac.valid_first : (ts : List (Tac S)) → (∀ t ∈ ts, t.Valid) → (T
 
 end ProofTools.Explore
 
--- The bound on the axioms of this file: an upper bound.  `Classical.choice` comes
--- with the theorems of `Cursor` and `Run`.
-#axioms_within_file [propext, Classical.choice, Quot.sound]
+-- The bound on the axioms of this file: an upper bound.
+#axioms_within_file [propext, Quot.sound]

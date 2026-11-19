@@ -210,7 +210,6 @@ never a wrong derivation.
 
 * Lean's kernel.
 * For a script: `derives`, `Att.sound` and the instance's `Sound` theorem.
-  That path is within `[propext, Quot.sound]`.
 * For a model: the instance's `Evaluator.sound`.
 
 Not trusted: everything in `Explorable`, the tactics, `candidates`, any
@@ -219,10 +218,13 @@ the premises and quotes them with the instance's `ToExpr`; the node it
 builds is checked by the kernel. `ProofToolsTest/Explore/Tactic.lean` has an
 instance that quotes wrongly, and the kernel's refusal.
 
-Each theory file ends with its bound on axioms (`#axioms_within_file`).
-`Classical.choice` appears only in the theorems that compare `run` with its
-specification and in those about the combinators, where `omega` brings it;
-no definition uses it.
+Each theory file ends with its bound on axioms (`#axioms_within_file`), and
+every bound is `[propext, Quot.sound]`: nothing in the library uses
+`Classical.choice`. One thing to know when proving about numbers of goals:
+`omega` stays within that bound when it is given one comparison to prove,
+and brings in `Classical.choice` when it is given a conjunction (it negates
+the goal, and pushes the negation through `∧` with
+`Classical.propDecidable`). Split the goal first.
 
 ## Declaring an instance
 
