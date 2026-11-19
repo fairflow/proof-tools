@@ -289,4 +289,56 @@ example : Att Up true (1 : Nat) := by
   apply_move ()
   leave_open
 
+/-! ## Judgments that hold functions: the equation of a node, decided
+
+A judgment of `Swap` is a function on `Bool`, and the one move swaps its two
+values.  The premise the tactic writes, `fun b => cond b 2 1`, is equal to
+what `step` computes, `fun b => (fun b => cond b 1 2) (!b)`, but not by
+definition.  So `rfl` cannot prove the node's equation, and the instance
+asks for it to be decided (`eqByDecide`). -/
+
+/-- A function on `Bool`, as a judgment. -/
+structure Pair where
+  /-- The function. -/
+  f : Bool → Nat
+
+instance : DecidableEq Pair := fun a b =>
+  decidable_of_iff (a.f true = b.f true ∧ a.f false = b.f false) (by
+    obtain ⟨f⟩ := a
+    obtain ⟨g⟩ := b
+    constructor
+    · intro h
+      have : f = g := funext fun x => by cases x <;> simp_all
+      rw [this]
+    · intro h
+      rw [h]
+      exact ⟨rfl, rfl⟩)
+
+/-- The system: one move, which swaps the two values. -/
+abbrev Swap : ProofSystem where
+  Judg := Pair
+  Move := Unit
+  step _ j := .ok [⟨fun b => j.f (!b)⟩]
+
+/-- A pair as a term: `⟨fun b => cond b x y⟩`. -/
+def quotePair (j : Pair) : Lean.Expr :=
+  Lean.mkApp (Lean.mkConst ``Pair.mk) (.lam `b (Lean.mkConst ``Bool)
+    (Lean.mkApp4 (Lean.mkConst ``cond [1]) (Lean.mkConst ``Nat) (.bvar 0)
+      (Lean.mkNatLit (j.f true)) (Lean.mkNatLit (j.f false))) .default)
+
+instance : Explorable Swap where
+  candidates _ := [()]
+  showJudg j := s!"{j.f true}, {j.f false}"
+  showMove _ := "swap"
+  quoteJudg := ⟨quotePair, Lean.mkConst ``Pair⟩
+  quoteMove := inferInstanceAs (Lean.ToExpr Unit)
+  eqByDecide := true
+
+/-- Decided: the kernel evaluates `step` and compares the premises. -/
+def swapped : Att Swap true ⟨fun b => cond b 1 2⟩ := by
+  apply_move ()
+  leave_open
+
+#guard swapped.goals.map (fun j => (j.f true, j.f false)) == [(2, 1)]
+
 end ProofToolsTest.Explore.TacticTest

@@ -29,7 +29,9 @@ infoview's goal list is the calculus's, and it follows the cursor.
 code, and quotes them with the instance's `ToExpr`.  The proof term it
 builds is `Att.node m ps (Eq.refl _) …`, whose equation `S.step m j = .ok ps`
 is proved by the kernel's own evaluation of `S.step` when the declaration
-is checked.  Nothing the instance supplies in `Explorable` is trusted: a
+is checked.  Where the instance sets `eqByDecide`, the equation is proved
+by `step_of_stepIs (Eq.refl true)` instead: the kernel evaluates `S.step`
+and decides that its premises are the ones written.  Nothing the instance supplies in `Explorable` is trusted: a
 wrong `candidates` or `quoteJudg` costs a failure, never a wrong
 derivation.
 
@@ -68,6 +70,13 @@ class Explorable (S : ProofSystem) where
   lines the tactic suggests.  Where it gives nothing, the move's term
   (`quoteMove`) is printed by Lean. -/
   moveSource : S.Move → Option String := fun _ => none
+  /-- How the tactic proves a node's equation `S.step m j = .ok ps`.  By
+  `rfl` (`false`, the default): the premises as quoted must be, by
+  definition, what `step` computes.  By deciding the equality (`true`):
+  they need only be equal, and an instance of `DecidableEq S.Judg` is
+  needed.  An instance whose judgments hold functions needs the second,
+  since a function quoted is seldom the function computed. -/
+  eqByDecide : Bool := false
 
 variable {S : ProofSystem}
 
@@ -91,13 +100,23 @@ def Explorable.quoteScript (S : ProofSystem) [E : Explorable S] (ls : Script S) 
     List (Nat × Expr) :=
   ls.map fun l => (l.goal, E.quoteMove.toExpr l.move)
 
+/-- A judgment's text under an indentation; `mark` goes before its first
+line, and as many spaces before the others. -/
+def judgLines (ind mark text : String) : List String :=
+  match text.splitOn "\n" with
+  | [] => [ind ++ mark]
+  | l :: ls => (ind ++ mark ++ l) :: ls.map fun x => ind ++ "".pushn ' ' mark.length ++ x
+
 mutual
 /-- The lines of an attempt drawn as text: each node its judgment and its
-move, the premises indented below; an open goal is marked `?`. -/
+move, the premises indented below; an open goal is marked `?`.  A judgment
+of one line has its move beside it, a longer one below it. -/
 def Att.lines [E : Explorable S] : {o : Bool} → {j : S.Judg} → Att S o j → String → List String
-  | _, j, .goal, ind => [ind ++ "? " ++ E.showJudg j]
+  | _, j, .goal, ind => judgLines ind "? " (E.showJudg j)
   | _, j, .node m _ _ ds, ind =>
-    (ind ++ E.showJudg j ++ "   by " ++ E.showMove m) :: ds.lines (ind ++ "  ")
+    (match judgLines ind "" (E.showJudg j) with
+      | [l] => [l ++ "   by " ++ E.showMove m]
+      | ls => ls ++ [ind ++ "   by " ++ E.showMove m]) ++ ds.lines (ind ++ "  ")
 /-- `Att.lines` on a list. -/
 def Atts.lines [E : Explorable S] : {o : Bool} → {ps : List S.Judg} → Atts S o ps → String →
     List String
@@ -135,6 +154,11 @@ unsafe def evalApplicableU (e : Expr) : MetaM (List (Cand × Bool)) :=
 /-- Evaluate a closed term of type `List ((Expr × Option String) × Bool)`. -/
 @[implemented_by evalApplicableU] opaque evalApplicable (e : Expr) : MetaM (List (Cand × Bool))
 
+/-- See `evalBool`. -/
+unsafe def evalBoolU (e : Expr) : MetaM Bool := evalExpr Bool (mkConst ``Bool) e
+/-- Evaluate a closed term of type `Bool`. -/
+@[implemented_by evalBoolU] opaque evalBool (e : Expr) : MetaM Bool
+
 /-- See `evalScript`. -/
 unsafe def evalScriptU (e : Expr) : MetaM (List (Nat × Expr)) :=
   evalExpr (List (Nat × Expr)) (listTy (prodTy (mkConst ``Nat) exprTy)) e
@@ -169,6 +193,9 @@ def goalInfo (tac : String) (g : MVarId) : MetaM GoalInfo := do
     let instTy := mkApp (mkConst ``Explorable) sys
     let inst ← try synthInstance instTy catch _ =>
       throwError "{tac}: there is no instance of{indentExpr instTy}"
+    let inst ← instantiateMVars inst
+    if inst.hasFVar || inst.hasMVar || sys.hasFVar || sys.hasMVar then
+      throwError "{tac}: the calculus and its instance of `Explorable` must be closed terms         (declare the instance; a local hypothesis will not do)"
     return { sys, o, j, inst
              judgTy := mkApp (mkConst ``ProofSystem.Judg) sys
              moveTy := mkApp (mkConst ``ProofSystem.Move) sys }
@@ -192,9 +219,19 @@ def applyMoveAt (tac : String) (g : MVarId) (m : Expr) (k : Nat) : MetaM (List M
         dsE := mkApp6 (mkConst ``Atts.cons) gi.sys gi.o p psE ng dsE
         psE := mkApp3 (mkConst ``List.cons [0]) gi.judgTy p psE
         gs := gs.push ng.mvarId!
-      let excTy := mkApp2 (mkConst ``Except [0, 0]) (mkConst ``String) (listTy gi.judgTy)
-      let okE := mkApp3 (mkConst ``Except.ok [0, 0]) (mkConst ``String) (listTy gi.judgTy) psE
-      let h := mkApp2 (mkConst ``Eq.refl [1]) excTy okE
+      let h ←
+        if ← evalBool (mkApp2 (mkConst ``Explorable.eqByDecide) gi.sys gi.inst) then
+          -- `step_of_stepIs (Eq.refl true)`: the kernel evaluates `stepIs`
+          let decTy ← mkAppM ``DecidableEq #[gi.judgTy]
+          let dec ← try synthInstance decTy catch _ =>
+            throwError "{tac}: the instance asks for the equation of a node to be decided \
+              (`eqByDecide`), and there is no instance of{indentExpr decTy}"
+          pure <| mkApp6 (mkConst ``step_of_stepIs) gi.sys dec m gi.j psE
+            (mkApp2 (mkConst ``Eq.refl [1]) (mkConst ``Bool) (mkConst ``Bool.true))
+        else
+          let excTy := mkApp2 (mkConst ``Except [0, 0]) (mkConst ``String) (listTy gi.judgTy)
+          let okE := mkApp3 (mkConst ``Except.ok [0, 0]) (mkConst ``String) (listTy gi.judgTy) psE
+          pure <| mkApp2 (mkConst ``Eq.refl [1]) excTy okE
       g.assign (mkApp7 (mkConst ``Att.node) gi.sys gi.o gi.j m psE h dsE)
       return gs.toList.reverse
 

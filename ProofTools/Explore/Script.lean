@@ -120,6 +120,23 @@ theorem Att.ofMove_eq_error {m : S.Move} {j : S.Judg} {e : String}
       rw [hs, Except.error.inj h]
   exact key _ rfl
 
+/-- **Is `ps` what `m` asks for at `j`?**  Decided by evaluating `step` and
+comparing the premises as judgments.  The tactic `apply_move` proves a
+node's equation through this where the premises it writes are equal to what
+`step` computes without being so by definition (judgments that hold
+functions, for one). -/
+def stepIs [DecidableEq S.Judg] (m : S.Move) (j : S.Judg) (ps : List S.Judg) : Bool :=
+  match S.step m j with
+  | .ok qs => decide (qs = ps)
+  | .error _ => false
+
+theorem step_of_stepIs [DecidableEq S.Judg] {m : S.Move} {j : S.Judg} {ps : List S.Judg}
+    (h : stepIs m j ps = true) : S.step m j = .ok ps := by
+  unfold stepIs at h
+  split at h
+  · next qs hq => rw [hq, of_decide_eq_true h]
+  · cases h
+
 /-! ## One move, from the root -/
 
 mutual

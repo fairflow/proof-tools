@@ -239,6 +239,17 @@ no definition uses it.
 `step` should reduce in the kernel: structural recursion, and `Decidable`
 instances that compute. `docs/deciders.md` says what to avoid.
 
+**Judgments that hold functions.** The tactic writes each premise as a
+term, quoted from its value, and proves the node's equation
+`S.step m j = .ok ps` by `rfl`. That asks the quoted premises to be, by
+definition, what `step` computes. A function quoted is seldom the function
+computed (`fun b => cond b 2 1` against `fun b => (fun b => cond b 1 2) (!b)`),
+so an instance whose judgments hold functions sets `eqByDecide := true` and
+gives `DecidableEq S.Judg`: the equation is then proved by
+`step_of_stepIs (Eq.refl true)`, the kernel evaluating `step` and deciding
+that its premises are the ones written. `run`, `derives` and the certifier
+do not quote, and need neither.
+
 ## Limits
 
 1. When the cursor passes a premise off its path, it reads that premise to
