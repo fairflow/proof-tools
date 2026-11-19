@@ -251,6 +251,7 @@ instance : Explorable Up where
   showMove _ := "up"
   quoteJudg := ⟨fun n => Lean.mkNatLit (n + 1), Lean.mkConst ``Nat⟩
   quoteMove := inferInstanceAs (Lean.ToExpr Unit)
+  moveSource _ := some "() -- up"
 
 /--
 error: ipc: the goal is not an attempt in `ProofToolsTest.Explore.IPC`
@@ -258,6 +259,17 @@ error: ipc: the goal is not an attempt in `ProofToolsTest.Explore.IPC`
 #guard_msgs in
 example : Att Up true (0 : Nat) := by
   ipc ()
+
+-- A suggested line is written with the instance's source text
+-- (`moveSource`), where it gives one.
+/--
+info: apply_move: at goal 0, 1 move applies; no move is made. Try these:
+  [apply] apply_move () -- up
+-/
+#guard_msgs in
+example : Att Up true (5 : Nat) := by
+  apply_move
+  leave_open
 
 /-! ## Nothing an instance supplies is trusted
 

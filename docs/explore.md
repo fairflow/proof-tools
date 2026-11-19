@@ -232,7 +232,8 @@ no definition uses it.
 3. `S.Sound D`, for the instance's `D`.
 4. For the tactics, `Explorable S`: `candidates`, `quoteJudg` and `quoteMove`
    (`deriving Lean.ToExpr` gives them), `showJudg`, `showMove`, and
-   optionally `within`.
+   optionally `within` and `moveSource` (a move as Lean source, for the
+   lines the tactic suggests; without it Lean prints the move's term).
 5. Optionally an `Evaluator`, a producer, and an alias.
 
 `step` should reduce in the kernel: structural recursion, and `Decidable`

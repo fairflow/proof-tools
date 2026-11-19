@@ -64,6 +64,10 @@ class Explorable (S : ProofSystem) where
   /-- `within p j`: the premise `p` adds nothing to the conclusion `j`.  A
   move with such a premise is offered only if no other applies. -/
   within : S.Judg → S.Judg → Bool := fun _ _ => false
+  /-- A move as Lean source, as `apply_move` is to be given it, for the
+  lines the tactic suggests.  Where it gives nothing, the move's term
+  (`quoteMove`) is printed by Lean. -/
+  moveSource : S.Move → Option String := fun _ => none
 
 variable {S : ProofSystem}
 
@@ -72,13 +76,14 @@ def Explorable.premises (S : ProofSystem) [E : Explorable S] (m : S.Move) (j : S
     Except String (List Expr) :=
   (S.step m j).map (·.map E.quoteJudg.toExpr)
 
-/-- The candidates that apply at `j`, as terms, each with whether one of
-its premises adds nothing. -/
+/-- The candidates that apply at `j`, as terms with their source text if
+the instance gives one, each with whether one of its premises adds
+nothing. -/
 def Explorable.applicable (S : ProofSystem) [E : Explorable S] (j : S.Judg) :
-    List (Expr × Bool) :=
+    List ((Expr × Option String) × Bool) :=
   (E.candidates j).filterMap fun m =>
     match S.step m j with
-    | .ok ps => some (E.quoteMove.toExpr m, ps.any (E.within · j))
+    | .ok ps => some ((E.quoteMove.toExpr m, E.moveSource m), ps.any (E.within · j))
     | .error _ => none
 
 /-- The lines of a script, their moves as terms. -/
@@ -118,11 +123,17 @@ unsafe def evalPremisesU (e : Expr) : MetaM (Except String (List Expr)) :=
 @[implemented_by evalPremisesU]
 opaque evalPremises (e : Expr) : MetaM (Except String (List Expr))
 
+/-- A move the instance proposes: its term, and its source text if the
+instance gives one. -/
+abbrev Cand : Type := Expr × Option String
+
 /-- See `evalApplicable`. -/
-unsafe def evalApplicableU (e : Expr) : MetaM (List (Expr × Bool)) :=
-  evalExpr (List (Expr × Bool)) (listTy (prodTy exprTy (mkConst ``Bool))) e
-/-- Evaluate a closed term of type `List (Expr × Bool)`. -/
-@[implemented_by evalApplicableU] opaque evalApplicable (e : Expr) : MetaM (List (Expr × Bool))
+unsafe def evalApplicableU (e : Expr) : MetaM (List (Cand × Bool)) :=
+  evalExpr (List (Cand × Bool))
+    (listTy (prodTy (prodTy exprTy (mkApp (mkConst ``Option [0]) (mkConst ``String)))
+      (mkConst ``Bool))) e
+/-- Evaluate a closed term of type `List ((Expr × Option String) × Bool)`. -/
+@[implemented_by evalApplicableU] opaque evalApplicable (e : Expr) : MetaM (List (Cand × Bool))
 
 /-- See `evalScript`. -/
 unsafe def evalScriptU (e : Expr) : MetaM (List (Nat × Expr)) :=
@@ -267,10 +278,13 @@ def namesMove (f : Syntax) (moveTy : Expr) (ns : Option Name) : TacticM Bool :=
     catch _ => pure false
     finally saved.restore (restoreInfo := true)
 
-/-- A move as source text, its namespace open. -/
-def moveText (m : Expr) (ns : Option Name) : TacticM String :=
-  withOpen ns do
-    let stx ← PrettyPrinter.delab m
+/-- A move as source text: the instance's, or Lean's printing of the term
+with the namespace of the moves open. -/
+def moveText (m : Cand) (ns : Option Name) : TacticM String :=
+  match m.2 with
+  | some src => pure src
+  | none => withOpen ns do
+    let stx ← PrettyPrinter.delab m.1
     return (← PrettyPrinter.ppTerm stx).pretty 100
 
 /-- The line `tac m`, at goal `k` if it is not the first. -/
@@ -288,7 +302,7 @@ def offer (ref : Syntax) (header : String) (lines : Array String) : TacticM Unit
   Lean.Meta.Tactic.TryThis.addSuggestions ref sugg (header := header) (footer := footer)
 
 /-- Set aside the moves that add nothing, while another is there. -/
-def setAside (ms : List (Expr × Bool)) : List Expr :=
+def setAside (ms : List (Cand × Bool)) : List Cand :=
   let good := ms.filter (!·.2)
   (if good.isEmpty then ms else good).map (·.1)
 
@@ -318,18 +332,18 @@ def applyMoveCore (tac : String) (sys? : Option Name) (ref : Syntax) (line? : Op
       throwError "{tac}: the goal is not an attempt in `{s}`"
   let ctors ← moveCtors gi.moveTy
   let ns := ctors.map (·.1)
-  let applicable : TacticM (List (Expr × Bool)) :=
+  let applicable : TacticM (List (Cand × Bool)) :=
     evalApplicable (mkApp3 (mkConst ``Explorable.applicable) gi.sys gi.inst gi.j)
   let make (m : Expr) : TacticM Unit := do
     let new ← applyMoveAt tac g m k
     setGoals (gs.take k ++ new ++ gs.drop (k + 1))
-  let offerAll (ms : List Expr) (h : Option String) : TacticM Unit := do
+  let offerAll (ms : List Cand) (h : Option String) : TacticM Unit := do
     let whose := match h with | some h => s!" whose name begins with `{h}`" | none => ""
     if ms.isEmpty then throwError "{tac}: no move{whose} applies at goal {k}"
     let lines ← ms.toArray.mapM fun m => do return lineText tac (← moveText m ns) k
     offer ref s!"{tac}: at goal {k}, {movesApply ms.length h}; no move is made. Try these:" lines
   -- a pattern: match it against the candidates that apply
-  let matchPattern (stx : Syntax) : TacticM (Option Expr × List Expr) := do
+  let matchPattern (stx : Syntax) : TacticM (Option Expr × List Cand) := do
     let saved ← saveState
     let r ← try
       g.withContext do
@@ -337,7 +351,7 @@ def applyMoveCore (tac : String) (sys? : Option Name) (ref : Syntax) (line? : Op
         if !pat.hasMVar then pure (some pat, [])
         else
           let ms ← (← applicable).filterM fun (c, _) =>
-            withoutModifyingState <| withAssignableSyntheticOpaque <| isDefEq pat c
+            withoutModifyingState <| withAssignableSyntheticOpaque <| isDefEq pat c.1
           pure (none, setAside ms)
       catch e =>
         saved.restore (restoreInfo := true)
@@ -354,7 +368,7 @@ def applyMoveCore (tac : String) (sys? : Option Name) (ref : Syntax) (line? : Op
       if apply_move.tryThis.get (← getOptions) then
         Lean.Meta.Tactic.TryThis.addSuggestion ref
           { suggestion := .string (lineText tac (← moveText m ns) k) }
-      make m
+      make m.1
     | (none, ms) =>
       let lines ← ms.toArray.mapM fun m => do return lineText tac (← moveText m ns) k
       offer ref s!"{tac}: {ms.length} moves of this form apply at goal {k}; no move is made. \
@@ -379,7 +393,7 @@ def applyMoveCore (tac : String) (sys? : Option Name) (ref : Syntax) (line? : Op
         else
           -- the start of a name: a query
           let names := withPrefix.map (·.getString!)
-          let ms := (← applicable).filter fun (m, _) => (headName m).any (names.contains ·)
+          let ms := (← applicable).filter fun (m, _) => (headName m.1).any (names.contains ·)
           offerAll (setAside ms) (some txt)
     | _, _ => usePattern line
 
