@@ -41,7 +41,7 @@ Lean. Their answers decide what the later stages are for.
 |---|---|---|---|---|
 | 0 | **Survey** | The five questions. | The plan: goals, non-goals, order. | `plan.md` |
 | 1 | **Adopt** | The rules as an inductive family; `#rules` and `#slime` run on it; a first explorer instance. | The rules as inference figures beside the source, and **the test**: the source's own derivations, typed in by hand. | A table matching each rule to its place in the source; a file of exercises. |
-| 2 | **Prove** | The plan's theorems. Statements first, shown before they are proved. Countermodels are looked for before a proof is attempted. | Each statement, marked PROVED, REFUTED or OPEN. | The statements; an audit file bounding each theorem's axioms. |
+| 2 | **Prove** | The plan's theorems. Statements first, shown before they are proved. Countermodels are looked for before a proof is attempted. | Each statement, marked PROVED, REFUTED or OPEN. | The statements; in each theory file, the bound on its axioms that the development's policy sets. |
 | 3 | **Run** | Procedures that search for proofs or countermodels, each an untrusted producer whose output a checker certifies. | Verdicts on a corpus of judgments of known status. | The procedures, the corpus, the settings. |
 | 4 | **Explore** | The explorer in full: display, queries, scripts, what question 4 asked for. | **The tutorial**, worked through. | A user's guide; a retrospective, with changes to this method. |
 
@@ -64,8 +64,27 @@ Everything else produces candidates: a person typing, a search procedure, a
 language model, a translation from another calculus. A wrong candidate is
 refused by a checker; it cannot become a wrong theorem. A declaration that
 is still a `sorry` is OPEN, and "machine-checked" is said only of what the
-kernel has checked with its axioms bounded (`#axioms_within`,
-`#axiom_sweep`).
+kernel has checked, within the axioms its development allows.
+
+## Axioms: a policy of the development, not of the method
+
+Which axioms a development may use is an option of the campaign, settled in
+its plan. It depends on the calculus and on the part of the work.
+
+- A propositional calculus with finite countermodels can often be kept free
+  of `Classical.choice`, and a development may set that as its aim. A
+  first-order calculus whose completeness goes through infinite models will
+  in general need it, and aims at something else. The method prescribes
+  neither.
+- The policy is stated once, at the top of the development (for example:
+  avoid `Classical.choice` wherever possible), and then written into the
+  files: **each theory file states the axioms its declarations may depend
+  on.** Files of code (producers, printers, tactics) carry no bound, since
+  nothing they compute is trusted.
+- A bound is an upper bound (`#axioms_within`, `#axiom_sweep`): a proof may
+  use fewer axioms than its file allows, and must use none outside them.
+  An exact list is not pinned, so a proof that gets cleaner breaks nothing.
+- Exceptions are the reviewer's to grant, one declaration at a time.
 
 ## Countermodels
 
