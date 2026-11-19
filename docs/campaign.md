@@ -4,7 +4,8 @@ Draft, 2026-11-19. This page says how the parts of this repository are meant
 to be used together on one proof calculus. It was drawn from work on calculi
 for propositional lax logic in
 [lax-logic-in-lean](https://github.com/fairflow/lax-logic-in-lean), and will
-be revised as it is applied. The explorer it mentions is not built yet.
+be revised as it is applied. The explorer it mentions is `ProofTools.Explore`
+([explore.md](explore.md)).
 
 ## Who does what
 

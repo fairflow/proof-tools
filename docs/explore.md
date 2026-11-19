@@ -242,6 +242,24 @@ the goal, and pushes the negation through `∧` with
 `step` should reduce in the kernel: structural recursion, and `Decidable`
 instances that compute. `docs/deciders.md` says what to avoid.
 
+Two things that instances have found useful:
+
+* Write `step` through one function that gives, for a move at a judgment,
+  whether it applies, its premises, and what to say if it does not. The
+  lemmas about `step` are then one case analysis each.
+* A function or theorem by recursion on an attempt is written for every
+  `o`, with `o = false` as a hypothesis where it is about derivations:
+  Lean's structural recursion needs the indices of `Att S o j` to be
+  variables.
+
+A worked instance on a calculus with a decision procedure, a certified
+countermodel side and a translation to natural deduction: the subframe
+tableau for propositional lax logic, in
+[lax-logic-in-lean](https://github.com/fairflow/lax-logic-in-lean)
+(`LaxLogic/PLL/SubTab/Explore.lean`). There a derivation and a closed
+tableau of the existing checker are each computed from the other, so every
+proof its search finds is also a script.
+
 **Judgments that hold functions.** The tactic writes each premise as a
 term, quoted from its value, and proves the node's equation
 `S.step m j = .ok ps` by `rfl`. That asks the quoted premises to be, by
