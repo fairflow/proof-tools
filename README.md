@@ -1,205 +1,90 @@
-# Lean certify
+# Proof tools
 
-A harness for certified computation in Lean 4: the theory says what must be
-computed; an untrusted implementation, built for speed and faithful to the
-theory, computes it; a checker proved sound certifies each product in the
-kernel. Termination arguments stay in the theory and are never recomputed at
-run time.
+Tools, and a method, for taking a proof calculus from its paper to a form
+that Lean's kernel checks and that people can use: transcribed, proved
+correct, run by certified procedures, and explored by hand. Lean 4, core
+Lean only (no Mathlib).
 
-Status: v0.3.0 released (2026-10-15): deciders (prover, disprover,
-fallback pairs; a settings registry; a command-line driver;
-`docs/v0.3-statements.md`, `docs/deciders.md`); no changed signature.  It
-contains v0.2.1 (2026-10-14): v0.2.0 (V1 plus chunking and
-streaming, `@[csimp]` fast paths, and decisions (b) and (c);
-`docs/v0.2-report.md`) with R3 on theorems (`docs/v0.2.1-statements.md`). Core Lean only (no Mathlib); pinned at Lean v4.31.0, checked on
-v4.33.0. Build the library with `lake build`, and the tests with
-`lake build LeanCertifyTest`. The procedure, as a Claude skill, is `SKILL.md`.
+**Status, 2026-11-19.** This repository continues lean-certify under a wider
+name. `LeanCertify` is unchanged. `ProofTools.Audit` is new here. The proof
+explorer is planned and not built. No release of `proof-tools` is tagged
+yet; lean-certify's tags (v0.1.0 to v0.3.0) are in this history.
 
-- `docs/outline.md`: the design, as reviewed and decided by Matthew Fairtlough
-  (2026-10-09). The specification for V1.
-- `docs/v1-statements.md`: the V1 statements, approved by Matthew (R10).
-- `docs/v1-report.md`: what V1 built, measurements, deviations.
-- `docs/v0.2-decisions.md`: decided for v0.2 (R3 and `implemented_by`; the
-  shape of `Refinement`), not yet built.
-- `docs/v0.2.1-statements.md`: R3 on theorems (what a proof decides by
-  evaluation), allowances, and the walk into `@[implemented_by]`; released
-  in 0.2.1.
-- `docs/v0.3-statements.md`: deciders (prover, disprover, fallback pairs),
-  the settings file and its generated JSON, backward compatibility;
-  released in 0.3.0.
-- `docs/deciders.md`: choosing a decider's tools, for a reader who does not
-  know Lean.
-- `docs/survey.md`: the prior-art survey behind it (certifying algorithms,
-  proof by reflection, translation validation, Rocq extraction, Lean
-  precedents).
+## The parts
 
-Used by: [locus](https://github.com/fairflow/locus) (private) and
-[lax-logic-in-lean](https://github.com/fairflow/lax-logic-in-lean), pinned by tag.
-
-## Versioning
-
-- A **patch release** (0.1.x) never changes a signature of the library's
-  interface: `Certifier`, `Verdict`, `Engine`, `Refinement`, `Config`,
-  `CertifierConfig`, the `@[harness]` attribute. A **minor release** (0.x)
-  may, and must ship a migration note.
-- **Downstream check before every tag.** Before tagging, build every known
-  use against the candidate commit, under the budget rule (a kernel check
-  under about 4 GB and 30 s per process; stop and report above about 15
-  minutes), and tag only if all pass. Locus is private, so this runs
-  locally, not in public CI.
-
-Known downstream modules (keep this list current):
-
-| Project | Module | Build |
+| Part | What it is | Status |
 |---|---|---|
-| lax-logic-in-lean | `CertifyAdoption` (FinCM countermodels) | `lake build CertifyAdoption` |
-| lax-logic-in-lean | `CertifyAdoption.CheckDeriv`, `LJF.OCheckDeriv` (derivation trees; main 4de06e9) | `lake build CertifyAdoption LJF.OCheckDeriv` |
-| lax-logic-in-lean | `CertifyAdoption.Regression` (regression test: R1, R3, R4 pinned on every certifier, engine and theorem decided through one; one certified run per checker; main 0828de8; its CI builds it with the two above on every change of the pin) | `lake build CertifyAdoption.Regression` |
-| locus (private) | `Logic.Certify` (bisimulation certificates) | `lake build LogicCertify` |
-| locus (private) | `Logic.Examples.LinkModel.NeoSweep` (R3 over the Neo proof files) | `lake build Logic.Examples.LinkModel.NeoSweep` |
-| locus (private) | on-demand certificates: `ABPCert`, `ABPOneCert`, `ABPRunsCert`, `ABPTrackBuff` (streamed by `certify_chunks`, assembled by `certify_all`), `ABPOneRel`, `M1Prime.ToyFast`, all under `Logic.Examples` | one module at a time, the rows files first (about 20 s and under 4 GB each): `lake build Logic.Examples.<name>` |
+| `LeanCertify` | Certified computation: an untrusted fast producer computes a certificate, and a checker proved sound certifies it in the kernel. | Released as lean-certify v0.3.0. `docs/lean-certify.md`; the procedure as a Claude skill, `SKILL.md`. |
+| `ProofTools.Audit` | Commands that audit a development: what axioms a declaration may depend on and where one enters, the same over whole libraries, an inductive family printed as inference figures, and a check for computed indices. | Carried in from lax-logic-in-lean, 2026-11-19. `ProofTools/Audit.lean`. |
+| `ProofTools.Explore` | A proof explorer for any calculus given as a type of judgments, a type of moves, and a step function proved sound: derivations and unfinished derivations as data, one tactic, scripts. | Not built. |
+| The method | How the parts are used on one calculus, in five stages. | Draft: `docs/campaign.md`. |
 
-Releases: v0.1.0 (V1), v0.1.1 (R3: panic functions are leaves), v0.1.2
-(lints open the parameters of a generic certifier), v0.1.3 (R4 runs
-automatically on every `Certifier` and `Engine` declaration), v0.2.0 (V2:
-chunking and streaming, `@[csimp]` fast paths; decisions (b) and (c)),
-v0.2.1 (R3 on theorems: no vacuous pass; allowances), v0.3.0 (deciders:
-prover, disprover, fallback pairs; settings registry; command-line driver).
+Related, and kept elsewhere:
 
-## Migrating from 0.1.x to 0.2.0
+- **calculus-adoption**, a Claude skill in
+  [lax-logic-in-lean](https://github.com/fairflow/lax-logic-in-lean)
+  (`.claude/skills/calculus-adoption/`): the procedure for transcribing a
+  published calculus and proving its theorems. It is the origin of the
+  Adopt and Prove stages below, and of the audit commands.
+- **prover-toolkit**, a folder of the same repository: a Python harness that
+  drives a hosted prover on Lean `sorry`s, with a search over a project's
+  declarations and an axiom check. It is independent of this repository,
+  and has had little use so far.
 
-0.2.0 is a minor release: one interface signature changes.
+## The method in brief
 
-1. **`Refinement`** (decision (c), `docs/v0.2-decisions.md`). `fastEval`
-   now takes the specification, `fastEval : Spec → Cert → Q → Bool`, and
-   there is a domain, `dom : Spec → Cert → Q → Bool`. `refine` takes both
-   hypotheses: `valid s c = true → dom s c q = true → fastEval s c q =
-   specEval s q`. For the old meaning, write `dom := fun _ _ _ => true`, and
-   give `fastEval` a first argument `_`. (No known downstream module used
-   `Refinement` in 0.1.x.)
-2. **R3 and `@[implemented_by]`** (decision (b)). Under the default
-   `route := .kernel`, an `@[implemented_by]` constant on a checker's path
-   is now an information note ("R3 note: …"), no longer an error. Under any
-   other route it is still an error. A `#guard_msgs` that pinned the old
-   error must be re-pinned. In locus, `Logic/Certify.lean` pins R3 on
-   `wbisimCertifier` (`Match.guard`'s error strings reach `Nat.repr`); it
-   now reads "R3 passes" followed by the note.
-3. **New, nothing to migrate**: `Certify.all_of_chunks` and the commands
-   `certify_chunks` / `certify_all` (chunking and streaming), and
-   `Refinement.guarded`, `guarded_eq` and `certify_fastpath` (`@[csimp]`
-   fast paths). The new commands are keywords: an identifier spelled
-   `certify_chunks`, `certify_all` or `certify_fastpath` no longer parses.
+Work on a calculus is one campaign. It starts from five questions, asked of
+the literature before anything is written: what the rules are; what has
+been proved about them; what should run, and why; how people use the
+calculus; which calculi it is related to. Then:
 
-## Changes in 0.2.1
+| Stage | What is done | What the reviewer gets |
+|---|---|---|
+| Survey | The five questions, answered from the sources. | A plan: goals, and what is left out. |
+| Adopt | The rules, transcribed as an inductive family; a first explorer. | The rules printed as figures beside the source, and derivations to type by hand. |
+| Prove | The theorems of the plan, statements first. | Each statement, marked proved, refuted or open. |
+| Run | Search and countermodel procedures, each certified. | Verdicts with certificates the kernel checks. |
+| Explore | The explorer in full, with its guides. | A tutorial to work through. |
 
-0.2.1 is a patch release: no interface signature changes, but R3 is
-stricter (`docs/v0.2.1-statements.md`).
+No stage is automatic. An operator (a person, or a language model working
+with one) does the work, and a reviewer decides at the end of each stage.
+What is trusted is small: Lean's kernel, and two checkers per calculus, each
+with a theorem. `docs/campaign.md` has the detail.
 
-1. **R3 on a theorem** no longer passes vacuously. `#certify_structural t`
-   walks what `t`'s proof decides by evaluation (`of_decide_eq_true` and its
-   siblings applied to a reflexivity proof, as `decide` and `decide +kernel`
-   leave them), and reports `WellFounded.fix`, `WellFounded.Nat.fix` and the
-   rest as **errors**; a theorem that decides nothing is an error ("nothing
-   to walk"). `#certify_domain t` walks the same, or gives the same error.
-   A `#guard_msgs` that pinned "R3 passes" or "R1: nothing to report" on a
-   theorem must be re-pinned.
-2. **`@[implemented_by]` under the kernel route** is still a note, but the
-   walk now enters it (the kernel reduces its value). A checker that
-   reaches a well-founded loop only through such a constant now fails R3:
-   core `Array.contains` and `Array.any` do, through `Array.anyM.loop`.
-3. **New: allowances.** `#certify_structural f allow c "reason", …`
-   downgrades to a warning what R3 forbids at or below each named `c`; an
-   allowance not on the path, or with nothing forbidden below it, is an
-   error. `allow` is not a reserved word.
+## Using it
 
-Downstream check (against this branch, local override): lax-logic-in-lean
-`CertifyAdoption`, `CertifyAdoption.CheckDeriv` and `LJF.OCheckDeriv`, and
-the private downstream module in the table above, all build unchanged.
+    [[require]]
+    name = "proof-tools"
+    git = "https://github.com/fairflow/proof-tools"
+    rev = "<a tag or a commit>"
 
-## Changes in 0.3.0
+Then `import LeanCertify`, or `import ProofTools.Audit`. A project that
+imports one library does not build the other.
 
-0.3.0 is a minor release that changes no interface signature
-(`docs/v0.3-statements.md`). A file that compiles against 0.2.1 compiles
-unchanged; nothing is recoded.
+Build with `lake build`; the tests with `lake build LeanCertifyTest
+ProofToolsTest` (a few seconds each; the lints, gates and audit commands
+are pinned by `#guard_msgs`, their failing cases included). Pinned at Lean
+v4.31.0.
 
-1. **New: deciders** (`LeanCertify/Decider.lean`). `Certify.Prover` and
-   `Certify.Disprover` separate the two sides of an engine; `Certify.Decider`
-   is a prover, a disprover and fallback pairs tried in order;
-   `Decider.run` races or sequences each pair, raises the budget on a flag,
-   and returns a `Decision` carrying the proposition from `sound`. A
-   certificate its certifier rejects is reported as a tool defect and
-   ignored. An existing `Engine` plugs in through `Prover.ofEngine` and
-   `Disprover.ofEngine`.
-2. **New: the settings file.** `Harness.Registry` names the tools once;
-   `Harness.DeciderConfig` chooses them by name; `#certify_decider` checks
-   every name when the file compiles; `Certify.Cli.main` is the executable
-   (flags `--deadline=`, `--budget=`, `--mode=`, `--json`). The JSON is
-   generated from the Lean file, never read. A guide for readers who do not
-   know Lean: `docs/deciders.md`.
-3. **One proviso.** The new short names (`Prover`, `Disprover`, `Decider`,
-   `Decision`, `Mode`, `RunConfig`, `tryPair`, `Cli` in `Certify`;
-   `DeciderConfig`, `Tool`, `Registry` in `Harness`) can make an identifier
-   ambiguous in a file that opens `Certify` or `Harness` and gives one of
-   its own declarations the same short name. No known downstream file does.
+## Coming from lean-certify
 
-Downstream check against the candidate 173b60a (the tag is on main's
-23d9423, the same tree), each project at its current main with the pin
-moved to 173b60a in a scratch worktree:
-lax-logic-in-lean `CertifyAdoption`,
-`CertifyAdoption.CheckDeriv`, `CertifyAdoption.Regression` and
-`LJF.OCheckDeriv` (v4.31.0; 72 s, every pinned message unchanged); locus
-`LogicCertify` (v4.33.0; 10 s), `NeoSweep` (34 s; R3 passes on its 140
-theorems proved by evaluation) and the 25 on-demand certificate modules
-(401 s in all, the largest process 26 s and 3.6 GB). All build unchanged.
+Nothing in `LeanCertify` has changed, and its imports are the same. In the
+project that requires it, the package's name becomes `proof-tools` (and the
+address, when the pin is moved to a release of this repository):
 
-## Changes in 0.3.1 (proposed)
+    [[require]]
+    name = "proof-tools"                               # was "lean-certify"
+    git = "https://github.com/fairflow/proof-tools"    # was .../lean-certify
+    rev = "…"
 
-A patch release: no interface signature changes. R3 is stricter, R4 no
-longer sees producers (`LeanCertifyTest/PartialFixpoint.lean`).
+A project that keeps its own copy of the audit commands (`Meta/Audit.lean`
+and its neighbours, as lax-logic-in-lean does) cannot import that copy and
+`ProofTools.Audit` in one file, since both declare the same commands: drop
+the copy when moving. The commands' names and syntax are unchanged; their
+namespace is now `ProofTools.Audit`.
 
-1. **R3 and `partial_fixpoint`.** R3 passed a `partial_fixpoint` definition,
-   which the kernel does not reduce (found in lax-logic's research,
-   2026-10-20). It now reports `Lean.Order.fix` with the reason and where
-   such a definition belongs: in `produce`, or in `Holds` with a certificate
-   checked against it. Using `partial_fixpoint` is not an error; asking the
-   kernel to evaluate it is.
-2. **R3 and axioms.** The walk treated an axiom as a harmless leaf. An axiom
-   that is not a proposition (`Classical.choice`, `sorryAx`) has no value to
-   reduce, and is now an error on the path, like an opaque constant: a
-   checker under `open Classical` (through `Classical.propDecidable`) now
-   fails R3, as `decide` fails on it. Propositional axioms (`propext`,
-   `Quot.sound`) are not reported, and proofs are still not walked, so a
-   classical soundness proof does not concern R3.
-3. **R4 pins results, not producers** (Matthew, 2026-10-21). The automatic
-   R4 check and `#certify_axioms` cover an `Engine`, `Prover` or
-   `Disprover` on its type and certifiers only, so a producer may reach
-   `Classical.choice` (a `partial_fixpoint` search does). A result stated
-   through the engine (`E.yes.verdict s c`) names the engine and with it the
-   producer; `#certify_axioms` now says so and points to the named certifier
-   (`K.verdict s c`), whose term does not mention the producer.
-4. **`sorryAx` fails everywhere**, producers included, even when the
-   allow-list names it.
-
-A `#guard_msgs` that pinned "R3 passes" on a checker reaching a
-non-propositional axiom, or R4's message for an engine whose producer uses
-`sorry`, must be re-pinned.
-
-5. **New: facts about `partial_fixpoint` functions, certified by a table**
-   (`LeanCertify/Fixpoint.lean`, `Certify.Fixpoint`). The kernel cannot
-   evaluate a `partial_fixpoint` function; it can evaluate its body `F` on
-   the entries of a table that the compiled function records in
-   post-order. `check_sound` (by induction along the table): each entry
-   `(a, b)` of a passing table holds of every fixed point of `F`
-   (`FixesAt F a b`, which `fixesAt_iff` shows is exactly the
-   `partial_fixpoint` value). `check_spec`: given the one-step lemma that
-   `partial_correctness` takes as premise, each entry satisfies the
-   invariant, which gives facts about the subject. Both are free of
-   `Classical.choice`; only a statement that names the `partial_fixpoint`
-   function itself depends on it. Certifiers: `certifier`,
-   `specCertifier`. Cost: one body evaluation per entry plus linear
-   lookups, a fraction of a second for a few hundred entries
-   (`LeanCertifyTest/FixpointScale.lean`). Examples and negative tests:
-   `LeanCertifyTest/Fixpoint.lean` (Collatz, Ackermann's function with a
-   nested call).
+Versioning, the downstream check before every tag, the list of known
+downstream modules and the release notes are in `docs/lean-certify.md`, and
+go on applying to the whole package.
 
 Licence: Apache-2.0 (see `LICENSE`).

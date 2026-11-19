@@ -1,6 +1,6 @@
-name = "lean-certify"
+name = "proof-tools"
 version = "0.1.0"
-defaultTargets = ["LeanCertify"]
+defaultTargets = ["LeanCertify", "ProofTools"]
 
 # No dependencies beyond core Lean, deliberately: the library must stay light
 # and build unchanged on every toolchain its users pin (v4.31.0 and v4.33.0 as
@@ -17,3 +17,14 @@ name = "LeanCertify"
 [[lean_lib]]
 name = "LeanCertifyTest"
 globs = ["LeanCertifyTest.+"]
+
+# The audit commands (#axioms_within, #axiom_sweep, #rules, #slime, ...),
+# carried in from lax-logic-in-lean's `Meta/` (2026-11-19).  Core Lean only.
+[[lean_lib]]
+name = "ProofTools"
+globs = ["ProofTools", "ProofTools.+"]
+
+# Their tests, pinned by `#guard_msgs`.  `lake build ProofToolsTest`.
+[[lean_lib]]
+name = "ProofToolsTest"
+globs = ["ProofToolsTest.+"]
