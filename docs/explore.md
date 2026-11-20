@@ -33,6 +33,21 @@ The library then gives, the same for every instance:
 | the two checkers, as certifiers of `LeanCertify` | `Explore/Certify.lean` |
 | tactics of the calculus, built from tactics | `Explore/Tac.lean` |
 | Lean tactics: `apply_move`, `apply_script`, `leave_open` | `Explore/Tactic.lean` |
+| the motions of the cursor, and their laws | `Explore/Motion.lean` |
+| the view at a position; the command `#walk` | `Explore/Walk.lean` |
+
+What it is for, and the entry point of each purpose (this table changes in
+the same commit as any entry point):
+
+| purpose | entry point |
+|---|---|
+| build by hand, a move at a time | `apply_move`, or the instance's alias of it |
+| build by program | a script and `run`; the tactics of the calculus (`Tac`) |
+| check | the term itself, each node's equation by `rfl`; a script by `derives` |
+| look at an attempt that is built | `#walk`; as functions `Cursor.view`, `walkText`; all of it at once, `Att.render` |
+| change an attempt that is built | a move at an open goal (`apply_move … at k`, `Att.run`); nothing else yet |
+| map out to the mathematics | `Der.sound` and `Att.sound`, with the instance's soundness theorem |
+| keep and replay | `Att.script`, `run`, `apply_script` |
 
 ## Attempts and derivations
 
@@ -180,6 +195,68 @@ theorem swap_valid : Valid ([] ⊢ (p ⋏ q) ⟶ (q ⋏ p)) := Der.sound sound s
 The lines of a proof by `apply_move` are the lines of a script:
 `swap.script` gives them back.
 
+## Looking at an attempt that is built
+
+An attempt or a derivation is a value, whatever made it: a proof by
+`apply_move`, `(run S j ls).att`, `Der.ofScript j ls h`, a search.  `#walk`
+names one and makes motions from its root; it shows the **view** at the
+position reached, and changes nothing.
+
+```lean
+#walk swap down 0 down 0
+```
+
+```
+   ⊢ ((p0 ∧ p1) → (p1 ∧ p0))   by impR
+    (p0 ∧ p1) ⊢ (p1 ∧ p0)   by andL p0 p1
+>     p0, p1, (p0 ∧ p1) ⊢ (p1 ∧ p0)   by andR
+        0: p0, p1, (p0 ∧ p1) ⊢ p1   by ax   [closed]
+        1: p0, p1, (p0 ∧ p1) ⊢ p0   by ax   [closed]
+  at 0.0: 2 premises; no open goals
+```
+
+The view is: the nodes from the root down to the focus, each with its move;
+the focus, marked `>`; the premises of the focus, numbered, an open one
+marked `?` and a node with its move and whether it is closed; then the
+address of the focus (the premise numbers from the root) and where the open
+goals are.
+
+| motion | goes to |
+|---|---|
+| `up` | the node the focus is a premise of |
+| `down i` | premise number `i` of the focus, numbered from 0 |
+| `left`, `right` | the premise before, or after, of the same node |
+| `top` | the root |
+| `goal k` | open goal `k` of the whole attempt, numbered from 0 |
+
+Written over several lines, a walk shows the view after each line as a
+message at that line, so the infoview follows the editor's cursor:
+
+```lean
+#walk swap
+  down 0
+  down 0
+  down 1
+  up
+```
+
+A motion that cannot be made is an error at that motion, with the reason
+(`the focus is the root`, `the focus has no premise 3: its premises are
+numbered 0 to 0`, `there is no goal 4`, …); the view before it is shown.
+A comma may follow a motion.
+
+The motions are functions of the library (`Explore/Motion.lean`):
+`Cursor.move m c`, and `Cursor.moves c ms` for several.  A motion changes
+the position and nothing else (PROVED; `c.Ok` says that the cursor's count
+of the open goals left of the focus is right):
+
+    c.Ok → c.move m = some c'   →  c'.toRoot = c.toRoot ∧ c'.Ok      (Cursor.move_some)
+    c.Ok → c.moves ms = .ok c'  →  c'.toRoot = c.toRoot ∧ c'.Ok      (Cursor.moves_ok)
+    c.down i = some c'  →  c'.up = some c                            (Cursor.up_down)
+
+`walkText d ms` is the view after the motions `ms` as a string, for use
+without the command.
+
 ## Tactics of the calculus, from tactics
 
 ```lean
@@ -284,3 +361,7 @@ do not quote, and need neither.
    the candidates the instance proposes when a line is a pattern.
 5. There is no search procedure, no model of an open goal, and no map
    between systems: those belong to the instance.
+6. `#walk` needs the attempt to be a closed term, and evaluates compiled
+   code, as the tactics do.  The view draws the premises of the focus, not
+   those of the nodes above it: `up` shows them.  Going `up`, the open
+   goals of the premises before the focus are counted again.

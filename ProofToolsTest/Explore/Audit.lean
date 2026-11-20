@@ -55,6 +55,12 @@ open ProofTools ProofTools.Explore
 #axioms_within Att.runFrom_append [propext, Quot.sound]
 #axioms_within derives_script [propext, Quot.sound]
 
+/-! ## The motions of the cursor -/
+
+#axioms_within Cursor.move_some [propext, Quot.sound]
+#axioms_within Cursor.moves_ok [propext, Quot.sound]
+#axioms_within Cursor.up_down [propext, Quot.sound]
+
 /-! ## Scripts as programs -/
 
 #axioms_within Att.runFrom_shift [propext, Quot.sound]
