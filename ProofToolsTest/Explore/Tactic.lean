@@ -62,10 +62,10 @@ example : Der IPC ([p ⋏ q] ⊢ p) := by
 
 /--
 info: Try this:
-  [apply] apply_move andL (Form.atom 1) (Form.atom 2)
+  [apply] apply_move andL (Form.atom 1) r
 ---
 info: Try this:
-  [apply] apply_move andL (Form.atom 0) (Form.atom 1)
+  [apply] apply_move andL p (Form.atom 1)
 -/
 #guard_msgs in
 example : Att IPC true ([p ⋏ q, q ⋏ r] ⊢ r) := by

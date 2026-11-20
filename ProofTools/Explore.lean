@@ -13,7 +13,11 @@ The parts, in the order they build on one another:
 | `Certify` | `derives`, `certifier`, `Evaluator`, `engine`: the two checkers |
 | `Tac` | scripts as programs: `Script.shift` and the combinators on tactics |
 | `Tactic` | `Explorable`; the tactics `apply_move`, `apply_script`, `leave_open` |
+| `Motion` | the motions of the cursor (`up`, `down i`, `left`, `right`, `top`, `goal k`) and their laws |
+| `Walk` | the view at a position; the command `#walk`, to look at an attempt that is built |
 -/
 import ProofTools.Explore.Certify
 import ProofTools.Explore.Tac
 import ProofTools.Explore.Tactic
+import ProofTools.Explore.Motion
+import ProofTools.Explore.Walk
