@@ -33,6 +33,20 @@ The motions are `up`, `down i`, `left`, `right`, `top`, `goal k`; a comma
 may follow one.  A motion that cannot be made is an error at that motion,
 saying why; the view before it is shown.
 
+**To walk by clicking.**  After the last view, `#walk` offers the motions
+that can be made from the position reached (`Cursor.motions`), as
+suggestions:
+
+    Motions from here:
+      [apply] down 0
+      [apply] up
+      [apply] top
+
+A click on `[apply]` writes that motion after the last one, on the same
+line, so the editor's cursor stays where the next view and the next offer
+appear.  The walk stays in the file as text.  `set_option walk.offer false`
+turns the offer off.
+
 `walkText d ms` is the view after the motions `ms`, as a function, for use
 without the command.
 
@@ -144,7 +158,29 @@ where
       | some c' => let r := go (n + 1) c' ms; (c.view :: r.1, r.2)
       | none => ([c.view], some (n, c.whyNot m))
 
+/-- **The motions offered after the walk `ms`** from the root of `d`, as
+they are written (`Cursor.motions`); none if a motion of `ms` cannot be
+made. -/
+def walkOffers {o : Bool} {j : S.Judg} (d : Att S o j) (ms : List Motion) : List String :=
+  match (Cursor.ofAtt d).moves ms with
+  | .ok c => c.motions.map Motion.text
+  | .error _ => []
+
+/-- What `#walk` shows: the views along the walk (`walkViews`), and the
+motions offered at its end (`walkOffers`) if `offer`. -/
+def walkShown [Explorable S] {o : Bool} {j : S.Judg} (d : Att S o j) (ms : List Motion)
+    (offer : Bool) : (List String × Option (Nat × String)) × List String :=
+  (walkViews d ms, if offer then walkOffers d ms else [])
+
 /-! ## The command -/
+
+/-- `walk.offer`: `#walk` offers the motions that can be made from the
+position it reaches. -/
+register_option walk.offer : Bool := {
+  defValue := true
+  descr := "#walk offers the motions that can be made from the position it reaches, as \
+    suggestions: a click writes the motion after the last one"
+}
 
 /-- A motion, as `#walk` is given it. -/
 declare_syntax_cat walk_motion (behavior := both)
@@ -166,7 +202,9 @@ syntax "goal " num : walk_motion
 that the motions `m₁ m₂ …` reach from its root: `up`, `down i`, `left`,
 `right`, `top`, `goal k`.  With no motion, the root.  Written over several
 lines, each line shows the view after it, so the infoview follows the
-editor's cursor.  `d` is not changed. -/
+editor's cursor.  After the last view the motions that can be made from
+there are offered: a click writes one after the last motion
+(`set_option walk.offer false` for none).  `d` is not changed. -/
 syntax (name := walkCmd) withPosition("#walk " term:max (colGt walk_motion ","?)*) : command
 
 /-- A motion's term. -/
@@ -180,21 +218,23 @@ def motionTerm (stx : Syntax) : MacroM Term :=
   | `(walk_motion| goal $k) => `(ProofTools.Explore.Motion.goal $k)
   | _ => Macro.throwUnsupported
 
-/-- See `evalViews`. -/
-unsafe def evalViewsU (e : Expr) : MetaM (List String × Option (Nat × String)) :=
-  evalExpr (List String × Option (Nat × String))
-    (ToExpr.toTypeExpr (α := List String × Option (Nat × String))) e
-/-- Evaluate a closed term of type `List String × Option (Nat × String)`. -/
-@[implemented_by evalViewsU]
-opaque evalViews (e : Expr) : MetaM (List String × Option (Nat × String))
+/-- See `evalShown`. -/
+unsafe def evalShownU (e : Expr) :
+    MetaM ((List String × Option (Nat × String)) × List String) :=
+  evalExpr ((List String × Option (Nat × String)) × List String)
+    (ToExpr.toTypeExpr (α := (List String × Option (Nat × String)) × List String)) e
+/-- Evaluate a closed term of the type of `walkShown`. -/
+@[implemented_by evalShownU]
+opaque evalShown (e : Expr) : MetaM ((List String × Option (Nat × String)) × List String)
 
 @[command_elab walkCmd, inherit_doc walkCmd]
 def elabWalk : CommandElab := fun stx => do
   let d : Term := ⟨stx[1]⟩
   let motions : Array Syntax := stx[2].getArgs.map (·[0])
   let terms ← motions.mapM fun m => liftMacroM (motionTerm m)
-  let (views, failed) ← liftTermElabM do
-    let e ← Term.elabTerm (← `(ProofTools.Explore.walkViews $d [$terms,*])) none
+  let offer : Term := mkCIdent (if walk.offer.get (← getOptions) then ``true else ``false)
+  let ((views, failed), offers) ← liftTermElabM do
+    let e ← Term.elabTerm (← `(ProofTools.Explore.walkShown $d [$terms,*] $offer)) none
     Term.synthesizeSyntheticMVarsNoPostponing
     let e ← instantiateMVars e
     -- the term did not elaborate: Lean has said why
@@ -202,7 +242,7 @@ def elabWalk : CommandElab := fun stx => do
     if e.hasMVar || e.hasFVar then
       throwErrorAt d "#walk: the attempt must be a closed term, of a calculus with an \
         instance of `Explorable`"
-    evalViews e
+    evalShown e
   -- item 0 is `#walk d`; item `k + 1` is motion `k`.  View `k` is shown at
   -- item `k`, when the next item is on a later line or there is none.
   let fileMap ← getFileMap
@@ -217,5 +257,19 @@ def elabWalk : CommandElab := fun stx => do
     if shown then logInfoAt (item k) views[k]!
   if let some (n, why) := failed then
     logErrorAt (item (n + 1)) m!"#walk: this motion cannot be made: {why}"
+  -- The motions that can be made from the position reached, offered at the
+  -- last item; a click writes one after it, on the same line.
+  else if !offers.isEmpty then
+    let last := item motions.size
+    if let some p := last.getTailPos? then
+      let sugg : Array Lean.Meta.Tactic.TryThis.Suggestion :=
+        (offers.take maxOffered).toArray.map fun m =>
+          { suggestion := .string (" " ++ m), messageData? := some m!"{m}",
+            toCodeActionTitle? := some fun _ => s!"#walk: {m}" }
+      let footer : MessageData :=
+        if offers.length > maxOffered then m!"\n… and {offers.length - maxOffered} more" else .nil
+      liftCoreM <| Lean.Meta.Tactic.TryThis.addSuggestions last sugg
+        (origSpan? := some (Syntax.ofRange ⟨p, p⟩)) (header := "Motions from here:")
+        (footer := footer)
 
 end ProofTools.Explore

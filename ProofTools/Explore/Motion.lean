@@ -26,6 +26,10 @@ A motion changes the position and nothing else (PROVED; `c.Ok` says that
     c.Ok → c.moves ms = .ok c'  →  c'.toRoot = c.toRoot ∧ c'.Ok      (Cursor.moves_ok)
     c.down i = some c'  →  c'.up = some c                            (Cursor.up_down)
 
+`Cursor.motions c` lists the motions that can be made from `c` (PROVED:
+`m ∈ c.motions → ∃ c', c.move m = some c'`, `Cursor.motions_move`); `#walk`
+offers them.
+
 The name `Cursor.left` is the count of goals, so the motions to a sibling
 have no function of their own: they are `Cursor.move .left` and
 `Cursor.move .right`.
@@ -260,6 +264,25 @@ theorem Cursor.moves_ok {j : S.Judg} {ms : List Motion} {c c' : Cursor S j} (hc 
 /-- The cursor at the root of an attempt or of a derivation counts right. -/
 theorem Cursor.ok_ofAtt {o : Bool} {j : S.Judg} (d : Att S o j) : (Cursor.ofAtt d).Ok :=
   Cursor.ok_ofRoot _
+
+/-! ## The motions that can be made -/
+
+/-- **The motions that can be made from a position**, in the order they are
+offered: `down i` for each premise of the focus; `up`, `left`, `right`;
+`top`, unless the focus is the root; `goal k` for each open goal of the
+attempt, unless the focus is that goal.  Each is kept only if `Cursor.move`
+makes it. -/
+def Cursor.motions {j : S.Judg} (c : Cursor S j) : List Motion :=
+  let downs := (List.range c.pos.z.focus.premises.length).map Motion.down
+  let top := if c.pos.ds.isEmpty then [] else [Motion.top]
+  let goals := ((List.range c.toRoot.goals.length).filter fun k =>
+    !(c.pos.z.focus.isGoal && k == c.left)).map Motion.goal
+  (downs ++ [Motion.up, Motion.left, Motion.right] ++ top ++ goals).filter fun m => (c.move m).isSome
+
+/-- **A motion of `Cursor.motions` can be made.** -/
+theorem Cursor.motions_move {j : S.Judg} {m : Motion} {c : Cursor S j} (h : m ∈ c.motions) :
+    ∃ c', c.move m = some c' :=
+  Option.isSome_iff_exists.mp (List.mem_filter.mp h).2
 
 end ProofTools.Explore
 

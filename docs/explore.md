@@ -44,7 +44,7 @@ the same commit as any entry point):
 | build by hand, a move at a time | `apply_move`, or the instance's alias of it |
 | build by program | a script and `run`; the tactics of the calculus (`Tac`) |
 | check | the term itself, each node's equation by `rfl`; a script by `derives` |
-| look at an attempt that is built | `#walk`; as functions `Cursor.view`, `walkText`; all of it at once, `Att.render` |
+| look at an attempt that is built | `#walk`, by typing motions or by clicking the ones it offers; as functions `Cursor.view`, `walkText`, `Cursor.motions`; all of it at once, `Att.render` |
 | change an attempt that is built | a move at an open goal (`apply_move … at k`, `Att.run`); nothing else yet |
 | map out to the mathematics | `Der.sound` and `Att.sound`, with the instance's soundness theorem |
 | keep and replay | `Att.script`, `run`, `apply_script` |
@@ -245,6 +245,28 @@ A motion that cannot be made is an error at that motion, with the reason
 numbered 0 to 0`, `there is no goal 4`, …); the view before it is shown.
 A comma may follow a motion.
 
+**Walking by clicking.**  After the last view, `#walk` offers the motions
+that can be made from the position reached, as a second message:
+
+```
+Motions from here:
+  [apply] down 0
+  [apply] down 1
+  [apply] up
+  [apply] top
+```
+
+A click on `[apply]` writes that motion after the last one, on the same
+line; the same edits are in the editor's menu of code actions (`#walk:
+down 0`, …).  The editor's cursor stays on that line, so the infoview shows
+the next view and the next offer: an attempt is walked by clicking from
+`#walk d` alone.  The walk stays in the file as text; break the line where
+a view in between is wanted.  Offered, in this order: `down i` for each
+premise of the focus; `up`, `left`, `right`; `top`, unless the focus is
+the root; `goal k` for each open goal, unless the focus is that goal; at
+most 40.  A walk that fails offers nothing.  `set_option walk.offer false`
+turns the offer off (in a file of walks kept as a record, for example).
+
 The motions are functions of the library (`Explore/Motion.lean`):
 `Cursor.move m c`, and `Cursor.moves c ms` for several.  A motion changes
 the position and nothing else (PROVED; `c.Ok` says that the cursor's count
@@ -254,8 +276,14 @@ of the open goals left of the focus is right):
     c.Ok → c.moves ms = .ok c'  →  c'.toRoot = c.toRoot ∧ c'.Ok      (Cursor.moves_ok)
     c.down i = some c'  →  c'.up = some c                            (Cursor.up_down)
 
-`walkText d ms` is the view after the motions `ms` as a string, for use
-without the command.
+`Cursor.motions c` is the list of motions offered, and each can be made
+(PROVED):
+
+    m ∈ c.motions  →  ∃ c', c.move m = some c'                       (Cursor.motions_move)
+
+`walkText d ms` is the view after the motions `ms` as a string, and
+`walkOffers d ms` the motions offered after them, for use without the
+command.
 
 ## Tactics of the calculus, from tactics
 
@@ -364,4 +392,7 @@ do not quote, and need neither.
 6. `#walk` needs the attempt to be a closed term, and evaluates compiled
    code, as the tactics do.  The view draws the premises of the focus, not
    those of the nodes above it: `up` shows them.  Going `up`, the open
-   goals of the premises before the focus are counted again.
+   goals of the premises before the focus are counted again.  The motions
+   are offered at the end of a walk only, and a click writes on its last
+   line.  That every motion that can be made is among those offered is not
+   stated; that each one offered can be made is proved.

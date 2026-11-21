@@ -60,6 +60,7 @@ open ProofTools ProofTools.Explore
 #axioms_within Cursor.move_some [propext, Quot.sound]
 #axioms_within Cursor.moves_ok [propext, Quot.sound]
 #axioms_within Cursor.up_down [propext, Quot.sound]
+#axioms_within Cursor.motions_move [propext, Quot.sound]
 
 /-! ## Scripts as programs -/
 
