@@ -47,6 +47,10 @@ line, so the editor's cursor stays where the next view and the next offer
 appear.  The walk stays in the file as text.  `set_option walk.offer false`
 turns the offer off.
 
+**The panel** (a trial, `Panel.lean`): with `set_option walk.panel true`,
+`#walk` also draws the attempt as a tree in the infoview, with nodes to
+click.
+
 `walkText d ms` is the view after the motions `ms`, as a function, for use
 without the command.
 
@@ -58,6 +62,7 @@ Core Lean only.
 import Lean
 import ProofTools.Explore.Motion
 import ProofTools.Explore.Tactic
+import ProofTools.Explore.Panel
 
 namespace ProofTools.Explore
 
@@ -166,11 +171,13 @@ def walkOffers {o : Bool} {j : S.Judg} (d : Att S o j) (ms : List Motion) : List
   | .ok c => c.motions.map Motion.text
   | .error _ => []
 
-/-- What `#walk` shows: the views along the walk (`walkViews`), and the
-motions offered at its end (`walkOffers`) if `offer`. -/
+/-- What `#walk` shows: the views along the walk (`walkViews`); the motions
+offered at its end (`walkOffers`) if `offer`; what the panel is given
+(`walkPanelData`) if `panel`, else the empty string. -/
 def walkShown [Explorable S] {o : Bool} {j : S.Judg} (d : Att S o j) (ms : List Motion)
-    (offer : Bool) : (List String × Option (Nat × String)) × List String :=
-  (walkViews d ms, if offer then walkOffers d ms else [])
+    (offer panel : Bool) : (List String × Option (Nat × String)) × List String × String :=
+  (walkViews d ms, if offer then walkOffers d ms else [],
+    if panel then walkPanelData d ms else "")
 
 /-! ## The command -/
 
@@ -180,6 +187,14 @@ register_option walk.offer : Bool := {
   defValue := true
   descr := "#walk offers the motions that can be made from the position it reaches, as \
     suggestions: a click writes the motion after the last one"
+}
+
+/-- `walk.panel`: `#walk` also draws the attempt as a tree in the infoview,
+with nodes to click (a trial; `Panel.lean`). -/
+register_option walk.panel : Bool := {
+  defValue := false
+  descr := "#walk also draws the attempt as a tree in the infoview, with nodes to click \
+    (a trial)"
 }
 
 /-- A motion, as `#walk` is given it. -/
@@ -220,12 +235,13 @@ def motionTerm (stx : Syntax) : MacroM Term :=
 
 /-- See `evalShown`. -/
 unsafe def evalShownU (e : Expr) :
-    MetaM ((List String × Option (Nat × String)) × List String) :=
-  evalExpr ((List String × Option (Nat × String)) × List String)
-    (ToExpr.toTypeExpr (α := (List String × Option (Nat × String)) × List String)) e
+    MetaM ((List String × Option (Nat × String)) × List String × String) :=
+  evalExpr ((List String × Option (Nat × String)) × List String × String)
+    (ToExpr.toTypeExpr (α := (List String × Option (Nat × String)) × List String × String)) e
 /-- Evaluate a closed term of the type of `walkShown`. -/
 @[implemented_by evalShownU]
-opaque evalShown (e : Expr) : MetaM ((List String × Option (Nat × String)) × List String)
+opaque evalShown (e : Expr) :
+    MetaM ((List String × Option (Nat × String)) × List String × String)
 
 @[command_elab walkCmd, inherit_doc walkCmd]
 def elabWalk : CommandElab := fun stx => do
@@ -233,8 +249,9 @@ def elabWalk : CommandElab := fun stx => do
   let motions : Array Syntax := stx[2].getArgs.map (·[0])
   let terms ← motions.mapM fun m => liftMacroM (motionTerm m)
   let offer : Term := mkCIdent (if walk.offer.get (← getOptions) then ``true else ``false)
-  let ((views, failed), offers) ← liftTermElabM do
-    let e ← Term.elabTerm (← `(ProofTools.Explore.walkShown $d [$terms,*] $offer)) none
+  let panel : Term := mkCIdent (if walk.panel.get (← getOptions) then ``true else ``false)
+  let ((views, failed), offers, panelData) ← liftTermElabM do
+    let e ← Term.elabTerm (← `(ProofTools.Explore.walkShown $d [$terms,*] $offer $panel)) none
     Term.synthesizeSyntheticMVarsNoPostponing
     let e ← instantiateMVars e
     -- the term did not elaborate: Lean has said why
@@ -271,5 +288,14 @@ def elabWalk : CommandElab := fun stx => do
       liftCoreM <| Lean.Meta.Tactic.TryThis.addSuggestions last sugg
         (origSpan? := some (Syntax.ofRange ⟨p, p⟩)) (header := "Motions from here:")
         (footer := footer)
+  -- The panel (a trial): the attempt as a tree, shown while the editor's
+  -- cursor is on the command.  `range` is where the motions are written:
+  -- from the end of `d` to the end of the last motion, or of its comma.
+  if let .ok data := Json.parse panelData then
+    if let some dEnd := stx[1].getTailPos? then
+      let mEnd := stx[2].getTailPos?.getD dEnd
+      let range := fileMap.utf8RangeToLspRange ⟨dEnd, mEnd⟩
+      let props := data.setObjVal! "range" (toJson range)
+      liftCoreM <| Widget.savePanelWidgetInfo walkPanelModule.javascriptHash (pure props) stx
 
 end ProofTools.Explore

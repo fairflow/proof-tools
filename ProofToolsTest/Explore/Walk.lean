@@ -4,8 +4,8 @@ example calculus: the view at the root and after motions, on an attempt
 with an open goal and on a derivation; a walk written over several lines,
 with a view at each; every motion; every way a motion can fail, with its
 reason; an attempt named by a term; `walkText` as a function; the laws on
-an example; the motions offered after a walk, and the edit a click makes.
-Each message is pinned by `#guard_msgs`.
+an example; the motions offered after a walk, and the edit a click makes;
+what the panel is given.  Each message is pinned by `#guard_msgs`.
 -/
 import ProofToolsTest.Explore.Tactic
 
@@ -415,5 +415,155 @@ info: line +2, columns 16 to 16: write " top"   [#walk: top]
   (fun c => c.motions.all fun m => (c.move m).isSome) == some true
 -- a click and then the view: the walk with the offered motion written after it
 #guard (walkText swapAtt [.down 0, .down 0, .down 1]).toOption.isSome
+
+/-! ## The panel (a trial): what it is given
+
+With `set_option walk.panel true`, `#walk` also saves a panel for the
+infoview: the attempt as a tree of text, the address the motions reach,
+and where the motions are written in the file.  The script that draws it
+(`walkPanel.js`) is not run here. -/
+
+section Panel
+
+open Lean Elab Command
+
+/-- The panels recorded in an info tree. -/
+partial def panelsOf : InfoTree → Array UserWidgetInfo → Array UserWidgetInfo
+  | .context _ t, a => panelsOf t a
+  | .node i ts, a =>
+    let a := match i with
+      | .ofUserWidgetInfo w => a.push w
+      | _ => a
+    ts.foldl (fun a t => panelsOf t a) a
+  | .hole _, a => a
+
+/-- `#panels in cmd`: run `cmd`, then show each panel it saved: whether it
+is the panel of `#walk`, the address of the focus, where the motions are
+written (the line counted from the first line of `cmd`), and the tree. -/
+elab "#panels " "in" c:command : command => do
+  elabCommand c
+  let line0 := ((← getFileMap).utf8PosToLspPos (c.raw.getPos?.getD 0)).line
+  let ws := (← getInfoTrees).foldl (fun a t => panelsOf t a) #[]
+  if ws.isEmpty then logInfo "no panel"
+  for w in ws do
+    let props := (w.props.run' {})
+    let ours := w.javascriptHash == walkPanelModule.javascriptHash
+    let r := props.getObjValD "range"
+    let pos (k : String) : String :=
+      let q := r.getObjValD k
+      s!"+{(q.getObjValD "line").getNat?.toOption.getD 0 - line0}:\
+        {(q.getObjValD "character").getNat?.toOption.getD 0}"
+    logInfo m!"the panel of #walk: {ours}\nfocus: {(props.getObjValD "focus").compress}\n\
+      motions written from {pos "start"} to {pos "end"}\n\
+      tree: {(props.getObjValD "tree").compress}"
+
+end Panel
+
+-- off unless asked for
+/--
+info:    ⊢ ((p0 ∧ p1) → (p1 ∧ p0))   by impR
+>   ? (p0 ∧ p1) ⊢ (p1 ∧ p0)
+  at 0: open goal 0; 1 open in all
+---
+info: Motions from here:
+  [apply] up
+  [apply] top
+---
+info: no panel
+-/
+#guard_msgs in
+#panels in
+#walk (run IPC ([] ⊢ (p ⋏ q) ⟶ (q ⋏ p)) [⟨0, .impR⟩]).att down 0
+
+set_option walk.panel true
+
+-- the tree, the focus the motions reach, and the place of the motions
+/--
+info:    ⊢ ((p0 ∧ p1) → (p1 ∧ p0))   by impR
+>   ? (p0 ∧ p1) ⊢ (p1 ∧ p0)
+  at 0: open goal 0; 1 open in all
+---
+info: Motions from here:
+  [apply] up
+  [apply] top
+---
+info: the panel of #walk: true
+focus: [0]
+motions written from +0:57 to +0:64
+tree: {"j":" ⊢ ((p0 ∧ p1) → (p1 ∧ p0))","kids":[{"j":"(p0 ∧ p1) ⊢ (p1 ∧ p0)","kids":[]}],"m":"impR"}
+-/
+#guard_msgs in
+#panels in
+#walk (run IPC ([] ⊢ (p ⋏ q) ⟶ (q ⋏ p)) [⟨0, .impR⟩]).att down 0
+
+-- no motions: the place to write them is the end of the attempt's name;
+-- a walk over several lines, with a comma: all of it is the place
+set_option walk.offer false in
+/--
+info: >  ⊢ ((p0 ∧ p1) → (p1 ∧ p0))   by impR
+    0: (p0 ∧ p1) ⊢ (p1 ∧ p0)   by andL p0 p1   [1 open]
+  at the root: 1 premise; open goals: 1 under the focus, 0 left of it, 1 in all
+---
+info: the panel of #walk: true
+focus: []
+motions written from +0:13 to +0:13
+tree: {"j":" ⊢ ((p0 ∧ p1) → (p1 ∧ p0))","kids":[{"j":"(p0 ∧ p1) ⊢ (p1 ∧ p0)","kids":[{"j":"p0, p1, (p0 ∧ p1) ⊢ (p1 ∧ p0)","kids":[{"j":"p0, p1, (p0 ∧ p1) ⊢ p1","kids":[]},{"j":"p0, p1, (p0 ∧ p1) ⊢ p0","kids":[],"m":"ax"}],"m":"andR"}],"m":"andL p0 p1"}],"m":"impR"}
+-/
+#guard_msgs in
+#panels in
+#walk swapAtt
+
+set_option walk.offer false in
+/--
+info: >  ⊢ ((p0 ∧ p1) → (p1 ∧ p0))   by impR
+    0: (p0 ∧ p1) ⊢ (p1 ∧ p0)   by andL p0 p1   [closed]
+  at the root: 1 premise; no open goals
+---
+info:    ⊢ ((p0 ∧ p1) → (p1 ∧ p0))   by impR
+>   (p0 ∧ p1) ⊢ (p1 ∧ p0)   by andL p0 p1
+      0: p0, p1, (p0 ∧ p1) ⊢ (p1 ∧ p0)   by andR   [closed]
+  at 0: 1 premise; no open goals
+---
+info:    ⊢ ((p0 ∧ p1) → (p1 ∧ p0))   by impR
+    (p0 ∧ p1) ⊢ (p1 ∧ p0)   by andL p0 p1
+      p0, p1, (p0 ∧ p1) ⊢ (p1 ∧ p0)   by andR
+>       p0, p1, (p0 ∧ p1) ⊢ p0   by ax
+  at 0.0.1: no premises; no open goals
+---
+info: the panel of #walk: true
+focus: [0,0,1]
+motions written from +0:10 to +2:17
+tree: {"j":" ⊢ ((p0 ∧ p1) → (p1 ∧ p0))","kids":[{"j":"(p0 ∧ p1) ⊢ (p1 ∧ p0)","kids":[{"j":"p0, p1, (p0 ∧ p1) ⊢ (p1 ∧ p0)","kids":[{"j":"p0, p1, (p0 ∧ p1) ⊢ p1","kids":[],"m":"ax"},{"j":"p0, p1, (p0 ∧ p1) ⊢ p0","kids":[],"m":"ax"}],"m":"andR"}],"m":"andL p0 p1"}],"m":"impR"}
+-/
+#guard_msgs in
+#panels in
+#walk swap
+  down 0
+  down 0, down 1,
+
+-- a motion that cannot be made: the panel is at the position before it
+set_option walk.offer false in
+/--
+info:    ⊢ ((p0 ∧ p1) → (p1 ∧ p0))   by impR
+>   (p0 ∧ p1) ⊢ (p1 ∧ p0)   by andL p0 p1
+      0: p0, p1, (p0 ∧ p1) ⊢ (p1 ∧ p0)   by andR   [1 open]
+  at 0: 1 premise; open goals: 1 under the focus, 0 left of it, 1 in all
+---
+error: #walk: this motion cannot be made: the focus has no premise 3: its premises are numbered 0 to 0
+---
+info: the panel of #walk: true
+focus: [0]
+motions written from +0:13 to +0:27
+tree: {"j":" ⊢ ((p0 ∧ p1) → (p1 ∧ p0))","kids":[{"j":"(p0 ∧ p1) ⊢ (p1 ∧ p0)","kids":[{"j":"p0, p1, (p0 ∧ p1) ⊢ (p1 ∧ p0)","kids":[{"j":"p0, p1, (p0 ∧ p1) ⊢ p1","kids":[]},{"j":"p0, p1, (p0 ∧ p1) ⊢ p0","kids":[],"m":"ax"}],"m":"andR"}],"m":"andL p0 p1"}],"m":"impR"}
+-/
+#guard_msgs in
+#panels in
+#walk swapAtt down 0 down 3
+
+-- as a function
+#guard (Lean.Json.parse (walkPanelData swap [.down 0, .down 0, .down 1])).toOption.map
+  (·.getObjValD "focus" |>.compress) == some "[0,0,1]"
+#guard (Lean.Json.parse (walkPanelData swap [.down 0, .up, .up])).toOption.map
+  (·.getObjValD "focus" |>.compress) == some "[]"
 
 end ProofToolsTest.Explore.WalkTest

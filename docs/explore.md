@@ -35,6 +35,7 @@ The library then gives, the same for every instance:
 | Lean tactics: `apply_move`, `apply_script`, `leave_open` | `Explore/Tactic.lean` |
 | the motions of the cursor, and their laws | `Explore/Motion.lean` |
 | the view at a position; the command `#walk` | `Explore/Walk.lean` |
+| the panel of `#walk` (a trial): the attempt as a tree in the infoview | `Explore/Panel.lean`, `Explore/walkPanel.js` |
 
 What it is for, and the entry point of each purpose (this table changes in
 the same commit as any entry point):
@@ -266,6 +267,35 @@ premise of the focus; `up`, `left`, `right`; `top`, unless the focus is
 the root; `goal k` for each open goal, unless the focus is that goal; at
 most 40.  A walk that fails offers nothing.  `set_option walk.offer false`
 turns the offer off (in a file of walks kept as a record, for example).
+
+**The panel (a trial, 2026-11-21).**  With `set_option walk.panel true`,
+`#walk` also draws the attempt as a tree in the infoview, while the
+editor's cursor is on the command:
+
+```
+Walk: at 0.0
+[up] [left] [right] [top] [goal 0]
+▾  ⊢ ((p0 ∧ p1) → (p1 ∧ p0))   by impR
+  ▾ (p0 ∧ p1) ⊢ (p1 ∧ p0)   by andL p0 p1
+    ▾ p0, p1, (p0 ∧ p1) ⊢ (p1 ∧ p0)   by andR
+        ? p0, p1, (p0 ∧ p1) ⊢ p1
+        p0, p1, (p0 ∧ p1) ⊢ p0   by ax
+at 0.0: 2 premises; 1 open under the focus, 1 in all.  write into the file
+```
+
+The whole attempt is there.  A node's premises are drawn if it is on the
+way to the focus or is the focus; `▸` and `▾` show and hide the premises
+of any node, and a hidden part says `[closed]` or `[n open]`.  A click on
+a node puts the focus there, and the buttons are the motions.  The panel
+keeps the focus: nothing is written to the file until `write into the
+file` is clicked, which replaces the motions of the `#walk` by the path to
+the focus (`down i …`).  When the motions in the file change, the panel
+follows them.
+
+It is off by default, and a trial: the script that draws it
+(`Explore/walkPanel.js`, under 200 lines of JavaScript on the infoview's
+React) is the only code of the library that is not Lean.  What Lean gives
+it is tested here (`walkPanelData`); the script is not run by the tests.
 
 The motions are functions of the library (`Explore/Motion.lean`):
 `Cursor.move m c`, and `Cursor.moves c ms` for several.  A motion changes
