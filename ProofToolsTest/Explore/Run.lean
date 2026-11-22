@@ -113,7 +113,7 @@ end Zipper
 /-! ## Both checkers, in the kernel -/
 
 /-- Level 1: a script, checked. -/
-example : Valid swap := (certifier sound).verdict swap swapScript
+example : Valid swap := (certifier sound.soundT).verdict swap swapScript
 
 /-- A sequent that does not hold. -/
 def notValid : Seq := [] ⊢ (p ⋎ q) ⟶ p
@@ -159,7 +159,7 @@ def distrScript : Script IPC :=
    ⟨0, .orR1⟩, ⟨0, .andR⟩, ⟨0, .ax⟩, ⟨0, .ax⟩,
    ⟨0, .orR2⟩, ⟨0, .andR⟩, ⟨0, .ax⟩, ⟨0, .ax⟩]
 
-example : Valid distr := (certifier sound).verdict distr distrScript
+example : Valid distr := (certifier sound.soundT).verdict distr distrScript
 
 /-! ## Scripts as programs -/
 

@@ -12,15 +12,39 @@ carries the equation `S.step m j = .ok ps`, which the kernel proves by
 evaluating `step`.  The children are a list indexed by the premises
 (`Atts`), so an attempt is first-order data.
 
-The one theorem an instance proves about its `step` is `S.Sound D`, for its
-own notion `D` of what holds (derivability in the calculus as its source
-states it, or validity).  Then (PROVED here):
+The one thing an instance proves about its `step` is that its moves are
+sound for its own notion of what holds.  That notion is a family `T` over
+the judgments, into any sort: a proposition (validity, or that a derivation
+exists), or a type, the derivations of the calculus as its source states
+it.
 
+    S.SoundT T  :=  ∀ m j ps, S.step m j = .ok ps → Each T ps → T j
+
+`Each T ps` is one `T p` for each premise `p`, by position, so that two
+premises with one judgment keep their own derivations.  Then (here):
+
+    S.SoundT T → (d : Att S o j) → Each T d.goals → T j             (Att.mapOut)
+    S.SoundT T → Der S j → T j                                       (Der.mapOut)
+
+`Att.mapOut` says that an attempt is a derived rule, from its open goals to
+its root; when `T` is a type it is a function, and a derivation of the
+explorer gives a derivation of the calculus as data.
+
+For a proposition `D` the same is said with the premises taken by
+membership, which is what an instance proves when it has no more than a
+proposition, and (PROVED here) it is the same notion:
+
+    S.Sound D  :=  ∀ m j ps, S.step m j = .ok ps → (∀ p ∈ ps, D p) → D j
+    S.SoundT D ↔ S.Sound D                                           (soundT_iff_sound)
     S.Sound D → (d : Att S o j) → (∀ g ∈ d.goals, D g) → D j        (Att.sound)
     S.Sound D → Der S j → D j                                        (Der.sound)
+    S.SoundT T → S.Sound (fun j => Nonempty (T j))                   (SoundT.nonempty)
 
-`Att.sound` says that an attempt is a derived rule, from its open goals to
-its root.
+`Att.sound` and `Der.sound` are `Att.mapOut` and `Der.mapOut` at a
+proposition: the recursion over an attempt is written once.  `Sound` is not
+`SoundT` with another sort because its premises, taken by membership,
+cannot be given from the premises of a node when `T` is data: that would
+ask to tell two positions of one judgment apart by a proof of `p ∈ ps`.
 
 Functions on attempts are written for every `o`, since Lean's structural
 recursion needs the index to be a variable.
@@ -59,6 +83,8 @@ end
 
 /-- **A derivation**: an attempt with no open goal. -/
 abbrev Der (S : ProofSystem) (j : S.Judg) : Type := Att S false j
+
+universe u v
 
 variable {S : ProofSystem}
 
@@ -197,35 +223,139 @@ end
 @[simp] theorem Der.goals {j : S.Judg} (d : Der S j) : Att.goals d = [] :=
   Att.goals_of_closed d rfl
 
-/-! ## The first checker: steps -/
+/-! ## One thing for each judgment of a list -/
 
-/-- **Soundness of the moves** for a notion `D` of what holds: where a move
-applies and its premises hold, its conclusion holds.  The one theorem an
-instance proves about its `step`. -/
+/-- **One `T a` for each member `a` of a list, by position**: `Each T [a, b]`
+is `T a ×' T b ×' PUnit`.  With `T` into `Prop` it says that `T` holds of
+every member; with `T` into `Type` it holds one piece of data for each
+position, so two positions with one member keep their own. -/
+def Each {α : Type v} (T : α → Sort u) : List α → Sort (max 1 u)
+  | [] => PUnit
+  | a :: as => T a ×' Each T as
+
+/-- One for each member of `xs ++ ys`, as one for each of `xs` and one for
+each of `ys`. -/
+def Each.split {α : Type v} {T : α → Sort u} : (xs : List α) → {ys : List α} →
+    Each T (xs ++ ys) → Each T xs ×' Each T ys
+  | [], _, e => ⟨⟨⟩, e⟩
+  | _ :: xs, _, ⟨t, e⟩ => ⟨⟨t, (Each.split xs e).1⟩, (Each.split xs e).2⟩
+
+/-- From one for each member, taken by membership.  (With `T` into `Type`,
+two positions with one member are given the same.) -/
+def Each.ofMem {α : Type v} {T : α → Sort u} : {as : List α} → (∀ a ∈ as, T a) → Each T as
+  | [], _ => ⟨⟩
+  | a :: _, h => ⟨h a List.mem_cons_self, Each.ofMem fun b hb => h b (List.mem_cons_of_mem _ hb)⟩
+
+/-- For a proposition: it holds of each member. -/
+theorem Each.mem {α : Type v} {D : α → Prop} : {as : List α} → Each D as → ∀ a ∈ as, D a
+  | [], _ => fun _ h => nomatch h
+  | _ :: _, ⟨h, e⟩ => fun _ hb =>
+    (List.mem_cons.mp hb).elim (fun eq => eq ▸ h) (Each.mem e _)
+
+/-- Where each member has one, there is one for each. -/
+theorem Each.nonempty {α : Type v} {T : α → Sort u} : {as : List α} →
+    (∀ a ∈ as, Nonempty (T a)) → Nonempty (Each T as)
+  | [], _ => ⟨⟨⟩⟩
+  | a :: _, h =>
+    let ⟨t⟩ := h a List.mem_cons_self
+    let ⟨e⟩ := Each.nonempty fun b hb => h b (List.mem_cons_of_mem _ hb)
+    ⟨⟨t, e⟩⟩
+
+/-! ## Soundness of the moves, and the map out -/
+
+/-- **Soundness of the moves** for a family `T` over the judgments, into any
+sort: where a move applies, from one `T` for each premise, by position, a
+`T` for its conclusion.  With `T` a type of derivations this is a function:
+each rule of the calculus, applied. -/
+def ProofSystem.SoundT (S : ProofSystem) (T : S.Judg → Sort u) :=
+  ∀ m j ps, S.step m j = .ok ps → Each T ps → T j
+
+/-- **Soundness of the moves** for a proposition `D`, the premises taken by
+membership: where a move applies and its premises hold, its conclusion
+holds.  It is `S.SoundT D` (`soundT_iff_sound`). -/
 def ProofSystem.Sound (S : ProofSystem) (D : S.Judg → Prop) : Prop :=
   ∀ m j ps, S.step m j = .ok ps → (∀ p ∈ ps, D p) → D j
 
-variable {D : S.Judg → Prop}
+variable {D : S.Judg → Prop} {T : S.Judg → Sort u}
+
+/-- Soundness by membership gives soundness by position. -/
+theorem ProofSystem.Sound.soundT (hS : S.Sound D) : S.SoundT D :=
+  fun m j ps h e => hS m j ps h e.mem
+
+/-- For a proposition, soundness by position gives soundness by membership. -/
+theorem ProofSystem.SoundT.sound (hS : S.SoundT D) : S.Sound D :=
+  fun m j ps h hps => hS m j ps h (Each.ofMem hps)
+
+/-- **For a proposition the two are one notion.** -/
+theorem ProofSystem.soundT_iff_sound : S.SoundT D ↔ S.Sound D :=
+  ⟨ProofSystem.SoundT.sound, ProofSystem.Sound.soundT⟩
+
+/-- Moves sound for a family are sound for its being inhabited. -/
+theorem ProofSystem.SoundT.nonempty (hS : S.SoundT T) : S.Sound (fun j => Nonempty (T j)) :=
+  fun m j ps h hps =>
+    let ⟨e⟩ := Each.nonempty hps
+    ⟨hS m j ps h e⟩
 
 mutual
-/-- **An attempt is a derived rule**, from its open goals to its root. -/
-theorem Att.sound (hS : S.Sound D) : {o : Bool} → {j : S.Judg} → (d : Att S o j) →
-    (∀ g ∈ d.goals, D g) → D j
-  | _, _, .goal, hg => hg _ (by simp)
-  | _, _, .node m ps h ds, hg => hS m _ ps h (Atts.sound hS ds (by simpa using hg))
-theorem Atts.sound (hS : S.Sound D) : {o : Bool} → {ps : List S.Judg} → (ds : Atts S o ps) →
-    (∀ g ∈ ds.goals, D g) → ∀ p ∈ ps, D p
-  | _, _, .nil, _ => by simp
-  | _, _, .cons d ds, hg => by
-    intro p hp
-    rcases List.mem_cons.mp hp with hp | hp
-    · exact hp ▸ Att.sound hS d fun g hgm => hg g (by simp [hgm])
-    · exact Atts.sound hS ds (fun g hgm => hg g (by simp [hgm])) p hp
+/-- `Att.mapOut` with its result as a list of one.  (Lean asks the results
+of a mutual definition to be in one universe; `T j` is in `Sort u` and
+`Each T ps` in `Sort (max 1 u)`.) -/
+def Att.mapOutAux (hS : S.SoundT T) : {o : Bool} → {j : S.Judg} → (d : Att S o j) →
+    Each T d.goals → Each T [j]
+  | _, _, .goal, g => g
+  | _, _, .node m ps h ds, g => ⟨hS m _ ps h (Atts.mapOut hS ds g), ⟨⟩⟩
+/-- `Att.mapOut` on a list: from one `T` for each open goal, one for each
+premise. -/
+def Atts.mapOut (hS : S.SoundT T) : {o : Bool} → {ps : List S.Judg} → (ds : Atts S o ps) →
+    Each T ds.goals → Each T ps
+  | _, _, .nil, _ => ⟨⟩
+  | _, _, .cons d ds, g =>
+    ⟨(Att.mapOutAux hS d (Each.split d.goals g).1).1, Atts.mapOut hS ds (Each.split d.goals g).2⟩
 end
 
-/-- **What a derivation derives holds.** -/
+/-- **An attempt is a derived rule**, from its open goals to its root: from
+one `T` for each open goal, by position, a `T` for the root.  With `T` a
+type of derivations, it carries the attempt into them. -/
+def Att.mapOut (hS : S.SoundT T) {o : Bool} {j : S.Judg} (d : Att S o j) (g : Each T d.goals) :
+    T j :=
+  (Att.mapOutAux hS d g).1
+
+@[simp] theorem Att.mapOut_goal (hS : S.SoundT T) {j : S.Judg} (g : Each T [j]) :
+    Att.mapOut hS (Att.goal : Att S true j) g = g.1 := rfl
+
+@[simp] theorem Att.mapOut_node (hS : S.SoundT T) {o : Bool} {j : S.Judg} (m : S.Move)
+    (ps : List S.Judg) (h : S.step m j = .ok ps) (ds : Atts S o ps) (g : Each T ds.goals) :
+    Att.mapOut hS (Att.node m ps h ds) g = hS m j ps h (Atts.mapOut hS ds g) := rfl
+
+@[simp] theorem Atts.mapOut_nil (hS : S.SoundT T) {o : Bool} (g : Each T ([] : List S.Judg)) :
+    Atts.mapOut hS (Atts.nil : Atts S o []) g = ⟨⟩ := rfl
+
+@[simp] theorem Atts.mapOut_cons (hS : S.SoundT T) {o : Bool} {p : S.Judg} {ps : List S.Judg}
+    (d : Att S o p) (ds : Atts S o ps) (g : Each T (d.goals ++ ds.goals)) :
+    Atts.mapOut hS (Atts.cons d ds) g =
+      ⟨Att.mapOut hS d (Each.split d.goals g).1, Atts.mapOut hS ds (Each.split d.goals g).2⟩ :=
+  rfl
+
+/-- **What a derivation derives, mapped out**: with `T` a type of
+derivations, the derivation in `T`. -/
+def Der.mapOut (hS : S.SoundT T) {j : S.Judg} (d : Der S j) : T j :=
+  Att.mapOut hS d ((Der.goals d).symm ▸ PUnit.unit)
+
+/-! ## At a proposition -/
+
+/-- **An attempt is a derived rule**, from its open goals to its root:
+`Att.mapOut` at a proposition, the goals taken by membership. -/
+theorem Att.sound (hS : S.Sound D) : {o : Bool} → {j : S.Judg} → (d : Att S o j) →
+    (∀ g ∈ d.goals, D g) → D j :=
+  fun d hg => Att.mapOut hS.soundT d (Each.ofMem hg)
+
+theorem Atts.sound (hS : S.Sound D) : {o : Bool} → {ps : List S.Judg} → (ds : Atts S o ps) →
+    (∀ g ∈ ds.goals, D g) → ∀ p ∈ ps, D p :=
+  fun ds hg => (Atts.mapOut hS.soundT ds (Each.ofMem hg)).mem
+
+/-- **What a derivation derives holds**: `Der.mapOut` at a proposition. -/
 theorem Der.sound (hS : S.Sound D) {j : S.Judg} (d : Der S j) : D j :=
-  Att.sound hS d (by simp)
+  Der.mapOut hS.soundT d
 
 end ProofTools.Explore
 
