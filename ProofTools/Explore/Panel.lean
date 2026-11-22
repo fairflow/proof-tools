@@ -6,18 +6,25 @@ on, `#walk d …` also shows a panel in the infoview while the editor's
 cursor is on the command:
 
     Walk: at 0.0
-    [up] [left] [right] [top] [goal 0]
+    [down 0] [down 1] [up] [top] [goal 0]
     ▾  ⊢ ((p0 ∧ p1) → (p1 ∧ p0))   by impR
       ▾ (p0 ∧ p1) ⊢ (p1 ∧ p0)   by andL p0 p1
         ▾ p0, p1, (p0 ∧ p1) ⊢ (p1 ∧ p0)   by andR            the focus
-            ? p0, p1, (p0 ∧ p1) ⊢ p1
-            p0, p1, (p0 ∧ p1) ⊢ p0   by ax
-    at 0.0: 2 premises; 1 open under the focus, 1 in all.  write into the file
+            0: ? p0, p1, (p0 ∧ p1) ⊢ p1
+            1: p0, p1, (p0 ∧ p1) ⊢ p0   by ax   [closed]
+    at 0.0: 2 premises; open goals: 1 under the focus, 0 left of it, 1 in all.  write into the file
 
 * The whole attempt is there as a tree.  A node's premises are drawn if it
   is on the way to the focus or is the focus; `▸` and `▾` show and hide the
   premises of any node, where a hidden part says `[closed]` or `[n open]`.
-* A click on a node puts the focus there; the buttons are the motions.
+* At a focus the panel says what the view of `#walk` says there
+  (`Walk.lean`): the buttons are the motions that can be made, in the order
+  they are offered (`Cursor.motions`); the rows from the root to the focus,
+  and the premises of the focus with their numbers and `[closed]` or
+  `[n open]`, are the lines of `Cursor.view`; the last line is
+  `Cursor.viewFoot`.  The script computes these again from the tree, so a
+  change to one of them in Lean is to be made in the script too.
+* A click on a button, or on a node, puts the focus there.
   The panel keeps the focus: nothing is written to the file.
 * `write into the file` replaces the motions of the `#walk` by the path to
   the focus (`down i …`), so that the file's walk, its view and the panel

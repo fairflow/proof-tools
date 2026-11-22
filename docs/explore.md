@@ -274,28 +274,36 @@ editor's cursor is on the command:
 
 ```
 Walk: at 0.0
-[up] [left] [right] [top] [goal 0]
+[down 0] [down 1] [up] [top] [goal 0]
 ▾  ⊢ ((p0 ∧ p1) → (p1 ∧ p0))   by impR
   ▾ (p0 ∧ p1) ⊢ (p1 ∧ p0)   by andL p0 p1
     ▾ p0, p1, (p0 ∧ p1) ⊢ (p1 ∧ p0)   by andR
-        ? p0, p1, (p0 ∧ p1) ⊢ p1
-        p0, p1, (p0 ∧ p1) ⊢ p0   by ax
-at 0.0: 2 premises; 1 open under the focus, 1 in all.  write into the file
+        0: ? p0, p1, (p0 ∧ p1) ⊢ p1
+        1: p0, p1, (p0 ∧ p1) ⊢ p0   by ax   [closed]
+at 0.0: 2 premises; open goals: 1 under the focus, 0 left of it, 1 in all.  write into the file
 ```
 
 The whole attempt is there.  A node's premises are drawn if it is on the
 way to the focus or is the focus; `▸` and `▾` show and hide the premises
-of any node, and a hidden part says `[closed]` or `[n open]`.  A click on
-a node puts the focus there, and the buttons are the motions.  The panel
-keeps the focus: nothing is written to the file until `write into the
-file` is clicked, which replaces the motions of the `#walk` by the path to
-the focus (`down i …`).  When the motions in the file change, the panel
-follows them.
+of any node, and a hidden part says `[closed]` or `[n open]`.
+
+At a focus the panel says what the view says there: the buttons are the
+motions that can be made, the same and in the same order as those offered
+under Messages; the rows from the root to the focus, and the premises of
+the focus with their numbers, read as the lines of the view; the last line
+is the view's.  A click on a button, or on a node, puts the focus there.
+The panel keeps the focus: nothing is written to the file until `write
+into the file` is clicked, which replaces the motions of the `#walk` by
+the path to the focus (`down i …`).  When the motions in the file change,
+the panel follows them.
 
 It is off by default, and a trial: the script that draws it
-(`Explore/walkPanel.js`, under 200 lines of JavaScript on the infoview's
+(`Explore/walkPanel.js`, about 220 lines of JavaScript on the infoview's
 React) is the only code of the library that is not Lean.  What Lean gives
 it is tested here (`walkPanelData`); the script is not run by the tests.
+That its buttons, rows and last line are those of the view was compared
+once, outside the tests, at every address of eight attempts (2026-11-22);
+nothing in the repository repeats that comparison.
 
 The motions are functions of the library (`Explore/Motion.lean`):
 `Cursor.move m c`, and `Cursor.moves c ms` for several.  A motion changes

@@ -12,6 +12,16 @@
 // The focus is kept in the panel: a click moves it and writes nothing.
 // "write into the file" replaces the motions of the `#walk` by the path to
 // the focus; then the file's walk and the panel agree again.
+//
+// What the panel says at a focus is what the view of `#walk` says there
+// (`Walk.lean`), by the same rules, written again here:
+//   the buttons     the motions that can be made, in the order they are
+//                   offered: `Cursor.motions` (`motionsAt`)
+//   the rows        from the root to the focus, and the premises of the
+//                   focus, numbered and with `[closed]` or `[n open]`:
+//                   the lines of `Cursor.view`
+//   the last line   `Cursor.viewFoot` (`footAt`)
+// A change to one of those in Lean is to be made here too.
 import * as React from 'react';
 import { EditorContext, EnvPosContext } from '@leanprover/infoview';
 
@@ -50,6 +60,60 @@ function motionsText(addr) {
   return addr.map(i => ' down ' + i).join('');
 }
 
+/** Is the open goal at `g` left of the address `f`: before it, and not under it. */
+function leftOf(g, f) {
+  for (let i = 0; i < g.length && i < f.length; i++) {
+    if (g[i] !== f[i]) return g[i] < f[i];
+  }
+  return false;
+}
+
+/** The motions that can be made from an address, in the order `#walk` offers
+ * them (`Cursor.motions`), each as it is written and with the address it
+ * reaches: `down i` for each premise; `up`, `left`, `right`; `top`, unless at
+ * the root; `goal k` for each open goal, unless the focus is that goal. */
+export function motionsAt(tree, focus) {
+  const out = [];
+  kidsOf(nodeAt(tree, focus)).forEach((_, i) =>
+    out.push({ text: 'down ' + i, to: focus.concat([i]), title: 'to premise ' + i + ' of the focus' }));
+  if (focus.length) {
+    const parent = focus.slice(0, -1);
+    const last = focus[focus.length - 1];
+    const siblings = kidsOf(nodeAt(tree, parent)).length;
+    out.push({ text: 'up', to: parent, title: 'to the node this one is a premise of' });
+    if (last > 0) {
+      out.push({ text: 'left', to: parent.concat([last - 1]), title: 'to the premise before this one' });
+    }
+    if (last + 1 < siblings) {
+      out.push({ text: 'right', to: parent.concat([last + 1]), title: 'to the premise after this one' });
+    }
+    out.push({ text: 'top', to: [], title: 'to the root' });
+  }
+  goalsOf(tree, [], []).forEach((g, k) => {
+    if (!sameAddr(g, focus)) out.push({ text: 'goal ' + k, to: g, title: 'to open goal ' + k });
+  });
+  return out;
+}
+
+/** The last line of the view at an address (`Cursor.viewFoot`): the address,
+ * and where the open goals are. */
+export function footAt(tree, focus) {
+  const addr = focus.length ? focus.join('.') : 'the root';
+  const node = nodeAt(tree, focus);
+  const goals = goalsOf(tree, [], []);
+  const total = goals.length;
+  const left = goals.filter(g => leftOf(g, focus)).length;
+  if (isGoal(node)) return 'at ' + addr + ': open goal ' + left + '; ' + total + ' open in all';
+  const n = kidsOf(node).length;
+  const prem = n === 0 ? 'no premises' : n === 1 ? '1 premise' : n + ' premises';
+  const where = total === 0 ? 'no open goals'
+    : 'open goals: ' + countOpen(node) + ' under the focus, ' + left + ' left of it, ' + total + ' in all';
+  return 'at ' + addr + ': ' + prem + '; ' + where;
+}
+
+/** As many motions are offered as `#walk` offers under Messages (`maxOffered`). */
+const maxOffered = 40;
+
 const linkStyle = { color: 'var(--vscode-textLink-foreground)' };
 const dimStyle = { opacity: 0.6 };
 
@@ -82,42 +146,29 @@ export default function WalkPanel(props) {
     setKept({ stamp, focus, opened });
   };
 
-  const here = nodeAt(tree, focus);
-  const goals = goalsOf(tree, [], []);
-  const total = goals.length;
-  const parent = focus.slice(0, -1);
-  const last = focus.length ? focus[focus.length - 1] : 0;
-  const siblings = focus.length ? kidsOf(nodeAt(tree, parent)).length : 0;
-
-  const button = (label, target, title) =>
+  // The buttons: the motions that can be made from the focus.
+  const motions = motionsAt(tree, focus);
+  const buttons = motions.slice(0, maxOffered).map(m =>
     e('button', {
-      key: label,
-      title,
-      disabled: target === null,
-      onClick: () => { if (target !== null) setFocus(target); },
+      key: m.text,
+      title: m.title,
+      onClick: () => setFocus(m.to),
       style: { marginRight: '0.4em' }
-    }, label);
-
-  const buttons = [
-    button('up', focus.length ? parent : null, 'to the node this one is a premise of'),
-    button('left', focus.length && last > 0 ? parent.concat([last - 1]) : null,
-      'to the premise before this one'),
-    button('right', focus.length && last + 1 < siblings ? parent.concat([last + 1]) : null,
-      'to the premise after this one'),
-    button('top', focus.length ? [] : null, 'to the root')
-  ];
-  const maxGoals = 12;
-  const goalButtons = goals.slice(0, maxGoals).map((g, k) =>
-    button('goal ' + k, sameAddr(g, focus) ? null : g, 'to open goal ' + k));
+    }, m.text));
 
   // One row for a node, then its premises if they are drawn.
   const rows = [];
   const draw = (n, addr) => {
     const kids = kidsOf(n);
     const isFocus = sameAddr(addr, focus);
+    // A premise of the focus has its number, as `down i` reads it.
+    const isPremise = addr.length === focus.length + 1 && isPrefix(focus, addr);
     const open = countOpen(n);
-    const text = (isGoal(n) ? '? ' : '') + n.j + (isGoal(n) ? '' : '   by ' + n.m);
-    const note = kids.length && !drawn(addr)
+    const text = (isPremise ? addr[addr.length - 1] + ': ' : '') +
+      (isGoal(n) ? '? ' : '') + n.j + (isGoal(n) ? '' : '   by ' + n.m);
+    // Whether a node is closed: said of the premises of the focus, as the
+    // view says it, and of any node whose premises are not drawn.
+    const note = !isGoal(n) && (isPremise || (kids.length && !drawn(addr)))
       ? (open === 0 ? '   [closed]' : '   [' + open + ' open]') : '';
     rows.push(e('div', {
       key: key(addr) || 'root',
@@ -145,11 +196,6 @@ export default function WalkPanel(props) {
   draw(tree, []);
 
   const addrText = focus.length ? focus.join('.') : 'the root';
-  const kidsHere = kidsOf(here).length;
-  const premText = isGoal(here) ? 'an open goal'
-    : kidsHere === 0 ? 'no premises' : kidsHere === 1 ? '1 premise' : kidsHere + ' premises';
-  const goalText = total === 0 ? 'no open goals'
-    : countOpen(here) + ' open under the focus, ' + total + ' in all';
   const inFile = sameAddr(focus, props.focus);
   const uri = (props.pos && props.pos.uri) || (envPos && envPos.uri);
   const write = () => {
@@ -160,13 +206,13 @@ export default function WalkPanel(props) {
   return e('details', { open: true },
     e('summary', { className: 'mv2 pointer' }, 'Walk: at ' + addrText),
     e('div', { className: 'ml1' },
-      e('div', { style: { marginBottom: '0.4em' } }, buttons, goalButtons,
-        goals.length > maxGoals
-          ? e('span', { style: dimStyle }, '… ' + (goals.length - maxGoals) + ' more goals')
+      e('div', { style: { marginBottom: '0.4em' } }, buttons,
+        motions.length > maxOffered
+          ? e('span', { style: dimStyle }, '… and ' + (motions.length - maxOffered) + ' more')
           : null),
       e('div', null, rows),
       e('div', { style: { marginTop: '0.4em' } },
-        e('span', null, 'at ' + addrText + ': ' + premText + '; ' + goalText + '.  '),
+        e('span', null, footAt(tree, focus) + '.  '),
         inFile
           ? e('span', { style: dimStyle }, 'The #walk in the file is here.')
           : e('span', {
