@@ -42,9 +42,9 @@ edges, and give it Huet's zipper (1997) as well.
 
 | Module | Types | Moves, edits and the rest |
 |---|---|---|
-| `ProofTools.Zipper` | `Deriv I W D` (the crumbs of a family `W : I → Type`, and `plug`), `Deriv.Unplug`, `Deriv.Path`, `Deriv.Zipper`, `Deriv.Pos` | Moves `up` (total), `down`, `descend`, `sibling`; edits `replace`, `modify`; `ofRoot`, `toRoot`, `addr`. |
+| `ProofTools.Zipper` | `Deriv I W D` (the crumbs of a family `W : I → Type`, and `plug`), `Deriv.Unplug` (a layer opened at a direction), `Deriv.Sibling` (the hole of an open layer moved one place), `Deriv.Path`, `Deriv.Zipper`, `Deriv.Pos` | Moves `up` (total), `down`, `descend`, `sibling` (up, then down), `left` and `right` (to the next sibling, in one step); edits `replace`, `modify`; `ofRoot`, `toRoot`, `addr`, `crumb` (the nearest crumb). |
 | `ProofTools.Zipper.Rose` | `RTree κ α`, `Crumb κ α`, `Zipper κ α` | Moves `up`, `downAt i` (by position), `down k` (the first child along the edge `k`), `left`, `right`, `top`, `descend`, `goto`; edits at the focus `modify`, `replace`, `addChild`, `insertLeft`, `insertRight`, `delete`; `ofTree`, `toTree`, `addr`; lookups `find?`, `splitKey`, `RTree.get?`. |
-| `ProofTools.Zipper.RoseIndexed` | `rtreeDeriv κ α`, `IPath κ α ra`, `IZipper κ α ra` | Rose trees as an instance of `ProofTools.Zipper`. `ofTree`, `up`, `down`, `descend`, `goto`, `toTree` are the generic ones; `left`, `right`, `modify`, `replace`; `forget` to a `Zipper κ α`, and `Zipper.index` back. |
+| `ProofTools.Zipper.RoseIndexed` | `rtreeDeriv κ α`, `IPath κ α ra`, `IZipper κ α ra` | Rose trees as an instance of `ProofTools.Zipper`. `ofTree`, `up`, `down`, `descend`, `goto`, `toTree`, `left`, `right`, `replace` are the generic ones; `modify` (of the label); `forget` to a `Zipper κ α`, and `Zipper.index` back. |
 | `ProofTools.Zipper.RoseUpdate` | | `RTree.updateAt g a` changes the subtree at an address; `RTree.at?`, `updFirst`. |
 | `ProofTools.Zipper.RoseRender` | | `RTree.drawWith`, `Zipper.drawWith` (the focus marked), `RTree.map`; `BEq` on trees, and `Repr`. |
 
@@ -63,7 +63,12 @@ are shown here.
   `down_eq_some`, `up_down`, `toRoot_down`, `down_up`, `toRoot_descend`,
   `canon_down`, `canon_descend`, `eq_of_toRoot`, `descend_cons_of_down`,
   `descend_snoc`, `exists_descend_plug`, `descend_addr`; in `Deriv.Path`:
-  `plug_inj`, and for `simp` `plug_top`, `plug_cons`.
+  `plug_inj`, and for `simp` `plug_top`, `plug_cons`. The nearest crumb:
+  `path_eq_cons`, `focus_up`. The one step to a sibling keeps the parent
+  and the whole tree, its two directions undo each other, and it is
+  `sibling` at the direction it reaches: `up_left`, `up_right`,
+  `toRoot_left`, `toRoot_right`, `right_left`, `left_right`,
+  `sibling_of_left`, `sibling_of_right`.
 - `Rose`, in `Zipper`. A move keeps the whole tree: `toTree_up`,
   `toTree_downAt`, `toTree_down`, `toTree_left`, `toTree_right`,
   `toTree_descend`, `toTree_top`. The moves undo each other: `up_down`,
@@ -74,13 +79,15 @@ are shown here.
   `splitKey_find?`. For `simp`: `toTree_ofTree`, `toTree_cons`, `addr_cons`.
 - `RoseIndexed`, in `IZipper`: `toTree_eq_plug`, `toTree_up`, `up_down`,
   `down_up`, `toTree_down`, `eq_of_toTree`, `canon_down`, `canon_descend`,
-  `canon_goto`, `goto_unique`. Agreement with the plain zipper:
+  `canon_goto`, `goto_unique`; from the generic laws of the one step and of
+  `replace`: `toTree_left`, `toTree_right`, `right_left`, `left_right`,
+  `toTree_replace`. Agreement with the plain zipper:
   `addr_forget`, `toTree_eq_forget`, `forget_up`, `forget_down`,
   `forget_descend`, `forget_goto`, `Zipper.forget_index`. Paths:
   `IPath.map_edge_toList`, `IPath.toList_ofList`, `IPath.plug_eq_foldl`,
   `IPath.plug_inj`. Lists of children: `splitKey_append`, `splitKey_plug`,
   `splitKey_left`. The three laws of `Deriv.Unplug` are the instance
-  `rtreeUnplug`.
+  `rtreeUnplug`, the four of `Deriv.Sibling` the instance `rtreeSibling`.
 - `RoseUpdate`: `RTree.get?_append`, `RTree.get?_updateAt_append`,
   `RTree.at_updateAt_of_not_prefix`, `find?_updFirst_self`,
   `find?_updFirst_ne`, `find?_append_new`.
@@ -90,8 +97,11 @@ are shown here.
 Not stated: any law for the edits at the focus of `Rose`, and the agreement
 of `RTree.updateAt` with `goto`, `replace` and `toTree` (the tests check it
 on one tree). The explorer's attempts are an instance of `ProofTools.Zipper`
-(`ProofTools/Explore/Zipper.lean`), not rose trees; its trees of moves are
-rose trees (`Cert S := Zip.RTree Unit S.Move`, `ProofTools/Explore/Cert.lean`).
+(`ProofTools/Explore/Zipper.lean`), not rose trees, and the motions of its
+cursor are that zipper's moves: `up`, `down`, `left`, `right`, with the
+laws read off the generic ones (`ProofTools/Explore/Motion.lean`). Its
+trees of moves are rose trees (`Cert S := Zip.RTree Unit S.Move`,
+`ProofTools/Explore/Cert.lean`).
 Every file ends with the
 bound `#axioms_within_file [propext, Quot.sound]`; the tests are
 `ProofToolsTest/Zipper/Rose.lean`: every move and edit, on Huet's parse

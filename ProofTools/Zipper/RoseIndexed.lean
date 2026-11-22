@@ -18,10 +18,12 @@ first), so the address `ra.reverse` is in the type:
 * `down k` lands in `IZipper κ α (k :: ra)`, and `goto t a` in
   `IZipper κ α a.reverse`, with no casts.
 
-`ofTree`, `up`, `down`, `descend`, `goto` and `toTree`, their laws and the
+`ofTree`, `up`, `down`, `descend`, `goto`, `toTree`, `left` and `right` (to
+the next sibling, whatever its edge) and `replace`, their laws and the
 injectivity of plugging are the generic ones of `ProofTools.Zipper`, read at
-this instance.  `left` and `right` (to the next sibling, whatever its edge)
-and the edits `modify` and `replace` are written here.  Opening a layer
+this instance; for `left` and `right` the instance says how the hole of a
+crumb moves one place (`rtreeSibling`).  The edit `modify`, which changes
+the label, is written here.  Opening a layer
 (`unplug`) takes the *first* child along an edge, so it needs
 `DecidableEq κ`; paths, `up` and `plug` do not.  A crumb is canonical
 (`Canon`) when no left sibling shares the edge to the hole; `down` makes only
@@ -33,6 +35,11 @@ Results (all PROVED), for `z : IZipper κ α ra`:
     z.down k = some z'  →  z'.up = z                               (up_down)
     z.path.Canon  →  z.up.down k = some z                          (down_up)
     z.down k = some z'  →  z'.toTree = z.toTree                    (toTree_down)
+    z.left = some x  →  x.2.toTree = z.toTree                      (toTree_left)
+    z.right = some x  →  x.2.toTree = z.toTree                     (toTree_right)
+    z.left = some x  →  x.2.right = some ⟨k, z⟩                    (right_left)
+    z.right = some x  →  x.2.left = some ⟨k, z⟩                    (left_right)
+    (z.replace t).toTree = z.path.plug t                           (toTree_replace)
     z.path.Canon → z'.path.Canon → z.toTree = z'.toTree  →  z = z' (eq_of_toTree)
     z.path.Canon → z.down k = some z'  →  z'.path.Canon            (canon_down)
     z.path.Canon → z.descend a = some z'  →  z'.path.Canon         (canon_descend)
@@ -154,6 +161,44 @@ instance rtreeUnplug (κ : Type u) (α : Type v) [DecidableEq κ] : (rtreeDeriv 
     obtain ⟨-, rfl⟩ := Prod.mk.inj (eq_of_heq he)
     exact splitKey_left hs
 
+/-- **The next sibling of a rose tree**, on either side and whatever its
+edge: the hole of a crumb moved one place, in one step. -/
+instance rtreeSibling (κ : Type u) (α : Type v) : (rtreeDeriv κ α).Sibling where
+  left := @fun k _ _ c t => match c with
+    | (a, (k', t') :: l, r) => some ⟨k', (), t', (a, l, (k, t) :: r)⟩
+    | (_, [], _) => none
+  right := @fun k _ _ c t => match c with
+    | (a, l, (k', t') :: r) => some ⟨k', (), t', (a, (k, t) :: l, r)⟩
+    | (_, _, []) => none
+  plug_left := by
+    intro d d' i i' j c w w' c' h
+    obtain ⟨a, _ | ⟨⟨k', t'⟩, l⟩, r⟩ := c <;> simp only [reduceCtorEq, Option.some.injEq] at h
+    obtain ⟨rfl, h⟩ := Sigma.mk.inj h
+    obtain ⟨-, h⟩ := Sigma.mk.inj (eq_of_heq h)
+    obtain ⟨rfl, rfl⟩ := Prod.mk.inj (eq_of_heq h)
+    simp [rtreeDeriv, Crumb.plug]
+  plug_right := by
+    intro d d' i i' j c w w' c' h
+    obtain ⟨a, l, _ | ⟨⟨k', t'⟩, r⟩⟩ := c <;> simp only [reduceCtorEq, Option.some.injEq] at h
+    obtain ⟨rfl, h⟩ := Sigma.mk.inj h
+    obtain ⟨-, h⟩ := Sigma.mk.inj (eq_of_heq h)
+    obtain ⟨rfl, rfl⟩ := Prod.mk.inj (eq_of_heq h)
+    simp [rtreeDeriv, Crumb.plug]
+  right_left := by
+    intro d d' i i' j c w w' c' h
+    obtain ⟨a, _ | ⟨⟨k', t'⟩, l⟩, r⟩ := c <;> simp only [reduceCtorEq, Option.some.injEq] at h
+    obtain ⟨rfl, h⟩ := Sigma.mk.inj h
+    obtain ⟨-, h⟩ := Sigma.mk.inj (eq_of_heq h)
+    obtain ⟨rfl, rfl⟩ := Prod.mk.inj (eq_of_heq h)
+    rfl
+  left_right := by
+    intro d d' i i' j c w w' c' h
+    obtain ⟨a, l, _ | ⟨⟨k', t'⟩, r⟩⟩ := c <;> simp only [reduceCtorEq, Option.some.injEq] at h
+    obtain ⟨rfl, h⟩ := Sigma.mk.inj h
+    obtain ⟨-, h⟩ := Sigma.mk.inj (eq_of_heq h)
+    obtain ⟨rfl, rfl⟩ := Prod.mk.inj (eq_of_heq h)
+    rfl
+
 /-- A path back to the root whose type is the list of edges taken, nearest
 first: the reversed address of the focus. -/
 abbrev IPath (κ : Type u) (α : Type v) (ra : List κ) := (rtreeDeriv κ α).Path ra () ()
@@ -231,21 +276,22 @@ def goto [DecidableEq κ] (t : RTree κ α) (a : List κ) : Option (IZipper κ �
   (ofTree t).descend a
 
 /-- Move to the left sibling; its edge is returned with the zipper. -/
-def left {k : κ} {ra : List κ} : IZipper κ α (k :: ra) → Option (Σ k', IZipper κ α (k' :: ra))
-  | ⟨t, .cons (a, (k', t') :: l, r) p⟩ => some ⟨k', ⟨t', .cons (a, l, (k, t) :: r) p⟩⟩
-  | ⟨_, .cons (_, [], _) _⟩ => none
+def left {k : κ} {ra : List κ} (z : IZipper κ α (k :: ra)) :
+    Option (Σ k', IZipper κ α (k' :: ra)) :=
+  (Deriv.Zipper.left (L := rtreeDeriv κ α) z).map fun x => ⟨x.1, x.2.2⟩
 
 /-- Move to the right sibling; its edge is returned with the zipper. -/
-def right {k : κ} {ra : List κ} : IZipper κ α (k :: ra) → Option (Σ k', IZipper κ α (k' :: ra))
-  | ⟨t, .cons (a, l, (k', t') :: r) p⟩ => some ⟨k', ⟨t', .cons (a, (k, t) :: l, r) p⟩⟩
-  | ⟨_, .cons (_, _, []) _⟩ => none
+def right {k : κ} {ra : List κ} (z : IZipper κ α (k :: ra)) :
+    Option (Σ k', IZipper κ α (k' :: ra)) :=
+  (Deriv.Zipper.right (L := rtreeDeriv κ α) z).map fun x => ⟨x.1, x.2.2⟩
 
 /-- Change the label at the focus. -/
 def modify {ra : List κ} (f : α → α) : IZipper κ α ra → IZipper κ α ra
   | ⟨.node a cs, p⟩ => ⟨.node (f a) cs, p⟩
 
 /-- Replace the subtree at the focus. -/
-def replace {ra : List κ} (t : RTree κ α) (z : IZipper κ α ra) : IZipper κ α ra := ⟨t, z.path⟩
+def replace {ra : List κ} (t : RTree κ α) (z : IZipper κ α ra) : IZipper κ α ra :=
+  Deriv.Zipper.replace z t
 
 /-- The whole tree. -/
 def toTree {ra : List κ} (z : IZipper κ α ra) : RTree κ α :=
@@ -278,6 +324,34 @@ theorem down_up [DecidableEq κ] {k : κ} {ra : List κ} (z : IZipper κ α (k :
 theorem toTree_down [DecidableEq κ] {ra : List κ} {k : κ} {z : IZipper κ α ra}
     {z' : IZipper κ α (k :: ra)} (h : z.down k = some z') : z'.toTree = z.toTree := by
   rw [← up_down h, toTree_up]
+
+theorem toTree_left {k : κ} {ra : List κ} {z : IZipper κ α (k :: ra)}
+    {x : Σ k', IZipper κ α (k' :: ra)} (h : z.left = some x) : x.2.toTree = z.toTree := by
+  simp only [left, Option.map_eq_some_iff] at h
+  obtain ⟨y, hy, rfl⟩ := h
+  exact Deriv.Zipper.toRoot_left hy
+
+theorem toTree_right {k : κ} {ra : List κ} {z : IZipper κ α (k :: ra)}
+    {x : Σ k', IZipper κ α (k' :: ra)} (h : z.right = some x) : x.2.toTree = z.toTree := by
+  simp only [right, Option.map_eq_some_iff] at h
+  obtain ⟨y, hy, rfl⟩ := h
+  exact Deriv.Zipper.toRoot_right hy
+
+theorem right_left {k : κ} {ra : List κ} {z : IZipper κ α (k :: ra)}
+    {x : Σ k', IZipper κ α (k' :: ra)} (h : z.left = some x) : x.2.right = some ⟨k, z⟩ := by
+  simp only [left, Option.map_eq_some_iff] at h
+  obtain ⟨y, hy, rfl⟩ := h
+  simp only [right, Deriv.Zipper.right_left hy, Option.map_some]
+
+theorem left_right {k : κ} {ra : List κ} {z : IZipper κ α (k :: ra)}
+    {x : Σ k', IZipper κ α (k' :: ra)} (h : z.right = some x) : x.2.left = some ⟨k, z⟩ := by
+  simp only [right, Option.map_eq_some_iff] at h
+  obtain ⟨y, hy, rfl⟩ := h
+  simp only [left, Deriv.Zipper.left_right hy, Option.map_some]
+
+theorem toTree_replace {ra : List κ} (t : RTree κ α) (z : IZipper κ α ra) :
+    (z.replace t).toTree = z.path.plug t :=
+  Deriv.Zipper.toRoot_replace z t
 
 /-- **An indexed zipper is determined by its tree**, among canonical ones of
 the same index. -/

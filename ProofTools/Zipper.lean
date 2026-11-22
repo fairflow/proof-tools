@@ -22,6 +22,12 @@ and McBride, *Derivatives of containers*, TLCA 2003).
 **Opening a layer** (`Deriv.Unplug`) is separate: it is the partial inverse of
 `plug`.  The paths and the zipper's upward moves do not need it.
 
+**Passing to the next hole of a layer** (`Deriv.Sibling`) is separate again:
+from a crumb and what fills its hole, the same layer with its hole one place
+to the left or to the right, in one step.  `sibling d'` reaches a hole of
+the same layer by going up and opening the layer again at `d'`, which takes
+time in the size of the layer; `left` and `right` keep the layer open.
+
 **A path** `L.Path ds i k` is a list of crumbs, nearest first, from a hole of
 index `i` to a root of index `k`, each crumb's root index matching the next
 crumb's hole index (a type-aligned list).  `ds` lists the directions of the
@@ -34,9 +40,15 @@ index `k`.  Because `ds` is in the type, `up` is total on
 `L.Zipper (d :: ds) i k`.  The parent's index is returned with it (`Σ j`),
 since only the crumb knows it.
 
+`z.crumb` is the nearest crumb of a zipper that has one: the layer the focus
+sits in, for a caller that keeps something of its own about the path (the
+explorer's cursor keeps a count of open goals).
+
 Results (all PROVED):
 
     z.up.2.toRoot = z.toRoot                              (toRoot_up)
+    z.path = .cons z.crumb z.up.2.path                    (path_eq_cons)
+    z.up.2.focus = L.plug z.crumb z.focus                 (focus_up)
     z.down d = some x  →  x.2.up = ⟨j, z⟩                 (up_down)
     z.down d = some x  →  x.2.toRoot = z.toRoot           (toRoot_down)
     z.path.Canon  →  z.up.2.down d = some ⟨i, z⟩          (down_up)
@@ -54,6 +66,21 @@ index, so that positions under one root can be compared.
 `plug` (`Unplug.unplug_plug`).  With it, a zipper is determined by its root
 and its address: the zipper is an optimised form of the pair (root, address),
 and holds nothing more.
+
+For the one step to a sibling, with `x` the direction, the index and the
+zipper reached (all PROVED):
+
+    z.left = some x   →  x.2.2.up = z.up                  (up_left)
+    z.right = some x  →  x.2.2.up = z.up                  (up_right)
+    z.left = some x   →  x.2.2.toRoot = z.toRoot          (toRoot_left)
+    z.right = some x  →  x.2.2.toRoot = z.toRoot          (toRoot_right)
+    z.left = some x   →  x.2.2.right = some ⟨d, i, z⟩     (right_left)
+    z.right = some x  →  x.2.2.left = some ⟨d, i, z⟩      (left_right)
+    z.left = some x  → x.2.2.path.Canon → z.sibling x.1 = some x.2   (sibling_of_left)
+    z.right = some x → x.2.2.path.Canon → z.sibling x.1 = some x.2   (sibling_of_right)
+
+The last two say that the one step is `sibling` at the direction it
+reaches.
 
 Core Lean only.
 -/
@@ -93,6 +120,34 @@ class Unplug (L : Deriv I W D) where
   /-- `unplug` produces canonical crumbs. -/
   canon_unplug : ∀ {j : I} {w : W j} {d : D} {i : I} {w' : W i} {c : L.Crumb d i j},
     unplug w d = some ⟨i, w', c⟩ → Canon c
+
+/-- **Passing to the next hole of a layer**, in one step.  `right c w` takes
+a crumb `c` and what fills its hole, and gives the same layer with its hole
+at the next place to the right: the direction and the index of that hole,
+what was in it, and the crumb left behind, in which `w` is now a sibling.
+`left` is the same to the left.  `none`: there is no hole on that side.
+The layer is the same one (`plug_left`, `plug_right`), and the two steps
+undo each other.  Separate from `Unplug`: a layer is not opened here, the
+hole of an open one is moved. -/
+class Sibling (L : Deriv I W D) where
+  /-- The hole one place to the left. -/
+  left : {d : D} → {i j : I} → L.Crumb d i j → W i →
+    Option ((d' : D) × (i' : I) × W i' × L.Crumb d' i' j)
+  /-- The hole one place to the right. -/
+  right : {d : D} → {i j : I} → L.Crumb d i j → W i →
+    Option ((d' : D) × (i' : I) × W i' × L.Crumb d' i' j)
+  /-- A step to the left keeps the layer. -/
+  plug_left : ∀ {d d' : D} {i i' j : I} {c : L.Crumb d i j} {w : W i} {w' : W i'}
+    {c' : L.Crumb d' i' j}, left c w = some ⟨d', i', w', c'⟩ → L.plug c' w' = L.plug c w
+  /-- A step to the right keeps the layer. -/
+  plug_right : ∀ {d d' : D} {i i' j : I} {c : L.Crumb d i j} {w : W i} {w' : W i'}
+    {c' : L.Crumb d' i' j}, right c w = some ⟨d', i', w', c'⟩ → L.plug c' w' = L.plug c w
+  /-- Left, then right, returns. -/
+  right_left : ∀ {d d' : D} {i i' j : I} {c : L.Crumb d i j} {w : W i} {w' : W i'}
+    {c' : L.Crumb d' i' j}, left c w = some ⟨d', i', w', c'⟩ → right c' w' = some ⟨d, i, w, c⟩
+  /-- Right, then left, returns. -/
+  left_right : ∀ {d d' : D} {i i' j : I} {c : L.Crumb d i j} {w : W i} {w' : W i'}
+    {c' : L.Crumb d' i' j}, right c w = some ⟨d', i', w', c'⟩ → left c' w' = some ⟨d, i, w, c⟩
 
 /-- **A path**: crumbs from a hole of index `i` back to a root of index `k`,
 nearest first; `ds` lists the directions of the holes, nearest first (the
@@ -170,6 +225,11 @@ comes with it. -/
 def up {d : D} : L.Zipper (d :: ds) i k → (j : I) × L.Zipper ds j k
   | ⟨w, .cons c p⟩ => ⟨_, ⟨L.plug c w, p⟩⟩
 
+/-- **The nearest crumb**: the layer the focus sits in.  Its root has the
+index that `up` returns. -/
+def crumb {d : D} : (z : L.Zipper (d :: ds) i k) → L.Crumb d i z.up.1
+  | ⟨_, .cons c _⟩ => c
+
 /-- Replace the focus.  (The zipper comes first, so that it fixes the family
 before the new focus is elaborated.) -/
 def replace (z : L.Zipper ds i k) (w : W i) : L.Zipper ds i k := ⟨w, z.path⟩
@@ -198,6 +258,22 @@ def sibling {d : D} (d' : D) (z : L.Zipper (d :: ds) i k) :
 
 end Unplug
 
+section Sibling
+
+variable [L.Sibling]
+
+/-- **Left**: to the hole one place to the left in the same layer, in one
+step; its direction and index come with it. -/
+def left {d : D} : L.Zipper (d :: ds) i k → Option ((d' : D) × (i' : I) × L.Zipper (d' :: ds) i' k)
+  | ⟨w, .cons c p⟩ => (Sibling.left c w).map fun x => ⟨x.1, x.2.1, ⟨x.2.2.1, .cons x.2.2.2 p⟩⟩
+
+/-- **Right**: to the hole one place to the right in the same layer, in one
+step. -/
+def right {d : D} : L.Zipper (d :: ds) i k → Option ((d' : D) × (i' : I) × L.Zipper (d' :: ds) i' k)
+  | ⟨w, .cons c p⟩ => (Sibling.right c w).map fun x => ⟨x.1, x.2.1, ⟨x.2.2.1, .cons x.2.2.2 p⟩⟩
+
+end Sibling
+
 /-! ### Laws -/
 
 theorem toRoot_up {d : D} (z : L.Zipper (d :: ds) i k) : z.up.2.toRoot = z.toRoot := by
@@ -207,6 +283,90 @@ theorem toRoot_up {d : D} (z : L.Zipper (d :: ds) i k) : z.up.2.toRoot = z.toRoo
 
 theorem toRoot_replace (z : L.Zipper ds i k) (w : W i) :
     (z.replace w).toRoot = z.path.plug w := rfl
+
+/-- The path is the nearest crumb, then the path of the parent. -/
+theorem path_eq_cons {d : D} (z : L.Zipper (d :: ds) i k) :
+    z.path = .cons z.crumb z.up.2.path := by
+  obtain ⟨w, p⟩ := z
+  cases p
+  rfl
+
+/-- The parent's focus is the nearest crumb, filled with the focus. -/
+theorem focus_up {d : D} (z : L.Zipper (d :: ds) i k) :
+    z.up.2.focus = L.plug z.crumb z.focus := by
+  obtain ⟨w, p⟩ := z
+  cases p
+  rfl
+
+section Sibling
+
+variable [L.Sibling]
+
+/-- **A step to the left keeps the parent.** -/
+theorem up_left {d : D} {z : L.Zipper (d :: ds) i k}
+    {x : (d' : D) × (i' : I) × L.Zipper (d' :: ds) i' k} (h : z.left = some x) :
+    x.2.2.up = z.up := by
+  obtain ⟨w, p⟩ := z
+  cases p with
+  | cons c p =>
+    simp only [left, Option.map_eq_some_iff] at h
+    obtain ⟨⟨d', i', w', c'⟩, hl, rfl⟩ := h
+    show (⟨_, ⟨L.plug c' w', p⟩⟩ : (j : I) × L.Zipper ds j k) = ⟨_, ⟨L.plug c w, p⟩⟩
+    rw [Sibling.plug_left hl]
+
+/-- **A step to the right keeps the parent.** -/
+theorem up_right {d : D} {z : L.Zipper (d :: ds) i k}
+    {x : (d' : D) × (i' : I) × L.Zipper (d' :: ds) i' k} (h : z.right = some x) :
+    x.2.2.up = z.up := by
+  obtain ⟨w, p⟩ := z
+  cases p with
+  | cons c p =>
+    simp only [right, Option.map_eq_some_iff] at h
+    obtain ⟨⟨d', i', w', c'⟩, hr, rfl⟩ := h
+    show (⟨_, ⟨L.plug c' w', p⟩⟩ : (j : I) × L.Zipper ds j k) = ⟨_, ⟨L.plug c w, p⟩⟩
+    rw [Sibling.plug_right hr]
+
+/-- A step to the left keeps the whole tree. -/
+theorem toRoot_left {d : D} {z : L.Zipper (d :: ds) i k}
+    {x : (d' : D) × (i' : I) × L.Zipper (d' :: ds) i' k} (h : z.left = some x) :
+    x.2.2.toRoot = z.toRoot := by
+  rw [← toRoot_up x.2.2, ← toRoot_up z]
+  exact congrArg (fun y : (j : I) × L.Zipper ds j k => y.2.toRoot) (up_left h)
+
+/-- A step to the right keeps the whole tree. -/
+theorem toRoot_right {d : D} {z : L.Zipper (d :: ds) i k}
+    {x : (d' : D) × (i' : I) × L.Zipper (d' :: ds) i' k} (h : z.right = some x) :
+    x.2.2.toRoot = z.toRoot := by
+  rw [← toRoot_up x.2.2, ← toRoot_up z]
+  exact congrArg (fun y : (j : I) × L.Zipper ds j k => y.2.toRoot) (up_right h)
+
+/-- **Left, then right, returns.** -/
+theorem right_left {d : D} {z : L.Zipper (d :: ds) i k}
+    {x : (d' : D) × (i' : I) × L.Zipper (d' :: ds) i' k} (h : z.left = some x) :
+    x.2.2.right = some ⟨d, i, z⟩ := by
+  obtain ⟨w, p⟩ := z
+  cases p with
+  | cons c p =>
+    simp only [left, Option.map_eq_some_iff] at h
+    obtain ⟨⟨d', i', w', c'⟩, hl, rfl⟩ := h
+    show (Sibling.right c' w').map _ = _
+    rw [Sibling.right_left hl]
+    rfl
+
+/-- **Right, then left, returns.** -/
+theorem left_right {d : D} {z : L.Zipper (d :: ds) i k}
+    {x : (d' : D) × (i' : I) × L.Zipper (d' :: ds) i' k} (h : z.right = some x) :
+    x.2.2.left = some ⟨d, i, z⟩ := by
+  obtain ⟨w, p⟩ := z
+  cases p with
+  | cons c p =>
+    simp only [right, Option.map_eq_some_iff] at h
+    obtain ⟨⟨d', i', w', c'⟩, hr, rfl⟩ := h
+    show (Sibling.left c' w').map _ = _
+    rw [Sibling.left_right hr]
+    rfl
+
+end Sibling
 
 section Unplug
 
@@ -244,6 +404,23 @@ theorem down_up {d : D} (z : L.Zipper (d :: ds) i k) (hc : z.path.Canon) :
     show (Unplug.unplug (L.plug c w) d).map _ = _
     rw [Unplug.unplug_plug w hc.1]
     rfl
+
+/-- **The step to the left is `sibling`** at the direction it reaches, when
+the path reached is canonical: one step, where `sibling` goes up and opens
+the layer again. -/
+theorem sibling_of_left [L.Sibling] {d : D} {z : L.Zipper (d :: ds) i k}
+    {x : (d' : D) × (i' : I) × L.Zipper (d' :: ds) i' k} (h : z.left = some x)
+    (hc : x.2.2.path.Canon) : z.sibling x.1 = some x.2 := by
+  rw [sibling, ← up_left h]
+  exact down_up x.2.2 hc
+
+/-- **The step to the right is `sibling`** at the direction it reaches, when
+the path reached is canonical. -/
+theorem sibling_of_right [L.Sibling] {d : D} {z : L.Zipper (d :: ds) i k}
+    {x : (d' : D) × (i' : I) × L.Zipper (d' :: ds) i' k} (h : z.right = some x)
+    (hc : x.2.2.path.Canon) : z.sibling x.1 = some x.2 := by
+  rw [sibling, ← up_right h]
+  exact down_up x.2.2 hc
 
 theorem toRoot_descend : ∀ {ds : List D} {j : I} (a : List D) {z : L.Zipper ds j k}
     {x : (i : I) × L.Zipper (a.reverseAux ds) i k}, z.descend a = some x →

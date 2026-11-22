@@ -133,7 +133,7 @@ def Cursor.step {j : S.Judg} (c : Cursor S j) (l : Line S) : Except String (Curs
   | none => .error s!"there is no goal {l.goal}"
   | some c' =>
     match Att.ofMove l.move c'.pos.i with
-    | .ok nd => .ok ⟨⟨c'.pos.ds, c'.pos.i, ⟨nd, c'.pos.z.path⟩⟩, l.goal⟩
+    | .ok nd => .ok ⟨⟨c'.pos.ds, c'.pos.i, c'.pos.z.replace nd⟩, l.goal⟩
     | .error e => .error s!"the move does not apply to goal {l.goal}: {e}"
 
 /-- `Cursor.step` at every line; `n` is the number of the first line.  The
