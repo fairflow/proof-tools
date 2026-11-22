@@ -10,7 +10,8 @@ The parts, in the order they build on one another:
 | `Script` | scripts; one move from the root, the specification of a step |
 | `Cursor` | `run`, with a zipper kept from line to line |
 | `Run` | `run` is the run by steps; a script read back rebuilds its attempt |
-| `Certify` | `derives`, `certifier` (its property a proposition or a type), `Evaluator`, `engine`: the two checkers |
+| `Cert` | a tree of moves as a certificate, a rose tree of `ProofTools.Zipper.Rose`: `Cert.check`, `Der.ofCert`, `Att.cert`, and that derivations and trees that check are the same things |
+| `Certify` | `derives`; the certifiers `certifier` (of scripts) and `Cert.certifier` (of trees of moves), their property a proposition or a type; `engine` |
 | `Tac` | scripts as programs: `Script.shift` and the combinators on tactics |
 | `Tactic` | `Explorable`; the tactics `apply_move`, `apply_script`, `leave_open` |
 | `Motion` | the motions of the cursor (`up`, `down i`, `left`, `right`, `top`, `goal k`), their laws, and the motions that can be made from a position |

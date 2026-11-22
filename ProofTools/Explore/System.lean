@@ -46,6 +46,21 @@ proposition: the recursion over an attempt is written once.  `Sound` is not
 cannot be given from the premises of a node when `T` is data: that would
 ask to tell two positions of one judgment apart by a proof of `p ∈ ps`.
 
+**The map out is natural in the family** (PROVED here).  For two families
+`T`, `T'` with their soundness `hS`, `hS'`, and `f : ∀ j, T j → T' j`:
+
+    (∀ m j ps h e, f j (hS m j ps h e) = hS' m j ps h (e.map f)) →
+      f j (Att.mapOut hS d g) = Att.mapOut hS' d (g.map f)           (Att.mapOut_map)
+      f j (Der.mapOut hS d) = Der.mapOut hS' d                       (Der.mapOut_map)
+
+where `e.map f` is `f` at each position.  So a function between two
+families that agrees with their rules at each move agrees with their maps
+out on every attempt: what is said of one move is said of every
+derivation, with no further recursion over attempts.  The trees of moves of
+`ProofTools.Explore.Cert` are one use (a derivation's tree of moves is its
+map out at a constant family, and that the tree checks is read off the map
+out at the family of trees that check).
+
 Functions on attempts are written for every `o`, since Lean's structural
 recursion needs the index to be a variable.
 
@@ -84,7 +99,7 @@ end
 /-- **A derivation**: an attempt with no open goal. -/
 abbrev Der (S : ProofSystem) (j : S.Judg) : Type := Att S false j
 
-universe u v
+universe u v w
 
 variable {S : ProofSystem}
 
@@ -261,6 +276,37 @@ theorem Each.nonempty {α : Type v} {T : α → Sort u} : {as : List α} →
     let ⟨e⟩ := Each.nonempty fun b hb => h b (List.mem_cons_of_mem _ hb)
     ⟨⟨t, e⟩⟩
 
+/-- **One `T' a` from each `T a`**: `f` at each position. -/
+def Each.map {α : Type v} {T : α → Sort u} {T' : α → Sort w} (f : (a : α) → T a → T' a) :
+    {as : List α} → Each T as → Each T' as
+  | [], _ => ⟨⟩
+  | a :: _, ⟨t, e⟩ => ⟨f a t, Each.map f e⟩
+
+/-- `Each.map` goes through `Each.split`. -/
+theorem Each.split_map {α : Type v} {T : α → Sort u} {T' : α → Sort w}
+    (f : (a : α) → T a → T' a) : (xs : List α) → {ys : List α} → (e : Each T (xs ++ ys)) →
+      Each.split xs (e.map f) = ⟨(Each.split xs e).1.map f, (Each.split xs e).2.map f⟩
+  | [], _, _ => rfl
+  | a :: xs, ys, ⟨t, e⟩ => by
+    have ih := Each.split_map f xs e
+    show (⟨⟨f a t, (Each.split xs (Each.map f e)).1⟩, (Each.split xs (Each.map f e)).2⟩ :
+        Each T' (a :: xs) ×' Each T' ys) = _
+    rw [ih]
+    rfl
+
+/-- **The list of one for each member**, in order: `f a t` for the `t : T a`
+at each position. -/
+def Each.list {α : Type v} {T : α → Sort u} {β : Type w} (f : (a : α) → T a → β) :
+    {as : List α} → Each T as → List β
+  | [], _ => []
+  | a :: _, ⟨t, e⟩ => f a t :: Each.list f e
+
+/-- For no member there is one way to give one for each. -/
+theorem Each.eq_of_nil {α : Type v} {T : α → Sort u} {as : List α} (h : as = [])
+    (x y : Each T as) : x = y := by
+  subst h
+  rfl
+
 /-! ## Soundness of the moves, and the map out -/
 
 /-- **Soundness of the moves** for a family `T` over the judgments, into any
@@ -340,6 +386,66 @@ def Att.mapOut (hS : S.SoundT T) {o : Bool} {j : S.Judg} (d : Att S o j) (g : Ea
 derivations, the derivation in `T`. -/
 def Der.mapOut (hS : S.SoundT T) {j : S.Judg} (d : Der S j) : T j :=
   Att.mapOut hS d ((Der.goals d).symm ▸ PUnit.unit)
+
+/-- On a derivation, the map out of an attempt is `Der.mapOut`, whatever is
+given for its open goals: it has none. -/
+theorem Der.mapOut_eq (hS : S.SoundT T) {j : S.Judg} (d : Der S j) (g : Each T (Att.goals d)) :
+    Att.mapOut hS d g = Der.mapOut hS d :=
+  congrArg (Att.mapOut hS d) (Each.eq_of_nil (Der.goals d) _ _)
+
+/-! ## The map out is natural in the family -/
+
+section Natural
+
+variable {T' : S.Judg → Sort w} {hS : S.SoundT T} {hS' : S.SoundT T'}
+  {f : (j : S.Judg) → T j → T' j}
+
+mutual
+/-- `Att.mapOut_map`, for `Att.mapOutAux`. -/
+theorem Att.mapOutAux_map
+    (hf : ∀ m j ps h (e : Each T ps), f j (hS m j ps h e) = hS' m j ps h (e.map f)) :
+    {o : Bool} → {j : S.Judg} → (d : Att S o j) → (g : Each T d.goals) →
+      (Att.mapOutAux hS d g).map f = Att.mapOutAux hS' d (g.map f)
+  | _, _, .goal, _ => rfl
+  | _, j, .node m ps h ds, g => by
+    show (⟨f j (hS m j ps h (Atts.mapOut hS ds g)), ⟨⟩⟩ : Each T' [j]) = ⟨hS' m j ps h _, ⟨⟩⟩
+    rw [hf, Atts.mapOut_map hf ds g]
+    rfl
+/-- `Att.mapOut_map` on a list. -/
+theorem Atts.mapOut_map
+    (hf : ∀ m j ps h (e : Each T ps), f j (hS m j ps h e) = hS' m j ps h (e.map f)) :
+    {o : Bool} → {ps : List S.Judg} → (ds : Atts S o ps) → (g : Each T ds.goals) →
+      (Atts.mapOut hS ds g).map f = Atts.mapOut hS' ds (g.map f)
+  | _, _, .nil, _ => rfl
+  | _, _, .cons d ds, g => by
+    have key : ∀ g : Each T (d.goals ++ ds.goals),
+        (Atts.mapOut hS (.cons d ds) g).map f = Atts.mapOut hS' (.cons d ds) (g.map f) := by
+      intro g
+      show (⟨f _ (Att.mapOutAux hS d (Each.split d.goals g).1).1,
+          (Atts.mapOut hS ds (Each.split d.goals g).2).map f⟩ : Each T' (_ :: _)) =
+        ⟨(Att.mapOutAux hS' d (Each.split d.goals (g.map f)).1).1,
+          Atts.mapOut hS' ds (Each.split d.goals (g.map f)).2⟩
+      rw [Each.split_map f d.goals g, ← Att.mapOutAux_map hf d, ← Atts.mapOut_map hf ds]
+      rfl
+    exact key g
+end
+
+/-- **The map out is natural in the family.**  A function `f` from one
+family to another that agrees with their rules at each move (`hf`) agrees
+with their maps out on every attempt. -/
+theorem Att.mapOut_map
+    (hf : ∀ m j ps h (e : Each T ps), f j (hS m j ps h e) = hS' m j ps h (e.map f))
+    {o : Bool} {j : S.Judg} (d : Att S o j) (g : Each T d.goals) :
+    f j (Att.mapOut hS d g) = Att.mapOut hS' d (g.map f) :=
+  congrArg PProd.fst (Att.mapOutAux_map hf d g)
+
+/-- `Att.mapOut_map`, on a derivation. -/
+theorem Der.mapOut_map
+    (hf : ∀ m j ps h (e : Each T ps), f j (hS m j ps h e) = hS' m j ps h (e.map f))
+    {j : S.Judg} (d : Der S j) : f j (Der.mapOut hS d) = Der.mapOut hS' d :=
+  (Att.mapOut_map hf d _).trans (Der.mapOut_eq hS' d _)
+
+end Natural
 
 /-! ## At a proposition -/
 

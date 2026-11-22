@@ -40,7 +40,8 @@ The library then gives, the same for every instance:
 | attempts and derivations as data, with soundness | `Explore/System.lean` |
 | a zipper of attempts | `Explore/Zipper.lean`, on `ProofTools/Zipper.lean` |
 | scripts, and `run` | `Explore/Script.lean`, `Explore/Cursor.lean`, `Explore/Run.lean` |
-| the two checkers, as certifiers of `LeanCertify` | `Explore/Certify.lean` |
+| trees of moves as certificates, and their check | `Explore/Cert.lean`, on the rose trees of `ProofTools/Zipper/Rose.lean` |
+| the checkers of scripts and of trees, as certifiers of `LeanCertify` | `Explore/Certify.lean` |
 | tactics of the calculus, built from tactics | `Explore/Tac.lean` |
 | Lean tactics: `apply_move`, `apply_script`, `leave_open` | `Explore/Tactic.lean` |
 | the motions of the cursor, and their laws | `Explore/Motion.lean` |
@@ -53,12 +54,12 @@ the same commit as any entry point):
 | purpose | entry point |
 |---|---|
 | build by hand, a move at a time | `apply_move`, or the instance's alias of it |
-| build by program | a script and `run`; the tactics of the calculus (`Tac`) |
-| check | the term itself, each node's equation by `rfl`; a script by `derives` |
+| build by program | a script and `run`; the tactics of the calculus (`Tac`); a tree of moves and `Der.ofCert` |
+| check | the term itself, each node's equation by `rfl`; a script by `derives`; a tree of moves by `Cert.check` |
 | look at an attempt that is built | `#walk`, by typing motions or by clicking the ones it offers; as functions `Cursor.view`, `walkText`, `Cursor.motions`; all of it at once, `Att.render` |
 | change an attempt that is built | a move at an open goal (`apply_move … at k`, `Att.run`); nothing else yet |
 | map out to the mathematics | `Der.mapOut` and `Att.mapOut`, with the instance's soundness: into a type, a derivation of the calculus as data; into a proposition, a proof (there also as `Der.sound`, `Att.sound`) |
-| keep and replay | `Att.script`, `run`, `apply_script` |
+| keep and replay | `Att.script`, `run`, `apply_script`; `Att.cert`, the tree of moves, which is printed and compared as it stands |
 
 ## Attempts and derivations
 
@@ -134,6 +135,21 @@ does not on a derivation the tactic built for an instance that sets
 derivation rebuilt by `run`, and there it does. Compiled code runs either
 way. The tests have both cases (`swByRun`, `swByTactic`).
 
+**The map out is natural in the family.** For two families `T`, `T'` with
+their soundness `hS`, `hS'`, and `f : ∀ j, T j → T' j`. PROVED:
+
+    (∀ m j ps h e, f j (hS m j ps h e) = hS' m j ps h (e.map f)) →
+      f j (Att.mapOut hS d g) = Att.mapOut hS' d (g.map f)           (Att.mapOut_map)
+      f j (Der.mapOut hS d) = Der.mapOut hS' d                       (Der.mapOut_map)
+
+(`e.map f` is `f` at each position.) A function between two families that
+agrees with their rules at each move agrees with their maps out on every
+attempt. So what an instance says of one move, it has of every derivation,
+with no recursion over attempts of its own: that two ways from a derivation
+to the mathematics give the same thing, or that what one way gives has a
+property (take `T` to be the family of the things that have it, and `f`
+the projection). The trees of moves below are made this way.
+
 **Not asked, not given: the converse.** That every derivation of the
 calculus is a derivation of the explorer (`T j → Der S j`) is no field and
 no theorem here. A `step` that refuses a move the rule allows passes
@@ -202,38 +218,128 @@ long, `ProofToolsTest/Explore/Count.lean`):
 
 `run` is linear in the length of the script, the run by steps quadratic.
 
-## The two checkers
+## Trees of moves
+
+A derivation writes, at each node, the move, the premises and the equation.
+Its **tree of moves** keeps the moves and the shape, and nothing else:
+
+```lean
+abbrev Cert (S : ProofSystem) : Type := Zip.RTree Unit S.Move    -- a rose tree: moves at the nodes, nothing on the edges
+
+def Cert.check : S.Judg → Cert S → Bool          -- `step` at the root, then each child at its premise
+def Der.ofCert (j : S.Judg) (c : Cert S) (h : c.check j = true) : Der S j
+def Att.cert   : Der S j → Cert S
+
+def swapCert : Cert IPC := .mk .impR [.mk (.andL p q) [.mk .andR [.mk .ax [], .mk .ax []]]]
+
+example : Cert.check swapSeq swapCert = true := by decide +kernel
+example : swap.cert = swapCert := rfl             -- the kernel evaluates `Att.cert`
+```
+
+PROVED, for every proof system:
+
+    d.cert.check j = true                      for d : Der S j       (Att.check_cert)
+    (Der.ofCert j c h).cert = c                                      (Att.cert_ofCert)
+    Der.ofCert j d.cert h = d                                        (Der.ofCert_cert)
+    d.cert = d'.cert → d = d'                  for d d' : Der S j    (Att.cert_inj)
+
+So the derivations of `j` and the trees of moves that check at `j` are the
+same things, each computed from the other.
+
+* **It is a rose tree of the library**, not a type of its own. Trees of
+  moves are compared by `==` (`RTree.beq`, proved lawful), printed by
+  `Repr`, drawn by `RTree.drawWith`, and walked by Huet's zipper, with
+  nothing written for them. A node is `((), c)` for each child `c`;
+  `Cert.mk m cs` takes a list of trees. (The drawing prints an arrow for
+  every edge, also for these, which have nothing on them.)
+* **`Att.cert` is a map out**, `Der.mapOut Cert.moves`, at the constant
+  family `fun _ => Cert S`: a move over the trees of its premises is a
+  node. That the tree checks is the map out at the family of the trees
+  that check (`Cert.checked`), by naturality. No recursion over attempts
+  is written for either.
+* **An attempt with open goals has no tree of its own**, and `Cert` no leaf
+  for an open goal. It is `Att.mapOut Cert.moves d`: from one tree for each
+  open goal, by position, the tree of the whole.
+* `Cert.moves` makes no use of a node's equation, so the kernel evaluates
+  `d.cert` on every derivation, also for an instance that sets `eqByDecide`
+  (below).
+
+## The checkers
+
+A derivation has two writings as a certificate. Each has its checker, and
+with the soundness of the moves each is a certifier of `LeanCertify`:
 
 ```lean
 def derives (S) (j : S.Judg) (ls : Script S) : Bool      -- no line fails, no goal is left
 def certifier (hS : S.SoundT T) : Certify.Certifier S.Judg (Script S) T
+def Cert.certifier (hS : S.SoundT T) : Certify.Certifier S.Judg (Cert S) T
 
 example : Valid swap := (certifier sound.soundT).verdict swap swapScript   -- the kernel runs the script
 def swapByScript : G3 swap := (certifier soundT).verdict swap swapScript   -- and here builds the derivation
+example : Valid swap := (Cert.certifier sound.soundT).verdict swap swapCert   -- the kernel checks the tree
+def swapByTree : G3 swap := (Cert.certifier soundT).verdict swap swapCert
 ```
 
 `T` is into any sort, as the property of a `Certify.Certifier` is. With a
-proposition the certifier proves it (from `sound : S.Sound D`, by
+proposition a certifier proves it (from `sound : S.Sound D`, by
 membership: `certifier sound.soundT`). With a type of derivations its
-`sound` is a function, `Der.mapOut hS (Der.ofScript j ls h)`: a script is a
-certificate for the derivation itself.
+`sound` is a function, `Der.mapOut hS (Der.ofScript j ls h)` or
+`Der.mapOut hS (Der.ofCert j c h)`: the certificate is one for the
+derivation itself.
 
-PROVED: `derives S j ls = true → S.Sound D → D j` (`derives_sound`), and
-every derivation has a script that `derives` accepts, its own
-(`derives_script`).
+PROVED: `derives S j ls = true → S.Sound D → D j` (`derives_sound`); every
+derivation has a script that `derives` accepts, its own (`derives_script`),
+and a tree that `Cert.check` accepts, its own (`Att.check_cert`).
+
+**Which to use.** The script keeps the order of the work: it can be
+continued, composed (`Tac`), and replayed line by line in the editor. The
+tree keeps the shape: a producer that has a tree hands over a tree, and its
+check builds nothing. In the kernel (one machine, 2026-11-22;
+`ProofToolsTest/Explore/CertScale.lean`, where the command is):
+
+| derivation | moves | the tree, `Cert.check` | the script, `derives` | script / tree |
+|---|---|---|---|---|
+| `swap` | 5 | 1.4 ms | 4.9 ms | 3.4 |
+| `distr` | 11 | 2.3 ms | 10.0 ms | 4.3 |
+| `chain 300` | 301 | 44 ms | 264 ms | 6.1 |
+| `chain 1000` | 1,001 | 157 ms | 970 ms | 6.2 |
+| `conj 4` | 31 | 10 ms | 37 ms | 3.5 |
+| `conj 6` | 127 | 140 ms | 269 ms | 1.9 |
+| `conj 7` | 255 | 591 ms | 917 ms | 1.6 |
+
+`chain` is a derivation as deep as it is long, whose steps cost next to
+nothing; `conj k` a balanced one with `2 ^ k` hypotheses to search at each
+leaf. The tree's gain is the checker's own work, so it is largest where a
+step costs least and falls towards 1 as the steps dominate (`conj 8`: 1.3).
+Being a rose tree costs the tree's check something: a tree type with no
+edges, tried beside it, checked `chain 1000` in 96 ms and `conj 6` in
+137 ms.
 
 The refutation side is optional. An instance stops where its mathematics
 stops:
 
 | level | the instance has | it gets |
 |---|---|---|
-| 1 | moves and their soundness | `certifier`: scripts checked |
-| 2 | also a notion of model with a sound check (`Evaluator`) | `engine`, a `Certify.Engine`; its producer may answer `flag`, and nothing says a model is ever found |
+| 1 | moves and their soundness | `certifier`, `Cert.certifier`: scripts and trees checked |
+| 2 | also a certifier against what holds: a notion of model with a sound check | `engine`, a `Certify.Engine`; its producer may answer `flag`, and nothing says a model is ever found |
 | 3 | also a theorem that one side always answers | `Certify.Engine.Complete`, or the instance's own statement |
+
+A certifier against what holds is `LeanCertify`'s, as it stands:
+`Certify.Certifier S.Judg Model (fun j => D j → False)`. Bundled with its
+type of models, a name and a producer, it is a `Certify.Disprover`. The
+explorer has no structure of its own for it (until 2026-11-22 it had one,
+`Evaluator`, which held the same things as a `Disprover` does):
+
+```lean
+def engine (hS : S.Sound D) (no : Certify.Certifier S.Judg Model (fun j => D j → False))
+    (produce : S.Judg → Nat → Certify.Verdict (Script S) Model) :
+    Certify.Engine S.Judg (Script S) Model D
+```
 
 The example calculus is at level 2, on purpose. What holds is truth under
 every classical valuation; the calculus is intuitionistic, so Peirce's law
-holds and has no derivation, and its engine answers `flag`.
+holds and has no derivation, and its engine answers `flag`. Its no side is
+a `Certify.Disprover` (`refuter`), whose certifier the engine takes.
 
 ## Lean tactics
 
@@ -430,7 +536,9 @@ never a wrong derivation.
 * Lean's kernel.
 * For a script: `derives`, `Att.mapOut` (of which `Att.sound` is the case of
   a proposition) and the instance's soundness, `SoundT` or `Sound`.
-* For a model: the instance's `Evaluator.sound`.
+* For a tree of moves: `Cert.check`, `Der.ofCert`, `Att.mapOut` and the
+  instance's soundness.
+* For a model: the `sound` of the instance's certifier against what holds.
 
 Not trusted: everything in `Explorable`, the tactics, `candidates`, any
 producer, and `run` being fast. The tactic evaluates compiled code to find
@@ -461,7 +569,8 @@ the goal, and pushes the negation through `∧` with
    (`deriving Lean.ToExpr` gives them), `showJudg`, `showMove`, and
    optionally `within` and `moveSource` (a move as Lean source, for the
    lines the tactic suggests; without it Lean prints the move's term).
-5. Optionally an `Evaluator`, a producer, and an alias.
+5. Optionally a certifier against what holds (level 2, above), a producer,
+   and an alias.
 
 `step` should reduce in the kernel: structural recursion, and `Decidable`
 instances that compute. `docs/deciders.md` says what to avoid.
@@ -474,7 +583,12 @@ Two things that instances have found useful:
 * A function or theorem by recursion on an attempt is written for every
   `o`, with `o = false` as a hypothesis where it is about derivations:
   Lean's structural recursion needs the indices of `Att S o j` to be
-  variables.
+  variables. Before writing one, see whether it is a map out
+  (`Att.mapOut`, at a constant family for a function that forgets) or
+  follows from one by naturality (`Der.mapOut_map`): then there is no
+  recursion to write. Where a theorem about derivations does need its own
+  induction, a bound on the number of moves serves, the derivation matched
+  as it stands (`Der.ofCert_cert_aux`).
 
 A worked instance on a calculus with a decision procedure, a certified
 countermodel side and a translation to natural deduction: the subframe
@@ -482,7 +596,7 @@ tableau for propositional lax logic, in
 [lax-logic-in-lean](https://github.com/fairflow/lax-logic-in-lean)
 (`LaxLogic/PLL/SubTab/Explore.lean`). There a derivation and a closed
 tableau of the existing checker are each computed from the other, so every
-proof its search finds is also a script.
+proof its search finds is also a script and a tree of moves.
 
 **Judgments that hold functions.** The tactic writes each premise as a
 term, quoted from its value, and proves the node's equation
