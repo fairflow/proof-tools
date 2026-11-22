@@ -18,6 +18,8 @@ that is built (by a script, by the tactic, by a search) can be walked:
     Cursor.whyNot m c    why not, as text
     Cursor.moves c ms    motions in turn: the cursor reached, or the number
                          of the first motion that fails and why
+    Cursor.trail n c ms  the same with every position kept: the one loop
+                         over motions, which the others are read off
 
 A motion changes the position and nothing else (PROVED; `c.Ok` says that
 `c.left` is the number of open goals left of the focus):
@@ -145,15 +147,47 @@ def Cursor.whyNot {j : S.Judg} (m : Motion) (c : Cursor S j) : String :=
   | .top => "the motion can be made"
   | .goal k => s!"there is no goal {k}"
 
-/-- **Motions in turn**: the cursor reached, or the number of the first
-motion that cannot be made (from 0) and why. -/
-def Cursor.movesFrom {j : S.Judg} : Nat → Cursor S j → List Motion →
-    Except (Nat × String) (Cursor S j)
-  | _, c, [] => .ok c
+/-- **What motions in turn leave behind**: the cursors passed, the first
+first; the cursor reached, which is the last one before a motion that cannot
+be made; and that motion's number and why, if there is one. -/
+structure Trail (S : ProofSystem) (j : S.Judg) where
+  /-- The cursors passed, the first first. -/
+  passed : List (Cursor S j)
+  /-- The cursor reached. -/
+  last : Cursor S j
+  /-- The number of the motion that cannot be made, and why. -/
+  failed : Option (Nat × String)
+
+/-- **Motions in turn, every position kept**; `n` is the number of the first
+motion.  The one loop over motions: `Cursor.moves`, the views of `#walk`
+(`walkViews`) and the panel's focus (`Cursor.movesWhile`) are read off it. -/
+def Cursor.trail {j : S.Judg} : Nat → Cursor S j → List Motion → Trail S j
+  | _, c, [] => ⟨[], c, none⟩
   | n, c, m :: ms =>
     match c.move m with
-    | some c' => Cursor.movesFrom (n + 1) c' ms
-    | none => .error (n, c.whyNot m)
+    | some c' => let t := Cursor.trail (n + 1) c' ms; ⟨c :: t.passed, t.last, t.failed⟩
+    | none => ⟨[], c, some (n, c.whyNot m)⟩
+
+/-- **Motions in turn**: the cursor reached, or the number of the first
+motion that cannot be made (from `n`) and why. -/
+def Cursor.movesFrom {j : S.Judg} (n : Nat) (c : Cursor S j) (ms : List Motion) :
+    Except (Nat × String) (Cursor S j) :=
+  let t := Cursor.trail n c ms
+  match t.failed with
+  | none => .ok t.last
+  | some e => .error e
+
+theorem Cursor.movesFrom_nil {j : S.Judg} (n : Nat) (c : Cursor S j) :
+    Cursor.movesFrom n c [] = .ok c := rfl
+
+theorem Cursor.movesFrom_cons {j : S.Judg} (n : Nat) (c : Cursor S j) (m : Motion)
+    (ms : List Motion) :
+    Cursor.movesFrom n c (m :: ms) =
+      match c.move m with
+      | some c' => Cursor.movesFrom (n + 1) c' ms
+      | none => .error (n, c.whyNot m) := by
+  simp only [Cursor.movesFrom, Cursor.trail]
+  cases c.move m <;> rfl
 
 /-- **Motions in turn**, numbered from 0. -/
 def Cursor.moves {j : S.Judg} (c : Cursor S j) (ms : List Motion) :
@@ -243,11 +277,11 @@ theorem Cursor.move_some {j : S.Judg} {m : Motion} {c c' : Cursor S j} (hc : c.O
 theorem Cursor.movesFrom_ok {j : S.Judg} : ∀ (ms : List Motion) (n : Nat) {c c' : Cursor S j},
     c.Ok → Cursor.movesFrom n c ms = .ok c' → c'.toRoot = c.toRoot ∧ c'.Ok
   | [], _, _, _, hc, h => by
-    simp only [Cursor.movesFrom, Except.ok.injEq] at h
+    simp only [Cursor.movesFrom_nil, Except.ok.injEq] at h
     subst h
     exact ⟨rfl, hc⟩
   | m :: ms, n, c, c', hc, h => by
-    simp only [Cursor.movesFrom] at h
+    rw [Cursor.movesFrom_cons] at h
     split at h
     · next c₁ h₁ =>
       obtain ⟨e₁, o₁⟩ := Cursor.move_some hc h₁

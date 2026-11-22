@@ -13,14 +13,16 @@ The parts, in the order they build on one another:
 | `Cert` | a tree of moves as a certificate, a rose tree of `ProofTools.Zipper.Rose`: `Cert.check`, `Der.ofCert`, `Att.cert`, and that derivations and trees that check are the same things |
 | `Certify` | `derives`; the certifiers `certifier` (of scripts) and `Cert.certifier` (of trees of moves), their property a proposition or a type; `engine` |
 | `Tac` | scripts as programs: `Script.shift` and the combinators on tactics |
-| `Tactic` | `Explorable`; the tactics `apply_move`, `apply_script`, `leave_open` |
-| `Motion` | the motions of the cursor (`up`, `down i`, `left`, `right`, `top`, `goal k`), their laws, and the motions that can be made from a position |
-| `Walk` | the view at a position; the command `#walk`, to look at an attempt that is built, by typing motions or by clicking the ones it offers |
+| `Motion` | the motions of the cursor (`up`, `down i`, `left`, `right`, `top`, `goal k`), their laws, the one loop over motions (`Cursor.trail`), and the motions that can be made from a position |
+| `View` | `Explorable`; an attempt drawn as text: all of it (`Att.render`), the view at a position (`Cursor.view`), the view with every branch drawn (`Cursor.viewAll`) |
+| `Tactic` | the tactics `apply_move`, `apply_script`, `leave_open`; the query `apply_move where`, which draws the attempt so far; a goal shown as its judgment |
+| `Walk` | to look at an attempt that is built: the command `#walk`, by typing motions or by clicking the ones it offers; the goal `Walk d`, by a tactic block whose lines are motions |
 | `Panel` | a trial: the attempt drawn as a tree in the infoview, with nodes to click (`set_option walk.panel true`) |
 -/
 import ProofTools.Explore.Certify
 import ProofTools.Explore.Tac
-import ProofTools.Explore.Tactic
 import ProofTools.Explore.Motion
+import ProofTools.Explore.View
+import ProofTools.Explore.Tactic
 import ProofTools.Explore.Panel
 import ProofTools.Explore.Walk
