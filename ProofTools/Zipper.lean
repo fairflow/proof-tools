@@ -6,9 +6,11 @@ one layer of a tree with a hole looks like (a **crumb**), and how to fill the
 hole (**plug**).  This file states that once, for an *indexed* family
 `W : I → Type`, where the index of a subtree may differ from the index of
 the tree around it, and builds the paths, the zipper, its moves and its laws
-on top.  The instance in this package is the attempts of a proof system
-(`ProofTools.Explore`): `I` is the type of judgments, `W j` the attempts at
-`j`, and a direction is the number of a premise.
+on top.  The instances in this package are the attempts of a proof system
+(`ProofTools.Explore`: `I` is the type of judgments, `W j` the attempts at
+`j`, and a direction is the number of a premise) and rose trees
+(`ProofTools.Zipper.RoseIndexed`: one index, and a direction is the label of
+an edge).
 
 **The derivative** (`Deriv`).  A crumb `c : L.Crumb d i j` is one layer at the
 root of a tree of index `j`, with a hole at direction `d` whose subtree has
