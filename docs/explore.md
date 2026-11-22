@@ -15,13 +15,23 @@ structure ProofSystem where
   step : Move → Judg → Except String (List Judg)    -- the premises, or why the move does not apply
 ```
 
-and proves one theorem, that its moves are sound for its own notion `D` of
-what holds:
+and shows one thing, that its moves are sound for its own notion of what
+holds. That notion is a family `T` over the judgments, into any sort: a
+proposition (validity, or that a derivation exists), or a type, the
+derivations of the calculus as its source states it.
 
 ```lean
+def ProofSystem.SoundT (S : ProofSystem) (T : S.Judg → Sort u) :=
+  ∀ m j ps, S.step m j = .ok ps → Each T ps → T j     -- one `T p` for each premise, by position
+
 def ProofSystem.Sound (S : ProofSystem) (D : S.Judg → Prop) : Prop :=
-  ∀ m j ps, S.step m j = .ok ps → (∀ p ∈ ps, D p) → D j
+  ∀ m j ps, S.step m j = .ok ps → (∀ p ∈ ps, D p) → D j     -- for a proposition: by membership
 ```
+
+For a proposition the two are one notion (`soundT_iff_sound`), and an
+instance proves whichever is easier to state. For a type, `S.SoundT T` is a
+definition: each move that applies is a rule of the calculus, applied to
+the derivations of its premises.
 
 The library then gives, the same for every instance:
 
@@ -47,7 +57,7 @@ the same commit as any entry point):
 | check | the term itself, each node's equation by `rfl`; a script by `derives` |
 | look at an attempt that is built | `#walk`, by typing motions or by clicking the ones it offers; as functions `Cursor.view`, `walkText`, `Cursor.motions`; all of it at once, `Att.render` |
 | change an attempt that is built | a move at an open goal (`apply_move … at k`, `Att.run`); nothing else yet |
-| map out to the mathematics | `Der.sound` and `Att.sound`, with the instance's soundness theorem |
+| map out to the mathematics | `Der.mapOut` and `Att.mapOut`, with the instance's soundness: into a type, a derivation of the calculus as data; into a proposition, a proof (there also as `Der.sound`, `Att.sound`) |
 | keep and replay | `Att.script`, `run`, `apply_script` |
 
 ## Attempts and derivations
@@ -65,12 +75,69 @@ The Boolean says whether open goals are allowed. A node writes its premises
 and carries the equation `S.step m j = .ok ps`, which the kernel proves by
 evaluating `step`. `Atts S o ps` is a list of attempts, one at each premise.
 
-PROVED, for every proof system:
+## The map out
 
+`Each T ps` is one `T p` for each judgment `p` of the list `ps`, by
+position: `Each T [a, b]` is `T a ×' T b ×' PUnit`. For every proof system,
+and every `T` into any sort:
+
+    S.SoundT T → (d : Att S o j) → Each T d.goals → T j             (Att.mapOut)
+    S.SoundT T → Der S j → T j                                       (Der.mapOut)
+
+An attempt is a derived rule, from its open goals to its root. With `T` a
+type these are functions: `Der.mapOut` carries a derivation of the explorer
+to a derivation of the calculus, and `Att.mapOut` an attempt to a function
+from derivations of its open goals to a derivation of its root. In the
+tests the example calculus is stated a second time, as an inductive family
+`G3 : Seq → Type` with a constructor for each rule, and
+
+```lean
+def soundT : IPC.SoundT G3            -- each move that applies is a rule, applied
+
+example : Der.mapOut soundT swap = swapG3 := rfl       -- the kernel evaluates the map out
+```
+
+(`ProofToolsTest/Explore/MapOut.lean`).
+
+For a proposition, the same with the premises and the goals taken by
+membership. PROVED:
+
+    S.SoundT D ↔ S.Sound D                                           (soundT_iff_sound)
     S.Sound D → (d : Att S o j) → (∀ g ∈ d.goals, D g) → D j        (Att.sound)
     S.Sound D → Der S j → D j                                        (Der.sound)
+    S.SoundT T → S.Sound (fun j => Nonempty (T j))                   (SoundT.nonempty)
 
-An attempt is a derived rule, from its open goals to its root.
+`Att.sound` and `Der.sound` are `Att.mapOut` and `Der.mapOut` at a
+proposition: the recursion over an attempt is written once.
+
+**Why there are two statements of soundness, and not one.** `Sound`, with
+`Sort u` in place of `Prop`, is still a definition; but it has no map out.
+Its premises are given by membership (`∀ p ∈ ps, T p`), and a node of an
+attempt holds its premises' attempts by position. To go from the second to
+the first is to say, for a proof of `p ∈ ps`, which position is meant, and
+a proof of a proposition cannot be taken apart into data (Lean: "recursor
+`Or.casesOn` can only eliminate into `Prop`"). With decidable equality of
+judgments it can be written, and then two premises with one judgment get
+the derivation of the first: the map out of a node with premises `[p, p]`
+and derivations `d₁`, `d₂` would hold `d₁` twice. So for data the premises
+are by position; for a proposition nothing is lost either way, and `Sound`
+keeps the statement its instances prove.
+
+**In the kernel.** A soundness definition carries what it is given, for the
+premises a node writes, to the premises `step` computes, by a cast along
+the node's equation, and the kernel reduces such a cast when the two lists
+are equal by definition. So the kernel evaluates `Der.mapOut hS d` on a
+derivation whose nodes hold their equation by `rfl`, and on any derivation
+that `run` built, which writes the premises as `step` computes them. It
+does not on a derivation the tactic built for an instance that sets
+`eqByDecide` (below); `Der.ofScript j d.script (derives_script d)` is that
+derivation rebuilt by `run`, and there it does. Compiled code runs either
+way. The tests have both cases (`swByRun`, `swByTactic`).
+
+**Not asked, not given: the converse.** That every derivation of the
+calculus is a derivation of the explorer (`T j → Der S j`) is no field and
+no theorem here. A `step` that refuses a move the rule allows passes
+`SoundT` and is not the calculus.
 
 ## Scripts
 
@@ -139,13 +206,21 @@ long, `ProofToolsTest/Explore/Count.lean`):
 
 ```lean
 def derives (S) (j : S.Judg) (ls : Script S) : Bool      -- no line fails, no goal is left
-def certifier (hS : S.Sound D) : Certify.Certifier S.Judg (Script S) D
+def certifier (hS : S.SoundT T) : Certify.Certifier S.Judg (Script S) T
 
-example : Valid swap := (certifier sound).verdict swap swapScript    -- the kernel runs the script
+example : Valid swap := (certifier sound.soundT).verdict swap swapScript   -- the kernel runs the script
+def swapByScript : G3 swap := (certifier soundT).verdict swap swapScript   -- and here builds the derivation
 ```
 
-PROVED: `derives S j ls = true → S.Sound D → D j`, and every derivation has
-a script that `derives` accepts, its own (`derives_script`).
+`T` is into any sort, as the property of a `Certify.Certifier` is. With a
+proposition the certifier proves it (from `sound : S.Sound D`, by
+membership: `certifier sound.soundT`). With a type of derivations its
+`sound` is a function, `Der.mapOut hS (Der.ofScript j ls h)`: a script is a
+certificate for the derivation itself.
+
+PROVED: `derives S j ls = true → S.Sound D → D j` (`derives_sound`), and
+every derivation has a script that `derives` accepts, its own
+(`derives_script`).
 
 The refutation side is optional. An instance stops where its mathematics
 stops:
@@ -353,7 +428,8 @@ never a wrong derivation.
 ## What is trusted
 
 * Lean's kernel.
-* For a script: `derives`, `Att.sound` and the instance's `Sound` theorem.
+* For a script: `derives`, `Att.mapOut` (of which `Att.sound` is the case of
+  a proposition) and the instance's soundness, `SoundT` or `Sound`.
 * For a model: the instance's `Evaluator.sound`.
 
 Not trusted: everything in `Explorable`, the tactics, `candidates`, any
@@ -375,7 +451,12 @@ the goal, and pushes the negation through `∧` with
 1. `Judg`, `Move` (one constructor for each rule, with its data) and `step`.
 2. The system as an `abbrev`, so that `S.Judg` unfolds to the instance's own
    type where Lean looks for instances and notations.
-3. `S.Sound D`, for the instance's `D`.
+3. Soundness of the moves. Where the calculus is an inductive family
+   `T : S.Judg → Type`, `S.SoundT T`, a definition: a case for each move,
+   its rule applied to the derivations of its premises (`e.1`, `e.2.1`, …
+   of `e : Each T ps`). `Der.mapOut` then gives the calculus's own
+   derivation, and `SoundT.nonempty` the proposition that there is one.
+   Where there is only a proposition `D`, `S.Sound D` or `S.SoundT D`.
 4. For the tactics, `Explorable S`: `candidates`, `quoteJudg` and `quoteMove`
    (`deriving Lean.ToExpr` gives them), `showJudg`, `showMove`, and
    optionally `within` and `moveSource` (a move as Lean source, for the
@@ -412,7 +493,10 @@ so an instance whose judgments hold functions sets `eqByDecide := true` and
 gives `DecidableEq S.Judg`: the equation is then proved by
 `step_of_stepIs (Eq.refl true)`, the kernel evaluating `step` and deciding
 that its premises are the ones written. `run`, `derives` and the certifier
-do not quote, and need neither.
+do not quote, and need neither. For such an instance the kernel does not
+evaluate `Der.mapOut` into a type on a derivation the tactic built, and
+does on the derivation rebuilt from its script (see "In the kernel",
+above).
 
 ## Limits
 
@@ -426,7 +510,9 @@ do not quote, and need neither.
 4. The tactics need the goal's judgment to be a closed term, and see only
    the candidates the instance proposes when a line is a pattern.
 5. There is no search procedure, no model of an open goal, and no map
-   between systems: those belong to the instance.
+   between systems: those belong to the instance. The map out goes one
+   way: nothing here takes a derivation of the calculus to a derivation of
+   the explorer.
 6. `#walk` needs the attempt to be a closed term, and evaluates compiled
    code, as the tactics do.  The view draws the premises of the focus, not
    those of the nodes above it: `up` shows them.  Going `up`, the open

@@ -10,6 +10,7 @@ inductive family `G3 : Seq → Type` with one constructor for each rule of the
 table in `Calculus.lean`.  `soundT` says that each move is one of them.
 -/
 import ProofToolsTest.Explore.Calculus
+import ProofToolsTest.Explore.Tactic
 
 namespace ProofToolsTest.Explore.MapOutTest
 
@@ -184,5 +185,54 @@ example : swapByScript.rules = ["impR", "andL", "andR", "ax", "ax"] := by decide
 -- the same certifier at a proposition: from `Sound`, through `soundT`
 example : Valid ([] ⊢ (p ⋏ q) ⟶ (q ⋏ p)) := (certifier sound.soundT).verdict _ swap.script
 example : Nonempty (G3 ([] ⊢ (p ⋏ q) ⟶ (q ⋏ p))) := Der.sound soundT.nonempty swap
+
+/-! ## In the kernel: where a node's equation is decided
+
+`Swap` (`Tactic.lean`) is the system whose judgments hold functions.  A
+soundness definition carries what it is given for the premises a node
+writes to the premises `step` computes, by a cast along the node's
+equation.  The kernel reduces the cast when the two are equal by
+definition: so on an attempt that `run` built, which writes the premises as
+`step` computes them, and not on one the tactic built, which writes them
+quoted.  Compiled code runs on both. -/
+
+open TacticTest in
+/-- Swaps, counted: a family over the judgments of `Swap`. -/
+inductive Sw : Pair → Type where
+  | leaf (j : Pair) : Sw j
+  | swap {j : Pair} (d : Sw ⟨fun b => j.f (!b)⟩) : Sw j
+
+open TacticTest in
+/-- The number of swaps. -/
+def Sw.depth : {j : Pair} → Sw j → Nat
+  | _, .leaf _ => 0
+  | _, .swap d => d.depth + 1
+
+open TacticTest in
+/-- The one move is the one rule. -/
+def soundSw : Swap.SoundT Sw := fun _ _ _ h e =>
+  .swap (show Each Sw [_] from (Except.ok.inj h).symm ▸ e).1
+
+open TacticTest in
+/-- The attempt the tactic built (`swapped`), mapped out from a leaf at its
+open goal. -/
+def swByTactic : Sw ⟨fun b => cond b 1 2⟩ := Att.mapOut soundSw swapped ⟨.leaf _, ⟨⟩⟩
+
+open TacticTest in
+/-- The same attempt as `run` builds it, mapped out. -/
+def swByRun : Sw ⟨fun b => cond b 1 2⟩ :=
+  Att.mapOut soundSw (run Swap ⟨fun b => cond b 1 2⟩ [⟨0, ()⟩]).att ⟨.leaf _, ⟨⟩⟩
+
+#guard swByTactic.depth == 1
+#guard swByRun.depth == 1
+
+-- the kernel evaluates the second
+example : swByRun.depth = 1 := by decide +kernel
+
+-- and not the first: the cast is along an equation that holds, but not by definition
+example : True := by
+  fail_if_success
+    have : swByTactic.depth = 1 := by decide +kernel
+  trivial
 
 end ProofToolsTest.Explore.MapOutTest

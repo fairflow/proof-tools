@@ -5,12 +5,12 @@ The parts, in the order they build on one another:
 
 | file | what |
 |---|---|
-| `System` | `ProofSystem`; attempts `Att`, derivations `Der`; soundness of an attempt |
+| `System` | `ProofSystem`; attempts `Att`, derivations `Der`; soundness of the moves for a family into any sort (`SoundT`, and `Sound` for a proposition); the map out (`Att.mapOut`, `Der.mapOut`) |
 | `Zipper` | the zipper of attempts, an instance of `ProofTools.Zipper` |
 | `Script` | scripts; one move from the root, the specification of a step |
 | `Cursor` | `run`, with a zipper kept from line to line |
 | `Run` | `run` is the run by steps; a script read back rebuilds its attempt |
-| `Certify` | `derives`, `certifier`, `Evaluator`, `engine`: the two checkers |
+| `Certify` | `derives`, `certifier` (its property a proposition or a type), `Evaluator`, `engine`: the two checkers |
 | `Tac` | scripts as programs: `Script.shift` and the combinators on tactics |
 | `Tactic` | `Explorable`; the tactics `apply_move`, `apply_script`, `leave_open` |
 | `Motion` | the motions of the cursor (`up`, `down i`, `left`, `right`, `top`, `goal k`), their laws, and the motions that can be made from a position |
