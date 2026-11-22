@@ -35,14 +35,17 @@ for a family `T`, into any sort, a tree that checks gives `T j`: the
 certifier `Cert.certifier` of `ProofTools.Explore.Certify`, beside the one
 whose certificate is a script.
 
-**No recursion over attempts is written here.**  `Att.cert` is the library's
-map out (`Der.mapOut`) at the constant family `fun _ => Cert S`, the moves
-being sound for it by `Cert.moves`: a move over the trees of its premises is
-a node.  That the tree checks is read off the map out at the family of the
-trees that check (`Cert.checked`), by the naturality of the map out
-(`Der.mapOut_map`).  An attempt with open goals has no tree of its own, and
-`Cert` no leaf for an open goal: it is `Att.mapOut Cert.moves d`, a function
-from one tree for each open goal to the tree of the whole.
+**No recursion over attempts is written here for `Att.cert`, nor for its
+check.**  `Att.cert` is the library's map out (`Der.mapOut`) at the constant
+family `fun _ => Cert S`, the moves being sound for it by `Cert.moves`: a
+move over the trees of its premises is a node.  That the tree checks is
+read off the map out at the family of the trees that check
+(`Cert.checked`), by the naturality of the map out (`Der.mapOut_map`).  An
+attempt with open goals has no tree of its own, and `Cert` no leaf for an
+open goal: it is `Att.mapOut Cert.moves d`, a function from one tree for
+each open goal to the tree of the whole.  (`Der.ofCert` is by recursion on
+the tree, as `Att.cert_ofCert` is; `Der.ofCert_cert` is by induction on a
+bound on the number of moves.)
 
 `Cert.moves` makes no use of the node's equation, so the kernel evaluates
 `d.cert` on every derivation, also where an instance's soundness into a type
