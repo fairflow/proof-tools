@@ -204,10 +204,10 @@ def shownAs (head : String) (text : Expr) : PrettyPrinter.Delaborator.Delab := d
   let sep := if t.contains '\n' then "\n" else "   "
   return ⟨Syntax.node .none strLitKind #[Syntax.atom .none (head ++ sep ++ t)]⟩
 
-/-- A name as a goal's head shows it: a constant by the last part of its
-name. -/
-def headName? (e : Expr) : Option String :=
-  match e.constName? with
+/-- The last part of the name of the constant at the head of a term: the
+constructor of a move, the name of a calculus. -/
+def headName (m : Expr) : Option String :=
+  match m.getAppFn.constName? with
   | some (.str _ s) => some s
   | _ => none
 
@@ -215,14 +215,14 @@ open PrettyPrinter Delaborator SubExpr in
 /-- **A goal `Att S o j` is shown as its judgment**, drawn by the instance's
 `showJudg`: `Att S   j` where open goals are allowed, `Der S   j` where they
 are not, the judgment below the head if it is drawn on several lines.  For a
-calculus named by a constant, with an instance of `Explorable`, and a closed
-judgment; any other is printed by Lean. -/
+calculus with an instance of `Explorable` and a closed judgment; any other
+goal is printed by Lean. -/
 @[delab app.ProofTools.Explore.Att]
 def delabAtt : Delab := do
   let e ← getExpr
   let (``Att, #[sys, o, j]) := e.getAppFnArgs | failure
   if e.hasLooseBVars || e.hasFVar || e.hasMVar then failure
-  let some name := headName? sys | failure
+  let some name := headName sys | failure
   let kind ← if o.isConstOf ``Bool.true then pure "Att " else
     if o.isConstOf ``Bool.false then pure "Der " else failure
   let inst ← try synthInstance (mkApp (mkConst ``Explorable) sys) catch _ => failure
@@ -468,12 +468,6 @@ def movesApply (n : Nat) (h : Option String) : String :=
   | none, n => s!"{n} moves apply"
   | some h, 1 => s!"1 move whose name begins with `{h}` applies"
   | some h, n => s!"{n} moves whose names begin with `{h}` apply"
-
-/-- The name of the constructor at the head of a move. -/
-def headName (m : Expr) : Option String :=
-  match m.getAppFn.constName? with
-  | some (.str _ s) => some s
-  | _ => none
 
 /-- **The body of `apply_move`**: `tac` is the tactic's name, `sys?` the
 calculus it is fixed to, if any. -/

@@ -259,7 +259,9 @@ def delabWalk : Delab := do
   let (``Walk, #[sys, o, j, d, ms]) := e.getAppFnArgs | failure
   if e.hasLooseBVars || e.hasFVar || e.hasMVar then failure
   let inst ← try synthInstance (mkApp (mkConst ``Explorable) sys) catch _ => failure
-  let head := match headName? d with | some n => s!"Walk {n}" | none => "Walk"
+  let head := match (if d.isConst then headName d else none) with
+    | some n => s!"Walk {n}"
+    | none => "Walk"
   shownAs head (mkApp6 (mkConst ``walkGoalText) sys inst o j d ms)
 
 /-- **One motion, as a tactic**: the goal `Walk d ms` is closed and the goal

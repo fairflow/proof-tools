@@ -136,27 +136,23 @@ def Att.render [Explorable S] {o : Bool} {j : S.Judg} (d : Att S o j) : String :
 
 /-! ## The view at a position -/
 
-/-- `Atts.lines` for attempts kept nearest first (the left side of a hole),
-in the order of the premises. -/
-def Atts.linesRev [Explorable S] : {o : Bool} → {ps : List S.Judg} → Atts S o ps → String →
-    List String
-  | _, _, .nil, _ => []
-  | _, _, .cons d ds, ind => ds.linesRev ind ++ d.lines ind
-
 /-- **What is around a hole, as lines**, given the lines at the hole
 (`ls`): the nodes from the root down to the hole, each with its move and
 one step further in than the one before.  With `all`, the other premises of
 each of these nodes are drawn too, in full and in their order, so that the
 lines are those of the whole attempt (`Att.lines`).  Each line added has two
-spaces before it, where the lines at the hole may have the mark `>`. -/
+spaces before it, where the lines at the hole may have the mark `>`.  (The
+attempts left of a hole are kept nearest first; `Atts.revAppend` puts them
+back in the order of the premises.) -/
 def Path.linesAround [Explorable S] (all : Bool) {o : Bool} : {ds : List Nat} → {i k : S.Judg} →
     Path S o ds i k → List String → List String
   | _, _, _, .top, ls => ls
   | _ :: ds, _, _, .cons (j := j) ⟨mv, _, _, _, left, right, _⟩ p, ls =>
     let ind := "".pushn ' ' (2 * ds.length + 2)
     Path.linesAround all p
-      (nodeLines ind "" j (some mv) "" ++ (if all then left.linesRev (ind ++ "  ") else []) ++
-        ls ++ (if all then right.lines (ind ++ "  ") else []))
+      (nodeLines ind "" j (some mv) "" ++
+        (if all then (left.revAppend .nil).lines (ind ++ "  ") else []) ++ ls ++
+        (if all then right.lines (ind ++ "  ") else []))
 
 /-- The premises of a node, one after another from number `n`: an open goal
 is marked `?`, a node has its move and whether it is closed. -/
