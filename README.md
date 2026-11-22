@@ -64,7 +64,7 @@ are shown here.
   `canon_down`, `canon_descend`, `eq_of_toRoot`, `descend_cons_of_down`,
   `descend_snoc`, `exists_descend_plug`, `descend_addr`; in `Deriv.Path`:
   `plug_inj`, and for `simp` `plug_top`, `plug_cons`. The nearest crumb:
-  `path_eq_cons`, `focus_up`. The one step to a sibling keeps the parent
+  `path_eq_cons`. The one step to a sibling keeps the parent
   and the whole tree, its two directions undo each other, and it is
   `sibling` at the direction it reaches: `up_left`, `up_right`,
   `toRoot_left`, `toRoot_right`, `right_left`, `left_right`,

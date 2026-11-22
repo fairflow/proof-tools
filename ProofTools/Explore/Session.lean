@@ -198,8 +198,6 @@ inductive Cmd (S : ProofSystem) where
   the focus. -/
   | script (ls : Script S)
 
-instance : Coe Motion (Cmd S) := ⟨Cmd.motion⟩
-
 /-- **One command**: the cursor reached, or why the command cannot be
 made. -/
 def Cursor.cmd {j : S.Judg} (c : Cursor S j) : Cmd S → Except String (Cursor S j)

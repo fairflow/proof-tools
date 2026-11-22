@@ -48,7 +48,6 @@ Results (all PROVED):
 
     z.up.2.toRoot = z.toRoot                              (toRoot_up)
     z.path = .cons z.crumb z.up.2.path                    (path_eq_cons)
-    z.up.2.focus = L.plug z.crumb z.focus                 (focus_up)
     z.down d = some x  →  x.2.up = ⟨j, z⟩                 (up_down)
     z.down d = some x  →  x.2.toRoot = z.toRoot           (toRoot_down)
     z.path.Canon  →  z.up.2.down d = some ⟨i, z⟩          (down_up)
@@ -287,13 +286,6 @@ theorem toRoot_replace (z : L.Zipper ds i k) (w : W i) :
 /-- The path is the nearest crumb, then the path of the parent. -/
 theorem path_eq_cons {d : D} (z : L.Zipper (d :: ds) i k) :
     z.path = .cons z.crumb z.up.2.path := by
-  obtain ⟨w, p⟩ := z
-  cases p
-  rfl
-
-/-- The parent's focus is the nearest crumb, filled with the focus. -/
-theorem focus_up {d : D} (z : L.Zipper (d :: ds) i k) :
-    z.up.2.focus = L.plug z.crumb z.focus := by
   obtain ⟨w, p⟩ := z
   cases p
   rfl
