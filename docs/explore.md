@@ -237,9 +237,12 @@ def Att.cert   : Der S j → Cert S
 
 def swapCert : Cert IPC := .mk .impR [.mk (.andL p q) [.mk .andR [.mk .ax [], .mk .ax []]]]
 
-example : Cert.check swapSeq swapCert = true := by decide +kernel
+example : Cert.check ([] ⊢ (p ⋏ q) ⟶ (q ⋏ p)) swapCert = true := by decide +kernel
 example : swap.cert = swapCert := rfl             -- the kernel evaluates `Att.cert`
 ```
+
+(`swap` there is the derivation built by `apply_move`, under "Lean tactics"
+below; the tests are `ProofToolsTest/Explore/Cert.lean`.)
 
 PROVED, for every proof system:
 
