@@ -36,6 +36,8 @@ open ProofTools ProofTools.Explore
 
 /-! ## Trees of moves and derivations; the map out is natural -/
 
+#axioms_within Der.mapOut_node [propext, Quot.sound]
+#axioms_within Der.mapOutAll_cons [propext, Quot.sound]
 #axioms_within Att.mapOut_map [propext, Quot.sound]
 #axioms_within Der.mapOut_map [propext, Quot.sound]
 #axioms_within Cert.moves [propext, Quot.sound]

@@ -161,13 +161,12 @@ def Cert.moves : S.SoundT (fun _ => Cert S) :=
 `Cert.moves`. -/
 def Att.cert {j : S.Judg} (d : Der S j) : Cert S := Der.mapOut Cert.moves d
 
-/-- The tree of moves of a node, whatever is given for the open goals of
-its premises (they have none). -/
+/-- The tree of moves of a node: its move, over the trees of its premises. -/
 theorem Att.cert_node {m : S.Move} {j : S.Judg} {ps : List S.Judg} (hs : S.step m j = .ok ps)
-    (ds : Atts S false ps) (g : Each (fun _ => Cert S) ds.goals) :
+    (ds : Atts S false ps) :
     Att.cert (.node m ps hs ds) =
-      .node m ((Atts.mapOut Cert.moves ds g).list fun _ c => ((), c)) :=
-  (Der.mapOut_eq Cert.moves (.node m ps hs ds) g).symm
+      .node m ((Der.mapOutAll Cert.moves ds).list fun _ c => ((), c)) :=
+  Der.mapOut_node Cert.moves m ps hs ds
 
 /-! ## A derivation's tree checks -/
 
@@ -201,26 +200,22 @@ theorem Att.cert_ofCert : (c : Cert S) → (j : S.Judg) → (h : Cert.check j c 
   | .node m cs, j, h => by
     match hs : S.step m j with
     | .ok ps =>
-      rw [Der.ofCert_node hs h, Att.cert_node hs _ (Each.ofMem fun _ _ => .node m [])]
-      exact congrArg (Zip.RTree.node m) (Atts.certs_ofCerts cs ps _ _)
+      rw [Der.ofCert_node hs h, Att.cert_node hs]
+      exact congrArg (Zip.RTree.node m) (Atts.certs_ofCerts cs ps _)
     | .error _ => exact absurd h (Cert.not_check_of_error hs)
 /-- `Att.cert_ofCert` on a list. -/
 theorem Atts.certs_ofCerts : (cs : List (Unit × Cert S)) → (ps : List S.Judg) →
-    (h : Cert.checkL ps cs = true) → (g : Each (fun _ => Cert S) (Atts.ofCerts ps cs h).goals) →
-    (Atts.mapOut Cert.moves (Atts.ofCerts ps cs h) g).list (fun _ c => ((), c)) = cs
-  | [], [], _, _ => rfl
-  | (u, c) :: cs, p :: ps, h, g => by
-    have key : ∀ g : Each (fun _ => Cert S) (Att.goals (Der.ofCert p c (Cert.checkL_head h)) ++
-          (Atts.ofCerts ps cs (Cert.checkL_tail h)).goals),
-        (Atts.mapOut Cert.moves (.cons (Der.ofCert p c (Cert.checkL_head h))
-          (Atts.ofCerts ps cs (Cert.checkL_tail h))) g).list (fun _ c => ((), c)) =
-            (u, c) :: cs := by
-      intro g
-      simp only [Atts.mapOut_cons, Each.list, Der.mapOut_eq, Atts.certs_ofCerts cs ps]
-      exact congrArg (fun x => ((), x) :: cs) (Att.cert_ofCert c p _)
-    exact key g
-  | _ :: _, [], h, _ => absurd h (by simp [Cert.checkL])
-  | [], _ :: _, h, _ => absurd h (by simp [Cert.checkL])
+    (h : Cert.checkL ps cs = true) →
+    (Der.mapOutAll Cert.moves (Atts.ofCerts ps cs h)).list (fun _ c => ((), c)) = cs
+  | [], [], _ => rfl
+  | (u, c) :: cs, p :: ps, h => by
+    show (Der.mapOutAll Cert.moves (.cons (Der.ofCert p c (Cert.checkL_head h))
+      (Atts.ofCerts ps cs (Cert.checkL_tail h)))).list (fun _ c => ((), c)) = (u, c) :: cs
+    rw [Der.mapOutAll_cons]
+    show ((), Att.cert (Der.ofCert p c _)) :: _ = _
+    rw [Att.cert_ofCert c p, Atts.certs_ofCerts cs ps]
+  | _ :: _, [], h => absurd h (by simp [Cert.checkL])
+  | [], _ :: _, h => absurd h (by simp [Cert.checkL])
 end
 
 private theorem Atts.cons_congr {o : Bool} {p : S.Judg} {ps : List S.Judg} {d d' : Att S o p}
@@ -231,35 +226,38 @@ private theorem Atts.cons_congr {o : Bool} {p : S.Judg} {ps : List S.Judg} {d d'
 derivation is matched as it stands: only a structural recursion needs the
 index `o` of `Att S o j` to be a variable.) -/
 theorem Der.ofCert_cert_aux : (n : Nat) → {j : S.Judg} → (d : Der S j) → Att.size d ≤ n →
-    (g : Each (fun _ => Cert S) (Att.goals d)) →
-    (h : Cert.check j (Att.mapOut Cert.moves d g) = true) →
-    Der.ofCert j (Att.mapOut Cert.moves d g) h = d
-  | 0, _, .node _ _ _ _, hn, _, _ => absurd hn (Nat.not_succ_le_zero _)
-  | n + 1, j, .node m ps hs ds, hn, g, h => by
+    (h : Cert.check j d.cert = true) → Der.ofCert j d.cert h = d
+  | 0, _, .node _ _ _ _, hn, _ => absurd hn (Nat.not_succ_le_zero _)
+  | n + 1, j, .node m ps hs ds, hn, h => by
     have inner : ∀ (qs : List S.Judg) (es : Atts S false qs), es.size ≤ n →
-        ∀ (g : Each (fun _ => Cert S) es.goals)
-          (h' : Cert.checkL qs ((Atts.mapOut Cert.moves es g).list fun _ c => ((), c)) = true),
-          Atts.ofCerts qs ((Atts.mapOut Cert.moves es g).list fun _ c => ((), c)) h' = es := by
+        ∀ (h' : Cert.checkL qs ((Der.mapOutAll Cert.moves es).list fun _ c => ((), c)) = true),
+          Atts.ofCerts qs ((Der.mapOutAll Cert.moves es).list fun _ c => ((), c)) h' = es := by
       intro qs
       induction qs with
       | nil =>
-        intro es _ g h'
+        intro es _ h'
         match es with
         | .nil => rfl
       | cons q qs ih =>
-        intro es hes g h'
-        match es, hes, g, h' with
-        | .cons e es', hes, g, h' =>
+        intro es hes h'
+        match es, hes, h' with
+        | .cons e es', hes, h' =>
+          revert h'
+          rw [Der.mapOutAll_cons]
+          intro h'
           exact Atts.cons_congr
-            (Der.ofCert_cert_aux n e (Nat.le_trans (Nat.le_add_right _ _) hes) _ _)
-            (ih es' (Nat.le_trans (Nat.le_add_left _ _) hes) _ _)
-    have e := Der.ofCert_node hs (cs := (Atts.mapOut Cert.moves ds g).list fun _ c => ((), c)) h
-    exact e.trans (congrArg (Att.node m ps hs) (inner ps ds (Nat.le_of_succ_le_succ hn) g _))
+            (Der.ofCert_cert_aux n e (Nat.le_trans (Nat.le_add_right _ _) hes) _)
+            (ih es' (Nat.le_trans (Nat.le_add_left _ _) hes) _)
+    revert h
+    rw [Att.cert_node hs]
+    intro h
+    exact (Der.ofCert_node hs h).trans
+      (congrArg (Att.node m ps hs) (inner ps ds (Nat.le_of_succ_le_succ hn) _))
 
 /-- **A derivation is the derivation of its tree of moves.** -/
 theorem Der.ofCert_cert {j : S.Judg} (d : Der S j) (h : Cert.check j d.cert = true) :
     Der.ofCert j d.cert h = d :=
-  Der.ofCert_cert_aux (Att.size d) d (Nat.le_refl _) _ h
+  Der.ofCert_cert_aux (Att.size d) d (Nat.le_refl _) h
 
 /-- **A derivation is determined by its tree of moves.** -/
 theorem Att.cert_inj {j : S.Judg} {d d' : Der S j} (h : d.cert = d'.cert) : d = d' :=

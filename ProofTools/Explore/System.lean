@@ -28,7 +28,12 @@ premises with one judgment keep their own derivations.  Then (here):
 
 `Att.mapOut` says that an attempt is a derived rule, from its open goals to
 its root; when `T` is a type it is a function, and a derivation of the
-explorer gives a derivation of the calculus as data.
+explorer gives a derivation of the calculus as data.  On a derivation it
+computes by the rule of each move (`Der.mapOutAll` is `Der.mapOut` at each
+premise):
+
+    Der.mapOut hS (.node m ps h ds) = hS m j ps h (Der.mapOutAll hS ds)   (Der.mapOut_node)
+    Der.mapOutAll hS (.cons d ds) = ⟨Der.mapOut hS d, Der.mapOutAll hS ds⟩ (Der.mapOutAll_cons)
 
 For a proposition `D` the same is said with the premises taken by
 membership, which is what an instance proves when it has no more than a
@@ -387,11 +392,36 @@ derivations, the derivation in `T`. -/
 def Der.mapOut (hS : S.SoundT T) {j : S.Judg} (d : Der S j) : T j :=
   Att.mapOut hS d ((Der.goals d).symm ▸ PUnit.unit)
 
+/-- `Der.mapOut` on a list of derivations: one `T` for each premise. -/
+def Der.mapOutAll (hS : S.SoundT T) {ps : List S.Judg} (ds : Atts S false ps) : Each T ps :=
+  Atts.mapOut hS ds ((Atts.goals_of_closed ds rfl).symm ▸ PUnit.unit)
+
 /-- On a derivation, the map out of an attempt is `Der.mapOut`, whatever is
 given for its open goals: it has none. -/
 theorem Der.mapOut_eq (hS : S.SoundT T) {j : S.Judg} (d : Der S j) (g : Each T (Att.goals d)) :
     Att.mapOut hS d g = Der.mapOut hS d :=
   congrArg (Att.mapOut hS d) (Each.eq_of_nil (Der.goals d) _ _)
+
+/-- `Der.mapOut_eq` on a list. -/
+theorem Der.mapOutAll_eq (hS : S.SoundT T) {ps : List S.Judg} (ds : Atts S false ps)
+    (g : Each T ds.goals) : Atts.mapOut hS ds g = Der.mapOutAll hS ds :=
+  congrArg (Atts.mapOut hS ds) (Each.eq_of_nil (Atts.goals_of_closed ds rfl) _ _)
+
+/-- **The map out of a derivation, at a node**: the rule of its move, applied
+to the maps out of its premises. -/
+@[simp] theorem Der.mapOut_node (hS : S.SoundT T) {j : S.Judg} (m : S.Move) (ps : List S.Judg)
+    (h : S.step m j = .ok ps) (ds : Atts S false ps) :
+    Der.mapOut hS (.node m ps h ds) = hS m j ps h (Der.mapOutAll hS ds) :=
+  congrArg (hS m j ps h) (Der.mapOutAll_eq hS ds _)
+
+@[simp] theorem Der.mapOutAll_nil (hS : S.SoundT T) :
+    Der.mapOutAll hS (Atts.nil : Atts S false []) = ⟨⟩ := rfl
+
+@[simp] theorem Der.mapOutAll_cons (hS : S.SoundT T) {p : S.Judg} {ps : List S.Judg}
+    (d : Der S p) (ds : Atts S false ps) :
+    Der.mapOutAll hS (Atts.cons d ds) = ⟨Der.mapOut hS d, Der.mapOutAll hS ds⟩ := by
+  show (⟨Att.mapOut hS d _, Atts.mapOut hS ds _⟩ : Each T (p :: ps)) = _
+  rw [Der.mapOut_eq, Der.mapOutAll_eq]
 
 /-! ## The map out is natural in the family -/
 

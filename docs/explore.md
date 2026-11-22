@@ -98,7 +98,12 @@ def soundT : IPC.SoundT G3            -- each move that applies is a rule, appli
 example : Der.mapOut soundT swap = swapG3 := rfl       -- the kernel evaluates the map out
 ```
 
-(`ProofToolsTest/Explore/MapOut.lean`).
+(`ProofToolsTest/Explore/MapOut.lean`). On a derivation the map out
+computes by the rule of each move (`Der.mapOutAll` is `Der.mapOut` at each
+premise):
+
+    Der.mapOut hS (.node m ps h ds) = hS m j ps h (Der.mapOutAll hS ds)    (Der.mapOut_node)
+    Der.mapOutAll hS (.cons d ds) = ⟨Der.mapOut hS d, Der.mapOutAll hS ds⟩  (Der.mapOutAll_cons)
 
 For a proposition, the same with the premises and the goals taken by
 membership. PROVED:

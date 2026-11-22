@@ -172,6 +172,12 @@ example : Att.mapOut soundT swapAtt ⟨.ax (by decide), .ax (by decide), ⟨⟩�
 example (g : Each G3 [[p] ⊢ p]) : Att.mapOut soundT (Att.goal : Att IPC true ([p] ⊢ p)) g = g.1 := by
   simp
 
+-- on a derivation, the map out computes by the rule of each move
+example {s : Seq} (m : Move) (ps : List Seq) (h : IPC.step m s = .ok ps) (ds : Atts IPC false ps) :
+    Der.mapOut soundT (.node m ps h ds) = soundT m s ps h (Der.mapOutAll soundT ds) := by simp
+example {a : Seq} {as : List Seq} (d : Der IPC a) (ds : Atts IPC false as) :
+    Der.mapOutAll soundT (.cons d ds) = ⟨Der.mapOut soundT d, Der.mapOutAll soundT ds⟩ := by simp
+
 /-! ## The certifier, at a type and at a proposition -/
 
 /-- A script certifies a derivation of the calculus, as data: the kernel
