@@ -43,7 +43,8 @@ The library then gives, the same for every instance:
 | trees of moves as certificates, and their check | `Explore/Cert.lean`, on the rose trees of `ProofTools/Zipper/Rose.lean` |
 | the checkers of scripts and of trees, as certifiers of `LeanCertify` | `Explore/Certify.lean` |
 | tactics of the calculus, built from tactics | `Explore/Tac.lean` |
-| the motions of the cursor, their laws, the one loop over motions | `Explore/Motion.lean` |
+| the motions of the cursor, which are the moves of the zipper; their laws; the one loop of the cursor | `Explore/Motion.lean` |
+| changing an attempt that is built: one change at the focus and its uses; a session of commands | `Explore/Cursor.lean`, `Explore/Session.lean` |
 | what an instance supplies for the editor (`Explorable`); an attempt drawn as text: all of it, the view at a position, the view with every branch | `Explore/View.lean` |
 | Lean tactics: `apply_move`, `apply_script`, `leave_open`; the query `apply_move where`; a goal shown as its judgment | `Explore/Tactic.lean` |
 | the command `#walk`; the goal `Walk d`, for a tactic block of motions | `Explore/Walk.lean` |
@@ -58,7 +59,7 @@ the same commit as any entry point):
 | build by program | a script and `run`; the tactics of the calculus (`Tac`); a tree of moves and `Der.ofCert` |
 | check | the term itself, each node's equation by `rfl`; a script by `derives`; a tree of moves by `Cert.check` |
 | look at an attempt that is built | `#walk`, by typing motions or by clicking the ones it offers; `example : Walk d := by …`, a tactic block of motions whose goal is the view; as functions `Cursor.view`, `Cursor.viewAll`, `walkText`, `Cursor.motions`; all of it at once, `Att.render` |
-| change an attempt that is built | a move at an open goal (`apply_move … at k`, `Att.run`); nothing else yet |
+| change an attempt that is built | a move at an open goal (`apply_move … at k`, `Att.run`); at a position, as functions: `Cursor.replace` and its uses `Cursor.rule`, `Cursor.prune`, `Cursor.graft`, `Cursor.script`; in turn with motions, `Cursor.walk` on a list of commands (`Cmd`). No tactic or command of the editor changes one yet |
 | map out to the mathematics | `Der.mapOut` and `Att.mapOut`, with the instance's soundness: into a type, a derivation of the calculus as data; into a proposition, a proof (there also as `Der.sound`, `Att.sound`) |
 | keep and replay | `Att.script`, `run`, `apply_script`; `Att.cert`, the tree of moves, which is printed and compared as it stands |
 
@@ -580,13 +581,31 @@ The motions are functions of the library (`Explore/Motion.lean`):
 `Cursor.move m c`, and `Cursor.moves c ms` for several.  One loop makes
 motions in turn, `Cursor.trail`, which keeps every position passed, the
 last one reached and the motion that could not be made; `Cursor.moves`, the
-views of `#walk` and the panel's focus are read off it.  A motion changes
-the position and nothing else (PROVED; `c.Ok` says that the cursor's count
-of the open goals left of the focus is right):
+views of `#walk` and the panel's focus are read off it.  (It is
+`Cursor.trailBy`, the loop over any kind of step, at motions; a session,
+below, is the same loop at commands.)
+
+**The motions are the moves of the zipper** (`ProofTools/Zipper.lean`), with
+the cursor's count of goals kept beside them.  `up` and `down i` are its
+`up` and `down`; `left` and `right` are its one step to a sibling
+(`Deriv.Sibling`: the hole of the node moved one premise, where going up
+and down again fills the node and opens it from its first premise); `top`
+is its `ofRoot` of `toRoot`.  The count changes by the open goals of the
+premises before the focus in its node, read off the zipper's nearest crumb
+(`Zipper.crumb`).  So the laws are the zipper's.  A motion changes the
+position and nothing else (PROVED; `c.Ok` says that the cursor's count of
+the open goals left of the focus is right):
 
     c.Ok → c.move m = some c'   →  c'.toRoot = c.toRoot ∧ c'.Ok      (Cursor.move_some)
     c.Ok → c.moves ms = .ok c'  →  c'.toRoot = c.toRoot ∧ c'.Ok      (Cursor.moves_ok)
     c.down i = some c'  →  c'.up = some c                            (Cursor.up_down)
+    c.move .right = match c.pos.ds with
+      | [] => none | d :: _ => c.up.bind (·.down (d + 1))            (Cursor.move_right)
+    c.move .left = match c.pos.ds with
+      | [] => none | 0 :: _ => none | (d + 1) :: _ => c.up.bind (·.down d)   (Cursor.move_left)
+
+The last two say that the one step reaches what up, then down at the
+neighbouring premise number, reaches, with the same count.
 
 `Cursor.motions c` is the list of motions offered, and each can be made
 (PROVED):
@@ -604,6 +623,90 @@ the last line of the view, which is what `apply_move where` shows.  A node,
 made or open, is drawn by one function (`nodeLines`), and what is around a
 focus by one (`Path.linesAround`, which goes up the zipper's path crumb by
 crumb, with the other branches or without them).
+
+## Changing an attempt that is built
+
+An attempt is changed at a position.  The cursor goes there by motions,
+and the attempt at its focus is replaced: there is one change,
+`Cursor.replace` (the zipper's `replace`), and the others are uses of it.
+
+| | the focus | becomes |
+|---|---|---|
+| `c.replace d` | anything | the attempt `d`, at the same judgment |
+| `c.rule m` | an open goal | the node of the move `m`, its premises open |
+| `c.prune` | anything | an open goal |
+| `c.graft d` | an open goal | the attempt `d` |
+| `c.script ls` | anything | what the script `ls` leaves of it, the goals of `ls` numbered within the focus; nothing changes if a line fails |
+
+The position stays, and the cursor's count with it, since the goals left of
+the focus are not touched.  What a change does to the whole attempt is
+PROVED (`goalsL`, `goalsR`: the open goals left and right of the focus):
+
+    (c.replace d).toRoot.goals = goalsL ++ d.goals ++ goalsR               (Cursor.goals_replace)
+    c.prune.toRoot.goals = goalsL ++ c.pos.i :: goalsR                     (Cursor.goals_prune)
+    c.rule m = .ok c' → ∃ ps, S.step m c.pos.i = .ok ps ∧
+        c'.toRoot.goals = goalsL ++ ps ++ goalsR                           (Cursor.goals_rule)
+    c.rule m = .ok c' → c'.prune = c                                       (Cursor.prune_rule)
+    c.Ok → c.rule m = .ok c' → c.toRoot.step ⟨c.left, m⟩ = .ok c'.toRoot   (Cursor.toRoot_rule)
+    c.Ok → c.script ls = .ok c' →
+        c.toRoot.run (ls.shift c.left) = { att := c'.toRoot }              (Cursor.toRoot_script)
+
+The last two say what a change at the focus is at the root: a rule is the
+line of a script at goal number `c.left`, and a script at the focus is the
+script shifted by `c.left`.  A line of `run` is the motion to its goal and
+then the rule there (`Cursor.step_eq`).  Soundness asks nothing new: every
+state is an attempt, `c.toRoot`, to which `Att.mapOut` and `Att.sound`
+apply.
+
+**A session** is commands in turn: the motions, as they are, and the
+changes.
+
+```lean
+inductive Cmd (S : ProofSystem)
+  | motion (m : Motion) | rule (m : S.Move) | prune | script (ls : Script S)
+
+def Cursor.walk : Cursor S j → List (Cmd S) → Except (Nat × String) (Cursor S j)
+```
+
+`Cursor.walk` answers with the cursor reached, or the number of the first
+command that fails and why.  A graft enters a session as `script`, since a
+command cannot hold an attempt whose type depends on the focus.  From the
+tests (`ProofToolsTest/Explore/Session.lean`): a derivation built where the
+cursor is, and a branch taken the wrong way, pruned and built again.
+
+```lean
+def build : List (Cmd IPC) :=
+  [.rule .impR, .motion (.down 0), .rule (.andL p q), .motion (.down 0), .rule .andR,
+   .motion (.down 0), .rule .ax, .motion .right, .rule .ax]
+
+#guard ((start swap).walk build).toOption.map (·.toRoot.script) == some swapScript
+
+-- after `orL`, the wrong disjunct in the first branch; then back up, prune, the right one
+def wrong : List (Cmd IPC) := [… .rule (.orL q r), .motion (.down 0), .rule .orR2, .motion (.down 0), .rule .andR]
+def again : List (Cmd IPC) := [.motion .up, .prune, .rule .orR1, …]
+```
+
+PROVED of sessions:
+
+    c.Ok → c.walk cs = .ok c' → c'.Ok                                      (Cursor.walk_ok)
+    c.walk (ms.map .motion) = c.moves ms                                   (Cursor.walk_motions)
+    c.Ok → c.walk (ms.map .motion) = .ok c' → c'.toRoot = c.toRoot ∧ c'.Ok (Cursor.walk_motions_ok)
+    (d.run ls).failed = none →
+        ∃ c, (Cursor.ofRoot d).walk (Script.cmds ls) = .ok c ∧ c.toRoot = (d.run ls).att   (Att.walk_cmds)
+    (Cursor.ofRoot d).walk (Script.cmds ls) = .ok c → d.run ls = { att := c.toRoot }       (Att.run_of_walk_cmds)
+
+The first: the count stays right through a session, so `goal k` finds open
+goal `k` after any change.  The next two: a session of motions only is the
+motions in turn, and leaves the attempt as it was.  The last two: a script
+is the session that goes to each line's goal and makes its move there
+(`Script.cmds ls`), and succeeds exactly when no line of the run fails.
+
+A session is not a certificate.  It records what was done, with its
+retreats; the certificate is read off the result (`c.toRoot.script`; or,
+once no goal is open, the tree of moves of the derivation
+`c.toRoot.toDer h`), and the kernel checks that.  There
+is no tactic or command of the editor for a session yet: `Cursor.walk` is a
+function.
 
 ## Tactics of the calculus, from tactics
 
@@ -744,3 +847,8 @@ above).
    are offered at the end of a walk only, and a click writes on its last
    line.  That every motion that can be made is among those offered is not
    stated; that each one offered can be made is proved.
+7. A session (`Cursor.walk`) is a function, with no syntax of its own and
+   no view in the editor.  `Cursor.script` runs its script on the focus
+   from that focus's root, so its cost is the script's, not the attempt's.
+   A step to a sibling counts the open goals of the premises before the old
+   focus and before the new one: linear in those premises.

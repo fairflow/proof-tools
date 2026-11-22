@@ -18,7 +18,7 @@ yet; lean-certify's tags (v0.1.0 to v0.3.0) are in this history.
 | `LeanCertify` | Certified computation: an untrusted fast producer computes a certificate, and a checker proved sound certifies it in the kernel. | Released as lean-certify v0.3.0. `docs/lean-certify.md`; the procedure as a Claude skill, `SKILL.md`. |
 | `ProofTools.Audit` | Commands that audit a development: what axioms a declaration may depend on and where one enters, the same for a whole file or for whole libraries, an inductive family printed as inference figures, and a check for computed indices. | Carried in from lax-logic-in-lean, 2026-11-19. `ProofTools/Audit.lean`. |
 | `ProofTools.Zipper` | The zipper of an indexed family of trees: paths, moves and their laws, stated once. Beside it, Huet's zipper for rose trees with labelled edges, and those trees as an instance of the family. | New, 2026-11-19; the rose trees added 2026-11-22. `ProofTools/Zipper.lean`, `ProofTools/Zipper/`; "The zipper" below. |
-| `ProofTools.Explore` | A proof explorer for any calculus given as a type of judgments, a type of moves, and a step function proved sound: derivations and unfinished derivations as data, scripts and their `run`, trees of moves as certificates (rose trees of `ProofTools.Zipper`), the checkers of both as certifiers, one tactic (`apply_move`, with the query `apply_move where` that draws the attempt so far), a command to look at an attempt that is built (`#walk`, by typing motions or by clicking the ones it offers) and a tactic block for the same (`Walk d`), and tactics of the calculus built from tactics. | New, 2026-11-19. `docs/explore.md`. |
+| `ProofTools.Explore` | A proof explorer for any calculus given as a type of judgments, a type of moves, and a step function proved sound: derivations and unfinished derivations as data, scripts and their `run`, trees of moves as certificates (rose trees of `ProofTools.Zipper`), the checkers of both as certifiers, one tactic (`apply_move`, with the query `apply_move where` that draws the attempt so far), a command to look at an attempt that is built (`#walk`, by typing motions or by clicking the ones it offers) and a tactic block for the same (`Walk d`), functions that change one at a position (`Cursor.replace`, and by it `rule`, `prune`, `graft`, `script`) and run a session of motions and changes (`Cursor.walk`), and tactics of the calculus built from tactics. | New, 2026-11-19. `docs/explore.md`. |
 | The method | How the parts are used on one calculus, in five stages. | Draft: `docs/campaign.md`. |
 
 Related, and kept elsewhere:
@@ -99,7 +99,9 @@ of `RTree.updateAt` with `goto`, `replace` and `toTree` (the tests check it
 on one tree). The explorer's attempts are an instance of `ProofTools.Zipper`
 (`ProofTools/Explore/Zipper.lean`), not rose trees, and the motions of its
 cursor are that zipper's moves: `up`, `down`, `left`, `right`, with the
-laws read off the generic ones (`ProofTools/Explore/Motion.lean`). Its
+laws read off the generic ones (`ProofTools/Explore/Motion.lean`), and its
+one change at a position is that zipper's `replace`
+(`ProofTools/Explore/Session.lean`). Its
 trees of moves are rose trees (`Cert S := Zip.RTree Unit S.Move`,
 `ProofTools/Explore/Cert.lean`).
 Every file ends with the

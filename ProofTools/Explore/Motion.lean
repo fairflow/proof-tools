@@ -18,8 +18,9 @@ that is built (by a script, by the tactic, by a search) can be walked:
     Cursor.whyNot m c    why not, as text
     Cursor.moves c ms    motions in turn: the cursor reached, or the number
                          of the first motion that fails and why
-    Cursor.trail n c ms  the same with every position kept: the one loop
-                         over motions, which the others are read off
+    Cursor.trail n c ms  the same with every position kept, which the
+                         others are read off; it is `Cursor.trailBy`, the
+                         one loop of the cursor, at motions
 
 **The motions are the moves of the zipper** (`ProofTools/Zipper.lean`), with
 the cursor's count kept beside them: `Cursor.up` is its `up`, `Cursor.down`
@@ -163,35 +164,64 @@ def Cursor.whyNot {j : S.Judg} (m : Motion) (c : Cursor S j) : String :=
   | .top => "the motion can be made"
   | .goal k => s!"there is no goal {k}"
 
-/-- **What motions in turn leave behind**: the cursors passed, the first
-first; the cursor reached, which is the last one before a motion that cannot
-be made; and that motion's number and why, if there is one. -/
+/-- **What steps in turn leave behind** (motions, or the commands of a
+session): the cursors passed, the first first; the cursor reached, which is
+the last one before a step that cannot be made; and that step's number and
+why, if there is one. -/
 structure Trail (S : ProofSystem) (j : S.Judg) where
   /-- The cursors passed, the first first. -/
   passed : List (Cursor S j)
   /-- The cursor reached. -/
   last : Cursor S j
-  /-- The number of the motion that cannot be made, and why. -/
+  /-- The number of the step that cannot be made, and why. -/
   failed : Option (Nat × String)
 
-/-- **Motions in turn, every position kept**; `n` is the number of the first
-motion.  The one loop over motions: `Cursor.moves`, the views of `#walk`
-(`walkViews`) and the panel's focus (`Cursor.movesWhile`) are read off it. -/
-def Cursor.trail {j : S.Judg} : Nat → Cursor S j → List Motion → Trail S j
+/-- The cursor reached, or the number of the step that cannot be made and
+why. -/
+def Trail.result {j : S.Judg} (t : Trail S j) : Except (Nat × String) (Cursor S j) :=
+  match t.failed with
+  | none => .ok t.last
+  | some e => .error e
+
+/-- **Steps in turn, every position kept**; `n` is the number of the first
+step.  The one loop of the cursor, over whatever a step is: a motion
+(`Cursor.trail`), or a command of a session, which may also change the
+attempt (`Cursor.walk`, in `Session.lean`). -/
+def Cursor.trailBy {α : Type} {j : S.Judg} (step : Cursor S j → α → Except String (Cursor S j)) :
+    Nat → Cursor S j → List α → Trail S j
   | _, c, [] => ⟨[], c, none⟩
-  | n, c, m :: ms =>
-    match c.move m with
-    | some c' => let t := Cursor.trail (n + 1) c' ms; ⟨c :: t.passed, t.last, t.failed⟩
-    | none => ⟨[], c, some (n, c.whyNot m)⟩
+  | n, c, a :: as =>
+    match step c a with
+    | .ok c' => let t := Cursor.trailBy step (n + 1) c' as; ⟨c :: t.passed, t.last, t.failed⟩
+    | .error e => ⟨[], c, some (n, e)⟩
+
+theorem Cursor.trailBy_result_cons {α : Type} {j : S.Judg}
+    (step : Cursor S j → α → Except String (Cursor S j)) (n : Nat) (c : Cursor S j) (a : α)
+    (as : List α) :
+    (Cursor.trailBy step n c (a :: as)).result =
+      match step c a with
+      | .ok c' => (Cursor.trailBy step (n + 1) c' as).result
+      | .error e => .error (n, e) := by
+  simp only [Cursor.trailBy]
+  cases step c a <;> rfl
+
+/-- **One motion, or why it cannot be made.** -/
+def Cursor.tryMove {j : S.Judg} (c : Cursor S j) (m : Motion) : Except String (Cursor S j) :=
+  match c.move m with
+  | some c' => .ok c'
+  | none => .error (c.whyNot m)
+
+/-- **Motions in turn, every position kept**; `n` is the number of the first
+motion.  `Cursor.moves`, the views of `#walk` (`walkViews`) and the panel's
+focus (`Cursor.movesWhile`) are read off it. -/
+def Cursor.trail {j : S.Judg} (n : Nat) (c : Cursor S j) (ms : List Motion) : Trail S j :=
+  Cursor.trailBy Cursor.tryMove n c ms
 
 /-- **Motions in turn**: the cursor reached, or the number of the first
 motion that cannot be made (from `n`) and why. -/
 def Cursor.movesFrom {j : S.Judg} (n : Nat) (c : Cursor S j) (ms : List Motion) :
     Except (Nat × String) (Cursor S j) :=
-  let t := Cursor.trail n c ms
-  match t.failed with
-  | none => .ok t.last
-  | some e => .error e
+  (Cursor.trail n c ms).result
 
 theorem Cursor.movesFrom_nil {j : S.Judg} (n : Nat) (c : Cursor S j) :
     Cursor.movesFrom n c [] = .ok c := rfl
@@ -202,7 +232,7 @@ theorem Cursor.movesFrom_cons {j : S.Judg} (n : Nat) (c : Cursor S j) (m : Motio
       match c.move m with
       | some c' => Cursor.movesFrom (n + 1) c' ms
       | none => .error (n, c.whyNot m) := by
-  simp only [Cursor.movesFrom, Cursor.trail]
+  simp only [Cursor.movesFrom, Cursor.trail, Cursor.trailBy_result_cons, Cursor.tryMove]
   cases c.move m <;> rfl
 
 /-- **Motions in turn**, numbered from 0. -/
