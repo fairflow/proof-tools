@@ -43,9 +43,10 @@ The library then gives, the same for every instance:
 | trees of moves as certificates, and their check | `Explore/Cert.lean`, on the rose trees of `ProofTools/Zipper/Rose.lean` |
 | the checkers of scripts and of trees, as certifiers of `LeanCertify` | `Explore/Certify.lean` |
 | tactics of the calculus, built from tactics | `Explore/Tac.lean` |
-| Lean tactics: `apply_move`, `apply_script`, `leave_open` | `Explore/Tactic.lean` |
-| the motions of the cursor, and their laws | `Explore/Motion.lean` |
-| the view at a position; the command `#walk` | `Explore/Walk.lean` |
+| the motions of the cursor, their laws, the one loop over motions | `Explore/Motion.lean` |
+| what an instance supplies for the editor (`Explorable`); an attempt drawn as text: all of it, the view at a position, the view with every branch | `Explore/View.lean` |
+| Lean tactics: `apply_move`, `apply_script`, `leave_open`; the query `apply_move where`; a goal shown as its judgment | `Explore/Tactic.lean` |
+| the command `#walk`; the goal `Walk d`, for a tactic block of motions | `Explore/Walk.lean` |
 | the panel of `#walk` (a trial): the attempt as a tree in the infoview | `Explore/Panel.lean`, `Explore/walkPanel.js` |
 
 What it is for, and the entry point of each purpose (this table changes in
@@ -53,10 +54,10 @@ the same commit as any entry point):
 
 | purpose | entry point |
 |---|---|
-| build by hand, a move at a time | `apply_move`, or the instance's alias of it |
+| build by hand, a move at a time | `apply_move`, or the instance's alias of it; `apply_move where` draws the attempt so far, with the goal marked |
 | build by program | a script and `run`; the tactics of the calculus (`Tac`); a tree of moves and `Der.ofCert` |
 | check | the term itself, each node's equation by `rfl`; a script by `derives`; a tree of moves by `Cert.check` |
-| look at an attempt that is built | `#walk`, by typing motions or by clicking the ones it offers; as functions `Cursor.view`, `walkText`, `Cursor.motions`; all of it at once, `Att.render` |
+| look at an attempt that is built | `#walk`, by typing motions or by clicking the ones it offers; `example : Walk d := by …`, a tactic block of motions whose goal is the view; as functions `Cursor.view`, `Cursor.viewAll`, `walkText`, `Cursor.motions`; all of it at once, `Att.render` |
 | change an attempt that is built | a move at an open goal (`apply_move … at k`, `Att.run`); nothing else yet |
 | map out to the mathematics | `Der.mapOut` and `Att.mapOut`, with the instance's soundness: into a type, a derivation of the calculus as data; into a proposition, a proof (there also as `Der.sound`, `Att.sound`) |
 | keep and replay | `Att.script`, `run`, `apply_script`; `Att.cert`, the tree of moves, which is printed and compared as it stands |
@@ -352,7 +353,10 @@ a `Certify.Disprover` (`refuter`), whose certifier the engine takes.
 ## Lean tactics
 
 A goal is `Att S o j` or `Der S j` with `j` a closed term. The open goals of
-the calculus are Lean's goals.
+the calculus are Lean's goals. A goal is shown as its judgment, drawn by the
+instance's `showJudg`: `Att IPC   p0, p1 ⊢ p0`, or `Der IPC   …` where no
+goal may be left open; a judgment drawn on several lines goes below the
+head. One delaborator in the library does this for every instance.
 
 ```lean
 def swap : Der IPC ([] ⊢ (p ⋏ q) ⟶ (q ⋏ p)) := by
@@ -384,6 +388,58 @@ theorem swap_valid : Valid ([] ⊢ (p ⋏ q) ⟶ (q ⋏ p)) := Der.sound sound s
 
 The lines of a proof by `apply_move` are the lines of a script:
 `swap.script` gives them back.
+
+**Where the proof is: `apply_move where`.** The goals show what is left to
+do, and not what was done. The query `apply_move where` draws the attempt so
+far, all of it, with the first goal marked `>`; `apply_move where at k`
+marks goal `k`. It makes no move. After the third line of `swap`:
+
+```
+   ⊢ ((p0 ∧ p1) → (p1 ∧ p0))   by impR
+    (p0 ∧ p1) ⊢ (p1 ∧ p0)   by andL p0 p1
+      p0, p1, (p0 ∧ p1) ⊢ (p1 ∧ p0)   by andR
+>       ? p0, p1, (p0 ∧ p1) ⊢ p1
+        ? p0, p1, (p0 ∧ p1) ⊢ p0
+  at 0.0.0: open goal 0; 2 open in all
+```
+
+The lines are those of `Att.render` on the attempt, an open goal marked `?`;
+the last line is the last line of a view (below): the address of the goal,
+its number among the open goals of the attempt, and how many there are.
+The message is at the line of the query, so the infoview shows it while the
+editor's cursor is there. An alias has the query too (`ipc where`).
+
+`set_option apply_move.showWhere true` asks it after every move: each line
+that makes a move then shows where the proof is after it, the goal the next
+line acts on marked, and the line that closes the last goal shows the
+derivation. It is off by default: a script then shows a message at every
+line, and the attempt is read again at each (below).
+
+**How the attempt is found.** The tactic keeps no state: the attempt so far
+is the value, assigned in part, of the metavariable the proof began with,
+and Lean does not hand a tactic that metavariable. It is found again from
+the goal: among the metavariables that are assigned and whose value, with
+every later assignment put in, still mentions the goal, those of type
+`Att S o j` are the attempts the goal is part of, and the one made first
+holds the others. Its value is read as a closed term (each open goal
+becomes `Att.goal`; a part given with `exact` is taken as it is) and drawn
+by evaluating `Att.whereText`, which is `Cursor.viewAll` at that goal. So:
+
+* it is found under bullets, `case`, `all_goals`, `<;>`, and when the goals
+  are in another order (`rotate_left`): the goal marked is the tactic's
+  goal, wherever it is in the attempt;
+* a block inside a term (`exact .node m _ rfl (.cons (by …) .nil)`) is an
+  attempt of its own while it runs, since the term around it is not yet
+  the value of anything;
+* inside a `have d : Der S j := by …` the attempt drawn is `d`'s, and the
+  message says that there is more around it; after the `have` the goal is
+  drawn alone, since the proof is then under a binder;
+* with no goal left there is nothing to start from, and the query says so.
+  With the option on, the attempt is found before each move is made, so
+  the last line can draw the derivation;
+* each query has the kernel check the term so far again (the term is
+  evaluated as compiled code, and Lean checks what it compiles): about as
+  long as the check of the finished proof, at each query.
 
 ## Looking at an attempt that is built
 
@@ -434,6 +490,32 @@ A motion that cannot be made is an error at that motion, with the reason
 (`the focus is the root`, `the focus has no premise 3: its premises are
 numbered 0 to 0`, `there is no goal 4`, …); the view before it is shown.
 A comma may follow a motion.
+
+**As a tactic block.**  The same walk, with the view as the goal:
+
+```lean
+example : Walk swap := by
+  down 0
+  down 0
+  down 1
+  up
+```
+
+`Walk d` is the goal of a block whose lines are motions.  The goal after
+each line is `Walk d` at the position reached, and it is shown as the view
+there, so the infoview's goal follows the editor's cursor and no message is
+written.  A motion that cannot be made is an error at its line, with the
+same reason.  The block needs no last line: the goal that is left is closed
+by Lean when the block ends.  `Walk d` says nothing about `d`; it is there
+to be looked at.
+
+The motions `up`, `down i`, `top`, `goal k` are tactics for this goal only
+(on another goal: `a motion is for a goal Walk d`), and of low priority, so
+that a tactic of another library with the same form is read first.  `left`
+and `right` are Lean's own tactics: on a goal `Walk d` they are the
+motions, on any other goal they are Lean's, with Lean's errors.  The words
+are not reserved: `def top`, an argument named `left`, are as before.  The
+block does not offer motions to click; `#walk` does.
 
 **Walking by clicking.**  After the last view, `#walk` offers the motions
 that can be made from the position reached, as a second message:
@@ -495,7 +577,10 @@ once, outside the tests, at every address of eight attempts (2026-11-22);
 nothing in the repository repeats that comparison.
 
 The motions are functions of the library (`Explore/Motion.lean`):
-`Cursor.move m c`, and `Cursor.moves c ms` for several.  A motion changes
+`Cursor.move m c`, and `Cursor.moves c ms` for several.  One loop makes
+motions in turn, `Cursor.trail`, which keeps every position passed, the
+last one reached and the motion that could not be made; `Cursor.moves`, the
+views of `#walk` and the panel's focus are read off it.  A motion changes
 the position and nothing else (PROVED; `c.Ok` says that the cursor's count
 of the open goals left of the focus is right):
 
@@ -511,6 +596,14 @@ of the open goals left of the focus is right):
 `walkText d ms` is the view after the motions `ms` as a string, and
 `walkOffers d ms` the motions offered after them, for use without the
 command.
+
+**The drawings** (`Explore/View.lean`) are three, from the same pieces:
+`Att.render d`, all of an attempt; `Cursor.view c`, the view above;
+`Cursor.viewAll c`, the lines of `Att.render` with the focus marked `>` and
+the last line of the view, which is what `apply_move where` shows.  A node,
+made or open, is drawn by one function (`nodeLines`), and what is around a
+focus by one (`Path.linesAround`, which goes up the zipper's path crumb by
+crumb, with the other branches or without them).
 
 ## Tactics of the calculus, from tactics
 
@@ -555,8 +648,11 @@ builds is checked by the kernel. `ProofToolsTest/Explore/Tactic.lean` has an
 instance that quotes wrongly, and the kernel's refusal.
 
 Each theory file ends with its bound on axioms (`#axioms_within_file`), and
-every bound is `[propext, Quot.sound]`: nothing in the library uses
-`Classical.choice`. One thing to know when proving about numbers of goals:
+every bound is `[propext, Quot.sound]`: nothing that is proved, and nothing
+on the path of trust, uses `Classical.choice`. The code for the editor
+(`View.lean`, `Tactic.lean`, `Walk.lean`, `Panel.lean`) carries no bound:
+it proves nothing, and its drawings use Lean's own functions on strings,
+which do use `Classical.choice`. One thing to know when proving about numbers of goals:
 `omega` stays within that bound when it is given one comparison to prove,
 and brings in `Classical.choice` when it is given a conjunction (it negates
 the goal, and pushes the negation through `∧` with
@@ -577,6 +673,8 @@ the goal, and pushes the negation through `∧` with
    (`deriving Lean.ToExpr` gives them), `showJudg`, `showMove`, and
    optionally `within` and `moveSource` (a move as Lean source, for the
    lines the tactic suggests; without it Lean prints the move's term).
+   `showJudg` is also how a goal is shown: there is no delaborator to
+   write.
 5. Optionally a certifier against what holds (level 2, above), a producer,
    and an alias.
 
@@ -631,6 +729,10 @@ above).
    a derivation as deep as it is long.
 4. The tactics need the goal's judgment to be a closed term, and see only
    the candidates the instance proposes when a line is a pattern.
+   `apply_move where` reads the attempt again at each query, and does not
+   see past a `have` or out of a block inside a term (above).  A goal
+   stated with `Der S j` is printed by Lean until the first move; the
+   goals after it are shown as their judgments.
 5. There is no search procedure, no model of an open goal, and no map
    between systems: those belong to the instance. The map out goes one
    way: nothing here takes a derivation of the calculus to a derivation of

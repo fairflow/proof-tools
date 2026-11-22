@@ -97,6 +97,67 @@ example : Der IPC ([] ⊢ (p ⋏ q) ⟶ (q ⋏ p)) := by
   apply_move where
   all_goals apply_move ax
 
+-- At every goal in turn (`all_goals`, `<;>`), and at a goal taken by `case`.
+/--
+info:    ⊢ ((p0 ∧ p1) → (p1 ∧ p0))   by impR
+    (p0 ∧ p1) ⊢ (p1 ∧ p0)   by andL p0 p1
+      p0, p1, (p0 ∧ p1) ⊢ (p1 ∧ p0)   by andR
+>       ? p0, p1, (p0 ∧ p1) ⊢ p1
+        ? p0, p1, (p0 ∧ p1) ⊢ p0
+  at 0.0.0: open goal 0; 2 open in all
+---
+info:    ⊢ ((p0 ∧ p1) → (p1 ∧ p0))   by impR
+    (p0 ∧ p1) ⊢ (p1 ∧ p0)   by andL p0 p1
+      p0, p1, (p0 ∧ p1) ⊢ (p1 ∧ p0)   by andR
+        ? p0, p1, (p0 ∧ p1) ⊢ p1
+>       ? p0, p1, (p0 ∧ p1) ⊢ p0
+  at 0.0.1: open goal 1; 2 open in all
+-/
+#guard_msgs in
+example : Att IPC true ([] ⊢ (p ⋏ q) ⟶ (q ⋏ p)) := by
+  apply_move impR
+  apply_move andL p q
+  apply_move andR
+  all_goals apply_move where
+  all_goals leave_open
+
+/--
+info:    ⊢ ((p0 ∧ p1) → (p1 ∧ p0))   by impR
+    (p0 ∧ p1) ⊢ (p1 ∧ p0)   by andL p0 p1
+      p0, p1, (p0 ∧ p1) ⊢ (p1 ∧ p0)   by andR
+>       ? p0, p1, (p0 ∧ p1) ⊢ p1
+        ? p0, p1, (p0 ∧ p1) ⊢ p0
+  at 0.0.0: open goal 0; 2 open in all
+---
+info:    ⊢ ((p0 ∧ p1) → (p1 ∧ p0))   by impR
+    (p0 ∧ p1) ⊢ (p1 ∧ p0)   by andL p0 p1
+      p0, p1, (p0 ∧ p1) ⊢ (p1 ∧ p0)   by andR
+        ? p0, p1, (p0 ∧ p1) ⊢ p1
+>       ? p0, p1, (p0 ∧ p1) ⊢ p0
+  at 0.0.1: open goal 1; 2 open in all
+-/
+#guard_msgs in
+example : Der IPC ([] ⊢ (p ⋏ q) ⟶ (q ⋏ p)) := by
+  apply_move impR
+  apply_move andL p q
+  apply_move andR <;> apply_move where <;> apply_move ax
+
+/--
+info:    ⊢ ((p0 ∧ p1) → (p1 ∧ p0))   by impR
+    (p0 ∧ p1) ⊢ (p1 ∧ p0)   by andL p0 p1
+      p0, p1, (p0 ∧ p1) ⊢ (p1 ∧ p0)   by andR
+>       ? p0, p1, (p0 ∧ p1) ⊢ p1
+        ? p0, p1, (p0 ∧ p1) ⊢ p0
+  at 0.0.0: open goal 0; 2 open in all
+-/
+#guard_msgs in
+example : Att IPC true ([] ⊢ (p ⋏ q) ⟶ (q ⋏ p)) := by
+  apply_move impR
+  apply_move andL p q
+  apply_move andR
+  case _ => apply_move where; leave_open
+  leave_open
+
 /-- A derivation made before, to be given with `exact`. -/
 def part : Der IPC ([p, q, p ⋏ q] ⊢ q) := by apply_move ax
 
