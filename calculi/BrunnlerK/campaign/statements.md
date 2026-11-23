@@ -16,7 +16,7 @@ Status is exactly one of:
   proposition (`def Name : Prop := …`), not as a theorem with `sorry`.
 
 **As of 2026-11-23 17:36 GMT the ten goals are OPEN; S1 and S2 are
-PROVED.** Goals 1, 8, 9 (two of its three lines) and 10 are in Lean as
+PROVED, and S3 (the rules in the figure's shape).** Goals 1, 8, 9 (two of its three lines) and 10 are in Lean as
 named propositions and types with no proof (`BrunnlerK/Semantics.lean`),
 put to the reviewer in the fifth entry of `gates.md`. Goals 2 to 7 and
 the finite model property are displayed as the plan has them, in the
@@ -37,6 +37,7 @@ Read these first: no tool checks that they say what the source means.
 | the family of rules: K, and K + cut | `Fam`, `K`, `Kcut`, `BrunnlerK/System.lean` | Figures 2.3 (`fig:kx`), 2.4 (`fig:admissible`) | the rule table: signed 2026-11-23 |
 | the family of rules: K° | `FamO`, `BrunnlerK/SystemO.lean` | p. 14 | the rule table: signed 2026-11-23 |
 | the proof system: moves, one step | `Move`, `step`, `S`, `BrunnlerK/Proof.lean` | none: the rules of Figure 2.3 as moves | the rule table's last column and its section "The proof system"; put with the report of Adopt |
+| the comma `Γ, Δ`; a sequent context `Γ{ }`; filling its hole, `Γ{Δ}`; its depth | `NSeq.comma`, `Ctx`, `Ctx.fill`, `Ctx.depth`, `BrunnlerK/Ctx.lean` | "Sequent contexts, unary", pp. 7–8 | put 2026-11-23 (`gates.md`, the entry "decision 2: the rules in the figure's shape") |
 | what holds | the family itself, `Fam` | | the plan, passed 2026-11-23 |
 | the corresponding formula `Γ_F` of a sequent | `Form.bot`, `Form.disj`, `NSeq.boxForms`, `NSeq.form`, `BrunnlerK/Semantics.lean` | p. 7 | put 2026-11-23 (`gates.md`, the entry "Stage 2: the definitions and the statements, first sending") |
 | the models, truth in a model, two-valued models, `Valid` | `Model`, `Model.sat`, `Model.TwoValued`, `Valid`, `BrunnlerK/Semantics.lean` | Definition 2.6, p. 12 | the form, with the plan (passed 2026-11-23); the Lean: put 2026-11-23 |
@@ -69,6 +70,28 @@ of the conclusion). This is not the source's soundness theorem.
 `der_of_fam : Fam c Γ → c = false → Nonempty (Der S Γ)` by induction on
 the derivation. Source: none. Status: **PROVED**, within
 `[propext, Quot.sound]`.
+
+### S3. The rules as the figures print them
+
+For a context `C`, formulas `A`, `B`, a proposition `p`, a sequent `Δ`,
+and either family (`c` is `false` for K, `true` for K + cut):
+
+    Fam c (C.fill (p, p̄))                                              (axC)
+    Fam c (C.fill A) → Fam c (C.fill B) → Fam c (C.fill (A ⋏ B))        (andC)
+    Fam c (C.fill (A, B)) → Fam c (C.fill (A ⋎ B))                      (orC)
+    Fam c (C.fill [A]) → Fam c (C.fill □A)                              (boxC)
+    Fam c (C.fill (◇A, [Δ, A])) → Fam c (C.fill (◇A, [Δ]))              (diaC)
+    Kcut (C.fill A) → Kcut (C.fill Ā) → Kcut (C.fill ∅)                 (cutC)
+
+`BrunnlerK.Fam.axC` and the five after it, in `BrunnlerK/Ctx.lean`; the
+fillings are written there with `leaf` and `cons`. Source: Figures 2.3
+and 2.4, as printed. Each is a function on derivations, derived from the
+constructor of `Fam` for its rule. Status: **PROVED**, within
+`[propext, Quot.sound]`. What this does not say: that every instance of
+a constructor is an instance of one of these. It is not, as lists:
+`fill` puts what fills the hole in front of the node's formulas, so a
+rule here acts on the first formula of its node. Exchange (goal 4) is
+what would close that.
 
 ### Goal 1. Soundness
 
@@ -240,4 +263,4 @@ further goal is decided at the report of Prove. Status: OPEN.
 |---|---|---|---|
 | of the goals from the standing list (cut elimination, 10; the finite model property, in 9) | 0 | 0 | 2 |
 | of the other goals (1 to 8, and the rest of 9) | 0 | 0 | 9 |
-| of our own (S1, S2; `SoundnessCut`, `TreeModelTwoValued`) | 2 | 0 | 2 |
+| of our own (S1, S2, S3; `SoundnessCut`, `TreeModelTwoValued`) | 3 | 0 | 2 |

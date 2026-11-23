@@ -270,3 +270,22 @@ Adopt is not passed, and Prove is begun in the session of stages 0 and 1.
   and the six sequents of the exercises that are not derivable each
   have a refutation among those trees; four derivable ones have none.
 * **Answer**: not yet given.
+
+## 2026-11-23 17:46 GMT. Stage 1's report, decision 2: the rules in the figure's shape
+
+* **Put to the reviewer** (2026-11-23, at the rule table's gate, and
+  again as decision 2 of `report-1-2026-11-23.md`): a type of contexts
+  with `fill`, and each rule in the figure's own shape as a derived
+  rule.
+* **Answer** (2026-11-23, in the session): "PS yes add contexts and
+  lemmas of course"
+* **Result**: done, `BrunnlerK/Ctx.lean`: the comma (`NSeq.comma`),
+  contexts (`Ctx`, `Ctx.fill`), and the six rules `Fam.axC`, `Fam.andC`,
+  `Fam.orC`, `Fam.boxC`, `Fam.diaC`, `Fam.cutC`, each derived from its
+  constructor, within `[propext, Quot.sound]`. The definitions `comma`,
+  `Ctx` and `fill` are new and are for the reviewer to read: they are
+  put with this entry, and no statement of a goal rests on them yet.
+  No module that the exercises file rests on is changed.
+* **Not answered by this**: the gate of the entry before this one (the
+  semantics and the statements of goals 1, 8, 9, 10), and decisions 3 to
+  5 of the report.
