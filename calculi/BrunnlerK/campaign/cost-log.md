@@ -44,6 +44,7 @@ the reading of the source was all in the first part.
 | 14 | 2026-11-23 | 2 | decision, and a correction of the method | "Signed and if I set a goal that's a very deliberate thing to do so please modify the instructions of the skill to allow a later command of mine to override an earlier gate. As you call it. So yes "signed as put"." | the statements signed; the skill's rule 6; the proofs |
 | 15 | 2026-11-23 | 2 | decision | "Yes continue" (to: keep goals 3, 4, 5; set aside 6 and 7) | goals 6 and 7 set aside; the work on 3, 4, 5 |
 | 16 | 2026-11-23 | 2 | a correction of the method | "Stop telling me to read and approve everything. Act independently." | every gate lifted; the skill's rule 6 extended; the statements of goals 2 to 5 and the finite model property decided by the operator |
+| 17 | 2026-11-23 | after 4 | decision | "make the 16 remaining changes to the skill" | the skill, in commit `3186d6d`: `SKILL.md`, the three references, three templates; `method-notes.md`, the last section |
 
 ## By stage
 

@@ -368,3 +368,46 @@ checkout is behind `main`), which was written while this stage ran.
     operator cannot tell from inside: the documents were the memory, as
     the skill intends, and each stage was begun by reading them and the
     Lean files again.
+
+## After the closing report: the sixteen changes, made
+
+The reviewer: "make the 16 remaining changes to the skill". Made in
+commit `3186d6d`. The report's table is left as it was sent; this is its
+last column, brought up to date.
+
+| change (the report's words) | note | where it is now |
+|---|---|---|
+| say what the operator may do while a gate is open | 35 | `SKILL.md`, "How a gate is run", 1 |
+| name the two gates that lifting does not pass | 54 | `SKILL.md`, "How a gate is run", 6, last paragraph; `templates/gates.md`, the result "put, and not done" |
+| what Explore is when the reviewer's test has not been made | 53 | `SKILL.md`, stage 4, step 1 |
+| the first act: ask leave to download, or say none is needed | 4, 11 | `SKILL.md`, the first act, 3; `reference/adopt.md` §1 |
+| a gate answered in part: a form for its entry | 15 | `SKILL.md`, "How a gate is run", 4; `templates/gates.md`, the result "answered in part" |
+| a stage in the session of the one before, at the reviewer's word | 19, 56 | `SKILL.md`, rule 5 and "How a gate is run", 5; `templates/cost-log.md`, the column's third value |
+| a relation on whole judgments in place of a case analysis on positions | 44, 45 | `reference/adopt.md` §6, the last part; a pointer in §2 |
+| the form of a goal that is data | 36 | `reference/adopt.md` §5 |
+| a function on derivations by matching, not by `induction` | 38 | `reference/adopt.md` §6 |
+| S1 for a rule that looks its node up; `decide +kernel` on a step through `.toOption` | 27, 29 | `reference/explore.md` §13 |
+| a tactic's name, and a library's words, are keywords | 31, 51 | `reference/explore.md` §5; a line in `reference/certify.md` §1 |
+| where the search is proved and structural, try the direct decision first | 48 | `reference/certify.md` §4 |
+| a certificate as a term has limits before the kernel | 49, 52 | `reference/certify.md` §5 |
+| a fix found in Run may be made in a module of Prove | 50 | `SKILL.md`, stage 3, step 4; `reference/certify.md` §5 |
+| requests, tokens and cost are not known to an operator that is a model | 9 | `templates/cost-log.md` |
+| the plan's probe of `deriving`: on every type the plan names | 46 | `SKILL.md`, stage 0, step 3; `templates/plan.md`; `reference/explore.md` §13 |
+
+57. **Changed with them, since the new text made it false**:
+    `reference/explore.md` §13 said that no public instance has
+    judgments that are not flat. It now names this one.
+58. **Seen, and not changed, since the reviewer's word did not cover
+    it.** `SKILL.md`, "Status", still says that the whole has not been
+    run by an operator starting cold; it has now been run once, in one
+    session, with the gates lifted from the middle of Prove and the two
+    keyboard gates not done. "The worked instance" still names the
+    subframe tableau as the only instance outside the library's tests.
+    The last paragraph still says the text was checked against
+    `proof-tools` at `3fa25c0`. Notes of this file that the report did
+    not turn into changes are not in the skill either: 5, 6, 10, 14,
+    17, 18, 20, 21, 23, 24 and 30, 28, 32, 33, 34, 37, 43, 55.
+59. **Not tried.** The new text is prose and four schematic fragments
+    of Lean, each copied in shape from a file of this campaign that
+    compiles; the fragments themselves are not compiled, and no
+    operator has yet run a campaign from the amended skill.

@@ -425,3 +425,16 @@ Adopt is not passed, and Prove is begun in the session of stages 0 and 1.
   passed. The campaign is otherwise at its end.
 * **Result**: the stage's work is done; its gate, the tutorial, is put
   and waits for the reviewer.
+
+## 2026-11-23 20:49 GMT. After the closing report: the skill's changes
+
+* **Put to the reviewer**: the closing report (`report-5-2026-11-23.md`,
+  at `af1d730`), whose retrospective lists twenty changes to the skill,
+  four of them made during the campaign.
+* **Answer** (2026-11-23, in the session): "make the 16 remaining
+  changes to the skill"
+* **Done**: the sixteen, in commit `3186d6d`, which changes the skill's
+  files and nothing else. Where each is: `method-notes.md`, the last
+  section.
+* **Result**: not a gate of a stage. The reviewer's word for a change
+  outside the campaign's folder (the skill's rule 7).
