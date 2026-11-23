@@ -136,11 +136,15 @@ premises a node writes, to the premises `step` computes, by a cast along
 the node's equation, and the kernel reduces such a cast when the two lists
 are equal by definition. So the kernel evaluates `Der.mapOut hS d` on a
 derivation whose nodes hold their equation by `rfl`, and on any derivation
-that `run` built, which writes the premises as `step` computes them. It
-does not on a derivation the tactic built for an instance that sets
-`eqByDecide` (below); `Der.ofScript j d.script (derives_script d)` is that
-derivation rebuilt by `run`, and there it does. Compiled code runs either
-way. The tests have both cases (`swByRun`, `swByTactic`).
+that `run` built, which writes the premises as `step` computes them. For
+an instance that sets `eqByDecide` (below) a derivation the tactic built
+may have a node whose premises, as written, are equal to the computed ones
+without being so by definition: at such a node the cast is stuck, and the
+kernel does not evaluate the map out of that derivation. Where every node
+writes them as computed, it does. `Der.ofScript j d.script
+(derives_script d)` is the derivation rebuilt by `run`, and there it
+always does. Compiled code runs either way. The tests have a derivation
+that `run` built and a stuck one (`swByRun`, `swByTactic`).
 
 **The map out is natural in the family.** For two families `T`, `T'` with
 their soundness `hS`, `hS'`, and `f : ∀ j, T j → T' j`. PROVED:
@@ -816,8 +820,9 @@ so an instance whose judgments hold functions sets `eqByDecide := true` and
 gives `DecidableEq S.Judg`: the equation is then proved by
 `step_of_stepIs (Eq.refl true)`, the kernel evaluating `step` and deciding
 that its premises are the ones written. `run`, `derives` and the certifier
-do not quote, and need neither. For such an instance the kernel does not
-evaluate `Der.mapOut` into a type on a derivation the tactic built, and
+do not quote, and need neither. For such an instance the kernel may fail
+to evaluate `Der.mapOut` into a type on a derivation the tactic built
+(where a node's premises are not, by definition, the ones computed), and
 does on the derivation rebuilt from its script (see "In the kernel",
 above).
 
