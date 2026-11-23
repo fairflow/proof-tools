@@ -411,3 +411,19 @@ last column, brought up to date.
     of Lean, each copied in shape from a file of this campaign that
     compiles; the fragments themselves are not compiled, and no
     operator has yet run a campaign from the amended skill.
+60. **"Status" and "the worked instances", brought up to date** at the
+    reviewer's word ("Yes, update them"), in commit `d5c7f14`. The
+    instances outside the library's tests are now two: the subframe
+    tableau, and this one. "Status" says that the whole has been run
+    once, and lists what that run does not test. Note 58 was loose on
+    one point, put right here: the old sentence said that no operator
+    *starting cold* had run the whole, and that is still so. This
+    operator had read the source and written a first plan before it had
+    the skill (`gates.md`, the first entry; note 1). The new text keeps
+    that sentence, in its last paragraph, with the other three things
+    a full run needs and this one lacked: a fresh session at each
+    stage, every gate put to the reviewer, the two keyboard gates done.
+    Still not changed, since the word did not cover it: the last
+    paragraph of `SKILL.md`, "checked against `proof-tools` at commit
+    `3fa25c0`". Nothing of the amended text was checked against a later
+    commit of the library, so that line is still what is true.

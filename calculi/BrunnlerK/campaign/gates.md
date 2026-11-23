@@ -438,3 +438,15 @@ Adopt is not passed, and Prove is begun in the session of stages 0 and 1.
   section.
 * **Result**: not a gate of a stage. The reviewer's word for a change
   outside the campaign's folder (the skill's rule 7).
+
+## 2026-11-23 22:01 GMT. The skill's "Status" and "worked instance"
+
+* **Put to the reviewer**: with the sixteen changes, the two paragraphs
+  of `SKILL.md` that the campaign had made false or incomplete, and the
+  question whether to bring them up to date.
+* **Answer** (2026-11-23, in the session): "Yes, update them"
+* **Done**: the two paragraphs, in commit `d5c7f14`, which changes
+  `SKILL.md` and nothing else. What they now say, and what was left:
+  `method-notes.md`, note 60.
+* **Result**: not a gate of a stage. The reviewer's word for a change
+  outside the campaign's folder (the skill's rule 7).
