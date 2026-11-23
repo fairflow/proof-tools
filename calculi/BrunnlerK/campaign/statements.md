@@ -15,11 +15,12 @@ Status is exactly one of:
 * **OPEN**: everything else. An OPEN statement is in Lean as a named
   proposition (`def Name : Prop := …`), not as a theorem with `sorry`.
 
-**As of 2026-11-23 the ten goals are OPEN, and none of them is in Lean
-yet; S1 and S2 are PROVED.** The goals are displayed as the plan has
-them, in the source's notation. Each is stated in Lean, in the
-encoding's terms, and shown to the reviewer at the gate of Prove, before
-its proof (`gates.md`, the third entry; the plan, "Goals").
+**As of 2026-11-23 17:40 GMT the ten goals are OPEN; S1 and S2 are
+PROVED.** Goals 1, 8, 9 (two of its three lines) and 10 are in Lean as
+named propositions and types with no proof (`BrunnlerK/Semantics.lean`),
+put to the reviewer in the fifth entry of `gates.md`. Goals 2 to 7 and
+the finite model property are displayed as the plan has them, in the
+source's notation, and are not in Lean.
 
 The axiom policy of the development: every theory file within
 `[propext, Quot.sound]`.
@@ -37,9 +38,10 @@ Read these first: no tool checks that they say what the source means.
 | the family of rules: K° | `FamO`, `BrunnlerK/SystemO.lean` | p. 14 | the rule table: signed 2026-11-23 |
 | the proof system: moves, one step | `Move`, `step`, `S`, `BrunnlerK/Proof.lean` | none: the rules of Figure 2.3 as moves | the rule table's last column and its section "The proof system"; put with the report of Adopt |
 | what holds | the family itself, `Fam` | | the plan, passed 2026-11-23 |
-| the corresponding formula `Γ_F` of a sequent | not in Lean yet | p. 6 | |
-| the models, truth in a model, two-valued models, `Valid` | not in Lean yet | Definition 2.6, p. 12 | the form, with the plan (passed 2026-11-23); the Lean, at the gate of Prove |
-| a finite model as data | not in Lean yet | Theorem 2.23 (ii) | at the gate of Prove |
+| the corresponding formula `Γ_F` of a sequent | `Form.bot`, `Form.disj`, `NSeq.boxForms`, `NSeq.form`, `BrunnlerK/Semantics.lean` | p. 7 | put 2026-11-23 (`gates.md`, the entry "Stage 2: the definitions and the statements, first sending") |
+| the models, truth in a model, two-valued models, `Valid` | `Model`, `Model.sat`, `Model.TwoValued`, `Valid`, `BrunnlerK/Semantics.lean` | Definition 2.6, p. 12 | the form, with the plan (passed 2026-11-23); the Lean: put 2026-11-23 |
+| a countermodel as data: a finite tree, and the model of finite trees | `Tree`, `treeModel`, `Form.holds`, `Refutation`, `BrunnlerK/Semantics.lean` | Theorem 2.23 (ii) | put 2026-11-23 |
+| a model with finitely many states, as data | not in Lean yet | Corollary 2.24 | |
 | the depth of a derivation; `→ⁿ` | not in Lean yet | p. 8, not defined there (the rule table, D13) | at the gate of Prove |
 | permutation inside every node, `~` | not in Lean yet | none: the source's sequents are multisets | at the gate of Prove |
 
@@ -72,13 +74,30 @@ the derivation. Source: none. Status: **PROVED**, within
 
     K ⊢ Γ  →  Valid Γ
 
+In Lean (`BrunnlerK/Semantics.lean`):
+
+    def Soundness : Prop := ∀ Γ : NSeq, K Γ → Valid Γ
+
+    def Valid (Γ : NSeq) : Prop :=
+      ∀ M : Model, M.TwoValued → ∀ s : M.W, M.sat s Γ.form
+
+    def Model.TwoValued (M : Model) : Prop :=
+      ∀ (A : Form) (s : M.W), M.sat s A ∨ ¬ M.sat s A
+
 Source: Theorem 2.9 (i), (iii), p. 13 (no label), with Lemma 2.8
-(`l:deepsound`). `Valid Γ`: `M, s ⊨ Γ_F` for every two-valued model `M`
-and every state `s` of `M`; `M` is two-valued if for every formula `A`
-and state `s`, `M, s ⊨ A` or not `M, s ⊨ A`. Screened (stage 0, in
-scratch, not kept): the steps of `◇k_c` and of `cut` at the root, and the
-sequent `◇p, [p̄]`, hold in every two-valued model with no axiom. Status:
+(`l:deepsound`). Screened (stage 0, in scratch, not kept): the steps of
+`◇k_c` and of `cut` at the root, and the sequent `◇p, [p̄]`, hold in
+every two-valued model with no axiom. Screened again (stage 2,
+`BrunnlerK/Test/Semantics.lean`): 21 rule instances, at the root and one
+and two boxes deep, on 28 564 finite trees; no counterexample. Status:
 OPEN.
+
+With it, of our own, for goal 10:
+
+    def SoundnessCut : Prop := ∀ Γ : NSeq, Kcut Γ → Valid Γ
+
+Source: none; the source's Theorem 2.9 is for the rules of K. Screened:
+four instances of `cut`, on the same trees. Status: OPEN.
 
 The source's form, for comparison (not a goal): `ValidF Γ`, the same with
 "every model". `(∀ Γ, K ⊢ Γ → ValidF Γ) → ∀ P : Prop, P ∨ ¬P`, by the
@@ -138,8 +157,35 @@ OPEN.
     for every Γ:   K ⊢ Γ,   or a finite model M, as data, and a state s
                    with  not  M, s ⊨ Γ_F
 
-Source: Theorem 2.23, pp. 17–19 (`t:completeness`), at `X = ∅`. A
-function into a sum type. Status: OPEN.
+In Lean (`BrunnlerK/Semantics.lean`), a type; what is to be given is a
+function of this type:
+
+    abbrev ProofOrRefutation : Type := (Γ : NSeq) → K Γ ⊕ Refutation Γ
+
+    structure Refutation (Γ : NSeq) where
+      tree : Tree
+      refutes : ¬ treeModel.sat tree Γ.form
+
+    inductive Tree where
+      | node (val : List Nat) (kids : List Tree)
+
+    def treeModel : Model where
+      W := Tree
+      R t u := u ∈ t.kids
+      V p t := p ∈ t.val
+
+with, of our own, that this model is one `Valid` speaks of:
+
+    def TreeModelTwoValued : Prop := treeModel.TwoValued
+
+Source: Theorem 2.23, pp. 17–19 (`t:completeness`), at `X = ∅`. The
+countermodel is a finite tree, as data; it is a state of the model of
+all finite trees, whose set of states is not finite. A model with
+finitely many states is not stated here (goal 9, second line). The route
+proposed is not the source's: see `gates.md`, the fifth entry. Screened:
+the empty sequent, `[∅]` and six sequents that are not derivable have
+each a refutation of depth at most 2; four derivable ones have none
+among 28 564 trees. Status: OPEN.
 
 ### Goal 9. Completeness, the finite model property, decidability
 
@@ -147,18 +193,30 @@ function into a sum type. Status: OPEN.
     if Γ is not valid in some two-valued model, it is not valid in a finite one
     Valid Γ is decidable
 
+In Lean (`BrunnlerK/Semantics.lean`), the first and the third:
+
+    def Completeness : Prop := ∀ Γ : NSeq, Valid Γ → Nonempty (K Γ)
+
+    abbrev ValidDecidable : Type := (Γ : NSeq) → Decidable (Valid Γ)
+
 Source: Theorem 2.23 (i); Corollary 2.24, p. 19; Corollary 2.25, p. 19
-(no labels). The second line is the plan's "finite model property" in
-words; its form in Lean is put at the gate of Prove. Status: OPEN.
+(no labels). The second line is not in Lean: it needs a model with a
+finite set of states. Status: OPEN, all three.
 
 ### Goal 10. Cut elimination
 
     K + cut ⊢ Γ  →  K ⊢ Γ
 
+In Lean (`BrunnlerK/Semantics.lean`):
+
+    def CutElimination : Prop := ∀ Γ : NSeq, Kcut Γ → Nonempty (K Γ)
+
 Source: Theorem 2.35, p. 27 (`t:ce`), at `X = ∅`; and p. 19, "cut
-admissibility is an easy corollary of the completeness theorem". First by
-the short route; whether the procedure of §2.1.4 is a further goal is
-decided at the report of Prove. Status: OPEN.
+admissibility is an easy corollary of the completeness theorem". The
+form is "the rule is admissible", by the short route: from
+`SoundnessCut` and `Completeness`. It is not a procedure that removes
+cuts from a proof step by step; whether the procedure of §2.1.4 is a
+further goal is decided at the report of Prove. Status: OPEN.
 
 ## Refuted
 
@@ -182,4 +240,4 @@ decided at the report of Prove. Status: OPEN.
 |---|---|---|---|
 | of the goals from the standing list (cut elimination, 10; the finite model property, in 9) | 0 | 0 | 2 |
 | of the other goals (1 to 8, and the rest of 9) | 0 | 0 | 9 |
-| of our own (S1, S2) | 2 | 0 | 0 |
+| of our own (S1, S2; `SoundnessCut`, `TreeModelTwoValued`) | 2 | 0 | 2 |

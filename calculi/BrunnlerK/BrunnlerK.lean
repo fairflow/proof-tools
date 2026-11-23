@@ -9,7 +9,9 @@ import BrunnlerK.System
 import BrunnlerK.SystemO
 import BrunnlerK.Show
 import BrunnlerK.Proof
+import BrunnlerK.Semantics
 import BrunnlerK.Tactic
 import BrunnlerK.Test.Sequent
 import BrunnlerK.Test.System
 import BrunnlerK.Test.Proof
+import BrunnlerK.Test.Semantics

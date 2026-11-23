@@ -220,3 +220,53 @@ starts in a fresh session) and from the brief's first line of "Done".
 * **Result**: passed, as put. The five things are signed; no constructor
   changes. The offer of the derived rules was not taken up and not
   refused: it is carried to the report of the stage as a question.
+
+## 2026-11-23 17:30 GMT. Between stages: the reviewer's test deferred; Prove begun
+
+Recorded because it departs from the skill twice: the gate that ends
+Adopt is not passed, and Prove is begun in the session of stages 0 and 1.
+
+* **Put to the reviewer** (2026-11-23 15:55 GMT, at `5de5634`): the
+  reviewer's test, with `report-1-2026-11-23.md` and
+  `Play/BrunnlerK.lean`; and the report's four smaller decisions.
+* **Answer** (2026-11-23, in the session): "I will test later since
+  proving the next set of results may change what you already
+  implemented so: /goal prove completeness and cut elimination"
+* **Asked by the reviewer next** (2026-11-23, in the session): "We're
+  still in the skill process right? Or off track?"
+* **Answered by the operator**: in the process, at stage 2, with these
+  two departures, both the reviewer's.
+* **Result**: the reviewer's test is **not done and not passed**: it is
+  deferred by the reviewer. The report's decisions 2 to 5 are not
+  answered. Prove is begun, for two of the ten goals and what they rest
+  on: completeness (goal 9, first line) and cut elimination (goal 10).
+  A change that Prove makes to a module the exercises file rests on is
+  recorded here when it is made.
+
+## 2026-11-23 17:40 GMT. Stage 2: the definitions and the statements, first sending
+
+* **Put to the reviewer** (2026-11-23 17:40 GMT; the commit is named in
+  the message): `BrunnlerK/Semantics.lean`, all of it, and the entries
+  of `statements.md` for goals 1, 8, 9 and 10. To sign:
+  1. the models and truth (`Model`, `Model.sat`), Definition 2.6 clause
+     by clause, with "or", "not", "there is" as Lean's;
+  2. `Model.TwoValued` and `Valid`, as the plan has them;
+  3. the corresponding formula (`Form.bot`, `Form.disj`, `NSeq.form`):
+     `⊥` is `p ∧ p̄` at the proposition numbered 0; the disjunction is
+     bracketed to the left; formulas first, then boxes, in the
+     sequent's own order;
+  4. a countermodel as data: a finite tree (`Tree`), a state of the
+     model of all finite trees (`treeModel`); `Refutation Γ`;
+  5. the statements `Soundness`, `SoundnessCut`, `ProofOrRefutation`,
+     `Completeness`, `ValidDecidable`, `CutElimination`.
+  With them, said in the note: the route proposed for goal 8 is not the
+  source's (no K°, no Lemma 2.22); goals 2 to 7 are not on it and stay
+  OPEN; the finite model property, in a form with a finite set of
+  states, stays OPEN.
+* **Screened first** (`BrunnlerK/Test/Semantics.lean`): the
+  corresponding formula on five sequents; 21 rule instances and four
+  instances of `cut`, on 28 564 trees of depth at most 2: no tree makes
+  every premise true and the conclusion not; the empty sequent, `[∅]`
+  and the six sequents of the exercises that are not derivable each
+  have a refutation among those trees; four derivable ones have none.
+* **Answer**: not yet given.
