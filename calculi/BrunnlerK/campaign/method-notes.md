@@ -474,3 +474,32 @@ Made in commit `5337dd4`. They are the notes that note 58 lists.
     neither list. The operator's miscount. They are made in a commit of
     their own after this one, so that it can be taken back alone; the
     next section says where each is.
+
+## The eight notes the list of eighteen left out
+
+Made in commit `9cbfec1`, on the same word of the reviewer, read as
+"the notes that are not yet in the skill". The reviewer said eighteen;
+these are beyond that count, and are in a commit of their own.
+
+| note | what the skill now says | where |
+|---|---|---|
+| 3 | a session that has read the source or written files before the first act puts the proposal all the same, and says what was read and written | `SKILL.md`, the first act, after step 4 |
+| 7 | where a standing result has more than one form or route, the goal by rule is the statement the source states; form and route are the reviewer's | `SKILL.md`, "What a campaign proves" |
+| 8 | the first act asks how a report reaches the reviewer while nothing is pushed | `SKILL.md`, the first act, 3 |
+| 16 | the reviewer may ask for a change to the skill during a campaign: a commit of its own, the words in `gates.md`, said in the report | `SKILL.md`, rule 7 |
+| 22 | a side condition that looks local and is not: transcribed as stated, a simpler form tested first | `reference/pitfalls.md`, 8 |
+| 25 | S1 and S2 at step 4 of Adopt: entered as displayed, "not yet in Lean", OPEN | `templates/statements.md` |
+| 39 | `List.mem_erase_of_ne` brings in `Classical.choice`; `by_cases` on a decidable equation does not | `reference/adopt.md` §6 |
+| 47 | an estimate written as a fact: a time from `date`, a pinned value from Lean's output | `reference/pitfalls.md`, 11 |
+
+64. **Notes that are still not in the skill, and why.** 1 and 2 are
+    answered in the library (commit `07a5b2e`). 26 says there is
+    nothing to change. 41 says the reference was right. 42 is the
+    direct decision of `reference/certify.md` §4, already there from
+    note 48. 40 (a characterisation given to `simp` rewrites inside its
+    own right-hand side) is about Lean in general and not about a
+    calculus. 57 to 63 are about these changes themselves.
+65. **Renumbered**: the entries of `reference/pitfalls.md` after 7. No
+    file of the skill cites one by number (searched).
+66. **Still not changed**: the last paragraph of `SKILL.md`, "checked
+    against `proof-tools` at commit `3fa25c0`" (note 60).

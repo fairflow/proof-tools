@@ -459,7 +459,12 @@ Adopt is not passed, and Prove is begun in the session of stages 0 and 1.
 * **Answer** (2026-11-23, in the session): "turn the eighteen method
   notes into skill changes too"
 * **Done**: the eighteen, in commit `5337dd4`, which changes the skill's
-  files and nothing else. Where each is: `method-notes.md`, the last
-  section.
+  files and nothing else. Where each is: `method-notes.md`, the section
+  "the eighteen other notes".
+* **Done beyond the count**: eight further notes (3, 7, 8, 16, 22, 25,
+  39, 47), which the operator's list of eighteen had left out, in commit
+  `9cbfec1`, of its own. The reviewer's word was read as "the notes that
+  are not yet in the skill"; it can be taken back alone.
 * **Result**: not a gate of a stage. The reviewer's word for a change
-  outside the campaign's folder (the skill's rule 7).
+  outside the campaign's folder (the skill's rule 7, which says so since
+  `9cbfec1`).
