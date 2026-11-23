@@ -85,6 +85,13 @@ the answer.
      else. A
      session's folder is often cut from a local `main` that nobody has
      pulled;
+   - asked: may the agreed source be fetched: its LaTeX archive where
+     there is one (arXiv gives it for many papers), otherwise its PDF;
+     and may the LaTeX be compiled, to read the printed numbers
+     (`reference/adopt.md` §1)? Where your environment lets you download
+     a file without the reviewer's word, do not ask: say that the source
+     will be fetched, and from where. Either way no file is fetched
+     before the answer;
    - asked: where and when to push? The default is that you commit
      locally and push nothing until the reviewer says;
    - asked: is anything not to be touched? Only the reviewer contacts the
@@ -171,6 +178,9 @@ write it down (rule 8).
    (`templates/brief.md`): a long session pays to read its own history
    again at every step. The command's session is stage 0's. A stage may
    take several sessions, and a gate inside it is the place to end one.
+   The reviewer may say that a stage is run in the session of the one
+   before ("continue here"): "How a gate is run", 5, says what is then
+   done.
 6. **A stage's work ends when the reviewer can read its report**: pushed,
    sent in full, or published. A clean build is not the end, and a file
    in a temporary folder is not a report.
@@ -256,7 +266,20 @@ done is recorded with the gate, and is the first input of stage 4.
 ### How a gate is run
 
 1. **Stop.** At a gate you build nothing that rests on the thing being
-   reviewed.
+   reviewed. **While a gate is open** you may go on with what does not
+   rest on it:
+   - what rests on signed things only: lemmas about the data and the
+     functions of a table that is already signed, the printers, tests
+     of what is signed;
+   - the screening of the thing that waits (`reference/adopt.md` §5):
+     a statement refuted while it waits is taken back and put again;
+   - the documents.
+
+   What names the thing that waits, and is not a screen of it, is not
+   written: a `Move` or a `step` before the rule table is signed, a
+   proof of a statement that has not been sent. Say in the next note
+   the reviewer gets what was done while the gate was open, and what
+   each thing rests on.
 2. **Send a gate note**: the thing itself where the reviewer can read it,
    and what is asked. At the end of a stage the stage's report is the
    gate note; the Survey's report goes with the plan. Commit the
@@ -267,12 +290,30 @@ done is recorded with the gate, and is the first input of stage 4.
    else.
 4. **A gate is passed when its record says so.** With no record it has not
    been passed, whatever was built after it. A gate that is refused is
-   recorded too: change the thing, and ask again.
+   recorded too: change the thing, and ask again. **An answer may
+   settle a part only**: it decides some of what was asked, changes a
+   thing an earlier gate fixed, asks a question back, and says nothing
+   of the rest. Its entry has the result **answered in part**, and
+   lists each of the four. Do what the answer settled, build on that
+   and on nothing else, and put the gate again for the rest, as a new
+   entry.
 5. **After a gate inside a stage**, go on in the same session if the
    answer comes while it is open; otherwise write the brief
    (`brief-<stage number>-<k>.md`) and end. **After a gate that ends a
    stage**, always write the brief and end. Whoever runs the campaign
    opens the next session with `/calculus-campaign` and the brief's path.
+
+   **Where the reviewer says to go on in the same session** after a
+   gate that ends a stage, write the brief all the same, and begin the
+   stage from it as a fresh session would: read the brief, the
+   documents and the Lean files it names, and the parts of this skill
+   the stage names, again and in full. What the session remembers of
+   them, or a summary the environment made of its earlier part, is not
+   a reading. Correct any line of the brief that is false in a session
+   that goes on (a scratch file that is still there). The cost log's
+   row says "no, at the reviewer's word" under "fresh session from a
+   brief?". A whole campaign may be run so: the documents are then its
+   memory, and each stage is begun by reading them.
 6. **A later command of the reviewer overrides a gate.** A gate is the
    operator's stop, and the reviewer is free to lift it. Where the
    reviewer gives a command that cannot be carried out without going
@@ -289,9 +330,9 @@ done is recorded with the gate, and is the first input of stage 4.
      is not signed.
 
    This holds for a gate inside a stage and for one that ends a stage
-   (the reviewer's test, the brief and the fresh session). It does not
-   lift what was fixed with the target (where to push, what is not to be
-   touched), nor what only the reviewer may do.
+   (the brief and the fresh session). It does not lift what was fixed
+   with the target (where to push, what is not to be touched), nor what
+   only the reviewer may do.
 
    **The reviewer may lift every gate at once** ("act independently",
    "stop asking me to approve"). From then on a gate is a record and not
@@ -302,6 +343,18 @@ done is recorded with the gate, and is the first input of stage 4.
    display the definitions and the statements, as information and not
    as a question; they end with what was decided, not with what to
    sign. The reviewer can refuse any of it afterwards.
+
+   **Two gates are passed by neither: the reviewer's test (Adopt) and
+   the tutorial (Explore).** They are not things to sign. Each is done
+   by the reviewer at a keyboard, and no decision of the operator
+   stands in for it. A command, or the lifting of every gate, lets the
+   operator go on past them. Their entries in `gates.md` then have the
+   result **put, and not done**, with the reviewer's words; they stay
+   open until the reviewer has typed; part (v) of each later report
+   lists them as the reviewer's, stated and not asked for; and a
+   campaign may end with them open, which its closing report says.
+   What the reviewer finds when one is made is entered then, and is
+   work of the stage it belongs to.
 
 ### Stage 0, Survey
 
@@ -315,11 +368,17 @@ Read `reference/adopt.md` §1 to §3, and the Survey's pitfalls.
    need a part read first: the choices of encoding,
    `reference/explore.md` §2 and §13; what "holds" will mean, "What is
    trusted" below; the level aimed at, `reference/certify.md` §3.
-3. A few lines of Lean to find out whether an encoding is feasible (does
-   `deriving` work on the proposed type of judgments) may be tried now,
-   in a scratch file outside the campaign's folder that is not kept: say
-   in the plan what was tried and what Lean answered. Nothing else of
-   the calculus is written in Lean before the plan's gate.
+3. A few lines of Lean to find out whether an encoding is feasible may
+   be tried now, in a scratch file outside the campaign's folder that is
+   not kept: what `deriving` gives (`DecidableEq`, `Repr`,
+   `Lean.ToExpr`) for **every type the plan names**, not for the
+   judgments alone: the formulas, the judgments, the moves, and the
+   types of models and of certificates that Q3 proposes. A type signed
+   with the plan and found awkward in Prove costs a construction: a
+   type that holds a list of itself gets no `DecidableEq`, and a model
+   built on its members then cannot test them for equality. Say in the
+   plan what was tried and what Lean answered, type by type. Nothing
+   else of the calculus is written in Lean before the plan's gate.
 4. Send the plan, with the Survey's report. **Gate: the plan.** The
    reviewer passes it, and says which results are goals, as "What a
    campaign proves" lays down.
@@ -391,7 +450,17 @@ Read `reference/certify.md` and the skill `lean-certify`.
    explorer library gives for a calculus, and what is written by hand.
 3. A negative test for each certifier; the corpus; timings; kernel time
    against certificate size.
-4. Report: the verdicts, the measurements, and the frontier, named: the
+4. **A fault of a search that the measurements show** (a proof many
+   times longer than one made by hand; time that goes where it need
+   not) may be repaired in this stage, in the module of Prove where the
+   search is. The repair changes no statement: afterwards every theory
+   file is within its bound, and every proof and every pinned test is
+   as it was, or builds again unchanged. One that would change a
+   statement is not a repair, and goes to the reviewer. It is recorded
+   with Run's gate in `gates.md` and in part (iv) of the report, and
+   the report says of each figure whether it was measured before the
+   repair or after.
+5. Report: the verdicts, the measurements, and the frontier, named: the
    smallest inputs the procedures do not settle within their budget.
 
 Where the source gives no route to countermodels, the campaign stops at
@@ -403,7 +472,14 @@ countermodels is a calculus of its own, with its own campaign.
 Read `reference/explore.md` §11.
 
 1. List what Q4 asked for, and what the reviewer found missing at the
-   reviewer's test (`gates.md`).
+   reviewer's test (`gates.md`). **Where the reviewer's test has not
+   been made** (put off by the reviewer, or passed over by a command),
+   the list is Q4's alone: say so at its head and in the report. The
+   stage is then done on half of its input, and it does not settle
+   what the explorer needs. When the test is made, what the reviewer
+   asked for and could not do is a further sending of this stage,
+   begun from that entry of `gates.md`; the tutorial and the user's
+   guide are changed with it.
 2. Serve each from what the library has. What it lacks is reported, not
    built into the library (rule 7).
 3. The tutorial (`Play/<Calculus>Tutorial.lean`) and the user's guide.

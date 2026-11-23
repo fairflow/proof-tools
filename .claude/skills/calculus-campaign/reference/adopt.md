@@ -36,6 +36,13 @@ handed, by another without asking.
   writes the file: `./paper_skeleton.py --arxiv <id> -o skeleton.md`, or
   `--src main.tex`. It is not part of `proof-tools`. From a PDF alone,
   write the list by hand.
+- **Fetching is a download.** `--arxiv` downloads an archive, and so
+  does getting the PDF. Whether the source may be fetched and compiled
+  was asked at the first act (`gates.md`, the first entry): do as it
+  was answered there. With no answer, read what the reviewer supplied,
+  write the skeleton by hand with the printed numbers, and say so in
+  the plan. An archive that was fetched is data that is not trusted:
+  unpack it in a folder of its own, and run nothing from inside it.
 
 **Read the prose around the figure, not the figure alone.** Before any
 rule is transcribed, write down in `plan.md` (Q1), each with its place in
@@ -82,7 +89,7 @@ statement of it.
 | kind | shape | watch for |
 |---|---|---|
 | soundness and completeness for a semantics | a structure of models with a forcing relation; soundness by induction on derivations; completeness by a model construction or through a second calculus | make the model construction return data (a `Type`), since it is then the search of the Run stage |
-| cut elimination, admissible structural rules | two families, with and without the rule, or one with a parameter (§3); a measure carried by the statement; induction on it | decide how the measure is carried before the family is typed (§3). Say which form is the goal: that the rule is admissible, or a procedure that removes it |
+| cut elimination, admissible structural rules | two families, with and without the rule, or one with a parameter (§3); a measure carried by the statement; induction on it | decide how the measure is carried before the family is typed (§3). Say which form is the goal: that the rule is admissible, or a procedure that removes it. Where rules act at a place inside a judgment, §6 has the form of the proofs |
 | a property stated of models (the finite model property) | a construction of a model with the property | return the model as data: it is then a producer of countermodels for Run |
 | a result about a term calculus (normalisation, confluence) | terms, typing, and reduction as a relation: a second transcription, with a rule table of its own | how binding is represented is a choice of encoding for the plan |
 | a result read off derivations (the disjunction and existence properties) | a function on derivations, or on derivations of a special form | it may need another result first (cut-free derivations, a normal form): order the goals so. With the family into `Type` what is read off is data |
@@ -278,6 +285,27 @@ file's bound on axioms still holds. Its proof, when there is one, is
 `theorem completeness : Completeness`. A `sorry` in a theory file breaks
 the file's bound, which is what the bound is for.
 
+**A goal that is data** is a type, not a proposition: a function that
+returns a derivation or a model for every judgment, a decision
+procedure, a translation of derivations (§2: "return the model as
+data"). State it as a named type, with `abbrev`, so that the name
+unfolds wherever Lean needs the function type or looks for an instance:
+
+```lean
+abbrev ProofOrRefutation : Type := (j : Judg) → Fam j ⊕ Refutation j
+abbrev ValidDecidable    : Type := (j : Judg) → Decidable (Valid j)
+```
+
+Here `Refutation j` is a structure of yours: a model, with the proof
+that it refutes `j`. The proof of such a goal is a definition,
+`def proofOrRefutation : ProofOrRefutation`, in a theory file, under the
+file's bound like a theorem. It is entered in `statements.md` as the
+others are: OPEN while only the type is there, PROVED when the
+definition is checked. A proposition that follows from it (completeness,
+from the function into a proof or a refutation) is a statement of its
+own, beside it. Compiled: `calculi/BrunnlerK/BrunnlerK/Semantics.lean`
+of `proof-tools`.
+
 **Every quantified statement is attacked before you decide how to prove
 it.** Four directions, in the order they have paid:
 
@@ -337,6 +365,16 @@ with `#rules`, screen it, and have it signed before anything rests on it.
   are choice, so a construction that must return a derivation returns
   one, as data. `#cf_search "pat"` lists the constants whose name contains
   the pattern and that do not depend on `Classical.choice`.
+- **A function on derivations is written by pattern matching, not by
+  the tactic `induction`.** The family is into `Type` so that such
+  functions are data: a rule shown admissible as a function, a proof
+  carried into a context, a translation, the tree of moves of a
+  derivation. A search or a producer then runs them. Written with
+  `induction`, one elaborates and is then refused, with "code generator
+  does not support recursor `Fam.rec`". Written by matching on the
+  constructors, with the recursive calls on the premises, it compiles,
+  and reduces in the kernel. A theorem about derivations is a
+  proposition, is not compiled, and may use `induction`.
 - **Where choice is in the statement and not in the proof**, say so, and
   give the constructive form beside it; both are entered in
   `statements.md`.
@@ -352,3 +390,63 @@ with `#rules`, screen it, and have it signed before anything rests on it.
   and its theorems are within their bounds. Use the base's proofs as
   templates: the same witnesses, the same recursion, the same measure, new
   cases only. A template case that fails points at one rule.
+
+**Where rules act at a place inside a judgment: one relation between
+whole judgments, not cases on positions.** This is for the calculi of
+`reference/explore.md` §13, and for their admissible rules: weakening,
+exchange, the inversions, contraction. A source proves these "by a
+routine induction", by cases on where the place of the rule lies against
+the place of what is weakened or contracted. With places as paths, each
+such case is a pair of paths and a lemma that two replacements commute,
+and there are many. Do not write them. Write instead:
+
+1. a relation `Γ ≼ Γ'` between whole judgments, defined by recursion on
+   the first: what is asked of the formulas of a node, and that each
+   inner judgment of `Γ` is related to one of `Γ'`;
+2. one lemma about a place: if `Γ ≼ Γ'` and `Θ` is the node of `Γ` at a
+   path `a`, then `Γ'` has a node `Θ'` at some path `a'` with `Θ ≼ Θ'`,
+   and for all `X ≼ X'` the judgments changed there are related,
+
+       Γ.setNode a X ≼ Γ'.setNode a' X'
+
+   (where two nodes may have the same image, `X'` must also keep what
+   was at the image: `Θ' ≼ X'`);
+3. one theorem, by induction on the derivation, with the lemma at each
+   rule: a proof of `Γ` gives a proof of every `Γ'` with `Γ ≼ Γ'`, and
+   one that is no deeper,
+
+       (d : Fam Γ) → Γ ≼ Γ' → ∃ d' : Fam Γ', d'.depth ≤ d.depth
+
+Each admissible rule is then the theorem at a pair of judgments that
+are related by a short computation. Three relations served a calculus
+of nested sequents:
+
+| the relation | what it asks | its instances |
+|---|---|---|
+| `Γ` embeds in `Γ'` | each formula at least as many times in the image; the inner judgments into inner judgments at different positions | weakening, exchange |
+| the same, with a relation at the nodes | a number of the occurrences of one formula replaced by its parts | the inversion of each invertible rule |
+| `Γ` maps into `Γ'` | each formula in the image, by membership; two inner judgments may go to the same one | contraction, by induction on the depth, with the inversions |
+
+Four things met on the way:
+
+- **A statement about one occurrence needs a proof about several.** The
+  inversion of `∧` at one occurrence of `A ∧ B` does not go through the
+  induction: a rule on `(A ∧ B) ∧ C` puts a second `A ∧ B` into the
+  node. Let the relation say that some number of the occurrences are
+  replaced. Replacing every occurrence everywhere, by a function, does
+  not keep the depth, for the same reason.
+- **The depth is a function on derivations** (§3), so that "no deeper"
+  can be stated. What an axiom counts (0 there) is part of the
+  statement: say it in `statements.md`.
+- **A rule that puts a judgment under a new place** (necessitation) is
+  not an instance: there it was the function that carries a proof of
+  an inner judgment to a proof of the whole (`Fam.lift`), which keeps
+  the depth.
+- **The statements are for the reviewer, the relations are not**: what
+  is entered in `statements.md` is each rule in the source's form (for
+  a context `Γ{ }`), obtained from the theorem; the relation is a lemma
+  on the way (§5).
+
+Compiled, in `calculi/BrunnlerK/BrunnlerK/` of `proof-tools`:
+`Structural.lean` (`Sub`, `Sub.node`, `Fam.sub`), `Invert.lean` (`SubR`,
+`Fam.invert`), `Contract.lean` (`Hom`, `Hom.node`, `Fam.hom`).

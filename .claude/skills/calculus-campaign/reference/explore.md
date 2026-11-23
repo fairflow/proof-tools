@@ -232,6 +232,16 @@ instance : Explorable S where
 declare_move_tactic mycalc for S
 ```
 
+- **The tactic's name becomes a keyword.** `declare_move_tactic k for S`
+  makes `k` a token in every file that imports the declaration, and no
+  variable, field or function can then be called `k` there. Choose a
+  name that nothing else will want: not a letter, not the name of the
+  system, not a word of the source's notation (`kmove`, not `k`). The
+  same holds for the words of a library's own syntax: with
+  `LeanCertify` imported, `size` is a keyword (from
+  `certify_chunks … size n`) and cannot name a function of yours. The
+  sign is a parse error at a name that was accepted the day before:
+  rename, do not quote.
 - `candidates` should propose every move that could apply: queries offer
   from it, and a line with holes is matched against it. Too many costs
   nothing (those that do not apply are dropped); one missing is a move the
@@ -508,7 +518,8 @@ one. How such a judgment is represented, how a rule and a move name the
 place they act at, and what a move carries, are the plan's choices of
 encoding, signed by the reviewer with the plan. This section gives the
 options and what each costs. It chooses nothing, and it gives no rule of
-any calculus. No public instance is of this kind.
+any calculus. One instance is of this kind: `calculi/BrunnlerK/` of
+`proof-tools`, nested sequents as a type of its own.
 
 | option | what you get | what it costs |
 |---|---|---|
@@ -529,8 +540,51 @@ Whatever is chosen:
   conclusion (`reference/adopt.md` §3). Then S1 is one constructor for
   each move, and S2 one node for each constructor;
 - `step` is on the path the kernel evaluates: try early that one step on a
-  small judgment reduces (`by decide +kernel` on one
-  `S.step m j = .ok ps`), since `#guard` does not go through the kernel;
+  small judgment reduces, since `#guard` does not go through the kernel.
+  Core Lean has no `DecidableEq (Except String (List _))`, so the
+  equation `S.step m j = .ok ps` is not one `decide` can be asked.
+  State the check through `Except.toOption`:
+
+  ```lean
+  example : (S.step m j).toOption = some ps := by decide +kernel
+  ```
+
+  and a refusal as `(S.step m j).toOption = none`;
 - find out during the Survey what derives for the proposed type (a few
   lines suffice), and budget in the plan the groundwork that remains: the
-  quoting, the equality, the printer, the candidates.
+  quoting, the equality, the printer, the candidates. Try the same on
+  the type of models and of every other certificate the plan names: a
+  tree of worlds is a type that holds a list of itself, and gets no
+  `DecidableEq`. A construction of Prove that would test two of its
+  members for equality (a model whose worlds are the subtrees of a
+  tree) is then to be designed another way, and the plan is where that
+  is cheap to see;
+- **S1, where every rule begins by looking its place up.** The
+  template's S1 is one match on the move and the judgment, each case a
+  constructor: it relies on `m.rule j` reducing once the move and the
+  shape of the judgment are known. A rule that begins with "the node
+  at this path" does not reduce for a variable judgment. Split the
+  rule in two: the rule given what is at the place, and the lookup.
+
+  ```lean
+  def Move.ruleAt (Γ Θ : Judg) : Move → Rule        -- the rule, given the node Θ at the move's path
+  def Move.rule (Γ : Judg) (m : Move) : Rule :=
+    match Γ.node? m.path with
+    | some Θ => m.ruleAt Γ Θ
+    | none => ⟨false, [], "the sequent has no node at this path"⟩
+
+  theorem rule_some (h : Γ.node? m.path = some Θ) : m.rule Γ = m.ruleAt Γ Θ
+  theorem rule_none (h : Γ.node? m.path = none) : (m.rule Γ).ok = false
+  ```
+
+  S1 then matches on `Γ.node? m.path` first, with the equation kept
+  (`match hΘ : Γ.node? m.path with`), and under `some Θ` is the
+  template's match, on `ruleAt`. A rule that looks up a second thing
+  (a part of the node, by position) is split once more in the same
+  way, as a function of its own on what the second lookup returns,
+  with its own case of S1: a `match` on the second lookup inside the
+  first does not generalise the hypotheses. S2 is then one equation
+  for each constructor, `S.step m Γ = .ok [the premises, written out]`,
+  proved by `simp` with the side conditions. Compiled:
+  `calculi/BrunnlerK/BrunnlerK/Proof.lean` of `proof-tools`
+  (`Move.ruleAt`, `diaRule`, `step_sound`).

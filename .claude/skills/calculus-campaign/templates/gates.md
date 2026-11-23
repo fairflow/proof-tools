@@ -32,10 +32,19 @@ the folder point here.*
   "<the reviewer's words>"
 * **Result**: passed / passed with changes (<which, made in commit …>) /
   not passed (<what is to change before it is asked again>) /
+  answered in part (<what the answer settled, and what was done on it;
+  what it changed of a thing an earlier gate fixed; what it asked
+  back; what it said nothing of. The gate is put again for the rest,
+  as a new entry>) /
   overridden by the reviewer (<the later command, in the reviewer's
   words; what was then built on the thing that is not signed>) /
   decided by the operator (<the reviewer's words that lifted the gates;
-  what was decided, and why>).
+  what was decided, and why>) /
+  put, and not done (<for the reviewer's test and the tutorial only,
+  which no command and no decision of the operator passes: the
+  reviewer's words that put it off or let the work go on; what was
+  done without it. The entry is completed when the reviewer has
+  typed>).
 
 For the plan (stage 0), also:
 

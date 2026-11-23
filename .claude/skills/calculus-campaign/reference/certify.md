@@ -56,6 +56,10 @@ and not only for there being one. For a proposition proved sound by
 membership (`h : S.Sound P`), the certifiers are `Cert.certifier h.soundT`
 and `certifier h.soundT`.
 
+`import LeanCertify` brings the words of its syntax with it: `size`
+becomes a keyword, and a function of yours with that name no longer
+parses (`reference/explore.md` §5).
+
 Compiled, in the template's instance: both lints pass on both certifiers,
 with the property a type. For the script, R3 adds a note that the path
 reaches `Nat.repr` (the library's message for a failing line), "so this
@@ -196,6 +200,44 @@ out the answer is `flag`, never `fail`.
   count, a deadline). One that ran away wrote oversized files for
   minutes before it was stopped.
 
+**Where Prove left a search that is proved, and structural: try the
+direct decision first.** `lean-certify` is built for a producer that is
+not trusted. A campaign that reaches level 3 (§3) may have more than
+that: a function `(j : Judg) → Fam j ⊕ Refutation j`, proved to end and
+to be right, written by structural recursion (R3 asks the same of a
+checker). Then what holds is decidable by evaluation, and the kernel
+can run the search itself:
+
+```lean
+instance (j : Judg) : Decidable (Valid j) := validDecidable j
+example : Valid j₀   := by decide +kernel
+example : ¬ Valid j₁ := by decide +kernel
+```
+
+No certificate is written out, and no producer is in the statement.
+Plain `decide` may stop where `decide +kernel` goes through, since it
+does not unfold the search. So, in this case:
+
+- measure both routes on the corpus, the fact with its certificate and
+  the kernel running the search, and report both (§5). In the one
+  instance measured (`calculi/BrunnlerK/` of `proof-tools`) the kernel
+  running the search was the cheaper at every size tried for a proof
+  (0.44 s against 1.81 s at a tree of 655 moves) and answered where
+  the certificate was not elaborated; against validity the tree was
+  the cheaper (0.07 s against 2.04 s at 65 nodes);
+- keep the certifiers all the same, for what the direct decision does
+  not give: the proof as an object (a value of `Fam j` to print, walk
+  and compare; a tree of moves to keep), and any producer that is not
+  proved (a faster search, a person, a language model);
+- the compiled producer is still that search, with its answer checked
+  before it is handed on (above): being proved does not excuse it from
+  the check, which costs little and guards the file against its own
+  defects.
+
+Where the search is not structural (well-founded recursion, a budget),
+the kernel does not run it: R3. This route is then closed, and the
+certifier is the only one.
+
 ## 5. Gates, tests, measurements
 
 **Gate (R10, and the campaign's).** The library's two certifiers of
@@ -243,7 +285,34 @@ the date:
   exist. A depth-first search that shares nothing between branches can
   produce a proof many times longer than the one a person writes; the
   checker accepts either, and the difference says what the search should
-  learn.
+  learn. Where it can be taught in a few lines (a search that applied a
+  branching rule before it looked for an axiom gave `2ⁿ⁺¹ − 1` rule
+  instances where one serves), teach it in this stage: stage 3, step 4,
+  of `SKILL.md` says under what conditions and how it is recorded;
+- where there is a search that is proved and structural (§4): the kernel
+  running the search, beside the fact with its certificate.
+
+**A certificate written as a term has limits before the kernel.** R6 and
+R8 of `lean-certify` speak of kernel time. A large certificate fails
+earlier, while Lean reads the term: a tree of 2 335 moves, and one of
+258 moves nested 256 deep, were not elaborated (Lean's error names its
+maximum recursion depth), where a tree of 655 moves took 1.8 s and one
+nested 64 deep 0.5 s. So:
+
+- find this limit for your certificate with the family that grows,
+  both in size and in depth of nesting, and name it in the frontier as
+  what it is: a term that was not elaborated is a **flag**, not a
+  rejection. A certificate the checker rejects is a defect of the
+  tool; one too large to read is a limit of the route;
+- say what a column of times measures. Parsing, elaboration and the
+  kernel's check are one figure unless they are separated; call it
+  "kernel" only if they are;
+- `certify_chunks` does not help: it splits a long `List.all`, not a
+  deep tree. What does: a smaller certificate (R6); the direct
+  decision, where §4 allows it; or a certificate of your own that is
+  flat (§2);
+- raising `maxRecDepth` for the file of facts moves the limit and was
+  not tried.
 
 ## 6. Deciders
 

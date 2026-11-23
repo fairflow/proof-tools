@@ -100,6 +100,16 @@ Read `reference/adopt.md` §3 and `reference/explore.md` §2 and §13 before
 filling this. Give the options you weighed, not only the one proposed, and
 say what was tried in Lean to see that a choice is feasible.
 
+**What `deriving` gives**, tried in scratch on every type this plan
+names (stage 0, step 3), not on the judgments alone:
+
+| type | `DecidableEq` | `Repr` | `Lean.ToExpr` | where it does not derive: what is written instead, or what must then not be asked of the type |
+|---|---|---|---|---|
+| formulas | | | | |
+| judgments | | | | |
+| moves | | | | |
+| a finite model (Q3), and any other certificate | | | | |
+
 | choice | the options weighed | proposed, and why |
 |---|---|---|
 | a judgment as data | | |

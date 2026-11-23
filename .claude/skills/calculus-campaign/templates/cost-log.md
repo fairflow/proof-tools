@@ -8,15 +8,23 @@ good one.*
 
 ## Sessions
 
-The four columns from "requests" to "cost" are for an operator that is a
-language model; a person writes hours under "cost" and leaves the others.
+The four columns from "requests" to "cost" are about an operator that is
+a language model; a person writes hours under "cost" and leaves the
+others. **An operator that is a model does not, as a rule, know them**:
+its environment shows it neither its requests nor its tokens nor what
+they cost. It writes "not known" in each, and does not work a figure out
+from the length of the session. They are the reviewer's to fill, from
+the tool's usage report, if the method is to be costed; the line below
+the table says who filled them and from what. What the operator can
+measure, it measures: the clock, the builds, the lines.
 
 | # | stage | operator (person, or model and settings) | fresh session from a brief? | began | ended | waiting on builds (the sum of the build commands' times) | requests | output tokens | input read again (cached) | cost | Lean lines added / removed (`git diff --stat`) | document lines |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1 | Survey | | yes / no | | | | | | | | | |
+| 1 | Survey | | yes / no / no, at the reviewer's word | | | | | | | | | |
 
-Where the tokens and the cost come from: <the tool's usage report; the
-transcript; "not known">.
+Where the tokens and the cost come from: <the tool's usage report, read
+by the reviewer on <date>; the transcript; "not known to the operator,
+and not filled">.
 
 ## Exchanges with the reviewer
 
@@ -32,7 +40,7 @@ Every message from the reviewer during the campaign, classed:
 
 ## By stage
 
-| stage | sessions | elapsed | of which waiting on builds | requests | cost | reached its gate? | decisions / corrections / rescues |
+| stage | sessions | elapsed | of which waiting on builds | requests ("not known", where the rows say so) | cost (the same) | reached its gate? | decisions / corrections / rescues |
 |---|---|---|---|---|---|---|---|
 | 0 Survey | | | | | | | |
 | 1 Adopt | | | | | | | |
