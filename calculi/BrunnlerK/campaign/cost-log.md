@@ -11,6 +11,7 @@ start). A figure the environment does not give is written "not known".
 | 2 | Adopt, to the rule table's gate | Claude Fable 5.2 (`claude-fable-5-2`); effort setting not known | no: the session of row 1, at the reviewer's word (`gates.md`, the fourth entry); worked from `brief-1-1.md` | 2026-11-23 14:07 GMT | at the gate note, 2026-11-23 14:19 GMT by the clock | under a minute in all: the first build of the library's audit modules 6 s; each later build 1 to 3 s | not known | not known | not known | not known | 631 / 0 (of which tests 196) | 597 in `rule-table.md` and `statements.md`; additions to four other files |
 | 3 | Adopt, after the rule table's gate | Claude Fable 5.2 (`claude-fable-5-2`); effort setting not known | no: the session of rows 1 and 2, after a summary of its earlier part; worked from `brief-1-2.md` | 2026-11-23 15:45 GMT, at the reviewer's signature | at the report, 2026-11-23 15:55 GMT by the clock | under a minute in all: each module about 1 s; the tests file 1.5 s | not known | not known | not known | not known | 976 / 0 (`Proof.lean` 203, `Tactic.lean` 133, tests 439, the exercises file 201) | the report (184); additions to the rule table, the statements, the notes, this log |
 | 4 | Prove, to the reviewer's goal (completeness, cut elimination) | Claude Fable 5.2 (`claude-fable-5-2`); effort setting not known | no: the session of rows 1 to 3, after two summaries of its earlier parts; no brief (the reviewer's goal was the instruction) | 2026-11-23 17:30 GMT | at the report, 2026-11-23 18:00 GMT by the clock; of this, 17:36 to 17:53 GMT was at the statements' gate, with the contexts written meanwhile | under a minute in all: each module 1 to 3 s; the screens 2.4 s | not known | not known | not known | not known | 1 919 / 0 (theory 1 533: `Semantics` 169, `Context` 205, `Weight` 129, `Ctx` 268, `Soundness` 365, `Search` 345, `Completeness` 52; tests 343; `Play/Search.lean` 43) | the report; additions to the gates, the statements, the notes, this log; the skill's rule 6 |
+| 5 | Prove, the rest (goals 2 to 5, the finite model property) | Claude Fable 5.2 (`claude-fable-5-2`); effort setting not known | no: the session of rows 1 to 4; no brief | 2026-11-23 18:11 GMT, at the reviewer's "Yes continue" | at the report, 2026-11-23 18:33 GMT by the clock | under two minutes in all: each module 1 to 3 s | not known | not known | not known | not known | 2 135 / 0 (theory 2 044: `Structural` 514, `Identity` 126, `Invert` 727, `Contract` 451, `FiniteModel` 226; tests 91) | the report; additions to the gates, the statements, the notes, this log; the skill's rule 6, extended |
 
 Where the tokens and the cost come from: not known to the operator. The
 reviewer's application shows them.
@@ -39,6 +40,8 @@ the reading of the source was all in the first part.
 | 12 | 2026-11-23 | 2 | a question (none of the three classes) | "We're still in the skill process right? Or off track?" | nothing in the Lean; the operator said where in the process it was |
 | 13 | 2026-11-23 | 1, 2 | decision | "PS yes add contexts and lemmas of course" (decision 2 of Adopt's report) | `BrunnlerK/Ctx.lean`: contexts, `fill`, the six rules in the figure's shape |
 | 14 | 2026-11-23 | 2 | decision, and a correction of the method | "Signed and if I set a goal that's a very deliberate thing to do so please modify the instructions of the skill to allow a later command of mine to override an earlier gate. As you call it. So yes "signed as put"." | the statements signed; the skill's rule 6; the proofs |
+| 15 | 2026-11-23 | 2 | decision | "Yes continue" (to: keep goals 3, 4, 5; set aside 6 and 7) | goals 6 and 7 set aside; the work on 3, 4, 5 |
+| 16 | 2026-11-23 | 2 | a correction of the method | "Stop telling me to read and approve everything. Act independently." | every gate lifted; the skill's rule 6 extended; the statements of goals 2 to 5 and the finite model property decided by the operator |
 
 ## By stage
 
@@ -46,7 +49,7 @@ the reading of the source was all in the first part.
 |---|---|---|---|---|---|---|---|
 | 0 Survey | 1 | 34 min by the clock to the first gate note; the second part from 09:06 to 09:12 GMT | none | not known | not known | yes: the plan passed at its second putting; ended 09:36 GMT with the brief for Adopt | 7 / 3 / 0, and three questions |
 | 1 Adopt | 1 (the session of stage 0, continued) | 12 min by the clock to the rule table's gate note; 10 min from the signature to the report | under two minutes | not known | not known | the rule table: passed as put; the reviewer's test: put, not done | 2 / 0 / 0, and one question |
-| 2 Prove (to the reviewer's goal; not ended) | 1 (the session of stages 0 and 1, continued) | from 17:30 GMT to the report, 2026-11-23 18:00 GMT; 17 min of it at the statements' gate | under a minute | not known | not known | the statements, first sending: signed as put; the report: put | 3 / 1 / 0, and one question |
+| 2 Prove | 1 (the session of stages 0 and 1, continued) | from 17:30 GMT to the last report, 2026-11-23 18:33 GMT; 17 min of it at the statements' gate | under three minutes | not known | not known | the statements, first sending: signed as put; second sending: decided by the operator; done | 4 / 2 / 0, and one question |
 | 3 Run | | | | | | | |
 | 4 Explore | | | | | | | |
 
@@ -106,3 +109,14 @@ at the statements' gate after the reviewer had set a goal, and needed
 the reviewer's word to go on; one time written in a document was
 estimated and not read from the clock, and was corrected from the
 commit's time before anything else was built.
+
+**Prove, the rest.** Unaided: the choice of relations in place of the
+source's case analyses (`method-notes.md`, note 44); that inversion must
+count occurrences; that contraction needs inversion, so that goal 2,
+which the operator had said could fall, was proved; the finite model
+cut at the modal depth; all the statements and proofs. False starts:
+one design discarded before any Lean (inverting every occurrence by a
+function: not depth-preserving); a model on subtrees, given up when
+Lean would not derive the equality test; the usual first-run errors,
+each fixed from Lean's message. Not unaided: nothing. Not checked by
+anyone but the kernel: that the statements say what the source means.

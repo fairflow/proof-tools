@@ -293,6 +293,16 @@ done is recorded with the gate, and is the first input of stage 4.
    lift what was fixed with the target (where to push, what is not to be
    touched), nor what only the reviewer may do.
 
+   **The reviewer may lift every gate at once** ("act independently",
+   "stop asking me to approve"). From then on a gate is a record and not
+   a stop: at each one the operator decides, writes in `gates.md` what
+   the gate would have shown, what was decided and why, with the result
+   **decided by the operator**, and goes on, until the goals are done or
+   a thing that only the reviewer may do is reached. Reports still
+   display the definitions and the statements, as information and not
+   as a question; they end with what was decided, not with what to
+   sign. The reviewer can refuse any of it afterwards.
+
 ### Stage 0, Survey
 
 Read `reference/adopt.md` §1 to §3, and the Survey's pitfalls.

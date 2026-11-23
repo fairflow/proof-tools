@@ -33,7 +33,9 @@ the folder point here.*
 * **Result**: passed / passed with changes (<which, made in commit …>) /
   not passed (<what is to change before it is asked again>) /
   overridden by the reviewer (<the later command, in the reviewer's
-  words; what was then built on the thing that is not signed>).
+  words; what was then built on the thing that is not signed>) /
+  decided by the operator (<the reviewer's words that lifted the gates;
+  what was decided, and why>).
 
 For the plan (stage 0), also:
 

@@ -267,3 +267,46 @@ checkout is behind `main`), which was written while this stage ran.
     `Valid Γ` and `¬ Valid Γ` for the sequents tried. Plain `decide`
     stopped on one (it does not unfold the search). Not measured beyond
     the eleven sequents: Run is where the frontier is found.
+
+## Stage 2 (Prove), after the gates were lifted
+
+43. **"Act independently."** The reviewer, after two closing messages
+    that each ended with a thing to sign and a choice to make: "Stop
+    telling me to read and approve everything. Act independently." The
+    skill made every stage end in a question to the reviewer, and the
+    operator followed it. The skill now says the reviewer may lift every
+    gate at once, and that a gate is then a record with the result
+    "decided by the operator". What it still does not say: how a report
+    should read when nothing is asked. Here the report's last part is
+    "what was decided", with one line each.
+44. **One relation in place of a case analysis on positions.** The
+    source proves the admissible rules "by a routine induction", and
+    contraction by cases on where the contracted sequent lies in the
+    conclusion of the rule. With paths, each such case is a pair of
+    paths and a lemma that two replacements commute. None was written.
+    Instead: a relation between whole sequents, defined by recursion on
+    the first (`Sub`: embeds; `SubR`: embeds, with a relation at the
+    nodes; `Hom`: maps into), one lemma that a node and its image may be
+    replaced together, and one theorem "a proof of `Γ` gives a proof, no
+    deeper, of any `Γ'` it is related to". Weakening and exchange,
+    the four inversions, and contraction are instances. Worth a section
+    of `reference/adopt.md`, for any calculus whose rules act at a place
+    inside a judgment.
+45. **A statement about one occurrence needs a proof about several.**
+    Invertibility of `∧` at one occurrence does not go through the
+    induction: a rule on `(A ∧ B) ∧ C` puts a second `A ∧ B` into the
+    node. The relation counts: some number of the occurrences replaced.
+    The first attempt, replacing every occurrence everywhere by a
+    function, is not depth-preserving, for the same reason.
+46. **What Lean does not derive.** `DecidableEq` for a type that
+    contains a list of itself (`Tree`). The finite model was first to be
+    on the subtrees of the refuting tree, which needs that test for
+    two-valuedness; it is on levels and trees instead, cut at the modal
+    depth, and needs no recursion on trees at all. A type signed with a
+    gate may turn out awkward later: the plan's probe of `deriving`
+    (stage 0) was run on the type of sequents only.
+47. **An estimate written as a fact, twice.** A time in `gates.md`, and
+    the expected depth in one test, were written from expectation and
+    not from the clock or from Lean. Both were caught in minutes (the
+    commit's time; the elaborator). The rule holds for tests too: run
+    it, then pin it.

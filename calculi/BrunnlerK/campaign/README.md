@@ -11,7 +11,7 @@ Operator: Claude (Fable 5.2) for stages 0, 1 and 2; see the cost log. The method
 the skill `calculus-campaign`, read at commit `e6410cd` of proof-tools
 and amended on 2026-11-23 at the reviewer's word (the default folder; the
 letters Lean reserves; a later command of the reviewer overrides a
-gate).
+gate; the reviewer may lift every gate).
 
 ## Status
 
@@ -19,7 +19,7 @@ gate).
 |---|---|---|---|
 | 0. Survey | done | the target: passed, 2026-11-23; the plan: passed, 2026-11-23, at its second putting | [plan.md](plan.md), [report-0-2026-11-23.md](report-0-2026-11-23.md) |
 | 1. Adopt | done, but for its last gate: the package, formulas and sequents, the two families, the rule table, the proof system, the tactic `kmove`, the tests, the exercises file | the rule table: signed 2026-11-23; the reviewer's test: put 2026-11-23, deferred by the reviewer, not done | [rule-table.md](rule-table.md), [statements.md](statements.md), [report-1-2026-11-23.md](report-1-2026-11-23.md), `Play/BrunnlerK.lean` |
-| 2. Prove | begun 2026-11-23 at the reviewer's word, for completeness and cut elimination, in the session of stages 0 and 1; that goal is reached: goals 1, 8, 9 (completeness, decidability) and 10 PROVED. Not ended: goals 2 to 7 and the finite model property are OPEN and not attempted | the statements, first sending: signed as put, 2026-11-23; the report: put 2026-11-23 | [statements.md](statements.md), [report-2-2026-11-23.md](report-2-2026-11-23.md), `Play/Search.lean` |
+| 2. Prove | done, 2026-11-23, in the session of stages 0 and 1: goals 1, 2, 3, 4, 5, 8, 9 and 10 PROVED; goals 6 and 7 set aside by the reviewer. Nothing OPEN | the statements, first sending: signed as put; second sending: decided by the operator, the gates being lifted by the reviewer; the report: [report-3](report-3-2026-11-23.md) | [statements.md](statements.md), [report-2-2026-11-23.md](report-2-2026-11-23.md), [report-3-2026-11-23.md](report-3-2026-11-23.md), `Play/Search.lean` |
 | 3. Run | not started | the producers: not put | |
 | 4. Explore | not started | the tutorial: not put | |
 
@@ -39,6 +39,8 @@ gate).
 
 * [report-2-2026-11-23.md](report-2-2026-11-23.md): the report of Prove
   at the reviewer's goal (completeness, cut elimination).
+* [report-3-2026-11-23.md](report-3-2026-11-23.md): the report at the end
+  of Prove (goals 2 to 5, the finite model property).
 * [brief-1-1.md](brief-1-1.md), [brief-1-2.md](brief-1-2.md): the briefs
   for Adopt, to the rule table's gate and after it.
 * [rule-table.md](rule-table.md): each rule of the source beside its
@@ -70,7 +72,12 @@ toolchain (v4.31.0); the package requires `proof-tools` by its path.
 | `BrunnlerK/Soundness.lean` | truth of a sequent on the sequent; deep inference is sound; soundness of K and of K + cut | `[propext, Quot.sound]` |
 | `BrunnlerK/Search.lean` | the model of finite trees is two-valued; the search: a proof or a refutation | `[propext, Quot.sound]` |
 | `BrunnlerK/Completeness.lean` | completeness, decidability, cut elimination | `[propext, Quot.sound]` |
-| `BrunnlerK/Test/Semantics.lean`, `BrunnlerK/Test/Ctx.lean`, `BrunnlerK/Test/Search.lean` | the screens of the statements; tests | none: tests |
+| `BrunnlerK/Structural.lean` | the depth of a proof; embedding (`Sub`, `Fam.sub`); `nec`, `wk`, exchange | `[propext, Quot.sound]` |
+| `BrunnlerK/Identity.lean` | the general axiom | `[propext, Quot.sound]` |
+| `BrunnlerK/Invert.lean` | embedding with a relation at the nodes; `Fam.invert`; the inverse rules | `[propext, Quot.sound]` |
+| `BrunnlerK/Contract.lean` | mapping a sequent into another (`Hom`, `Fam.hom`); `ctr` | `[propext, Quot.sound]` |
+| `BrunnlerK/FiniteModel.lean` | models with finitely many states; the finite model property | `[propext, Quot.sound]` |
+| `BrunnlerK/Test/Semantics.lean`, `BrunnlerK/Test/Ctx.lean`, `BrunnlerK/Test/Search.lean`, `BrunnlerK/Test/Structural.lean` | the screens of the statements; tests | none: tests |
 | `Play/Search.lean` | the search, to try; in no library (`lake env lean Play/Search.lean`) | none |
 | `Play/BrunnlerK.lean` | the reviewer's exercises; in no library (`lake env lean Play/BrunnlerK.lean`) | none |
 

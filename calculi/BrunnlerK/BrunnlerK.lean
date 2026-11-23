@@ -20,6 +20,7 @@ import BrunnlerK.Structural
 import BrunnlerK.Identity
 import BrunnlerK.Invert
 import BrunnlerK.Contract
+import BrunnlerK.FiniteModel
 import BrunnlerK.Tactic
 import BrunnlerK.Test.Sequent
 import BrunnlerK.Test.System
