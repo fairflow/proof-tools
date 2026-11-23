@@ -7,6 +7,14 @@ for propositional lax logic in
 be revised as it is applied. The explorer it mentions is `ProofTools.Explore`
 ([explore.md](explore.md)).
 
+**This page describes the method. It is not the procedure.** The procedure,
+with its gates, its templates and the rules of every stage, is the Claude
+skill in `.claude/skills/calculus-campaign/`, run by the command
+`/calculus-campaign <the calculus, named in words>`. A campaign is run from
+the skill, not from this page. If you were asked for that command and it is
+unknown in your session, do not carry the campaign out from here: say so,
+and see "If the command is unknown" in the [README](../README.md).
+
 ## Who does what
 
 - The **operator** does the work of a stage: a person, or a language model

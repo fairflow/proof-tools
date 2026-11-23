@@ -142,6 +142,17 @@ whose first act is one proposal to the reviewer (the source, the system,
 the results aimed at), after which it stops for an answer. A campaign's
 files go in a Lake package of their own under `examples/`.
 
+**If the command is unknown.** Then the session was not started in a
+checkout that has `.claude/skills/calculus-campaign/`: the checkout is older
+than the skill, or the session's folder is somewhere else. Bring the
+checkout up to `main` and start a new session. A session registers the
+skills it finds when it starts; one that was running before the folder
+existed does not register it afterwards, whatever is pulled or merged into
+its folder. Where a new session is not possible, open `SKILL.md` as a file
+and follow it from the top, which it allows for, and say that this was
+done. A campaign is not run from `docs/campaign.md`: that page describes
+the method and has none of the gates.
+
 ## Using it
 
     [[require]]

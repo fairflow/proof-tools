@@ -76,6 +76,15 @@ the answer.
      The default is that you clone `https://github.com/fairflow/proof-tools`
      and use a commit that has the files `ProofTools/Explore/Cert.lean` and
      `ProofTools/Explore/Session.lean`;
+   - said, if you were started in a checkout of the library: whether it is
+     up to date. Compare the commit you are on with the remote's `main`
+     (`git ls-remote origin refs/heads/main`, which writes nothing). If
+     the remote's commit is not an ancestor of yours, or the checkout
+     does not have it, the library and this text may both be old: say so,
+     with the two commits, and ask whether to update before anything
+     else. A
+     session's folder is often cut from a local `main` that nobody has
+     pulled;
    - asked: where and when to push? The default is that you commit
      locally and push nothing until the reviewer says;
    - asked: is anything not to be touched? Only the reviewer contacts the
