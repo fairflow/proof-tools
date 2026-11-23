@@ -243,9 +243,9 @@ Adopt is not passed, and Prove is begun in the session of stages 0 and 1.
   A change that Prove makes to a module the exercises file rests on is
   recorded here when it is made.
 
-## 2026-11-23 17:40 GMT. Stage 2: the definitions and the statements, first sending
+## 2026-11-23 17:36 GMT. Stage 2: the definitions and the statements, first sending
 
-* **Put to the reviewer** (2026-11-23 17:40 GMT; the commit is named in
+* **Put to the reviewer** (2026-11-23 17:36 GMT, at `b423521`; the commit is named in
   the message): `BrunnlerK/Semantics.lean`, all of it, and the entries
   of `statements.md` for goals 1, 8, 9 and 10. To sign:
   1. the models and truth (`Model`, `Model.sat`), Definition 2.6 clause

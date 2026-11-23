@@ -15,7 +15,7 @@ Status is exactly one of:
 * **OPEN**: everything else. An OPEN statement is in Lean as a named
   proposition (`def Name : Prop := …`), not as a theorem with `sorry`.
 
-**As of 2026-11-23 17:40 GMT the ten goals are OPEN; S1 and S2 are
+**As of 2026-11-23 17:36 GMT the ten goals are OPEN; S1 and S2 are
 PROVED.** Goals 1, 8, 9 (two of its three lines) and 10 are in Lean as
 named propositions and types with no proof (`BrunnlerK/Semantics.lean`),
 put to the reviewer in the fifth entry of `gates.md`. Goals 2 to 7 and
