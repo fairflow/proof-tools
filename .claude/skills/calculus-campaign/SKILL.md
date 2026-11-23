@@ -148,16 +148,41 @@ Read a part when a stage sends you to it, and the stage's entries of
   nine moves, with what holds taken as validity), `MapOut.lean` (the same
   calculus as an inductive family), and their tests.
 
-**The worked instance** is not needed to follow this skill: the subframe
-tableau for propositional lax logic, in
-[lax-logic-in-lean](https://github.com/fairflow/lax-logic-in-lean)
-(`LaxLogic/PLL/SubTab/`), a calculus that was designed, not adopted, and
-the only instance outside the library's tests.
+**The worked instances** are not needed to follow this skill. There are
+two outside the library's tests:
+
+- **the subframe tableau** for propositional lax logic, in
+  [lax-logic-in-lean](https://github.com/fairflow/lax-logic-in-lean)
+  (`LaxLogic/PLL/SubTab/`): a calculus that was designed, not adopted;
+- **Brünnler's system K**, nested sequents for the modal logic K, in
+  `calculi/BrunnlerK/` of `proof-tools`: adopted from its source
+  (Brünnler, *Nested Sequents*, arXiv:1004.1845) by a campaign under
+  this skill. Its judgments are not flat (`reference/explore.md` §13).
+  The campaign's record is in its folder `campaign/`: the plan, the
+  rule table, the statements, the gates, the reports, the cost log and
+  the notes on the method.
 
 **Status.** The three parts have been used separately. The whole, from a
-paper to an explorer, has not yet been run by an operator starting cold.
-Where this text leaves you without an instruction, that is a finding:
-write it down (rule 8).
+paper to an explorer, has been run once: on Brünnler's system K, on
+2026-11-23, by an operator that is a language model. That run does not
+test all of this text:
+
+- the operator did not start cold: it had read the source and written a
+  first plan before it had the skill;
+- the five stages were one session, at the reviewer's word, so no stage
+  was begun by a fresh session from its brief (rule 5);
+- the reviewer lifted every gate in the middle of Prove, and from there
+  the operator decided what the gates would have put: the statements of
+  the later goals, the producers, what the explorer serves;
+- the reviewer's test and the tutorial were put, and not done;
+- this text was amended during that run and after it (the changes are
+  listed in the run's closing report and in its notes on the method),
+  and the text as it now stands has not been run.
+
+So a run by an operator starting cold, with a fresh session at each
+stage and every gate put to the reviewer, has not yet been made. Where
+this text leaves you without an instruction, that is a finding: write it
+down (rule 8).
 
 ## Eight rules for every stage
 
