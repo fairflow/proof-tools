@@ -450,3 +450,16 @@ Adopt is not passed, and Prove is begun in the session of stages 0 and 1.
   `method-notes.md`, note 60.
 * **Result**: not a gate of a stage. The reviewer's word for a change
   outside the campaign's folder (the skill's rule 7).
+
+## 2026-11-23 22:18 GMT. The eighteen notes the report did not turn into changes
+
+* **Put to the reviewer**: among what remained, the eighteen notes on
+  the method that the closing report did not turn into changes to the
+  skill (`method-notes.md`, note 58).
+* **Answer** (2026-11-23, in the session): "turn the eighteen method
+  notes into skill changes too"
+* **Done**: the eighteen, in commit `5337dd4`, which changes the skill's
+  files and nothing else. Where each is: `method-notes.md`, the last
+  section.
+* **Result**: not a gate of a stage. The reviewer's word for a change
+  outside the campaign's folder (the skill's rule 7).

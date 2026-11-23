@@ -427,3 +427,50 @@ last column, brought up to date.
     paragraph of `SKILL.md`, "checked against `proof-tools` at commit
     `3fa25c0`". Nothing of the amended text was checked against a later
     commit of the library, so that line is still what is true.
+
+## After the closing report: the eighteen other notes, made changes
+
+The reviewer: "turn the eighteen method notes into skill changes too".
+Made in commit `5337dd4`. They are the notes that note 58 lists.
+
+| note | what the skill now says | where |
+|---|---|---|
+| 5 | a statement the plan proposes may be screened in scratch before the plan's gate, and the plan says what the screen showed | `SKILL.md`, stage 0, step 3 |
+| 6 | a fourth way to hold a judgment that is not flat: a type that holds itself directly and never in a list; every `deriving` line works | `reference/explore.md` §13, the table's second row |
+| 10 | a fourth class of exchange, "question"; a message of two classes is entered once with both | `templates/cost-log.md` |
+| 14 | a statement about every structure may imply a classical principle: first the direct statement over the class of structures the source means, then the indirect form, then the two forms | `reference/adopt.md` §5; a pointer in `templates/statements.md` |
+| 17 | the plan's table of choices gives, with each choice, what it does to the rules: a rule of the source that needs no constructor, a rule added | `templates/plan.md` |
+| 18 | the skeleton script's header is old; on a source that compiles it reads the `.aux` and says so; read that line before citing a number | `reference/adopt.md` §1 |
+| 20 | the figure's letters stay; what the encoding adds takes letters the figure does not use | `reference/adopt.md` §3 |
+| 21 | where judgments are not flat, the rule table has three further sections: how a rule of the figure reads in Lean, the functions the rules use, what the reviewer is asked to sign | `templates/rule-table.md`; `reference/adopt.md` §4; pointers in `SKILL.md`, stage 1, step 4, and `reference/explore.md` §13 |
+| 23 | the source's worked derivations, as terms of the family, are a screen of the family: written before the rule table is sent, or while its gate waits | `SKILL.md`, stage 1, step 4, and "How a gate is run", 1 |
+| 24, 30 | a printer that writes a combining character: escapes in expected strings, pasted text in pinned messages, a line at the head of the tests file, and reading back what a tool wrote | `reference/explore.md` §10 |
+| 28 | S2 is proved in Adopt for a calculus whose judgments are not flat | `reference/explore.md` §13 |
+| 32 | an exercise at a judgment no move applies to has no query written; the text says what the reviewer types and sees | `reference/explore.md` §10; a comment in `templates/Play.lean.txt` |
+| 33 | `within`: where the source ends its search by a proviso, that proviso is the first candidate | `reference/explore.md` §5 |
+| 34 | a term syntax for judgments that are not flat, pinned by `rfl` in the tests | `reference/explore.md` §13 |
+| 37 | the plan's order is the source's route; goals that fall off another route stay goals, stay OPEN, and are put to the reviewer | `SKILL.md`, stage 2, step 4; a line in `templates/plan.md` |
+| 43 | the form of a report's last part where the gates are lifted: "What was decided", and "The reviewer's, and not done" | `templates/report.md`; `SKILL.md`, "Reports, the folder, the log" |
+| 55 | no comment after a pattern: comments on lines of their own in the exercises and the tutorial | `reference/explore.md` §6, §10 and §11 |
+
+61. **Decided on the way.** Note 23 asked a question and gave no
+    answer. The answer written is what this campaign did: the source's
+    worked proof as a term of the family is a screen of the family, so
+    it is allowed before the gate and while it waits; `Move` and `step`
+    still wait. Note 10 named one class; the entry for a message of two
+    classes was added with it, since rows 14 and 16 of this campaign's
+    log needed it. Note 43 said what one report did; the template's
+    form is that report's.
+62. **Not tried.** One new fragment of Lean (`def Valid`, in
+    `reference/adopt.md` §5) is schematic, in the shape of
+    `BrunnlerK/Semantics.lean`, and is not compiled. The exercises
+    template got a comment only. The skeleton script's messages were
+    read in its source (lax-logic-in-lean, the working copy on this
+    machine), not by running it again. No campaign has been run from
+    the skill as it now stands.
+63. **The list of eighteen was short.** Note 58 listed the notes "that
+    the report did not turn into changes", and left out eight that ask
+    for one, or for a line: 3, 7, 8, 16, 22, 25, 39 and 47 were in
+    neither list. The operator's miscount. They are made in a commit of
+    their own after this one, so that it can be taken back alone; the
+    next section says where each is.
