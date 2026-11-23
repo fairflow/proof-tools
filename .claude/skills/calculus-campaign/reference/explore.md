@@ -26,11 +26,11 @@ with its infoview.
 Where the campaign's files go was settled at the first act. Either way the
 project is a Lake package in a git repository.
 
-**A folder under `examples/` of `proof-tools`**: the default. Core Lean
+**A folder under `calculi/` of `proof-tools`**: the default. Core Lean
 only. The folder is a package of its own, which requires the library by
 its path:
 
-    examples/<Calculus>/
+    calculi/<Calculus>/
       lakefile.toml           below
       lean-toolchain          a copy of the library's
       lake-manifest.json      written by Lake; committed
@@ -55,14 +55,16 @@ name = "MyCalculus"
 globs = ["MyCalculus", "MyCalculus.+"]
 ```
 
-Build with `lake build`, run in `examples/<Calculus>/`. This layout was
+Build with `lake build`, run in `calculi/<Calculus>/`. This layout was
 built on Lean v4.31.0 at the library's commit `3fa25c0`, as
-`examples/Probe/`, with the instance of `templates/Instance.lean.txt`.
+`examples/Probe/` (the default folder was then named `examples/`; the
+layout does not depend on the name, only on the folder being two levels
+below the root), with the instance of `templates/Instance.lean.txt`.
 What it showed: the first `lake build` built the library's modules as
 well (39 jobs in all, under a minute); the library's build products went to
 `.lake/` at the root of the checkout and the package's to its own
 `.lake/`, both ignored by the library's `.gitignore`; `git status` at the
-root showed `examples/` and nothing else. So no tracked file outside the
+root showed that one folder and nothing else. So no tracked file outside the
 folder changes (rule 7).
 
 **A repository of its own, or a project that exists**: the same lakefile

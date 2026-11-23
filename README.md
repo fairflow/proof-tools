@@ -140,7 +140,7 @@ repository it is the command
 
 whose first act is one proposal to the reviewer (the source, the system,
 the results aimed at), after which it stops for an answer. A campaign's
-files go in a Lake package of their own under `examples/`.
+files go in a Lake package of their own under `calculi/`.
 
 **If the command is unknown.** Then the session was not started in a
 checkout that has `.claude/skills/calculus-campaign/`: the checkout is older

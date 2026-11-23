@@ -154,6 +154,15 @@ command's name.)
 
 - Do it now. Afterwards it means redoing every proof over the family.
 
+**The source's letters.** Lean reserves `λ`, `Π` and `Σ`: none of them
+can be a variable, and a source that writes sequents `Γ, Δ, Λ, Π, Σ` (as
+modal calculi do) cannot be followed letter for letter. Do not work
+around them case by case. Replace them once, in the plan, and enter the
+replacements in the "Notation" table of the rule table: `Ξ` for `Σ`,
+`Υ` for `Π`, and `Θ` and `Φ` where more letters are needed. The capital
+`Λ` is not reserved and stays. Use the same letters in the documents, so
+that a statement reads the same in the plan and in Lean.
+
 **A rule stated for every context.** Some sources state a rule
 schematically for any surrounding structure. Written as it stands, its
 conclusion is then a function applied to something: a computed index. The

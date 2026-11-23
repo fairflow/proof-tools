@@ -124,7 +124,7 @@ into the project's `Harness.config`.>
 
 ## Dependencies
 
-<Core Lean only (always, under `examples/`); or which libraries, and why.>
+<Core Lean only (always, under `calculi/`); or which libraries, and why.>
 The commit of `proof-tools` (of the checkout, or pinned): <…>. The
 toolchain: <…>.
 

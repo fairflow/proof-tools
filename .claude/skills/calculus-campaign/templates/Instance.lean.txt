@@ -5,8 +5,8 @@ written `‹…›`.
 COMPILED, as follows.  With every `‹…›` filled for the library's example
 calculus (the nine rules of `ProofToolsTest/Explore/Calculus.lean`, stated
 as a family into `Type`), these three files built with no error on Lean
-v4.31.0 against proof-tools `3fa25c0`, in a package under `examples/` as
-`reference/explore.md` §1 lays it out.  Everything outside a `‹…›` is the
+v4.31.0 against proof-tools `3fa25c0`, in a package of its own inside the
+library's checkout, as `reference/explore.md` §1 lays it out.  Everything outside a `‹…›` is the
 text that compiled.  The lines marked "as compiled" are that instance's own
 cases, kept as a model of the form: your rules come from your source.
 

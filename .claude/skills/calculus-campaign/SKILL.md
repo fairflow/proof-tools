@@ -70,7 +70,7 @@ the answer.
    - where the files go, and a short name `<Calculus>` for them, fit to be
      a Lean module name. A calculus has **a repository of its own** only
      if the reviewer says so; the directory you were started in is not one
-     by default. Otherwise the default is the folder `examples/<Calculus>/`
+     by default. Otherwise the default is the folder `calculi/<Calculus>/`
      of the library `proof-tools`, with core Lean only;
    - asked: is there a checkout of the library, and a branch, to work in?
      The default is that you clone `https://github.com/fairflow/proof-tools`
@@ -91,7 +91,7 @@ the answer.
      source's authors.
 4. **When the answer has come**, read the rest of this file. Then make
    the campaign folder, `<the place>/campaign/` (by default
-   `examples/<Calculus>/campaign/`), from `templates/README.md`,
+   `calculi/<Calculus>/campaign/`), from `templates/README.md`,
    `plan.md`, `cost-log.md` and `gates.md`; start the cost log and
    `method-notes.md`. The first entry of `gates.md` holds the command's
    words, your proposal and the reviewer's answer in their words. It is
@@ -176,7 +176,7 @@ write it down (rule 8).
    in a temporary folder is not a report.
 7. **Do not change the libraries.** If an instance seems to need a change
    to `proof-tools`, stop and report it (part (iv) of the report): it is
-   a finding about the library. A campaign under `examples/` changes no
+   a finding about the library. A campaign under `calculi/` changes no
    tracked file outside its own folder.
 8. **The method learns.** Keep `method-notes.md` in the campaign folder:
    every place where this skill was wrong, silent or unclear, and what you

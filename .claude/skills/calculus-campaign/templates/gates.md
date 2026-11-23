@@ -19,7 +19,7 @@ the folder point here.*
 * **Answer** (<date>, <how it came>): "<the reviewer's words>"
 * **Fixed**: the reviewer: <…>. The paper and version: <…>. The system:
   <…>; left out: <…>. The results aimed at: <…>. The files:
-  <`examples/<Calculus>/` of the library, or the place named>. The
+  <`calculi/<Calculus>/` of the library, or the place named>. The
   library: <the checkout and its commit; the branch>. Pushing: <where and
   when; until then, nothing is pushed>. Not to be touched: <…>.
 
