@@ -4,25 +4,49 @@ declaration may use fewer axioms than its list allows, and none outside
 it).  Each theory file of the library also carries its own bound, at its
 end (`#axioms_within_file`).
 
-What is trusted when a script is accepted is `derives`, `Att.sound` and the
-instance's soundness theorem.  Nothing in the library uses
-`Classical.choice`: every bound here is `[propext, Quot.sound]`.
+What is trusted when a script is accepted is `derives`, `Att.mapOut` (of
+which `Att.sound` is the case of a proposition) and the instance's
+soundness theorem; when a tree of moves is accepted, `Cert.check`,
+`Der.ofCert`, `Att.mapOut` and the instance's soundness.  Nothing in the library uses `Classical.choice`: every
+bound here is `[propext, Quot.sound]`.
 -/
 import ProofTools.Audit
 import ProofTools.Explore
 import ProofToolsTest.Explore.Calculus
+import ProofToolsTest.Explore.MapOut
 
 open ProofTools ProofTools.Explore
 
 /-! ## The path of trust -/
 
+#axioms_within Att.mapOut [propext, Quot.sound]
+#axioms_within Atts.mapOut [propext, Quot.sound]
+#axioms_within Der.mapOut [propext, Quot.sound]
+#axioms_within ProofSystem.soundT_iff_sound [propext, Quot.sound]
+#axioms_within ProofSystem.SoundT.nonempty [propext, Quot.sound]
 #axioms_within Att.sound [propext, Quot.sound]
 #axioms_within Der.sound [propext, Quot.sound]
 #axioms_within derives_sound [propext, Quot.sound]
 #axioms_within certifier [propext, Quot.sound]
-#axioms_within Evaluator.certifier [propext, Quot.sound]
 #axioms_within engine [propext, Quot.sound]
 #axioms_within Der.ofScript [propext, Quot.sound]
+#axioms_within Cert.check [propext, Quot.sound]
+#axioms_within Der.ofCert [propext, Quot.sound]
+#axioms_within Cert.certifier [propext, Quot.sound]
+
+/-! ## Trees of moves and derivations; the map out is natural -/
+
+#axioms_within Der.mapOut_node [propext, Quot.sound]
+#axioms_within Der.mapOutAll_cons [propext, Quot.sound]
+#axioms_within Att.mapOut_map [propext, Quot.sound]
+#axioms_within Der.mapOut_map [propext, Quot.sound]
+#axioms_within Cert.moves [propext, Quot.sound]
+#axioms_within Cert.checked [propext, Quot.sound]
+#axioms_within Att.cert [propext, Quot.sound]
+#axioms_within Att.check_cert [propext, Quot.sound]
+#axioms_within Att.cert_ofCert [propext, Quot.sound]
+#axioms_within Der.ofCert_cert [propext, Quot.sound]
+#axioms_within Att.cert_inj [propext, Quot.sound]
 
 /-! ## The functions that run -/
 
@@ -61,6 +85,8 @@ open ProofTools ProofTools.Explore
 #axioms_within Cursor.moves_ok [propext, Quot.sound]
 #axioms_within Cursor.up_down [propext, Quot.sound]
 #axioms_within Cursor.motions_move [propext, Quot.sound]
+#axioms_within Cursor.trail [propext, Quot.sound]
+#axioms_within Cursor.movesFrom_cons [propext, Quot.sound]
 
 /-! ## Scripts as programs -/
 
@@ -73,6 +99,9 @@ open ProofTools ProofTools.Explore
 /-! ## The example calculus -/
 
 #axioms_within ProofToolsTest.Explore.sound [propext, Quot.sound]
-#axioms_within ProofToolsTest.Explore.evaluator [propext, Quot.sound]
+#axioms_within ProofToolsTest.Explore.MapOutTest.soundT [propext, Quot.sound]
+#axioms_within ProofToolsTest.Explore.MapOutTest.swapByScript [propext, Quot.sound]
+#axioms_within ProofToolsTest.Explore.noValid [propext, Quot.sound]
+#axioms_within ProofToolsTest.Explore.refuter [propext, Quot.sound]
 #axioms_within ProofToolsTest.Explore.ipcEngine [propext, Quot.sound]
 #axioms_within ProofToolsTest.Explore.auto_valid [propext, Quot.sound]

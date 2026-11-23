@@ -1,37 +1,53 @@
 /-
-# `ProofTools.Explore.Certify`: both checkers, as certifiers of `LeanCertify`
+# `ProofTools.Explore.Certify`: the checkers, as certifiers of `LeanCertify`
 
-The first checker is `derives`: run the script from the open goal, and ask
-that no line failed and no goal is left.  With the soundness of the moves
-it is a `Certify.Certifier` whose certificate is a script.
+A derivation has two writings as a certificate, each with its checker, and
+with the soundness of the moves for a family `T` each is a
+`Certify.Certifier` for `T`:
+
+| certificate | checker | certifier | keeps |
+|---|---|---|---|
+| a script | `derives`: run it from the open goal; no line failed, no goal is left | `certifier` | the order of the work; it can be continued and composed |
+| a tree of moves (`ProofTools.Explore.Cert`) | `Cert.check`: `step` at the root, then each child at its premise | `Cert.certifier` | the shape; it builds nothing as it checks |
+
+`T` is into any sort: with a proposition a certifier proves it; with a type
+of derivations it builds the derivation, as `Der.mapOut` of the derivation
+the certificate is (`Der.ofScript`, `Der.ofCert`).
 
     derives S j ls = true → S.Sound D → D j                        (derives_sound)
     derives S j d.script = true          for d : Der S j           (derives_script)
+    Cert.check j d.cert = true           for d : Der S j           (Att.check_cert)
 
-The second gives every derivation a certificate: scripts are complete for
-derivations.
+The last two give every derivation a certificate of each kind: scripts, and
+trees of moves, are complete for derivations.
 
 **The refutation side is optional**, and comes in levels; an instance stops
 where its mathematics stops.
 
 | level | the instance has | it gets |
 |---|---|---|
-| 1 | moves and their soundness | `certifier`: scripts checked |
-| 2 | also a notion of model with a sound check (`Evaluator`) | `engine`; its producer may answer `flag`, and nothing says a model is ever found |
+| 1 | moves and their soundness | `certifier`, `Cert.certifier`: scripts and trees checked |
+| 2 | also a certifier against what holds: a notion of model with a sound check | `engine`; its producer may answer `flag`, and nothing says a model is ever found |
 | 3 | also a theorem that one side always answers | `Certify.Engine.Complete`, or the instance's own statement |
 
-The library says nothing about where a model comes from: `produce` is the
-instance's, and is not trusted.
+A certifier against what holds is a `Certify.Certifier S.Judg Model (fun j =>
+D j → False)` of `LeanCertify`, as it stands; bundled with its type of
+models, a name and a producer it is a `Certify.Disprover`.  The explorer has
+no structure of its own for it.  The library says nothing about where a
+model comes from: `produce` is the instance's, and is not trusted.
 
 Core Lean only.
 -/
 import ProofTools.Audit.FileBound
 import LeanCertify.Certifier
 import ProofTools.Explore.Run
+import ProofTools.Explore.Cert
 
 namespace ProofTools.Explore
 
-variable {S : ProofSystem} {D : S.Judg → Prop}
+universe u
+
+variable {S : ProofSystem} {D : S.Judg → Prop} {T : S.Judg → Sort u}
 
 /-- **The first checker**: the script runs without a failing line and
 leaves no goal. -/
@@ -39,51 +55,48 @@ def derives (S : ProofSystem) (j : S.Judg) (ls : Script S) : Bool :=
   let r := run S j ls
   r.failed.isNone && r.att.goals.isEmpty
 
-/-- **A script that `derives` accepts shows that its judgment holds.** -/
-theorem derives_sound (hS : S.Sound D) {j : S.Judg} {ls : Script S}
-    (h : derives S j ls = true) : D j := by
-  simp only [derives, Bool.and_eq_true, List.isEmpty_iff] at h
-  exact Att.sound hS (run S j ls).att (by simp [h.2])
-
 /-- The derivation a script builds, if `derives` accepts it. -/
 def Der.ofScript (j : S.Judg) (ls : Script S) (h : derives S j ls = true) : Der S j :=
   (run S j ls).att.toDer (by
     simp only [derives, Bool.and_eq_true, List.isEmpty_iff] at h
     exact h.2)
 
+/-- **A script that `derives` accepts shows that its judgment holds.** -/
+theorem derives_sound (hS : S.Sound D) {j : S.Judg} {ls : Script S}
+    (h : derives S j ls = true) : D j :=
+  Der.sound hS (Der.ofScript j ls h)
+
 /-- **Every derivation has a script that `derives` accepts**: its own. -/
 theorem derives_script {j : S.Judg} (d : Der S j) : derives S j (Att.script d) = true := by
   simp [derives, run_script]
 
 /-- **Level 1: scripts, checked.**  The certifier of a proof system whose
-moves are sound for `D`. -/
-def certifier (hS : S.Sound D) : Certify.Certifier S.Judg (Script S) D where
+moves are sound for `T`, into any sort.  With `T` a proposition, a script
+that `derives` accepts proves it; with `T` a type of derivations, it builds
+the derivation.  (From `hS : S.Sound D`, by membership: `certifier
+hS.soundT`.) -/
+def certifier (hS : S.SoundT T) : Certify.Certifier S.Judg (Script S) T where
   check := derives S
-  sound _ _ h := derives_sound hS h
+  sound j ls h := Der.mapOut hS (Der.ofScript j ls h)
 
-/-- **A notion of model with a sound check**: what refutes a judgment shows
-that it does not hold. -/
-structure Evaluator (S : ProofSystem) (D : S.Judg → Prop) where
-  /-- The models. -/
-  Model : Type
-  /-- Does the model refute the judgment? -/
-  refutes : Model → S.Judg → Bool
-  /-- What is refuted does not hold. -/
-  sound : ∀ M j, refutes M j = true → D j → False
+/-- **Level 1: trees of moves, checked.**  The certifier of a proof system
+whose moves are sound for `T`, into any sort, its certificate a tree of
+moves: with `T` a proposition, a tree that `Cert.check` accepts proves it;
+with `T` a type of derivations, it builds the derivation. -/
+def Cert.certifier (hS : S.SoundT T) : Certify.Certifier S.Judg (Cert S) T where
+  check := Cert.check
+  sound j c h := Der.mapOut hS (Der.ofCert j c h)
 
-/-- The second checker, as a certifier whose certificate is a model. -/
-def Evaluator.certifier (E : Evaluator S D) :
-    Certify.Certifier S.Judg E.Model (fun j => D j → False) where
-  check j M := E.refutes M j
-  sound j M h := E.sound M j h
-
-/-- **Level 2: both checkers, as one engine.**  The producer is not
-trusted; it may answer `flag`. -/
-def engine (hS : S.Sound D) (E : Evaluator S D)
-    (produce : S.Judg → Nat → Certify.Verdict (Script S) E.Model) :
-    Certify.Engine S.Judg (Script S) E.Model D where
-  yes := certifier hS
-  no := E.certifier
+/-- **Level 2: both sides, as one engine.**  The yes side is the certifier
+of scripts.  The no side is a certifier against `D`: a notion of model with
+a sound check (of a `Certify.Disprover`, its field `certifier`).  The
+producer is not trusted; it may answer `flag`. -/
+def engine (hS : S.Sound D) {Model : Type}
+    (no : Certify.Certifier S.Judg Model (fun j => D j → False))
+    (produce : S.Judg → Nat → Certify.Verdict (Script S) Model) :
+    Certify.Engine S.Judg (Script S) Model D where
+  yes := certifier hS.soundT
+  no := no
   produce := produce
 
 end ProofTools.Explore

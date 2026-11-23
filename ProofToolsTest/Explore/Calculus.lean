@@ -22,13 +22,15 @@ atoms only, and a rule adds hypotheses and removes none.
 
 What holds (`Valid`) is taken to be truth under every classical valuation.
 The moves are sound for it (`sound`, PROVED), and a valuation that makes the
-hypotheses true and the conclusion false refutes a sequent (`evaluator`).
-The calculus is intuitionistic, so it is not complete for `Valid`: Peirce's
-law holds and has no derivation.  That makes it an instance at level 2 of
-`ProofTools.Explore.Certify`: both checkers, and a producer that may answer
-`flag`.
+hypotheses true and the conclusion false refutes a sequent (`noValid`, a
+certifier of `LeanCertify` against `Valid`; with its producer, the disprover
+`refuter`).  The calculus is intuitionistic, so it is not complete for
+`Valid`: Peirce's law holds and has no derivation.  That makes it an
+instance at level 2 of `ProofTools.Explore.Certify`: both sides, and a
+producer that may answer `flag`.
 -/
 import ProofTools.Explore
+import LeanCertify.Decider
 
 namespace ProofToolsTest.Explore
 
@@ -234,13 +236,17 @@ theorem sound : IPC.Sound Valid := by
 /-- A valuation, as the list of the atoms it makes true. -/
 def valOf (M : List Nat) : Nat → Bool := fun n => M.contains n
 
-/-- **The second checker**: a valuation that makes the hypotheses true and
-the conclusion false. -/
-def evaluator : Evaluator IPC Valid where
-  Model := List Nat
-  refutes M s := s.hyps.all (·.eval (valOf M)) && !s.concl.eval (valOf M)
-  sound M s h hs := by
-    simp only [Bool.and_eq_true, List.all_eq_true, Bool.not_eq_true'] at h
+/-- Does the valuation refute the sequent: its hypotheses true, its
+conclusion false? -/
+def refutes (M : List Nat) (s : Seq) : Bool :=
+  s.hyps.all (·.eval (valOf M)) && !s.concl.eval (valOf M)
+
+/-- **The second checker**: what a valuation refutes does not hold.  A
+certifier of `LeanCertify` against `Valid`, as it stands. -/
+def noValid : Certify.Certifier Seq (List Nat) (fun s => Valid s → False) where
+  check s M := refutes M s
+  sound s M h hs := by
+    simp only [refutes, Bool.and_eq_true, List.all_eq_true, Bool.not_eq_true'] at h
     have := hs (valOf M) h.1
     rw [h.2] at this
     cases this
@@ -326,18 +332,29 @@ def sublists : List Nat → List (List Nat)
   | [] => [[]]
   | a :: as => (sublists as) ++ (sublists as).map (a :: ·)
 
+/-- **The second checker with its models and their producer**: a disprover
+of `LeanCertify`.  Its producer tries every valuation of the sequent's
+atoms. -/
+def refuter : Certify.Disprover Seq Valid where
+  name := "valuations"
+  RCert := List Nat
+  certifier := noValid
+  produce s _ :=
+    (sublists (s.hyps.flatMap Form.atoms ++ s.concl.atoms).eraseDups).find? (refutes · s)
+
 /-- **The producer**: a script from `auto`, or a valuation that refutes the
 sequent, or `flag`. -/
 def produce (s : Seq) (n : Nat) : Certify.Verdict (Script IPC) (List Nat) :=
   match (auto n s).filter (derives IPC s) with
   | some ls => .pass ls
   | none =>
-    match (sublists (s.hyps.flatMap Form.atoms ++ s.concl.atoms).eraseDups).find?
-        (evaluator.refutes · s) with
+    match refuter.produce s n with
     | some M => .fail M
     | none => .flag
 
-/-- **Both checkers and the producer, as one engine.** -/
-def ipcEngine : Certify.Engine Seq (Script IPC) (List Nat) Valid := engine sound evaluator produce
+/-- **Both sides and the producer, as one engine**: the certifier of
+scripts, and the disprover's certifier. -/
+def ipcEngine : Certify.Engine Seq (Script IPC) (List Nat) Valid :=
+  engine sound refuter.certifier produce
 
 end ProofToolsTest.Explore

@@ -18,21 +18,41 @@ that is built (by a script, by the tactic, by a search) can be walked:
     Cursor.whyNot m c    why not, as text
     Cursor.moves c ms    motions in turn: the cursor reached, or the number
                          of the first motion that fails and why
+    Cursor.trail n c ms  the same with every position kept, which the
+                         others are read off; it is `Cursor.trailBy`, the
+                         one loop of the cursor, at motions
 
-A motion changes the position and nothing else (PROVED; `c.Ok` says that
-`c.left` is the number of open goals left of the focus):
+**The motions are the moves of the zipper** (`ProofTools/Zipper.lean`), with
+the cursor's count kept beside them: `Cursor.up` is its `up`, `Cursor.down`
+its `down`, `left` and `right` its one step to a sibling (`Cursor.sibling`),
+`top` its `ofRoot` of `toRoot`, the address its `addr`.  The count changes
+by `goalsBefore`, the open goals before the focus in its node, read off the
+zipper's nearest crumb.
+
+A motion changes the position and nothing else (PROVED, from the zipper's
+laws `toRoot_up`, `toRoot_down`, `up_down`, `up_left`, `up_right`; `c.Ok`
+says that `c.left` is the number of open goals left of the focus):
 
     c.Ok → c.move m = some c'   →  c'.toRoot = c.toRoot ∧ c'.Ok      (Cursor.move_some)
     c.Ok → c.moves ms = .ok c'  →  c'.toRoot = c.toRoot ∧ c'.Ok      (Cursor.moves_ok)
     c.down i = some c'  →  c'.up = some c                            (Cursor.up_down)
+
+What the motions do on the crumbs is PROVED of them (`Cursor.up_top`,
+`Cursor.up_cons`, `Cursor.down_eq`), and the one step to a sibling is up,
+then down again at the premise number before or after:
+
+    c.move .right = match c.pos.ds with
+      | [] => none | d :: _ => c.up.bind (·.down (d + 1))            (Cursor.move_right)
+    c.move .left = match c.pos.ds with
+      | [] => none | 0 :: _ => none | (d + 1) :: _ => c.up.bind (·.down d)   (Cursor.move_left)
 
 `Cursor.motions c` lists the motions that can be made from `c` (PROVED:
 `m ∈ c.motions → ∃ c', c.move m = some c'`, `Cursor.motions_move`); `#walk`
 offers them.
 
 The name `Cursor.left` is the count of goals, so the motions to a sibling
-have no function of their own: they are `Cursor.move .left` and
-`Cursor.move .right`.
+are `Cursor.move .left` and `Cursor.move .right`; the function behind both
+is `Cursor.sibling`.
 
 A derivation (`Der S j`) is walked as an attempt, through `Att.toAtt`
 (`Cursor.ofAtt`).
@@ -86,24 +106,30 @@ def Cursor.ofAtt {o : Bool} {j : S.Judg} (d : Att S o j) : Cursor S j := .ofRoot
 def Cursor.focus {j : S.Judg} (c : Cursor S j) : Att S true c.pos.i := c.pos.z.focus
 
 /-- The address of the focus: the premise numbers from the root. -/
-def Cursor.addr {j : S.Judg} (c : Cursor S j) : List Nat := c.pos.ds.reverse
+def Cursor.addr {j : S.Judg} (c : Cursor S j) : List Nat := c.pos.z.addr
 
 /-! ## The motions -/
 
-/-- **Up**: to the node the focus is a premise of.  The open goals of the
-premises before the focus are no longer left of it. -/
+/-- **Up**: to the node the focus is a premise of (the zipper's `up`).  The
+open goals of the premises before the focus are no longer left of it. -/
 def Cursor.up {j : S.Judg} : Cursor S j → Option (Cursor S j)
-  | ⟨⟨_, _, ⟨_, .top⟩⟩, _⟩ => none
-  | ⟨⟨_, _, ⟨w, .cons cr p⟩⟩, l⟩ =>
-    some ⟨⟨_, _, ⟨cr.plug w, p⟩⟩, l - cr.left.goalsRev.length⟩
+  | ⟨⟨[], _, _⟩, _⟩ => none
+  | ⟨⟨_ :: _, _, z⟩, l⟩ => some ⟨⟨_, _, z.up.2⟩, l - goalsBefore z⟩
 
-/-- **Down** to premise number `i` of the focus.  The open goals of the
-premises before it are now left of the focus. -/
+/-- **Down** to premise number `i` of the focus (the zipper's `down`).  The
+open goals of the premises before it are now left of the focus. -/
 def Cursor.down {j : S.Judg} (i : Nat) (c : Cursor S j) : Option (Cursor S j) :=
-  match Att.unplug c.pos.z.focus i with
-  | none => none
-  | some ⟨p, w, cr⟩ =>
-    some ⟨⟨i :: c.pos.ds, p, ⟨w, .cons cr c.pos.z.path⟩⟩, c.left + cr.left.goalsRev.length⟩
+  (c.pos.z.down i).map fun x => ⟨⟨_, _, x.2⟩, c.left + goalsBefore x.2⟩
+
+/-- **To the premise beside the focus**, of the same node: the one after it
+(`right`) or the one before it, by one step of the zipper (its `right`, its
+`left`).  The count loses the goals before the old focus in the node and
+gains those before the new one. -/
+def Cursor.sibling {j : S.Judg} (right : Bool) : Cursor S j → Option (Cursor S j)
+  | ⟨⟨[], _, _⟩, _⟩ => none
+  | ⟨⟨_ :: _, _, z⟩, l⟩ =>
+    (if right then z.right else z.left).map fun x =>
+      ⟨⟨_, _, x.2.2⟩, l - goalsBefore z + goalsBefore x.2.2⟩
 
 /-- **To the root.** -/
 def Cursor.top {j : S.Judg} (c : Cursor S j) : Cursor S j := .ofRoot c.toRoot
@@ -113,15 +139,8 @@ def Cursor.move {j : S.Judg} (m : Motion) (c : Cursor S j) : Option (Cursor S j)
   match m with
   | .up => c.up
   | .down i => c.down i
-  | .left =>
-    match c.pos.ds with
-    | [] => none
-    | 0 :: _ => none
-    | (d + 1) :: _ => c.up.bind (·.down d)
-  | .right =>
-    match c.pos.ds with
-    | [] => none
-    | d :: _ => c.up.bind (·.down (d + 1))
+  | .left => c.sibling false
+  | .right => c.sibling true
   | .top => some c.top
   | .goal k => c.seek k
 
@@ -145,15 +164,76 @@ def Cursor.whyNot {j : S.Judg} (m : Motion) (c : Cursor S j) : String :=
   | .top => "the motion can be made"
   | .goal k => s!"there is no goal {k}"
 
+/-- **What steps in turn leave behind** (motions, or the commands of a
+session): the cursors passed, the first first; the cursor reached, which is
+the last one before a step that cannot be made; and that step's number and
+why, if there is one. -/
+structure Trail (S : ProofSystem) (j : S.Judg) where
+  /-- The cursors passed, the first first. -/
+  passed : List (Cursor S j)
+  /-- The cursor reached. -/
+  last : Cursor S j
+  /-- The number of the step that cannot be made, and why. -/
+  failed : Option (Nat × String)
+
+/-- The cursor reached, or the number of the step that cannot be made and
+why. -/
+def Trail.result {j : S.Judg} (t : Trail S j) : Except (Nat × String) (Cursor S j) :=
+  match t.failed with
+  | none => .ok t.last
+  | some e => .error e
+
+/-- **Steps in turn, every position kept**; `n` is the number of the first
+step.  The one loop of the cursor, over whatever a step is: a motion
+(`Cursor.trail`), or a command of a session, which may also change the
+attempt (`Cursor.walk`, in `Session.lean`). -/
+def Cursor.trailBy {α : Type} {j : S.Judg} (step : Cursor S j → α → Except String (Cursor S j)) :
+    Nat → Cursor S j → List α → Trail S j
+  | _, c, [] => ⟨[], c, none⟩
+  | n, c, a :: as =>
+    match step c a with
+    | .ok c' => let t := Cursor.trailBy step (n + 1) c' as; ⟨c :: t.passed, t.last, t.failed⟩
+    | .error e => ⟨[], c, some (n, e)⟩
+
+theorem Cursor.trailBy_result_cons {α : Type} {j : S.Judg}
+    (step : Cursor S j → α → Except String (Cursor S j)) (n : Nat) (c : Cursor S j) (a : α)
+    (as : List α) :
+    (Cursor.trailBy step n c (a :: as)).result =
+      match step c a with
+      | .ok c' => (Cursor.trailBy step (n + 1) c' as).result
+      | .error e => .error (n, e) := by
+  simp only [Cursor.trailBy]
+  cases step c a <;> rfl
+
+/-- **One motion, or why it cannot be made.** -/
+def Cursor.tryMove {j : S.Judg} (c : Cursor S j) (m : Motion) : Except String (Cursor S j) :=
+  match c.move m with
+  | some c' => .ok c'
+  | none => .error (c.whyNot m)
+
+/-- **Motions in turn, every position kept**; `n` is the number of the first
+motion.  `Cursor.moves`, the views of `#walk` (`walkViews`) and the panel's
+focus (`Cursor.movesWhile`) are read off it. -/
+def Cursor.trail {j : S.Judg} (n : Nat) (c : Cursor S j) (ms : List Motion) : Trail S j :=
+  Cursor.trailBy Cursor.tryMove n c ms
+
 /-- **Motions in turn**: the cursor reached, or the number of the first
-motion that cannot be made (from 0) and why. -/
-def Cursor.movesFrom {j : S.Judg} : Nat → Cursor S j → List Motion →
-    Except (Nat × String) (Cursor S j)
-  | _, c, [] => .ok c
-  | n, c, m :: ms =>
-    match c.move m with
-    | some c' => Cursor.movesFrom (n + 1) c' ms
-    | none => .error (n, c.whyNot m)
+motion that cannot be made (from `n`) and why. -/
+def Cursor.movesFrom {j : S.Judg} (n : Nat) (c : Cursor S j) (ms : List Motion) :
+    Except (Nat × String) (Cursor S j) :=
+  (Cursor.trail n c ms).result
+
+theorem Cursor.movesFrom_nil {j : S.Judg} (n : Nat) (c : Cursor S j) :
+    Cursor.movesFrom n c [] = .ok c := rfl
+
+theorem Cursor.movesFrom_cons {j : S.Judg} (n : Nat) (c : Cursor S j) (m : Motion)
+    (ms : List Motion) :
+    Cursor.movesFrom n c (m :: ms) =
+      match c.move m with
+      | some c' => Cursor.movesFrom (n + 1) c' ms
+      | none => .error (n, c.whyNot m) := by
+  simp only [Cursor.movesFrom, Cursor.trail, Cursor.trailBy_result_cons, Cursor.tryMove]
+  cases c.move m <;> rfl
 
 /-- **Motions in turn**, numbered from 0. -/
 def Cursor.moves {j : S.Judg} (c : Cursor S j) (ms : List Motion) :
@@ -163,50 +243,128 @@ def Cursor.moves {j : S.Judg} (c : Cursor S j) (ms : List Motion) :
 
 theorem Cursor.up_some {j : S.Judg} {c c' : Cursor S j} (hc : c.Ok) (h : c.up = some c') :
     c'.toRoot = c.toRoot ∧ c'.Ok := by
-  obtain ⟨⟨ds, i, ⟨w, p⟩⟩, l⟩ := c
-  cases p with
-  | top => simp [Cursor.up] at h
-  | cons cr p =>
+  obtain ⟨⟨ds, i, z⟩, l⟩ := c
+  cases ds with
+  | nil => cases h
+  | cons d ds =>
     simp only [Cursor.up, Option.some.injEq] at h
     subst h
-    refine ⟨rfl, ?_⟩
+    refine ⟨Zip.Deriv.Zipper.toRoot_up z, ?_⟩
+    have hg := length_goalsL z
     unfold Cursor.Ok at hc ⊢
-    simp only [Path.goalsL, List.length_append] at hc
-    simp only
+    simp only at hc ⊢
     omega
 
 theorem Cursor.down_some {j : S.Judg} {i : Nat} {c c' : Cursor S j} (hc : c.Ok)
     (h : c.down i = some c') : c'.toRoot = c.toRoot ∧ c'.Ok := by
-  unfold Cursor.down at h
-  split at h
-  · cases h
-  · next p w cr hu =>
-    simp only [Option.some.injEq] at h
-    subst h
-    have hp : cr.plug w = c.pos.z.focus :=
-      Zip.Deriv.Unplug.plug_unplug (L := attDeriv S true) hu
-    refine ⟨?_, ?_⟩
-    · show Zip.Deriv.Path.plug c.pos.z.path (cr.plug w) = _
-      rw [hp]
-      rfl
-    · unfold Cursor.Ok at hc ⊢
-      simp only [Path.goalsL, List.length_append]
-      omega
+  simp only [Cursor.down, Option.map_eq_some_iff] at h
+  obtain ⟨x, hx, rfl⟩ := h
+  refine ⟨Zip.Deriv.Zipper.toRoot_down hx, ?_⟩
+  have hg := length_goalsL x.2
+  have hup : (Path.goalsL x.2.up.2.path).length = (Path.goalsL c.pos.z.path).length :=
+    congrArg (fun y : (i : S.Judg) × Zipper S true c.pos.ds i j => (Path.goalsL y.2.path).length)
+      (Zip.Deriv.Zipper.up_down hx)
+  unfold Cursor.Ok at hc ⊢
+  simp only
+  omega
 
 /-- **Up undoes down.** -/
 theorem Cursor.up_down {j : S.Judg} {i : Nat} {c c' : Cursor S j} (h : c.down i = some c') :
     c'.up = some c := by
-  unfold Cursor.down at h
-  split at h
-  · cases h
-  · next p w cr hu =>
-    simp only [Option.some.injEq] at h
-    subst h
-    have hp : cr.plug w = c.pos.z.focus :=
-      Zip.Deriv.Unplug.plug_unplug (L := attDeriv S true) hu
-    obtain ⟨⟨ds, k, ⟨f, path⟩⟩, l⟩ := c
-    simp only at hp
-    simp only [Cursor.up, hp, Nat.add_sub_cancel]
+  simp only [Cursor.down, Option.map_eq_some_iff] at h
+  obtain ⟨x, hx, rfl⟩ := h
+  simp only [Cursor.up, Nat.add_sub_cancel]
+  exact congrArg (fun y : (i : S.Judg) × Zipper S true c.pos.ds i j =>
+    some (⟨⟨c.pos.ds, y.1, y.2⟩, c.left⟩ : Cursor S j)) (Zip.Deriv.Zipper.up_down hx)
+
+/-- A step to the premise beside the focus keeps the attempt, and the count
+of goals stays right. -/
+theorem Cursor.sibling_some {j : S.Judg} {r : Bool} {c c' : Cursor S j} (hc : c.Ok)
+    (h : c.sibling r = some c') : c'.toRoot = c.toRoot ∧ c'.Ok := by
+  obtain ⟨⟨ds, i, z⟩, l⟩ := c
+  cases ds with
+  | nil => cases h
+  | cons d ds =>
+    simp only [Cursor.sibling, Option.map_eq_some_iff] at h
+    obtain ⟨x, hx, rfl⟩ := h
+    have hup : x.2.2.up = z.up := by
+      cases r
+      · exact Zip.Deriv.Zipper.up_left hx
+      · exact Zip.Deriv.Zipper.up_right hx
+    refine ⟨?_, ?_⟩
+    · show x.2.2.toRoot = z.toRoot
+      rw [← Zip.Deriv.Zipper.toRoot_up x.2.2, ← Zip.Deriv.Zipper.toRoot_up z, hup]
+    · have hg := length_goalsL x.2.2
+      have hg' := length_goalsL z
+      rw [hup] at hg
+      unfold Cursor.Ok at hc ⊢
+      simp only at hc ⊢
+      omega
+
+/-- `Cursor.up` on the crumbs: at the root there is no node above. -/
+theorem Cursor.up_top {j : S.Judg} (w : Att S true j) (l : Nat) :
+    Cursor.up ⟨⟨[], j, ⟨w, .top⟩⟩, l⟩ = none := rfl
+
+/-- `Cursor.up` on the crumbs: the nearest crumb is filled with the focus,
+and the open goals of the premises before the focus leave the count. -/
+theorem Cursor.up_cons {j i i' : S.Judg} {d : Nat} {ds : List Nat} (w : Att S true i)
+    (cr : Crumb S true d i i') (p : Path S true ds i' j) (l : Nat) :
+    Cursor.up ⟨⟨d :: ds, i, ⟨w, .cons cr p⟩⟩, l⟩ =
+      some ⟨⟨ds, i', ⟨cr.plug w, p⟩⟩, l - cr.left.goalsRev.length⟩ := by
+  rw [Atts.length_goalsRev]
+  rfl
+
+/-- `Cursor.down` on the crumbs: the node at the focus is opened at premise
+`i`, and the open goals of the premises before it join the count. -/
+theorem Cursor.down_eq {j : S.Judg} (i : Nat) (c : Cursor S j) :
+    c.down i =
+      match Att.unplug c.pos.z.focus i with
+      | none => none
+      | some ⟨p, w, cr⟩ =>
+        some ⟨⟨i :: c.pos.ds, p, ⟨w, .cons cr c.pos.z.path⟩⟩, c.left + cr.left.goalsRev.length⟩ := by
+  show Option.map _ (Option.map _ (Att.unplug c.pos.z.focus i)) = _
+  cases Att.unplug c.pos.z.focus i with
+  | none => rfl
+  | some x =>
+    obtain ⟨p, w, cr⟩ := x
+    simp only [Option.map_some, Atts.length_goalsRev]
+    rfl
+
+/-- **The step to the premise after the focus is up, then down to the next
+premise number**: the one step of the zipper reaches what going up and
+opening the node again reaches, with the same count. -/
+theorem Cursor.move_right {j : S.Judg} (c : Cursor S j) :
+    c.move .right =
+      match c.pos.ds with
+      | [] => none
+      | d :: _ => c.up.bind (·.down (d + 1)) := by
+  obtain ⟨⟨ds, i, ⟨w, p⟩⟩, l⟩ := c
+  cases p with
+  | top => rfl
+  | cons cr p =>
+    show (Option.map _ (Option.map _ (Option.map _ (cr.stepRight w)))) =
+      Option.map _ (Option.map _ (Att.unplug (cr.plug w) _))
+    rw [Crumb.unplug_plug_succ]
+    cases cr.stepRight w <;> rfl
+
+/-- **The step to the premise before the focus is up, then down to the
+premise number before**; there is none before premise 0. -/
+theorem Cursor.move_left {j : S.Judg} (c : Cursor S j) :
+    c.move .left =
+      match c.pos.ds with
+      | [] => none
+      | 0 :: _ => none
+      | (d + 1) :: _ => c.up.bind (·.down d) := by
+  obtain ⟨⟨ds, i, ⟨w, p⟩⟩, l⟩ := c
+  cases p with
+  | top => rfl
+  | @cons d ds _ _ _ cr p =>
+    cases d with
+    | zero => rfl
+    | succ d =>
+      show _ = Option.map _ (Option.map _ (Att.unplug (cr.plug w) _))
+      rw [Crumb.unplug_plug_pred]
+      rfl
 
 /-- **(L1), (L2) A motion keeps the attempt, and the count of goals stays
 right.** -/
@@ -215,23 +373,8 @@ theorem Cursor.move_some {j : S.Judg} {m : Motion} {c c' : Cursor S j} (hc : c.O
   cases m with
   | up => exact Cursor.up_some hc h
   | down i => exact Cursor.down_some hc h
-  | left =>
-    simp only [Cursor.move] at h
-    split at h
-    · cases h
-    · cases h
-    · obtain ⟨c₁, h₁, h₂⟩ := Option.bind_eq_some_iff.mp h
-      obtain ⟨e₁, o₁⟩ := Cursor.up_some hc h₁
-      obtain ⟨e₂, o₂⟩ := Cursor.down_some o₁ h₂
-      exact ⟨e₂.trans e₁, o₂⟩
-  | right =>
-    simp only [Cursor.move] at h
-    split at h
-    · cases h
-    · obtain ⟨c₁, h₁, h₂⟩ := Option.bind_eq_some_iff.mp h
-      obtain ⟨e₁, o₁⟩ := Cursor.up_some hc h₁
-      obtain ⟨e₂, o₂⟩ := Cursor.down_some o₁ h₂
-      exact ⟨e₂.trans e₁, o₂⟩
+  | left => exact Cursor.sibling_some hc h
+  | right => exact Cursor.sibling_some hc h
   | top =>
     simp only [Cursor.move, Option.some.injEq] at h
     subst h
@@ -243,11 +386,11 @@ theorem Cursor.move_some {j : S.Judg} {m : Motion} {c c' : Cursor S j} (hc : c.O
 theorem Cursor.movesFrom_ok {j : S.Judg} : ∀ (ms : List Motion) (n : Nat) {c c' : Cursor S j},
     c.Ok → Cursor.movesFrom n c ms = .ok c' → c'.toRoot = c.toRoot ∧ c'.Ok
   | [], _, _, _, hc, h => by
-    simp only [Cursor.movesFrom, Except.ok.injEq] at h
+    simp only [Cursor.movesFrom_nil, Except.ok.injEq] at h
     subst h
     exact ⟨rfl, hc⟩
   | m :: ms, n, c, c', hc, h => by
-    simp only [Cursor.movesFrom] at h
+    rw [Cursor.movesFrom_cons] at h
     split at h
     · next c₁ h₁ =>
       obtain ⟨e₁, o₁⟩ := Cursor.move_some hc h₁

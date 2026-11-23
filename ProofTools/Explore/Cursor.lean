@@ -12,9 +12,19 @@ goal `k` from where it is, without going back to the root.
     Path.seekLeft p d n     the `n`-th open goal left of it, counted leftwards
     Cursor.seek k c         to open goal `k`: left if `k < c.left`, else
                             inside the focus, else right
+    Cursor.replace c d      the focus becomes the attempt `d` (the zipper's
+                            `replace`): the one change at a position
+    Cursor.rule c m         the open goal at the focus becomes the node of
+                            the move `m`, its premises open
+    Cursor.prune c          the focus becomes an open goal
+    Cursor.graft c d        the open goal at the focus becomes `d`
     Cursor.step c l         seek the line's goal, make its move there
+                            (`Cursor.rule`)
     run S j ls              `Cursor.step` at every line; the attempt is
                             rebuilt once, at the end
+
+What the changes do, and a session of motions and changes, of which a
+script is a special case, are in `ProofTools.Explore.Session`.
 
 What the seeking functions find (PROVED; `c.Ok` says that `c.left` is the
 number of goals left of the focus):
@@ -126,14 +136,52 @@ def Cursor.seek {j : S.Judg} (k : Nat) (c : Cursor S j) : Option (Cursor S j) :=
     | .inl x => some ⟨x, k⟩
     | .inr n => (Path.seekRight c.pos.z.path c.pos.z.focus (k - c.left - n)).map (⟨·, k⟩)
 
+/-- Is the attempt an open goal? -/
+def Att.isGoal {o : Bool} {j : S.Judg} : Att S o j → Bool
+  | .goal => true
+  | .node _ _ _ _ => false
+
+theorem Att.eq_goal_of_isGoal {j : S.Judg} (d : Att S true j) (h : d.isGoal = true) :
+    d = .goal := by
+  cases d with
+  | goal => rfl
+  | node _ _ _ _ => simp [Att.isGoal] at h
+
+/-! ## Changing the attempt at the focus -/
+
+/-- **Replace the focus** by an attempt at the same judgment (the zipper's
+`replace`).  The position stays, and so does the count: the goals left of
+the focus are not touched. -/
+def Cursor.replace {j : S.Judg} (c : Cursor S j) (d : Att S true c.pos.i) : Cursor S j :=
+  ⟨⟨c.pos.ds, c.pos.i, c.pos.z.replace d⟩, c.left⟩
+
+/-- **Prune**: the focus, whatever it is, becomes an open goal. -/
+def Cursor.prune {j : S.Judg} (c : Cursor S j) : Cursor S j := c.replace .goal
+
+/-- Why a change that needs an open goal cannot be made. -/
+def Cursor.notOpen : String := "the focus is not an open goal"
+
+/-- **Graft**: the open goal at the focus becomes the attempt `d`, at the
+same judgment. -/
+def Cursor.graft {j : S.Judg} (c : Cursor S j) (d : Att S true c.pos.i) :
+    Except String (Cursor S j) :=
+  if c.pos.z.focus.isGoal then .ok (c.replace d) else .error Cursor.notOpen
+
+/-- **A rule**: the open goal at the focus becomes the node of the move `m`,
+its premises open; or the reason the move does not apply there. -/
+def Cursor.rule {j : S.Judg} (c : Cursor S j) (m : S.Move) : Except String (Cursor S j) :=
+  if c.pos.z.focus.isGoal then (Att.ofMove m c.pos.i).map c.replace else .error Cursor.notOpen
+
 /-- **One line**: seek its goal, and make its move there.  The cursor stays
-on the node made. -/
+on the node made.  It is the motion `goal l.goal`, then `Cursor.rule`
+(`Cursor.step_eq`, PROVED); the rule's test that the focus is an open goal
+is left out here, since `seek` finds nothing else. -/
 def Cursor.step {j : S.Judg} (c : Cursor S j) (l : Line S) : Except String (Cursor S j) :=
   match c.seek l.goal with
   | none => .error s!"there is no goal {l.goal}"
   | some c' =>
     match Att.ofMove l.move c'.pos.i with
-    | .ok nd => .ok ⟨⟨c'.pos.ds, c'.pos.i, ⟨nd, c'.pos.z.path⟩⟩, l.goal⟩
+    | .ok nd => .ok (c'.replace nd)
     | .error e => .error s!"the move does not apply to goal {l.goal}: {e}"
 
 /-- `Cursor.step` at every line; `n` is the number of the first line.  The
@@ -156,17 +204,6 @@ def Att.run {j : S.Judg} (d : Att S true j) (ls : Script S) : Result S j := d.ru
 def run (S : ProofSystem) (j : S.Judg) (ls : Script S) : Result S j := Att.run .goal ls
 
 /-! ## What seeking finds -/
-
-/-- Is the attempt an open goal? -/
-def Att.isGoal {o : Bool} {j : S.Judg} : Att S o j → Bool
-  | .goal => true
-  | .node _ _ _ _ => false
-
-theorem Att.eq_goal_of_isGoal {j : S.Judg} (d : Att S true j) (h : d.isGoal = true) :
-    d = .goal := by
-  cases d with
-  | goal => rfl
-  | node _ _ _ _ => simp [Att.isGoal] at h
 
 mutual
 theorem Att.seekIn_inr {t : S.Judg} : {o : Bool} → {s : S.Judg} → (d : Att S o s) → (n : Nat) →
@@ -400,6 +437,26 @@ theorem Cursor.ok_ofRoot {j : S.Judg} (d : Att S true j) : (Cursor.ofRoot d).Ok 
 @[simp] theorem Cursor.toRoot_ofRoot {j : S.Judg} (d : Att S true j) :
     (Cursor.ofRoot d).toRoot = d := rfl
 
+/-- Replacing the focus keeps the count right: the path is not touched. -/
+theorem Cursor.ok_replace {j : S.Judg} {c : Cursor S j} (hc : c.Ok) (d : Att S true c.pos.i) :
+    (c.replace d).Ok := hc
+
+/-- **What a rule that applies has done**: the focus was an open goal, and
+it is replaced by the node of the move, as `Att.ofMove` makes it. -/
+theorem Cursor.rule_eq_ok {j : S.Judg} {m : S.Move} {c c' : Cursor S j} (h : c.rule m = .ok c') :
+    c.pos.z.focus.isGoal = true ∧ ∃ nd, Att.ofMove m c.pos.i = .ok nd ∧ c' = c.replace nd := by
+  unfold Cursor.rule at h
+  split at h
+  · next hg =>
+    cases hm : Att.ofMove m c.pos.i with
+    | ok nd =>
+      rw [hm] at h
+      exact ⟨hg, nd, rfl, (Except.ok.inj h).symm⟩
+    | error e =>
+      rw [hm] at h
+      cases h
+  · cases h
+
 /-- **Seeking finds the goal**: the attempt is unchanged, the focus is an
 open goal, it is goal `k`, and the count is right. -/
 theorem Cursor.seek_some {j : S.Judg} {k : Nat} {c c' : Cursor S j} (hc : c.Ok)
@@ -437,6 +494,39 @@ theorem Cursor.seek_some {j : S.Judg} {k : Nat} {c c' : Cursor S j} (hc : c.Ok)
       have := hc
       unfold Cursor.Ok at this
       omega
+
+/-- Seeking finds an open goal, from any cursor. -/
+theorem Cursor.seek_isGoal {j : S.Judg} {k : Nat} {c c' : Cursor S j} (h : c.seek k = some c') :
+    c'.pos.z.focus.isGoal = true := by
+  unfold Cursor.seek at h
+  split at h
+  · simp only [Option.map_eq_some_iff] at h
+    obtain ⟨x, hx, rfl⟩ := h
+    exact (Path.seekLeft_some _ _ _ hx).2.1
+  · split at h
+    · next x hx =>
+      simp only [Option.some.injEq] at h
+      subst h
+      exact (Att.seekIn_inl _ _ _ hx).2.1
+    · simp only [Option.map_eq_some_iff] at h
+      obtain ⟨x, hx, rfl⟩ := h
+      exact (Path.seekRight_some _ _ _ hx).2.1
+
+/-- **A line is: to its goal, then the rule there.** -/
+theorem Cursor.step_eq {j : S.Judg} (c : Cursor S j) (l : Line S) :
+    c.step l =
+      match c.seek l.goal with
+      | none => .error s!"there is no goal {l.goal}"
+      | some c' =>
+        match c'.rule l.move with
+        | .ok c'' => .ok c''
+        | .error e => .error s!"the move does not apply to goal {l.goal}: {e}" := by
+  unfold Cursor.step
+  cases hs : c.seek l.goal with
+  | none => rfl
+  | some c' =>
+    simp only [Cursor.rule, Cursor.seek_isGoal hs, if_true]
+    cases Att.ofMove l.move c'.pos.i <;> rfl
 
 /-- **Seeking fails only past the last goal.** -/
 theorem Cursor.seek_none {j : S.Judg} {k : Nat} {c : Cursor S j} (hc : c.Ok)
