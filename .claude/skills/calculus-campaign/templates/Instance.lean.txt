@@ -1,0 +1,392 @@
+/-
+Template: the files of an instance, in one listing, with places to fill
+written `‹…›`.
+
+COMPILED, as follows.  With every `‹…›` filled for the library's example
+calculus (the nine rules of `ProofToolsTest/Explore/Calculus.lean`, stated
+as a family into `Type`), these three files built with no error on Lean
+v4.31.0 against proof-tools `3fa25c0`, in a package under `examples/` as
+`reference/explore.md` §1 lays it out.  Everything outside a `‹…›` is the
+text that compiled.  The lines marked "as compiled" are that instance's own
+cases, kept as a model of the form: your rules come from your source.
+
+Split it into three files, and add a root module `‹Calculus›.lean` that
+imports them:
+
+  ‹Calculus›/Basic.lean     theory: syntax, the family, the proof system, the
+                            theorems.  Ends with its bound on axioms.
+  ‹Calculus›/Tactic.lean    code for the editor: `Explorable`, the alias.
+                            No bound: nothing in it is trusted.
+  ‹Calculus›/Test.lean      tests, every message pinned.
+-/
+
+-- ===================================================================
+-- ‹Calculus›/Basic.lean
+-- ===================================================================
+import ProofTools.Explore
+import ProofTools.Audit
+
+namespace ‹Calculus›
+
+open ProofTools ProofTools.Explore
+
+/-! ## Syntax (source: ‹place›) -/
+
+/-- Formulas. -/
+inductive Form where
+  | atom (n : Nat)
+  | ‹one constructor for each connective of the source›
+  deriving DecidableEq, Repr, Lean.ToExpr
+
+/-- Judgments, as the source defines them (‹place›), in the encoding the
+plan chose.  (As compiled: a structure with two fields, `hyps : List Form`
+and `concl : Form`.) -/
+structure Seq where
+  ‹the fields›
+  deriving DecidableEq, Repr, Lean.ToExpr
+
+-- The source's notation, so that `#rules` and Lean's goals read as its
+-- figure does.  As compiled:
+--   scoped infixr:70 " ⋏ " => Form.and
+--   scoped infix:50 " ⊢ " => Seq.mk
+‹notations›
+
+/-! ## The calculus, as the source states it (‹figure, page›)
+
+One constructor for each primitive rule; each cites its rule.  Side
+conditions are fields.  No computed index in a conclusion.  Into `Type` or
+`Prop`: as the plan chose. -/
+
+inductive Fam : Seq → ‹Type or Prop› where
+  /-- ‹the rule's name in the source›, ‹figure, page or label›. -/
+  | ‹rule› {‹schematic variables›} (‹side condition› : ‹…›) (‹premise› : Fam ‹…›) :
+      Fam ‹variables and constructors only›
+  -- as compiled:
+  -- | andR {Γ : List Form} {A B : Form} (d₁ : Fam (Γ ⊢ A)) (d₂ : Fam (Γ ⊢ B)) : Fam (Γ ⊢ A ⋏ B)
+  -- | andL {Γ : List Form} {C : Form} (A B : Form) (h : (A ⋏ B) ∈ Γ)
+  --     (d : Fam ((A :: B :: Γ) ⊢ C)) : Fam (Γ ⊢ C)
+
+/-- A control for `#slime`: no computed index. -/
+inductive CleanControl : List Nat → Prop where
+  | nil : CleanControl []
+  | cons {n : Nat} {ns : List Nat} (h : CleanControl ns) : CleanControl (n :: ns)
+
+/-- A control for `#slime`: a computed index in a conclusion. -/
+inductive SlimedControl : List Nat → Prop where
+  | nil : SlimedControl []
+  | app {ms ns : List Nat} (h₁ : SlimedControl ms) (h₂ : SlimedControl ns) :
+      SlimedControl (ms ++ ns)
+
+-- Compare with the figure, line by line; paste the output into
+-- `rule-table.md`.
+#rules ‹Calculus›.Fam
+-- `#slime` must pass the first control and warn of the second.
+#slime ‹Calculus›.CleanControl ‹Calculus›.SlimedControl
+#slime ‹Calculus›.Fam
+
+/-! ## The proof system -/
+
+/-- **A move**: a rule, named by its data. -/
+inductive Move where
+  | ‹rule› (‹what says which instance of the rule is meant›)
+  deriving DecidableEq, Repr, Lean.ToExpr
+
+/-- What a move asks of a judgment, what it leaves, and what to say when
+it does not apply. -/
+structure Rule where
+  ok : Bool
+  prems : List Seq
+  why : String
+
+/-- **The rule of a move at a judgment.** -/
+def Move.rule (j : Seq) : Move → Rule
+  | ‹.rule …› => ⟨‹the side conditions, as a Bool›, ‹the premises›,
+      ‹"which side condition failed, in the source's words"›⟩
+  -- as compiled:
+  -- | .andL a b => ⟨decide (Form.and a b ∈ j.hyps), [⟨a :: b :: j.hyps, j.concl⟩],
+  --     "the conjunction is not among the hypotheses"⟩
+  -- | .andR =>
+  --   match j.concl with
+  --   | .and a b => ⟨true, [⟨j.hyps, a⟩, ⟨j.hyps, b⟩], ""⟩
+  --   | _ => ⟨false, [], "the conclusion is not a conjunction"⟩
+
+/-- **One step**: the premises of the move at the judgment, or why it does
+not apply. -/
+def step (m : Move) (j : Seq) : Except String (List Seq) :=
+  if (m.rule j).ok then .ok (m.rule j).prems else .error (m.rule j).why
+
+/-- **The calculus as a proof system.**  An `abbrev`, so that `S.Judg`
+unfolds to `Seq` where Lean looks for instances. -/
+abbrev S : ProofSystem where
+  Judg := Seq
+  Move := Move
+  step := step
+
+theorem step_of {m : Move} {j : Seq} (h : (m.rule j).ok = true) :
+    S.step m j = .ok (m.rule j).prems := by
+  show step m j = _
+  simp [step, h]
+
+theorem step_ok {m : Move} {j : Seq} {ps : List Seq} (h : S.step m j = .ok ps) :
+    (m.rule j).ok = true ∧ ps = (m.rule j).prems := by
+  have h' : step m j = .ok ps := h
+  unfold step at h'
+  split at h'
+  · next hok => exact ⟨hok, (Except.ok.inj h').symm⟩
+  · cases h'
+
+/-! ### What holds: as the plan settled it.  Here, the family itself.
+(The other choice is validity in a semantics, a proposition `Valid`: then
+S1 is `theorem step_sound : S.Sound Valid`, as `sound` in the library's
+`Calculus.lean`, and `famOfDer`, `Derivable` below do not arise.) -/
+
+/-- **S1.  The soundness of the moves**: each move that applies is a rule of
+`Fam`, applied to the derivations of its premises.  One case for each move;
+a case where the move does not apply is not written (there `hok` is
+`false = true`).  With `Fam` into `Prop`: `theorem`, and `have e'` for
+`let e'`; `step_sound.sound : S.Sound Fam` is then its form by membership.
+This is not the source's soundness theorem. -/
+def step_sound : S.SoundT Fam := fun m j _ h e =>
+  have hok : (m.rule j).ok = true := (step_ok h).1
+  let e' : Each Fam (m.rule j).prems := (step_ok h).2 ▸ e
+  match m, j, hok, e' with
+  | ‹.rule …›, ‹the judgment, as far as the rule looks into it›, hok, e' =>
+      ‹the constructor: its side conditions from `hok`, its premises `e'.1`, `e'.2.1`, …›
+  -- as compiled:
+  -- | .andL a b, ⟨_, _⟩, hok, e' => .andL a b (of_decide_eq_true hok) e'.1
+  -- | .andR, ⟨_, .and _ _⟩, _, e' => .andR e'.1 e'.2.1
+
+/-- **The map out**: a derivation of the proof system, as a derivation of
+the calculus as the source states it (data, where `Fam` is into `Type`). -/
+def famOfDer {j : Seq} (d : Der S j) : Fam j := Der.mapOut step_sound d
+
+/-- That there is a derivation: the proposition that the engine, and a
+certifier against what holds, take (part (b) §3). -/
+def Derivable (j : Seq) : Prop := Nonempty (Fam j)
+
+theorem step_sound_derivable : S.Sound Derivable := step_sound.nonempty
+
+/-- **S2**, OPEN until proved: a named proposition, with no `sorry`. -/
+def FamToDer : Prop := ∀ j : Seq, Fam j → Nonempty (Der S j)
+-- Its proof, when there is one: a node for each constructor.  As compiled
+-- (all nine cases, within `[propext, Quot.sound]`):
+-- theorem famToDer : FamToDer := by
+--   intro j d
+--   induction d with
+--   | andL A B h _ ih =>
+--     let ⟨d⟩ := ih
+--     exact ⟨.node (.andL A B) _ (step_of (by simpa [Move.rule] using h)) (.cons d .nil)⟩
+--   | andR _ _ ih₁ ih₂ =>
+--     let ⟨d₁⟩ := ih₁
+--     let ⟨d₂⟩ := ih₂
+--     exact ⟨.node .andR _ (step_of rfl) (.cons d₁ (.cons d₂ .nil))⟩
+
+end ‹Calculus›
+
+-- The bound on the axioms of this file, as the plan's policy sets it.  It
+-- says nothing when it holds.  (As compiled: `[propext, Quot.sound]`.)
+#axioms_within_file [‹the axioms the plan allows›]
+
+-- ===================================================================
+-- ‹Calculus›/Tactic.lean
+-- ===================================================================
+import ‹Calculus›.Basic
+
+namespace ‹Calculus›
+
+open ProofTools ProofTools.Explore
+
+/-- A formula, a judgment and a move as text, in the source's notation. -/
+def Form.show : Form → String := ‹…›
+def Seq.show (j : Seq) : String := ‹…›
+def Move.show : Move → String := ‹…›
+
+/-- The moves to try at a judgment: every move that could apply. -/
+def candidates (j : Seq) : List Move := ‹…›
+
+/-- The premise `p` has nothing that the conclusion `j` lacks.  (As
+compiled: `p.concl == j.concl && p.hyps.all (· ∈ j.hyps)`.) -/
+def within (p j : Seq) : Bool := ‹…›
+
+/-- Optional.  A move as it is typed after the tactic's name, in a file that
+declares the atoms under the names this writes (as compiled: `andL p q`). -/
+def Move.src : Move → String := ‹…›
+
+instance : Explorable S where
+  candidates := candidates
+  showJudg := Seq.show
+  showMove := Move.show
+  quoteJudg := inferInstanceAs (Lean.ToExpr Seq)
+  quoteMove := inferInstanceAs (Lean.ToExpr Move)
+  within := within
+  moveSource m := some m.src
+
+-- `‹tactic›` is `apply_move`, fixed to this calculus.  (A `--` comment: the
+-- command takes no doc comment.)
+declare_move_tactic ‹tactic› for S
+
+-- No more is written for the editor.  A goal is shown as its judgment by
+-- the library, through `showJudg`: `Att S   ‹the judgment, as Seq.show
+-- writes it›`.
+
+end ‹Calculus›
+
+-- ===================================================================
+-- ‹Calculus›/Test.lean
+-- ===================================================================
+import ‹Calculus›.Tactic
+import LeanCertify    -- the two lints of section 7: `ProofTools.Explore` does not import them
+
+namespace ‹Calculus›.Test
+
+open ProofTools ProofTools.Explore ‹Calculus›
+
+-- The atoms, under the names `Move.src` writes.
+abbrev p : Form := .atom 0
+abbrev q : Form := .atom 1
+
+/-! Each message below is pasted from Lean's output after reading it,
+spaces included: `#guard_msgs` compares exactly.  The messages shown are
+those of the instance compiled. -/
+
+/-! ## 1. Each rule, where it applies and where it does not -/
+
+#guard (S.step ‹a move› ‹a judgment›).toOption == some ‹the figure's premises›
+#guard (S.step ‹a move› ‹a judgment where a side condition fails›).toOption.isNone
+-- as compiled:
+-- #guard (S.step (.andL p q) ([p ⋏ q] ⊢ p)).toOption == some [[p, q, p ⋏ q] ⊢ p]
+-- #guard (S.step (.andL p q) ([] ⊢ p)).toOption.isNone
+
+/-! ## 2. The source's derivations (‹place of each›) -/
+
+/-- ‹the source's example, with its place›. -/
+def ex1 : Der S ‹judgment› := by
+  ‹tactic› ‹move›
+  ‹…›
+
+/-! ## 3, 4. Non-theorems, and each refusal: what the plan predicted -/
+
+/-- error: the move does not apply to goal 0: ‹the side condition's message› -/
+#guard_msgs in
+example : Att S true ‹a non-theorem› := by
+  ‹tactic› ‹the moves that do apply›
+  ‹tactic› ‹the move that must be refused›
+
+-- A query where no move applies is an error too:
+/-- error: ‹tactic›: no move applies at goal 0 -/
+#guard_msgs in
+example : Att S true ‹a non-theorem› := by
+  ‹tactic› ‹the moves that do apply›
+  ‹tactic›
+
+/-! ## 5, 6. A query, a pattern, the goal as the infoview shows it, and
+where the proof is
+
+`trace_state` prints under `trace:`, and `#guard_msgs` lists it after the
+`info:` messages. -/
+
+/--
+info: ‹tactic›: at goal 0, 2 moves apply; no move is made. Try these:
+  [apply] ‹tactic› ‹a move›
+  [apply] ‹tactic› ‹another›
+---
+info: Try this:
+  [apply] ‹tactic› ‹the pattern, filled›
+---
+info: ‹the attempt so far, as `‹tactic› where` draws it: pasted from Lean's output›
+---
+trace: ⊢ Att S   ‹the judgment, as `Seq.show` writes it›
+-/
+#guard_msgs in
+example : Att S true ‹judgment› := by
+  ‹tactic›
+  ‹tactic› ‹a move's name with its arguments left out›
+  trace_state
+  ‹tactic› ‹a move›
+  ‹tactic› where
+  all_goals leave_open
+
+/-! ## 7. The certificates, checked with no tactic; corrupted ones, rejected -/
+
+-- A certificate is a tree of moves, or a script; what either certifies is
+-- the derivation in `Fam`.
+def treeCert := Cert.certifier step_sound
+def scriptCert := certifier step_sound
+
+-- The two lints of lean-certify (R3, R2), as compiled.
+
+/-- info: R3 passes: the evaluation path of treeCert is structural -/
+#guard_msgs in
+#certify_structural ‹Calculus›.Test.treeCert
+
+/-- info: R2 passes: the property of treeCert mentions no budget -/
+#guard_msgs in
+#certify_statement ‹Calculus›.Test.treeCert
+
+-- For the script both pass too; R3 adds a note that the path reaches
+-- `Nat.repr` (in the library's message for a failing line), "so this is not
+-- an error".  Pin what Lean prints.
+#certify_structural ‹Calculus›.Test.scriptCert
+#certify_statement ‹Calculus›.Test.scriptCert
+
+/-- The tree of moves of `ex1`, written out. -/
+def ex1Cert : Cert S := ‹.mk ‹move› [‹the trees of its premises›]›
+-- as compiled:
+-- def ex1Cert : Cert S := .mk .impR [.mk (.andL p q) [.mk .andR [.mk .ax [], .mk .ax []]]]
+
+example : ex1.cert = ex1Cert := rfl
+
+/-- The kernel checks the tree; the result is the derivation. -/
+def ex1ByTree : Fam ‹judgment› := treeCert.verdict _ ex1Cert
+
+/-- The kernel runs the script; the result is the derivation. -/
+def ex1ByScript : Fam ‹judgment› := scriptCert.verdict _ ex1.script
+
+theorem bad_tree_rejected :
+    treeCert.check ‹judgment› ‹ex1's tree, one move wrong› = false := by
+  decide +kernel
+
+theorem short_tree_rejected :
+    treeCert.check ‹judgment› ‹ex1's tree, one subtree left out› = false := by
+  decide +kernel
+
+theorem bad_script_rejected :
+    scriptCert.check ‹judgment› ‹ex1's script, one line wrong› = false := by
+  decide +kernel
+
+theorem short_script_rejected :
+    scriptCert.check ‹judgment› (ex1.script.take ‹its length less one›) = false := by
+  decide +kernel
+
+-- the same certifier at the proposition
+example : Derivable ‹judgment› :=
+  (Cert.certifier step_sound_derivable.soundT).verdict _ ex1Cert
+
+/-! ## 8. A derivation, walked: by the command, and as a tactic block -/
+
+set_option walk.offer false in
+/--
+info: ‹the view, pasted from Lean's output: its first line begins with spaces›
+-/
+#guard_msgs in
+#walk ex1 down 0
+
+/--
+trace: ⊢ Walk ex1
+‹the same view, as the goal shows it: pasted›
+-/
+#guard_msgs in
+example : Walk ex1 := by
+  down 0
+  trace_state
+
+/-! ## 9. A derivation, mapped out to the family (where `Fam` is into `Type`) -/
+
+example : famOfDer ex1 = ‹the same derivation, written with Fam's constructors› := rfl
+-- as compiled:
+-- example : famOfDer ex1 =
+--     .impR (.andL p q (by decide) (.andR (.ax (by decide)) (.ax (by decide)))) := rfl
+
+example : ex1ByTree = famOfDer ex1 := rfl
+
+end ‹Calculus›.Test

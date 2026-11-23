@@ -1,0 +1,255 @@
+# Part (b): certifying what runs
+
+Covers the Run stage. **The authority is the skill `lean-certify`**
+(`SKILL.md` at the root of `proof-tools`): its six steps and its rules R1
+to R11 hold here unchanged, and are not repeated; where that skill names
+its reviewer, read "the reviewer". This part says only what a calculus
+brings to them: which of the six steps the explorer library has already
+done for every calculus, and which are written by hand for each.
+
+Two words. A **certifier** is a Boolean checker packed with its soundness
+theorem (`Certify.Certifier`). **Splicing** is `lean-certify`'s word for
+putting a certificate that a producer computed into a Lean term the kernel
+checks. Names of Lean declarations (`step_sound`, `Fam`, `Derivable`,
+`treeCert`, `scriptCert`) are those of `templates/Instance.lean.txt`.
+
+Contents: 1 the six steps, for a calculus; 2 what is by hand; 3 the
+refutation side and its levels; 4 the producer; 5 gates, tests and
+measurements; 6 deciders.
+
+## 1. The six steps, for a calculus
+
+The pattern of `lean-certify`: the theory says what holds; an untrusted
+producer computes a certificate; a checker proved sound certifies it in
+the kernel. For a calculus given as a proof system `S` whose moves are
+sound (`reference/explore.md` §2 to §4), with `T` what holds on the yes
+side (the family `Fam` itself, or a proposition) and `P` a proposition
+(`Derivable`, or `Valid`):
+
+| step of `lean-certify` | the "yes" side: `T j` | the "no" side: `P j → False` |
+|---|---|---|
+| 1 theory: `Spec`, `Holds` | `Spec` is `S.Judg`; `Holds` is `T` | `Holds` is `fun j => P j → False` |
+| 2 certificate | a **tree of moves**, `Cert S`, or a **script**, `Script S` (`reference/explore.md` §7) | a finite **model**, as data: yours to define |
+| 3 checker and soundness | `Cert.check j c`, or `derives S j ls`. The soundness of either is given: from your `hS : S.SoundT T`, the map out of the derivation the certificate builds (`Der.ofCert`, `Der.ofScript`) | a Boolean check of a model against a judgment, with the theorem that what a model refutes does not hold: yours |
+| packaged | `Cert.certifier hS : Certify.Certifier S.Judg (Cert S) T`, or `certifier hS : Certify.Certifier S.Judg (Script S) T` | a `Certify.Certifier S.Judg Model (fun j => P j → False)`: `LeanCertify`'s, as it stands |
+| 4 producer | a search that returns a tree or a script: yours | a search that returns a model: yours |
+| 5 splice | the term `treeCert.verdict j c : T j`, written by you or by a generator of yours (§5) | the certifier's `verdict j M : P j → False`, likewise |
+| 6 kernel check | the default argument of `verdict`, `by decide +kernel`: the kernel checks the tree, or runs the script | the kernel evaluates the check |
+
+So for the yes side the library has done steps 2 and 3 and gives the gate
+of step 6. **What you write for it is the one-step checker `step` and the
+soundness of the moves, once; then a producer; and the splice.**
+
+```lean
+import LeanCertify                             -- the lints; not imported by ProofTools.Explore
+
+def treeCert := Cert.certifier step_sound      -- step_sound : S.SoundT Fam
+def scriptCert := certifier step_sound
+#certify_structural treeCert                   -- R3
+#certify_statement treeCert                    -- R2
+def d₀ : Fam j₀ := treeCert.verdict j₀ c₀      -- the kernel checks the tree
+```
+
+With the family into `Type`, `d₀` is a derivation of the calculus as the
+source states it: the certificate is then one for the derivation itself,
+and not only for there being one. For a proposition proved sound by
+membership (`h : S.Sound P`), the certifiers are `Cert.certifier h.soundT`
+and `certifier h.soundT`.
+
+Compiled, in the template's instance: both lints pass on both certifiers,
+with the property a type. For the script, R3 adds a note that the path
+reaches `Nat.repr` (the library's message for a failing line), "so this
+is not an error".
+
+**Which certificate.** Every derivation has both: `d.cert` and `d.script`.
+The default for the facts a campaign states and keeps is **the tree**:
+the kernel checks it 1.3 to 6.2 times faster than the script of the same
+derivation (the library's guide, "Which to use", with the command that
+measures it), its check builds nothing, and it is compared and printed as
+it stands. Take **the script** where the order of the work matters: a
+proof to be continued or replayed line by line in the editor; a producer
+built from the tactics of the calculus, which gives scripts
+(`reference/explore.md` §8); an attempt with open goals, which has no
+tree; and the yes side of the library's `engine` (§3), which is the
+script certifier. A campaign may use both; the plan says which is the
+certificate of record (Q3), and the reviewer signs that with the plan.
+
+**Which functions are "the checkers".** What you write and prove sound is
+`step` (and the check of a model). `Cert.check` and `derives` are the
+library's functions that run `step` over a tree and along a script; with
+your theorem each is the checker of its certifier. So "a negative test
+for each certifier" means: one for each certifier of derivations that the
+campaign uses, and one for the certifier against what holds.
+
+State a result with the named certifier (`treeCert.verdict j c`), not
+through an engine (`E.yes.verdict j ls`): the second names the engine and
+so, for Lean's count of axioms, its producer (R4).
+
+## 2. What is written by hand for each calculus
+
+| by hand | where it is used | trusted? |
+|---|---|---|
+| `Judg`, `Move`, `step` | everything | `step` is the one-step checker: yes, through its theorem |
+| the soundness of the moves: `S.SoundT T`, or `S.Sound P` for a proposition | `Cert.certifier`, `certifier`, `Der.mapOut`, `Der.sound`, `engine` | it is the theorem (for a family into `Type`, a definition) |
+| a type of models, the check of a model against a judgment, its soundness (optional) | the no side | the check yes, through its theorem |
+| every producer: proof search, countermodel search | `engine`, deciders | no |
+| completeness of one side or of the pair (optional) | level 3 | it is a theorem of the Prove stage |
+| a certificate of your own, with its own checker (optional): what a search already holds, say | where a search's own data is the cheapest to check (§5) | yes, through its own soundness theorem |
+| the splice: a file of facts, and the program that writes it | step 5 of `lean-certify` | no: the kernel checks each fact |
+
+Step 5 of `lean-certify` also offers "a tactic that runs the producer at
+elaboration time"; the library has no such tactic.
+
+**Rules of `lean-certify` that are still yours to meet**, since nothing in
+the explorer does them for you: R1 (`#certify_domain` on the producer); R4
+(`#certify_axioms` on each stated fact; the list is
+`Harness.config.axioms`, see "Axioms" in `SKILL.md`); R5 and R7 (flags
+rerun at a raised budget, every run under a deadline, every skip
+reported); R6 (a smaller certificate checks faster: shorten it before the
+kernel sees it, if kernel time matters); R8 and R9 (§5).
+
+`step` is on the path the kernel evaluates. So R3 applies to it:
+structural recursion, no `partial`, no well-founded recursion, `Decidable`
+instances that compute. And where the axiom policy excludes
+`Classical.choice`, R4's list applies to it too, the messages it returns
+included: build them from literals with `++`, and keep `String.splitOn`,
+`length`, `toList` and the others R4 names out of `step`.
+`#certify_structural treeCert` and the file's bound are the checks.
+
+## 3. The refutation side, and its three levels
+
+The refutation side is optional: not every calculus comes with a notion of
+finite model, a decidable check of it, and a way to find one. An instance
+stops where its mathematics stops.
+
+| level | the instance has | it gets |
+|---|---|---|
+| 1 | moves and their soundness | `Cert.certifier hS`, `certifier hS`: trees and scripts checked |
+| 2 | also a certifier against what holds: a notion of model with a sound check | `engine h no produce : Certify.Engine S.Judg (Script S) Model P`, from `h : S.Sound P`. Its producer may answer `flag`, and nothing says a model is ever found |
+| 3 | also a theorem that one side always answers | `Certify.Engine.Complete`, or the instance's own statement, such as `(∃ c, Cert.check j c = true) ∨ (∃ M, no.check j M = true)` |
+
+A certifier against what holds is `LeanCertify`'s, as it stands; the
+explorer has no structure of its own for it. The library's example has
+one (`noValid` in `ProofToolsTest/Explore/Calculus.lean`; its proof is
+left out here):
+
+```lean
+def noValid : Certify.Certifier Seq (List Nat) (fun s => Valid s → False) where
+  check s M := refutes M s          -- your Boolean check of a model
+  sound s M h hs := …               -- what a model refutes does not hold
+```
+
+Bundled with a name and a producer it is a `Certify.Disprover`. The
+engine takes a proposition: where what holds is a family into `Type`, the
+proposition is `Derivable`, and its soundness by membership is
+`step_sound.nonempty` (`step_sound_derivable`).
+
+At level 1 there is no engine. The producer is then a plain function,
+for instance `S.Judg → Nat → Option (Script S)`, and a result is stated
+with the certifier alone. The library's example is at level 2 on purpose,
+to show both sides; your level is the plan's.
+
+**What each level asks of the Prove stage.**
+
+- Level 1 asks nothing beyond the soundness of the moves.
+- Level 2, with `Derivable`: the `sound` of the certifier against it
+  needs the soundness of the calculus for its semantics (a derivable
+  judgment is true in every model), then that a model the check accepts
+  makes the judgment false. With `Valid`, the second half is all of it.
+- Level 3 is a completeness theorem: a result of Q2, proved if it is a
+  goal. Trust never needs it: without it the answer is sometimes `flag`,
+  and never wrong.
+
+**Where the countermodel comes from** is a question for the Survey (Q3),
+because calculi differ. In some an unfinished derivation that can go no
+further is a countermodel as it stands; in others the countermodel is
+assembled from several failed attempts; in others there is no such
+reading. The library assumes none of these: how a model is found is a
+producer.
+
+A calculus whose derivations are disproofs is a calculus, with its own
+proof system and its own campaign. No instance has used one as the no
+side of an engine.
+
+## 4. The producer
+
+`produce : S.Judg → Nat → Certify.Verdict (Script S) Model`, with
+`Verdict` one of `pass c`, `fail r`, `flag`. Compiled, untrusted, free to
+be `partial`. The number is a budget handed in at the call; when it runs
+out the answer is `flag`, never `fail`.
+
+- A search that builds a tree of moves hands over that tree (`Cert S`),
+  for `Cert.certifier`. For an engine it gives the script of the
+  derivation its tree checks to: `(Der.ofCert j c h).script`.
+- The combinators on tactics of the calculus (`Tac.move`, `orElse`,
+  `andThen`, `iterate`, `first`; `reference/explore.md` §8) are one way to
+  write a producer, and come with a theorem: a script they give has no
+  failing line. Whether it closes its goal is for `derives` to say. The
+  library's example does this (`auto`, `produce` in
+  `ProofToolsTest/Explore/Calculus.lean`).
+- Check the producer's own certificate before passing it on, and answer
+  `flag` if it does not check: a rejected certificate is a defect of the
+  tool, never a verdict.
+- **A termination bound that makes a proof easy is seldom runnable.** The
+  search does not use it.
+- Bound every generator of test inputs before running it (a size, a
+  count, a deadline). One that ran away wrote oversized files for
+  minutes before it was stopped.
+
+## 5. Gates, tests, measurements
+
+**Gate (R10, and the campaign's).** The library's two certifiers of
+derivations and the certifier against what holds were signed with the
+plan: what holds, the certificate of record, the level, the notion of
+model. Before any producer is written, the reviewer sees: which producers
+and why (who relies on the answers); and for any certifier of your own,
+`Holds`, the certificate, and the type of `sound`.
+
+**Negative tests (R9).** For each certifier, one corrupted certificate,
+rejected in the kernel and pinned. For a tree and for a script, two each:
+one with a wrong move, and one that stops early (`bad_tree_rejected`,
+`short_tree_rejected` and the two for scripts, in the template). A gate
+never watched failing does not count.
+
+**From a producer's answer to a checked fact.** The producer is compiled
+code; its certificate has to be written into a term.
+
+- For a few facts, by hand: evaluate the producer (`#eval`), and paste the
+  certificate as a literal into `treeCert.verdict j c` (or
+  `scriptCert.verdict j ls`). A tree and a script print as Lean data
+  where the moves have `Repr`.
+- For many: a small executable of your own that runs the producer on each
+  judgment and prints one line for each fact,
+  `theorem fact_i : Derivable j_i := … .verdict j_i c_i`. Commit the
+  generated file beside the program that wrote it (step 5 of
+  `lean-certify`). The library has no such generator.
+
+**The corpus.** Judgments of known status, with the status and its source:
+the paper's examples, its non-theorems, a family that grows (to find where
+time goes). Each run gives pass, fail or flag; every skip and every cap is
+reported. There is no driver for this in the library: the same executable
+serves, run under a deadline imposed from outside (the operating system's
+`timeout`), with a case that is cut off reported as a flag.
+
+**Measure** (R8), and put the figures in the report, with the machine and
+the date:
+
+- kernel time against the size of the certificate (Lean's profiler,
+  `set_option profiler true`, reports the time of each declaration);
+- the tree against the script, on your own derivations: the library's
+  figures (1.3 to 6.2 times, least where a step costs most) are for its
+  example. Where a search has a certificate of its own, that too;
+- the size of the search's proof against one made by hand, where both
+  exist. A depth-first search that shares nothing between branches can
+  produce a proof many times longer than the one a person writes; the
+  checker accepts either, and the difference says what the search should
+  learn.
+
+## 6. Deciders
+
+When a command-line tool or several tools with fallbacks are wanted, read
+the section "Deciders" of `lean-certify`: `Certify.Prover.ofEngine` and
+`Certify.Disprover.ofEngine` take the two sides of an engine. They take a
+proposition, so a family into `Type` is reached as `Derivable`. A decider
+is a decision procedure only where level 3 is proved; otherwise it may
+answer `flag`.

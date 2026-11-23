@@ -19,7 +19,7 @@ yet; lean-certify's tags (v0.1.0 to v0.3.0) are in this history.
 | `ProofTools.Audit` | Commands that audit a development: what axioms a declaration may depend on and where one enters, the same for a whole file or for whole libraries, an inductive family printed as inference figures, and a check for computed indices. | Carried in from lax-logic-in-lean, 2026-11-19. `ProofTools/Audit.lean`. |
 | `ProofTools.Zipper` | The zipper of an indexed family of trees: paths, moves and their laws, stated once. Beside it, Huet's zipper for rose trees with labelled edges, and those trees as an instance of the family. | New, 2026-11-19; the rose trees added 2026-11-22. `ProofTools/Zipper.lean`, `ProofTools/Zipper/`; "The zipper" below. |
 | `ProofTools.Explore` | A proof explorer for any calculus given as a type of judgments, a type of moves, and a step function proved sound: derivations and unfinished derivations as data, scripts and their `run`, trees of moves as certificates (rose trees of `ProofTools.Zipper`), the checkers of both as certifiers, one tactic (`apply_move`, with the query `apply_move where` that draws the attempt so far), a command to look at an attempt that is built (`#walk`, by typing motions or by clicking the ones it offers) and a tactic block for the same (`Walk d`), functions that change one at a position (`Cursor.replace`, and by it `rule`, `prune`, `graft`, `script`) and run a session of motions and changes (`Cursor.walk`), and tactics of the calculus built from tactics. | New, 2026-11-19. `docs/explore.md`. |
-| The method | How the parts are used on one calculus, in five stages. | Draft: `docs/campaign.md`. |
+| The method | How the parts are used on one calculus, in five stages. | Draft: `docs/campaign.md`; the procedure as a Claude skill, `.claude/skills/calculus-campaign/`. |
 
 Related, and kept elsewhere:
 
@@ -128,6 +128,19 @@ No stage is automatic. An operator (a person, or a language model working
 with one) does the work, and a reviewer decides at the end of each stage.
 What is trusted is small: Lean's kernel, and two checkers per calculus, each
 with a theorem. `docs/campaign.md` has the detail.
+
+The procedure is written out as a Claude skill, in
+`.claude/skills/calculus-campaign/`: `SKILL.md`, a reference for each of
+adopting, certifying and exploring, a list of pitfalls, and templates (the
+plan, a stage's brief and report, the instance of the explorer, as
+compiled). In a Claude Code session whose project is a checkout of this
+repository it is the command
+
+    /calculus-campaign <the calculus, named in words>
+
+whose first act is one proposal to the reviewer (the source, the system,
+the results aimed at), after which it stops for an answer. A campaign's
+files go in a Lake package of their own under `examples/`.
 
 ## Using it
 
