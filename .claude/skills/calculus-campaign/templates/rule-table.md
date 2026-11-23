@@ -14,6 +14,18 @@ Adopt, after the signature): `<name>`, in `<file>`.
 
 Signed by the reviewer: <not yet / date; see `gates.md`>.
 
+## How a rule of the figure reads in Lean
+
+*Only where judgments are not flat (`reference/adopt.md` §4); otherwise
+leave this section out, and the two marked like it below.* Once, for all
+rows: the figure's rule for a context, drawn as the source draws it;
+then what in a constructor stands for the context (a variable for the
+whole judgment), for the place of the rule (a path, and the side
+condition that says what is at it), for what the rule needs there (a
+side condition), and for the premise (the judgment changed at that
+place). Last, which letters of the constructors are the figure's and
+which are not in the figure.
+
 ## Notation
 
 | in the source | in Lean | note |
@@ -56,6 +68,16 @@ andL
     if   A ⋏ B ∈ Γ
 ```
 
+## The functions the rules use
+
+*Only where judgments are not flat.* `#rules` prints a definition by its
+name. These are the definitions, from `<file>`, copied by <the command or
+script>, not retyped:
+
+```lean
+<paste>
+```
+
 ## In the Lean and not in the figure
 
 | what | why it is there |
@@ -86,6 +108,14 @@ states, what is done here, and why. Three kinds:
 | # | kind | the source's item | what the source says | what is done here | why | date |
 |---|---|---|---|---|---|---|
 | D1 | | | | | | |
+
+## What the reviewer is asked to sign
+
+*Only where judgments are not flat.* The transcription, row by row, and
+these choices, which the plan left open: <each in a line, with its
+divergence: how a rule names its place; where a rule puts what it adds,
+and which occurrence it removes; the functions above; the divergences
+D1 to D<n>>.
 
 ## Errors of transcription
 

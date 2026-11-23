@@ -248,7 +248,13 @@ declare_move_tactic mycalc for S
   reviewer is never offered.
 - `within p j` is yours to define: the premise `p` has nothing that the
   conclusion `j` lacks. A move with such a premise is set aside while
-  another move applies, and offered when none does.
+  another move applies, and offered when none does. Look in the source
+  first: where it ends its search by a proviso (a rule is not applied
+  when its premise has the same formulas as its conclusion, as a set),
+  that proviso is the first candidate for `within`, and the source's
+  definition of it is what to write (Q3 of the plan has its place). In
+  one instance it was one line: the premise and the conclusion have the
+  same set sequent, which the source defines.
 - `moveSource` is optional: `m.src` is a function you write that gives
   the move as it is typed after the tactic's name (`andL p q`). Without
   it Lean prints the move's term (`andL (Form.atom 0) (Form.atom 1)`). If
@@ -299,6 +305,11 @@ filled pattern; `set_option apply_move.showWhere true` (off by default)
 asks `where` after every move. Every line of the table is a line of the
 alias too (`mycalc where`). `where` reads the attempt again at each query,
 and does not see out of a `have` or of a block inside a term.
+
+**No comment after a pattern.** A line `mycalc andL   -- a comment` is
+offered back as `mycalc andL` with the move's arguments written after
+the comment. In a file a person types in (the exercises, the tutorial),
+put each comment on a line of its own.
 
 The node the tactic builds carries the equation `S.step m j = .ok ps`,
 which the kernel proves by evaluating `step` when the declaration is
@@ -436,10 +447,32 @@ nine kinds; the library's own tests have more of each.
    (`Der.mapOut step_sound`), equal by `rfl` to the same derivation
    written with the family's constructors.
 
+**A printer that writes a combining character.** Where the source marks
+a letter (`p̄` for a negated atom) and the printer writes the letter
+followed by a combining character (the macron U+0304), the text a test
+expects must be those two characters. `#guard` on a string and
+`#guard_msgs` on a message compare character by character, and text
+typed or pasted with the precomposed letter (`ā`, one character) fails
+against output that looks the same.
+
+- In an expected string, spell the mark as an escape: `"ā ∧ b̄"`.
+- In a pinned message no escape is read: paste the message from Lean's
+  output, and do not retype it.
+- Say at the head of the tests file how marked letters are spelt in it,
+  comments included: an editor that composes the two characters into one
+  breaks the comparison.
+- A tool that writes the file for you may put the character where you
+  typed the escape. Read back what is in the file.
+
 **The exercises file** (`templates/Play.lean.txt`), in no library. It is
 the reviewer's. Its header says how to type a line and gives the rule
 table in brief; each exercise is a statement with the first query already
-written. The reference derivations stay in the tests file, not here.
+written. One exception: where no move applies to the judgment as it
+stands, a query is an error, and the file must elaborate with none. For
+such an exercise the query is left for the reviewer to type, and the
+text says so, and says what the message will be. Comments are on lines
+of their own (§6). The reference derivations stay in the tests file,
+not here.
 Where the source has no worked derivations, take the simplest instances of
 its theorems, or the axioms of the logic, and say that the choice is
 yours. Check that the file elaborates (§1) before the report. Once the
@@ -472,8 +505,9 @@ this calculus needs. Then serve each from what exists:
 of the exercises file, in no library, with its prose in comments, that
 takes a new user through building, a query, a pattern, a script, a tactic
 of the calculus, a walk, and one non-theorem. Unlike the exercises it
-explains each step and shows the answers. The reviewer works through it:
-that is the gate.
+explains each step and shows the answers. Its comments are on lines of
+their own, never after a line of the tactic (§6). The reviewer works
+through it: that is the gate.
 
 **The user's guide**: a page in the campaign folder: how a goal reads,
 the moves with their rules, the lines of the tactic, the messages. The
@@ -519,11 +553,12 @@ place they act at, and what a move carries, are the plan's choices of
 encoding, signed by the reviewer with the plan. This section gives the
 options and what each costs. It chooses nothing, and it gives no rule of
 any calculus. One instance is of this kind: `calculi/BrunnlerK/` of
-`proof-tools`, nested sequents as a type of its own.
+`proof-tools`, nested sequents by the second option below.
 
 | option | what you get | what it costs |
 |---|---|---|
 | a type of your own: an inductive type whose constructors hold lists of it | the source's shape, as the source writes it | every function on it is yours: what is at a place, the judgment changed at a place, the printer. On Lean v4.31.0 `Repr` and `Lean.ToExpr` derive for such a type and `DecidableEq` does not (tried): equality is a Boolean test written by recursion, with the proof that it decides |
+| a type of your own that holds itself directly and never in a list: the inner judgments joined by a constructor, `leaf` of a node's formulas and `cons` of an inner judgment and the rest | the source's shape; every `deriving` line works, `DecidableEq`, `Repr` and `Lean.ToExpr` (tried on Lean v4.31.0, and compiled: `calculi/BrunnlerK/BrunnlerK/Sequent.lean` of `proof-tools`) | the inner judgments of a node are not a `List`, and its formulas sit at the end of the chain: the formulas of a node, its inner judgments as a list, the one at a position, a formula or an inner judgment added or replaced, are each a recursion of yours, with its lemmas. Written with the constructors a judgment cannot be read: a term syntax is needed (below) |
 | the library's rose trees, `RTree κ α`: a node has a label in `α` and a list of children, each along an edge labelled in `κ` | the subtree at an address (`get?`), the label there (`at?`), the tree changed there (`updateAt`), with laws PROVED; Huet's zipper; a printer (`drawWith`); an equality test PROVED to decide equality (`RTree.beq_iff_eq`); `Repr`. On a small tree `get?`, `at?`, `updateAt` and `beq` reduce in the kernel (tried, by `decide +kernel`) | the source's judgment must be read as such a tree: what the labels are is yours to say, and a divergence of representation. An address is the list of edge labels from the root, and `get?`, `updateAt` take the first child along an edge: children of one node are told apart by their edge labels, or not at all. `Lean.ToExpr` does not derive for `RTree` (tried): it is written by recursion. `DecidableEq` comes from the equality test (`instDecidableEqOfLawfulBEq` of core Lean, a definition and not an instance) |
 | a flat type: lists, with the structure carried as data beside them | every `deriving` line works | the structure the source draws becomes an invariant to state and keep |
 
@@ -587,4 +622,24 @@ Whatever is chosen:
   for each constructor, `S.step m Γ = .ok [the premises, written out]`,
   proved by `simp` with the side conditions. Compiled:
   `calculi/BrunnlerK/BrunnlerK/Proof.lean` of `proof-tools`
-  (`Move.ruleAt`, `diaRule`, `step_sound`).
+  (`Move.ruleAt`, `diaRule`, `step_sound`);
+- **prove S2 in Adopt.** §4 lets it stay OPEN. For a calculus of this
+  kind it is worth its lines (forty, in the instance above): the
+  premises of `step` and of the family are the same functions applied
+  at a place, and S2 is the one check that `step` refuses no instance
+  of a rule. The reviewer's test shows a refusal only at the instances
+  the reviewer happens to type;
+- **a term syntax for judgments.** A judgment in a statement, a test
+  or an exercise is a closed term, and written with the constructors
+  it cannot be read against the source. Write a syntax that reads as
+  the source does: for nested sequents, `seq[A, B, [C, [D]]]`, where
+  an item in list brackets is an inner judgment and anything else a
+  formula. One `syntax "seq[" term,* "]" : term` and one `macro_rules`
+  that sorts the items did it, in a dozen lines, with no syntax
+  category. The kernel sees the term the macro gives, and the reviewer
+  sees the notation: pin in the tests, by `rfl`, that a judgment so
+  written is the term meant, as the display of a goal is pinned.
+  Compiled: `calculi/BrunnlerK/BrunnlerK/Tactic.lean`;
+- **the rule table needs the definitions.** `#rules` prints these
+  functions by name, so the table has three further sections for this
+  case (`reference/adopt.md` §4; `templates/rule-table.md`).

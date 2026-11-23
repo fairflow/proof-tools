@@ -298,6 +298,8 @@ done is recorded with the gate, and is the first input of stage 4.
      of what is signed;
    - the screening of the thing that waits (`reference/adopt.md` §5):
      a statement refuted while it waits is taken back and put again;
+     for a family, the source's worked derivations written with its
+     constructors (stage 1, step 4);
    - the documents.
 
    What names the thing that waits, and is not a screen of it, is not
@@ -402,8 +404,20 @@ Read `reference/adopt.md` §1 to §3, and the Survey's pitfalls.
    with the plan and found awkward in Prove costs a construction: a
    type that holds a list of itself gets no `DecidableEq`, and a model
    built on its members then cannot test them for equality. Say in the
-   plan what was tried and what Lean answered, type by type. Nothing
-   else of the calculus is written in Lean before the plan's gate.
+   plan what was tried and what Lean answered, type by type.
+
+   **A statement the plan proposes may be screened now too**, in the
+   same way. Where the plan fixes what a word of the goals will mean
+   in Lean (what "valid" is; the form of a standing result) and a small
+   case could show the form to be wrong, write the fragment the screen
+   needs (formulas, a model, truth in it) in a scratch file, outside
+   the campaign's folder and not kept, and say in the plan what was
+   screened, with what, and what it showed. The form is the reviewer's
+   to sign with the plan, and a form refuted after the gate is a gate
+   run again.
+
+   Nothing else of the calculus is written in Lean before the plan's
+   gate.
 4. Send the plan, with the Survey's report. **Gate: the plan.** The
    reviewer passes it, and says which results are goals, as "What a
    campaign proves" lays down.
@@ -419,10 +433,16 @@ pitfalls.
 3. The calculus as the source states it: one indexed inductive family, one
    constructor for each primitive rule. Run `#rules` and `#slime` on it.
 4. Fill `rule-table.md`: each rule of the figure, the output of `#rules`
-   for its constructor, every divergence. Start `statements.md`. **Gate:
-   the rule table.** While it waits, write nothing that names the family
-   or follows its rules (`Move`, `step`): the printers of formulas and
-   judgments may be written.
+   for its constructor, every divergence; where judgments are not flat,
+   the template's three further sections (`reference/adopt.md` §4).
+   Start `statements.md`. Before the table is sent, check the
+   transcription on the source's own worked derivations: each written
+   as a term of the family, with its constructors, in the tests, and
+   cited in the table. That is a screen of the family and nothing built
+   on it ("How a gate is run", 1), so it may be done while the gate
+   waits too. **Gate: the rule table.** While it waits, write nothing
+   else that names the family or follows its rules (`Move`, `step`):
+   the printers of formulas and judgments may be written.
 5. The proof system: `Move`, `step`, and the soundness of the moves for
    the family (`reference/explore.md` §2 to §4). Fill the table's column
    for the moves.
@@ -455,6 +475,16 @@ Read `reference/adopt.md` §2, §5 and §6, and Prove's pitfalls.
    Completeness against a rule table that allows too much is nearly free;
    the content is in soundness. Then the goals in the plan's order, a
    goal after those it rests on.
+
+   **That order is the source's route, and the proofs may take
+   another.** A lemma that the encoding gives and the source lacks can
+   make the source's lemmas on the way unnecessary: the theorem they
+   led to is then proved without them. Goals that fall off the route
+   are still goals. Say which they are in the next note the reviewer
+   gets; leave them OPEN; and put each to the reviewer in the report:
+   proved for its own sake, or set aside. Only the reviewer sets a
+   goal aside, and `statements.md` then lists it under "Set aside"
+   with the reviewer's words.
 5. Each theory file ends with its bound on axioms.
 6. Report: each statement PROVED, REFUTED or OPEN, with its axioms. The
    stage ends when every goal is PROVED, or is OPEN with what was tried:
@@ -591,7 +621,8 @@ goes through infinite models in general cannot.
 and what it cost; (ii) the statements, each PROVED, REFUTED or OPEN; (iii)
 what to look at or try, and what should happen; (iv) what differed, from
 the plan, from the source, from this skill, and anything asked of the
-library; (v) what the reviewer must decide.
+library; (v) what the reviewer must decide, or, where the reviewer has
+lifted the gates, what was decided (the template has both forms).
 
 **The campaign folder** holds `README.md` (a status board), `gates.md`,
 `plan.md`, `skeleton.md`, `rule-table.md`, `statements.md`, `cost-log.md`

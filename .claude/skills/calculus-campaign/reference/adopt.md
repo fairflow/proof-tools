@@ -35,7 +35,12 @@ handed, by another without asking.
   (Python, standard library only; it needs `pdflatex` and `pdftotext`)
   writes the file: `./paper_skeleton.py --arxiv <id> -o skeleton.md`, or
   `--src main.tex`. It is not part of `proof-tools`. From a PDF alone,
-  write the list by hand.
+  write the list by hand. The script's own header says that it
+  simulates the counters: that text is old. On a source that compiles
+  it runs `pdflatex` and reads the `.aux`, and it says which it did
+  ("… labels read from main.aux (compiled here)"; where there is no
+  `pdflatex` or no `.aux`, "items will carry no numbers"). Read that
+  line before a number from the file is cited.
 - **Fetching is a download.** `--arxiv` downloads an archive, and so
   does getting the PDF. Whether the source may be fetched and compiled
   was asked at the first act (`gates.md`, the first entry): do as it
@@ -170,6 +175,17 @@ replacements in the "Notation" table of the rule table: `Ξ` for `Σ`,
 `Λ` is not reserved and stays. Use the same letters in the documents, so
 that a statement reads the same in the plan and in Lean.
 
+**The figure's letters stay; what the encoding adds takes new ones.** A
+constructor often needs a name for a thing the figure has no letter
+for: the whole judgment at the place where a rule acts, a path, a
+position. Give each a letter the figure does not use. If an added
+thing takes one of the figure's letters, the figure's own use of that
+letter moves to another, and the constructor then reads against the
+figure with two letters changed. (One draft called the node `Δ`, and
+the figure's `Δ` became `Λ`; with `Θ` for the node every letter of the
+figure kept its meaning.) Enter the added letters in the "Notation"
+table, marked as not in the figure.
+
 **A rule stated for every context.** Some sources state a rule
 schematically for any surrounding structure. Written as it stands, its
 conclusion is then a function applied to something: a computed index. The
@@ -242,6 +258,22 @@ the figure has a table of its own. The column for the move of the proof
 system is empty when the table is signed; it is filled at step 5 of Adopt
 and is read at the reviewer's test.
 
+**Where judgments are not flat** (`reference/explore.md` §13), `#rules`
+prints each premise as functions applied to a variable
+(`Γ.setNode a (…)`), and the names carry the rule: the table cannot be
+read against the figure without the definitions. The template has three
+sections for this case, to be left out otherwise:
+
+- *How a rule of the figure reads in Lean*: once, for all rows, what in
+  a constructor stands for the context, for the place of the rule, and
+  for what the rule changes there;
+- *The functions the rules use*: their definitions, copied from the Lean
+  file by a command or a script, never retyped;
+- *What the reviewer is asked to sign*: the rows, and with them the
+  choices those functions make that the plan left open (how a rule
+  names its place; where a rule puts what it adds; which occurrence it
+  removes).
+
 A **divergence** is recorded when it is made, never afterwards. Three
 kinds, kept apart:
 
@@ -304,6 +336,34 @@ others are: OPEN while only the type is there, PROVED when the
 definition is checked. A proposition that follows from it (completeness,
 from the function into a proof or a refutation) is a statement of its
 own, beside it. Compiled: `calculi/BrunnlerK/BrunnlerK/Semantics.lean`
+of `proof-tools`.
+
+**A statement about every structure may say more than the source
+means.** In Lean, truth in a model is a proposition, and a valuation
+may take any proposition as its value. "Valid in every model" can then
+imply a classical principle. For a modal calculus:
+
+    (∀ M s,  M, s ⊨ ◇p ∨ □p̄)   →   ∀ P : Prop, P ∨ ¬P
+
+(a model of one reflexive state, with `p` true there exactly if `P`).
+The source does not mean that: its metatheory is classical, and each of
+its models is two-valued. Three forms of the statement are then open.
+Look for them in this order:
+
+1. **direct, over the class of structures the source means**: every
+   model in which each formula is true or not true at each state,
+
+   ```lean
+   def Valid (j : Judg) : Prop := ∀ M : Model, M.TwoValued → ∀ s : M.W, M.sat s j.form
+   ```
+
+   It is the source's statement under excluded middle: say so beside it;
+2. indirect: no model refutes the judgment;
+3. the classical form and a constructive form, both entered (§6).
+
+The first reads as the source does. Which form is used is a choice about what is meant: it
+is in the plan ("what holds"), screened there (stage 0, step 3), and
+signed with it. Compiled: `calculi/BrunnlerK/BrunnlerK/Semantics.lean`
 of `proof-tools`.
 
 **Every quantified statement is attacked before you decide how to prove

@@ -33,14 +33,20 @@ Every message from the reviewer during the campaign, classed:
 * **decision**: one the method asks for: a gate, a choice in the plan, an
   answer to a question the operator put;
 * **correction**: the operator was wrong or unclear and was put right;
-* **rescue**: the operator was stuck and could not have gone on alone.
+* **rescue**: the operator was stuck and could not have gone on alone;
+* **question**: the reviewer asks about the mathematics or about the
+  method, and neither decides nor corrects. Say what it led to (a
+  screen, a section of the plan), or that it changed nothing.
+
+A message that is two of these (a signature, and a correction of the
+method with it) is entered once, with both classes.
 
 | # | date | stage | class | the reviewer's words, in brief | what it changed |
 |---|---|---|---|---|---|
 
 ## By stage
 
-| stage | sessions | elapsed | of which waiting on builds | requests ("not known", where the rows say so) | cost (the same) | reached its gate? | decisions / corrections / rescues |
+| stage | sessions | elapsed | of which waiting on builds | requests ("not known", where the rows say so) | cost (the same) | reached its gate? | decisions / corrections / rescues / questions |
 |---|---|---|---|---|---|---|---|
 | 0 Survey | | | | | | | |
 | 1 Adopt | | | | | | | |

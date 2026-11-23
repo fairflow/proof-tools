@@ -110,7 +110,13 @@ names (stage 0, step 3), not on the judgments alone:
 | moves | | | | |
 | a finite model (Q3), and any other certificate | | | | |
 
-| choice | the options weighed | proposed, and why |
+In the third column give the reason with the choice, and **what the
+choice does to the rules**: which rule of the source needs no
+constructor under it, and why (exchange, where a rule finds its formula
+by membership); which rule the encoding adds. A reviewer who has to ask
+why a rule of the figure is missing was not given the reason here.
+
+| choice | the options weighed | proposed, why, and what it does to the rules |
 |---|---|---|
 | a judgment as data | | |
 | how a rule, and a move, names what it acts on | | |
@@ -121,7 +127,10 @@ names (stage 0, step 3), not on the judgments alone:
 ## Goals, non-goals, order
 
 **Goals**, in order: the source's soundness theorem first; then the rest,
-a goal after those it rests on.
+a goal after those it rests on. Of each goal that is a lemma on the
+source's way to another goal, say which one: if the proofs take another
+route it falls off, and is put to the reviewer again (`SKILL.md`,
+stage 2, step 4).
 
 **Non-goals**, with the reason for each:
 

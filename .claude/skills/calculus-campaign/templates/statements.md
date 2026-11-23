@@ -75,7 +75,11 @@ One entry in the form of S3 for each further goal, in the plan's order.
 Where a theorem takes a named hypothesis, enter both: the theorem (PROVED
 as stated, the hypothesis in its statement) and the hypothesis (OPEN).
 Where a statement needs `Classical.choice` in its statement and has a
-constructive form, enter both.
+constructive form, enter both. Before that, where a statement about
+every structure of some kind implies a classical principle, look for the
+class of structures the source means (`reference/adopt.md` §5): the
+statement restricted to that class is direct, and is entered alone, with
+a line on how it stands to the source's wording.
 
 ## Refuted
 

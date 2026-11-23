@@ -57,6 +57,21 @@ against certificate size>.
    gate: which results are goals, beyond those that are goals by rule.>
 2. <Each open choice, with a recommendation.>
 
+*Where the reviewer has lifted the gates (`SKILL.md`, "How a gate is
+run", 6), nothing is asked, and this part has another form:*
+
+## (v) What was decided
+
+1. <One line for each gate the stage met: what it would have shown, what
+   was decided, why, and its entry in `gates.md`.>
+
+**The reviewer's, and not done**: <the reviewer's test and the tutorial,
+where they are open; what only the reviewer may do. Stated, and not asked
+for.>
+
+*The message that carries such a report ends in the same way: with what
+was decided, and not with a thing to sign or a choice to make.*
+
 ---
 
 *In the closing report (after stage 4) part (iv) ends with the

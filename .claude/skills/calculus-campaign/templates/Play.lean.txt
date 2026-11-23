@@ -67,6 +67,10 @@ example : Att S true ‹judgment› := by
 Go as far as the moves go.  What should happen: ‹where it stops, and with
 what message or what query›. -/
 
+-- Where no move applies to the judgment as it stands, the query below is
+-- an error, and this file must elaborate with none: leave the line out,
+-- and say in the text above that the reviewer types it and what the
+-- message will be.
 example : Att S true ‹a non-theorem› := by
   ‹tactic›
   all_goals leave_open
