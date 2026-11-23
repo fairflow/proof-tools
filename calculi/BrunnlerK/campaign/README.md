@@ -7,7 +7,7 @@ the paper, the place of the files, the reviewer and the rules of the
 project: [gates.md](gates.md), the first entry, as changed by the second
 (the place of the files, and where commits go).
 
-Operator: Claude (Fable 5.2) for stages 0 and 1; see the cost log. The method:
+Operator: Claude (Fable 5.2) for stages 0, 1 and 2; see the cost log. The method:
 the skill `calculus-campaign`, read at commit `e6410cd` of proof-tools
 and amended on 2026-11-23 at the reviewer's word (the default folder; the
 letters Lean reserves; a later command of the reviewer overrides a
@@ -19,7 +19,7 @@ gate).
 |---|---|---|---|
 | 0. Survey | done | the target: passed, 2026-11-23; the plan: passed, 2026-11-23, at its second putting | [plan.md](plan.md), [report-0-2026-11-23.md](report-0-2026-11-23.md) |
 | 1. Adopt | done, but for its last gate: the package, formulas and sequents, the two families, the rule table, the proof system, the tactic `kmove`, the tests, the exercises file | the rule table: signed 2026-11-23; the reviewer's test: put 2026-11-23, deferred by the reviewer, not done | [rule-table.md](rule-table.md), [statements.md](statements.md), [report-1-2026-11-23.md](report-1-2026-11-23.md), `Play/BrunnlerK.lean` |
-| 2. Prove | begun 2026-11-23 at the reviewer's word, for completeness and cut elimination, in the session of stages 0 and 1: the semantics and the statements of goals 1, 8, 9, 10 are in Lean, screened, not proved | the statements, first sending: signed as put, 2026-11-23; goals PROVED: 0 of 10 (S1, S2 of our own: PROVED) | [statements.md](statements.md), `BrunnlerK/Semantics.lean` |
+| 2. Prove | begun 2026-11-23 at the reviewer's word, for completeness and cut elimination, in the session of stages 0 and 1; that goal is reached: goals 1, 8, 9 (completeness, decidability) and 10 PROVED. Not ended: goals 2 to 7 and the finite model property are OPEN and not attempted | the statements, first sending: signed as put, 2026-11-23; the report: put 2026-11-23 | [statements.md](statements.md), [report-2-2026-11-23.md](report-2-2026-11-23.md), `Play/Search.lean` |
 | 3. Run | not started | the producers: not put | |
 | 4. Explore | not started | the tutorial: not put | |
 
@@ -37,6 +37,8 @@ gate).
 * [report-1-2026-11-23.md](report-1-2026-11-23.md): Adopt's report, with
   what should happen at each exercise of the reviewer's test.
 
+* [report-2-2026-11-23.md](report-2-2026-11-23.md): the report of Prove
+  at the reviewer's goal (completeness, cut elimination).
 * [brief-1-1.md](brief-1-1.md), [brief-1-2.md](brief-1-2.md): the briefs
   for Adopt, to the rule table's gate and after it.
 * [rule-table.md](rule-table.md): each rule of the source beside its
@@ -61,5 +63,14 @@ toolchain (v4.31.0); the package requires `proof-tools` by its path.
 | `BrunnlerK/Proof.lean` | the moves, `step`, the proof system `S`; S1 (`step_sound`) and S2 (`famToDer`) | `[propext, Quot.sound]` |
 | `BrunnlerK/Tactic.lean` | `seq[…]`; moves as text; the moves to try; `within`; `Explorable S`; the tactic `kmove` | none: code |
 | `BrunnlerK/Test/Sequent.lean`, `BrunnlerK/Test/System.lean`, `BrunnlerK/Test/Proof.lean` | tests | none: tests |
+| `BrunnlerK/Semantics.lean` | models, truth, two-valued models, `Γ_F`, `Valid`; finite trees and their model; `Refutation`; the statements of goals 1, 8, 9, 10 | `[propext, Quot.sound]` |
+| `BrunnlerK/Context.lean` | lemmas on paths; `Fam.lift` (a proof of a subtree is a proof of the whole); `Fam.diaAll` | `[propext, Quot.sound]` |
+| `BrunnlerK/Weight.lean` | the weight the search goes down by | `[propext, Quot.sound]` |
+| `BrunnlerK/Ctx.lean` | the comma, contexts, `fill`; the rules in the figure's shape (S3) | `[propext, Quot.sound]` |
+| `BrunnlerK/Soundness.lean` | truth of a sequent on the sequent; deep inference is sound; soundness of K and of K + cut | `[propext, Quot.sound]` |
+| `BrunnlerK/Search.lean` | the model of finite trees is two-valued; the search: a proof or a refutation | `[propext, Quot.sound]` |
+| `BrunnlerK/Completeness.lean` | completeness, decidability, cut elimination | `[propext, Quot.sound]` |
+| `BrunnlerK/Test/Semantics.lean`, `BrunnlerK/Test/Ctx.lean`, `BrunnlerK/Test/Search.lean` | the screens of the statements; tests | none: tests |
+| `Play/Search.lean` | the search, to try; in no library (`lake env lean Play/Search.lean`) | none |
 | `Play/BrunnlerK.lean` | the reviewer's exercises; in no library (`lake env lean Play/BrunnlerK.lean`) | none |
 

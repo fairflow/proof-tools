@@ -15,12 +15,14 @@ Status is exactly one of:
 * **OPEN**: everything else. An OPEN statement is in Lean as a named
   proposition (`def Name : Prop := …`), not as a theorem with `sorry`.
 
-**As of 2026-11-23 17:36 GMT the ten goals are OPEN; S1 and S2 are
-PROVED, and S3 (the rules in the figure's shape).** Goals 1, 8, 9 (two of its three lines) and 10 are in Lean as
-named propositions and types with no proof (`BrunnlerK/Semantics.lean`),
-put to the reviewer in the fifth entry of `gates.md`. Goals 2 to 7 and
-the finite model property are displayed as the plan has them, in the
-source's notation, and are not in Lean.
+**As of 2026-11-23 18:00 GMT.** Of the ten goals: goal 1, goal 8, goal 9 in its
+first and third lines (completeness, decidability) and goal 10 are
+PROVED; goals 2 to 7 and the second line of goal 9 (the finite model
+property) are OPEN. Of our own: S1, S2, S3, `SoundnessCut` and
+`TreeModelTwoValued` are PROVED. Every PROVED statement is checked by
+the kernel, with no `sorry`, within `[propext, Quot.sound]`. Goals 2 to
+7 and the finite model property are displayed as the plan has them, in
+the source's notation, and are not in Lean.
 
 The axiom policy of the development: every theory file within
 `[propext, Quot.sound]`.
@@ -39,9 +41,11 @@ Read these first: no tool checks that they say what the source means.
 | the proof system: moves, one step | `Move`, `step`, `S`, `BrunnlerK/Proof.lean` | none: the rules of Figure 2.3 as moves | the rule table's last column and its section "The proof system"; put with the report of Adopt |
 | the comma `Γ, Δ`; a sequent context `Γ{ }`; filling its hole, `Γ{Δ}`; its depth | `NSeq.comma`, `Ctx`, `Ctx.fill`, `Ctx.depth`, `BrunnlerK/Ctx.lean` | "Sequent contexts, unary", pp. 7–8 | put 2026-11-23 (`gates.md`, the entry "decision 2: the rules in the figure's shape") |
 | what holds | the family itself, `Fam` | | the plan, passed 2026-11-23 |
-| the corresponding formula `Γ_F` of a sequent | `Form.bot`, `Form.disj`, `NSeq.boxForms`, `NSeq.form`, `BrunnlerK/Semantics.lean` | p. 7 | put 2026-11-23 (`gates.md`, the entry "Stage 2: the definitions and the statements, first sending") |
-| the models, truth in a model, two-valued models, `Valid` | `Model`, `Model.sat`, `Model.TwoValued`, `Valid`, `BrunnlerK/Semantics.lean` | Definition 2.6, p. 12 | the form, with the plan (passed 2026-11-23); the Lean: put 2026-11-23 |
-| a countermodel as data: a finite tree, and the model of finite trees | `Tree`, `treeModel`, `Form.holds`, `Refutation`, `BrunnlerK/Semantics.lean` | Theorem 2.23 (ii) | put 2026-11-23 |
+| the corresponding formula `Γ_F` of a sequent | `Form.bot`, `Form.disj`, `NSeq.boxForms`, `NSeq.form`, `BrunnlerK/Semantics.lean` | p. 7 | signed 2026-11-23 (`gates.md`, the entry "Stage 2: the definitions and the statements, first sending") |
+| the models, truth in a model, two-valued models, `Valid` | `Model`, `Model.sat`, `Model.TwoValued`, `Valid`, `BrunnlerK/Semantics.lean` | Definition 2.6, p. 12 | the form, with the plan (passed 2026-11-23); the Lean: signed 2026-11-23 |
+| a countermodel as data: a finite tree, and the model of finite trees | `Tree`, `treeModel`, `Form.holds`, `Refutation`, `BrunnlerK/Semantics.lean` | Theorem 2.23 (ii) | signed 2026-11-23 |
+| truth of a sequent, stated on the sequent: a tool of the proofs, in no statement here; `Model.sat_form` proves that it is truth of `Γ_F` | `NSeq.sat`, `BrunnlerK/Soundness.lean` | none | not put |
+| the weight of a sequent, which the search goes down by: in no statement here | `Form.weight`, `NSeq.weight`, `BrunnlerK/Weight.lean` | none (the source's measure is Definition 2.21) | not put |
 | a model with finitely many states, as data | not in Lean yet | Corollary 2.24 | |
 | the depth of a derivation; `→ⁿ` | not in Lean yet | p. 8, not defined there (the rule table, D13) | at the gate of Prove |
 | permutation inside every node, `~` | not in Lean yet | none: the source's sequents are multisets | at the gate of Prove |
@@ -113,14 +117,23 @@ Source: Theorem 2.9 (i), (iii), p. 13 (no label), with Lemma 2.8
 every two-valued model with no axiom. Screened again (stage 2,
 `BrunnlerK/Test/Semantics.lean`): 21 rule instances, at the root and one
 and two boxes deep, on 28 564 finite trees; no counterexample. Status:
-OPEN.
+**PROVED**: `BrunnlerK.soundness`, in `BrunnlerK/Soundness.lean`, within
+`[propext, Quot.sound]`. By induction on the proof. A rule that is sound
+at a node is sound in a context, by induction on the path
+(`NSeq.deep₂`: the source's Lemma 2.8, proved on the models and not
+through a Hilbert system). The model's two values are used at the axiom
+and at `◇k_c`, and nowhere else.
 
 With it, of our own, for goal 10:
 
     def SoundnessCut : Prop := ∀ Γ : NSeq, Kcut Γ → Valid Γ
 
 Source: none; the source's Theorem 2.9 is for the rules of K. Screened:
-four instances of `cut`, on the same trees. Status: OPEN.
+four instances of `cut`, on the same trees. Status: **PROVED**:
+`BrunnlerK.soundnessCut`, in `BrunnlerK/Soundness.lean`, within
+`[propext, Quot.sound]`. The case of `cut` does not use that the model
+is two-valued: a formula and its negation are not both true at a state
+of any model (`Model.not_sat_dual`).
 
 The source's form, for comparison (not a goal): `ValidF Γ`, the same with
 "every model". `(∀ Γ, K ⊢ Γ → ValidF Γ) → ∀ P : Prop, P ∨ ¬P`, by the
@@ -172,8 +185,10 @@ Source: Lemma 2.14, p. 15 (`l:equiv`), at `X = ∅`. Status: OPEN.
 
 Source: Lemma 2.22, p. 17 (`l:terminates`), at `X = ∅`, for the search
 without cyclic leaves (`gates.md`, the second and third entries). The
-statement takes its form from the search, which is not written. Status:
-OPEN.
+statement takes its form from the source's search, which is not
+written: the search of goal 8 is another, and its termination is by
+structural recursion on a bound of a weight (`BrunnlerK/Weight.lean`),
+not this lemma. Status: OPEN.
 
 ### Goal 8. A proof or a countermodel
 
@@ -208,7 +223,16 @@ finitely many states is not stated here (goal 9, second line). The route
 proposed is not the source's: see `gates.md`, the fifth entry. Screened:
 the empty sequent, `[∅]` and six sequents that are not derivable have
 each a refutation of depth at most 2; four derivable ones have none
-among 28 564 trees. Status: OPEN.
+among 28 564 trees. Status: **PROVED**, both: the function is
+`BrunnlerK.proofOrRefutation` (it is `BrunnlerK.search`, in
+`BrunnlerK/Search.lean`), and `BrunnlerK.treeModel_twoValued`; within
+`[propext, Quot.sound]`. The search: at the root, the rules `∧`, `∨`,
+`□` while one applies; then the axiom; then, for each box, the search of
+that box with the formulas under the root's diamonds added. A proof of
+one box is carried to the whole by `◇k_c` and `Fam.lift`; refutations of
+all the boxes are the children of a refutation of the whole
+(`NSeq.not_sat_saturated`). Tested (`BrunnlerK/Test/Search.lean`): the
+eleven sequents of the exercises file and seven boundary cases.
 
 ### Goal 9. Completeness, the finite model property, decidability
 
@@ -223,8 +247,15 @@ In Lean (`BrunnlerK/Semantics.lean`), the first and the third:
     abbrev ValidDecidable : Type := (Γ : NSeq) → Decidable (Valid Γ)
 
 Source: Theorem 2.23 (i); Corollary 2.24, p. 19; Corollary 2.25, p. 19
-(no labels). The second line is not in Lean: it needs a model with a
-finite set of states. Status: OPEN, all three.
+(no labels). Status of the first: **PROVED**, `BrunnlerK.completeness`,
+with the proof as data (`BrunnlerK.complete : Valid Γ → K Γ`). Status of
+the third: **PROVED**, the function `BrunnlerK.validDecidable`. Both in
+`BrunnlerK/Completeness.lean`, within `[propext, Quot.sound]`. With goal
+1: `Valid Γ ↔ Nonempty (K Γ)` (`valid_iff_derivable`). The decision
+reduces in the kernel: `example : ¬ Valid Γ := by decide +kernel` for
+the sequents tried. Status of the second: OPEN. It is not in Lean: it
+needs a model with a finite set of states. What there is: every sequent
+that is not valid is refuted at a finite tree (from goals 1 and 8).
 
 ### Goal 10. Cut elimination
 
@@ -239,7 +270,12 @@ admissibility is an easy corollary of the completeness theorem". The
 form is "the rule is admissible", by the short route: from
 `SoundnessCut` and `Completeness`. It is not a procedure that removes
 cuts from a proof step by step; whether the procedure of §2.1.4 is a
-further goal is decided at the report of Prove. Status: OPEN.
+further goal is put for decision in `report-2-2026-11-23.md`. Status:
+**PROVED**: `BrunnlerK.cutElimination`, in `BrunnlerK/Completeness.lean`,
+within `[propext, Quot.sound]`, with the proof as data
+(`BrunnlerK.cutElim : Kcut Γ → K Γ`). The proof it gives is the
+search's: the proof with cuts is used only to know that the sequent is
+valid.
 
 ## Refuted
 
@@ -261,6 +297,6 @@ further goal is decided at the report of Prove. Status: OPEN.
 
 | | PROVED | REFUTED | OPEN |
 |---|---|---|---|
-| of the goals from the standing list (cut elimination, 10; the finite model property, in 9) | 0 | 0 | 2 |
-| of the other goals (1 to 8, and the rest of 9) | 0 | 0 | 9 |
-| of our own (S1, S2, S3; `SoundnessCut`, `TreeModelTwoValued`) | 3 | 0 | 2 |
+| of the goals from the standing list (cut elimination, 10; the finite model property, in 9) | 1 (cut elimination) | 0 | 1 (the finite model property) |
+| of the other goals (1 to 8, and the rest of 9) | 3 (1, 8, the rest of 9) | 0 | 6 (2 to 7) |
+| of our own (S1, S2, S3; `SoundnessCut`, `TreeModelTwoValued`) | 5 | 0 | 0 |

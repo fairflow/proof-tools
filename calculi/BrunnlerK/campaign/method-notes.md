@@ -213,3 +213,57 @@ checkout is behind `main`), which was written while this stage ran.
     where an item in list brackets is a box): twelve lines of macro, no
     syntax category. Without it every statement is `NSeq.cons` and
     `NSeq.leaf`.
+
+## Stage 2 (Prove), to the reviewer's goal
+
+35. **A goal set by the reviewer, and a gate.** The reviewer set a goal
+    for the session ("prove completeness and cut elimination") with the
+    reviewer's test of Adopt not done and the statements of Prove not
+    put. The skill said: stop at each gate; a stage starts in a fresh
+    session. The operator stopped twice at the statements' gate. The
+    reviewer's word: a goal is deliberate, and a later command overrides
+    an earlier gate. The skill is amended: rule 6 of "How a gate is
+    run", and a fourth result, "overridden by the reviewer", in
+    `templates/gates.md`. What the skill should also say, and does not
+    yet: what the operator may do while a gate is open. Here it went on
+    with what rests on signed things only (the lemmas on paths,
+    `Fam.lift`, the weight, the contexts), and said so.
+36. **"Statements first" and a function into a sum.** `reference/adopt.md`
+    §5 gives the form `def Completeness : Prop := …`. Goal 8 is data: a
+    function, for every sequent, into a proof or a refutation. What was
+    done: `abbrev ProofOrRefutation : Type := (Γ : NSeq) → K Γ ⊕
+    Refutation Γ`, and the proof is `def proofOrRefutation :
+    ProofOrRefutation`. The same for decidability. The reference could
+    give this form beside the other.
+37. **The route may differ from the source's, and then goals fall off
+    it.** The plan's goals 2 to 7 are the source's lemmas on the way to
+    its completeness theorem. With `Fam.lift` (a proof of a subtree is a
+    proof of the whole, from deep inference alone) and a search that
+    works at the root, none of them is used. The skill's rule for the
+    order of goals ("a goal after those it rests on") assumes the
+    source's order. Said at the gate; the goals stay OPEN and are put
+    for decision in the report.
+38. **A function on derivations is written by matching, not by
+    `induction`.** `Fam.lift` by the tactic `induction` elaborated and
+    then failed: "code generator does not support recursor
+    `BrunnlerK.Fam.rec`". Written by pattern matching it compiles, and
+    the search can be run. `reference/adopt.md` §6 could say so, since
+    the family is into `Type` so that such functions are data.
+39. **`Classical.choice` from a library lemma about lists.**
+    `List.mem_erase_of_ne` brought it in; the file's bound caught it at
+    once. Replaced by a six-line induction. `by_cases` on an equation of
+    formulas did not bring it in (the type has decidable equality).
+40. **A characterisation used as a `simp` lemma loops.** `NSeq.sat_iff`
+    states truth of a sequent by truth of its boxes; given to `simp` it
+    rewrites inside its own right-hand side. `rw` with the sequent named
+    does what was meant.
+41. **The screen before the proofs was cheap and was the check of the
+    countermodels afterwards.** `Form.holds`, written for the screens of
+    step 3, is the function `holds_iff` proves equal to truth in the
+    model of finite trees, and the tests of the search use it to check
+    each tree returned. As `reference/adopt.md` §5 says it would be.
+42. **Deciding in the kernel.** The search is structural on a bound and
+    the proofs it carries are propositions, so `decide +kernel` proves
+    `Valid Γ` and `¬ Valid Γ` for the sequents tried. Plain `decide`
+    stopped on one (it does not unfold the search). Not measured beyond
+    the eleven sequents: Run is where the frontier is found.
