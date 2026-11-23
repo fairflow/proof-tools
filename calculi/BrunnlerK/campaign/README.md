@@ -4,17 +4,19 @@ System K is Brünnler's nested sequent calculus for the least normal modal
 logic K: one-sided sequents of formulas in negation normal form, with
 boxed sequents inside them, and rules that act at any depth. The target,
 the paper, the place of the files, the reviewer and the rules of the
-project: [gates.md](gates.md), the first entry.
+project: [gates.md](gates.md), the first entry, as changed by the second
+(the place of the files, and where commits go).
 
 Operator: Claude (Fable 5.2) for stage 0; see the cost log. The method:
-the skill `calculus-campaign`, as it stood at commit `e6410cd` of
-proof-tools.
+the skill `calculus-campaign`, read at commit `e6410cd` of proof-tools
+and amended on 2026-11-23 at the reviewer's word (the default folder; the
+letters Lean reserves).
 
 ## Status
 
 | stage | state | gate | where |
 |---|---|---|---|
-| 0. Survey | done, waiting at its gate | the target: passed, 2026-11-23; the plan: not passed | [plan.md](plan.md), [report-0-2026-11-23.md](report-0-2026-11-23.md) |
+| 0. Survey | done, waiting at its gate | the target: passed, 2026-11-23; the plan: put twice, not passed (answered in part 2026-11-23; revised and put again) | [plan.md](plan.md), [report-0-2026-11-23.md](report-0-2026-11-23.md) |
 | 1. Adopt | not started | the rule table: not put; the reviewer's test: not put | |
 | 2. Prove | not started | the statements: 0 of 10 seen; goals PROVED: 0 of 10 | |
 | 3. Run | not started | the producers: not put | |
@@ -25,8 +27,8 @@ proof-tools.
 * [gates.md](gates.md): the reviewer's word at each gate; first, the
   target.
 * [plan.md](plan.md): the five questions, the results, and the plan.
-* [skeleton.md](skeleton.md): the source's numbered results, by printed
-  number and page (no labels: the TeX source was not fetched).
+* [skeleton.md](skeleton.md): the source's numbered results, by label
+  where the source has one, with printed number and page.
 * [cost-log.md](cost-log.md): one row for each session.
 * [method-notes.md](method-notes.md): where the skill was wrong, silent
   or unclear.

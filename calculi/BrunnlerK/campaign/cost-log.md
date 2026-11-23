@@ -7,7 +7,7 @@ start). A figure the environment does not give is written "not known".
 
 | # | stage | operator (person, or model and settings) | fresh session from a brief? | began | ended | waiting on builds | requests | output tokens | input read again (cached) | cost | Lean lines added / removed | document lines |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1 | Survey | Claude Fable 5.2 (`claude-fable-5-2`); effort setting not known | no: the command's session, and not cold (see `gates.md`) | 2026-11-23 07:23 GMT | at its gate note, 2026-11-23 07:57 GMT | none: no build; six scratch runs of `lean` on four files, a few seconds each | not known | not known | not known | not known | 0 / 0 | 815 added |
+| 1 | Survey | Claude Fable 5.2 (`claude-fable-5-2`); effort setting not known | no: the command's session, and not cold (see `gates.md`) | 2026-11-23 07:23 GMT | first at its gate note, 2026-11-23 07:57 GMT; taken up again on the reviewer's answer (the clock read 09:06 at the first command) and at the gate again at 2026-11-23 09:12 GMT | none: no build; scratch runs of `lean` on seven files, a few seconds each; one run of `pdflatex` on the source | not known | not known | not known | not known | 0 / 0 | 815 added before the answer; after it, see the commits of 2026-11-23 |
 
 Where the tokens and the cost come from: not known to the operator. The
 reviewer's application shows them.
@@ -27,12 +27,13 @@ the reading of the source was all in the first part.
 | 3 | 2026-11-23 | 0 | a question (none of the three classes) | on the excluded-middle screen: "somehow the object model theory forces EM in our META-theory? is this a shallow or a deep embedding then, it looks deep!" | two more screens (omniscience; the form with no countermodel); the plan's section on what "valid" means |
 | 4 | 2026-11-23 | 0 | decision | "Continue here" (over a fresh session) | the first act was done in this session |
 | 5 | 2026-11-23 | 0 | decision | the target gate: "Yes, as proposed" | the campaign folder; the Survey |
+| 6 | 2026-11-23 | 0 | decisions (three), corrections (two), questions (two) | the plan's gate, answered in part; the words are in `gates.md`, the second entry | decisions: the source may be fetched; cyclic leaves left out; the letters. Corrections: the place (`examples/` to `calculi/`, in the skill too); commits go to `main`. Questions: exchange (the plan's table says why); a less absolute "valid" (found: two-valued models) |
 
 ## By stage
 
 | stage | sessions | elapsed | of which waiting on builds | requests | cost | reached its gate? | decisions / corrections / rescues |
 |---|---|---|---|---|---|---|---|
-| 0 Survey | 1 | 34 min by the clock | none | not known | not known | yes, the plan's gate is put | 3 / 1 / 0, and one question |
+| 0 Survey | 1 | 34 min by the clock to the first gate note; the second part from 09:06 to 09:12 GMT | none | not known | not known | yes, the plan's gate is put, twice | 6 / 3 / 0, and three questions |
 | 1 Adopt | | | | | | | |
 | 2 Prove | | | | | | | |
 | 3 Run | | | | | | | |

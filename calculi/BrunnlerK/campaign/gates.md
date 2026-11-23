@@ -81,3 +81,61 @@ brought in by merging `origin/proof-tools-home`, and the reviewer chose
 "Continue here" over a fresh session. The proposal above was put after
 that. So the operator of this stage did not start cold, and the reading
 that the first act forbids had already been done.
+
+## 2026-11-23 09:11 GMT. Stage 0: the plan
+
+* **Put to the reviewer**: the Survey's report and the plan, as one
+  private page (rendered from `report-0-2026-11-23.md` and `plan.md` at
+  commit `f940347`), with nine things to decide listed in the session.
+* **Asked**: pass the plan's gate with the recommended choices, or
+  changes first?
+* **Answer** (2026-11-23, in the session): "yes you may download the
+  source, surprised you need permission; puzzled as to how you can omit
+  exchange if you do a direct encoding into type, avoiding Sets; it
+  doesn't really matter about the warm test; I think examples is a poor
+  choice of target directory so please amend skill accordingly; merge to
+  main as there's no current need for branching; I don't like the
+  generality of Valid as it implies EM if stated as written in your
+  sources, can you make it less absolute so that doesn't happen, or do
+  you have to state it indirectly as per current proposal? Oh, you can
+  omit the cyclic check if it isn't relevant to K; but think about how to
+  accommodate it later; as with all modal calculi, trying to follow the
+  Greek convention and allowing Π and Σ as variable names is not ideal
+  since those are extremely reserved symbols in Lean and you will have to
+  work around them anyway. You can use Θ and Φ or Ξ (for Σ) and give me
+  an Upsilon please."
+* **Result**: not passed. The answer settles some decisions, changes
+  others and asks two questions; it does not say which results are goals
+  and does not pass the plan. What was done on it, before the gate is
+  asked again:
+  - *The TeX source* (decision 6): fetched and compiled outside the
+    repository; `skeleton.md` has the labels.
+  - *Exchange* (decision 4): a question. Answered in the session and in
+    the plan's table of encodings, the row "lists for multisets". No
+    change of proposal: lists, no exchange rule, exchange as goal 4.
+  - *The place of the files*: `examples/` is rejected as the default.
+    The skill is amended to `calculi/<Calculus>/` (the operator's choice
+    of name, for the reviewer to change), and this campaign is moved to
+    `calculi/BrunnlerK/`. **This replaces the place fixed in the first
+    entry**; "not to be touched" is now everything outside
+    `calculi/BrunnlerK/`, the skill excepted where the reviewer asks for
+    a change to it.
+  - *Pushing*: "merge to main as there's no current need for branching".
+    **This replaces the first entry's "nothing is pushed … then to
+    `proof-tools-home`"**: the campaign's commits go to `main`.
+  - *"Valid"* (decision 2): the indirect form is not wanted. A direct
+    form is proposed in its place: truth at every state of every
+    two-valued model (the plan's Q2, with what was proved of it in
+    scratch). To be confirmed.
+  - *Cyclic leaves* (decision 3): left out for K. The plan's Q3 says
+    where they would be brought in.
+  - *Letters*: `Υ` for the source's `Π`, `Ξ` for its `Σ`, `Θ` and `Φ`
+    for further sequents; in the plan's Q1, and in the skill
+    (`reference/adopt.md` §3).
+  - *The warm test*: "it doesn't really matter".
+* **Set aside by the reviewer**: nothing yet.
+* **Made goals by the reviewer**: nothing yet. Still open at this gate:
+  which results are goals (the four by rule, and those proposed beyond
+  the rule); the route to cut elimination (decision 1); whether `K°` is
+  a family of its own (in decision 3); the rest of the encoding table
+  (decision 4); who relies on the answers (decision 7).

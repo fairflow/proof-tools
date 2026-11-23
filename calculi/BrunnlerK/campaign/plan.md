@@ -3,8 +3,12 @@
 The Survey's deliverable. It can be reviewed without opening any code.
 **No Lean of the calculus until the reviewer has read it.**
 
-Written 2026-11-23 07:55 GMT. Reviewed: not yet. The target, the place of
-the files and the rules of the project: `gates.md`, the first entry.
+Written 2026-11-23 07:55 GMT. Revised 2026-11-23 09:11 GMT, after the
+reviewer's answer at the plan's gate (`gates.md`, the second entry):
+decisions 2, 3 and 6 are answered, the letters for sequents are fixed,
+and the files moved to `calculi/BrunnlerK/`. Reviewed: in part; the gate
+is not passed. The target and the rules of the project: `gates.md`, the
+first entry.
 
 **This plan was written after the reading it reports.** The source was
 read, and an earlier plan written and published, before the target was
@@ -17,9 +21,16 @@ fixed (`gates.md` says how). That earlier plan is replaced by this one.
   The version agreed: this one, Chapter 2, §2.1.
 * **Which file was read:** the PDF of v1, pages 3 to 43 (all of Chapter
   2) and 69 to 72 (the bibliography), from the page images. Not read:
-  Chapter 3, pages 45 to 68, except page 67. The TeX source was not
-  fetched, so citations are printed numbers and pages, and no labels
-  (decision 6).
+  Chapter 3, pages 45 to 68, except page 67.
+* **The TeX source** of v1 (`arxiv.org/src/1004.1845v1`, an archive of
+  69 kB: `main.tex`, `main.bbl`, `virginialake.sty`) was fetched on
+  2026-11-23 with the reviewer's leave, to a temporary folder outside
+  the repository, and compiled there. It serves for labels and for
+  searching; `skeleton.md` now has the labels, from the compiled `.aux`.
+  Many items of §2.1 carry no label in the source (Definition 2.6,
+  Theorem 2.9, Corollaries 2.24 and 2.25 among them): those are cited by
+  the printed number and page of v1. The numbers and pages of the
+  compiled source agree with the PDF that was read.
 * The appendix: there is none.
 * Other sources consulted: none of this calculus. The journal version
   ([11] of the thesis: Archive for Mathematical Logic 48(6), 2009) and
@@ -52,7 +63,11 @@ fixed (`gates.md` says how). That earlier plan is replaced by this one.
   is multiset union. `Γ{ }` is a unary context, a sequent with one hole
   in the place of a formula; `Γ{Δ}` is it filled; `depth(Γ{ })` counts
   the boxes around the hole. `p` ranges over propositions and `a, b, c, d`
-  over atoms. `S ⊢ Γ` says there is a proof of `Γ` in system `S`. A
+  over atoms. **In Lean and in this campaign's documents** (the
+  reviewer, 2026-11-23): `Υ` for the source's `Π` and `Ξ` for its `Σ`,
+  because Lean reserves `Π` and `Σ` (tried: neither is accepted as a
+  variable; `Υ`, `Ξ`, `Θ`, `Φ` and `Λ` are); `Θ` and `Φ` where a further
+  sequent is needed. The rule table's notation table will carry this. `S ⊢ Γ` says there is a proof of `Γ` in system `S`. A
   *derivation* is a finite tree of sequents built by the rules, its
   leaves its premises; a *proof* is a derivation whose premises are all
   instances of the axiom `Γ{p, p̄}`.
@@ -168,31 +183,70 @@ proposition.
 A formula is valid if it holds at every state of every model; a sequent
 is valid if its corresponding formula is.
 
-**What "valid" will mean in Lean** (decision 2). PROVED in scratch (Lean
-v4.31.0, within `[propext, Quot.sound]`): with `→` into `Prop` and `V`
-into `Bool`,
+**What "valid" will mean in Lean** (decision 2; revised after the
+reviewer's answer). PROVED in scratch (Lean v4.31.0, within
+`[propext, Quot.sound]`): with `→` into `Prop` and `V` into `Bool`,
 
     (∀ M s,  M, s ⊨ ◇p ∨ □p̄)   →   ∀ P : Prop, P ∨ ¬P
 
 and `◇p, [p̄]` is provable in K. With `→` and `V` both into `Bool`, the
 same assumption gives the limited principle of omniscience (take the
-states to be `ℕ`). So Theorem 2.9 as the source reads it cannot be proved
-within `[propext, Quot.sound]`. Proposed, and both forms entered in
-`statements.md` as its template asks:
+states to be `ℕ`). So Theorem 2.9, read with "every model" meaning every
+structure the host logic can define, cannot be proved within
+`[propext, Quot.sound]`.
 
-    M, s refutes A₁,…,Aₘ,[Δ₁],…,[Δₙ]   iff   M, s ⊨ Āᵢ for each i, and for
-                                             each j some t with s → t has
-                                             M, t refutes Δⱼ
+The reviewer asked for a direct statement that is less absolute, in
+place of the indirect "no model refutes the sequent" of the first
+version. There is one: restrict the models, not the form of the
+statement.
 
-    Valid Γ      iff   no M, s refutes Γ                (the form proved)
-    ValidF Γ     iff   M, s ⊨ Γ_F for all M, s          (the source's form)
+    M is two-valued   iff   for every formula A and state s of M:
+                            M, s ⊨ A   or   not  M, s ⊨ A
 
-    (∀ P : Prop, P ∨ ¬P)  →  (Valid Γ ↔ ValidF Γ)       (the bridge; OPEN)
+    Valid Γ           iff   M, s ⊨ Γ_F  for every two-valued M and every
+                            state s of M
 
-That each rule of K turns a model refuting its conclusion into one
-refuting a premise, with no case split on truth, is expected and OPEN.
-For `cut` a case split on the cut formula is needed; it is available in a
-finite model given as data, where forcing is decidable.
+`V` is into `Prop`, and `s ⊨ p̄` is `¬ V p s`, as in Definition 2.6. A
+two-valued model is a model in the source's sense: the source's
+metatheory is classical, so every model it speaks of is two-valued, and
+`Valid` says what Theorem 2.9 says with that assumption written as a
+hypothesis on the model. Under excluded middle every model is two-valued
+and `Valid` is the source's validity.
+
+PROVED in scratch (Lean v4.31.0; the first four with no axioms, the fifth
+within `[propext, Quot.sound]`), for every two-valued `M` and state `s`:
+
+    M, s ⊨ ◇p ∨ □p̄                                      the sequent above
+    M, s ⊨ ◇A ∨ □(D ∨ A)   →   M, s ⊨ ◇A ∨ □D          the step of ◇k_c, at the root
+    M, s ⊨ Ā   ↔   not  M, s ⊨ A                         the dual is the negation
+    M, s ⊨ C ∨ A  →  M, s ⊨ C ∨ Ā  →  M, s ⊨ C         the step of cut, at the root
+    a finite model given as data (n states, a Boolean relation,
+    a Boolean valuation) is two-valued
+
+So the two rules that need a case split on truth (`◇k_c` and `cut`) are
+sound over two-valued models with no classical axiom, and the finite
+models that the search returns are two-valued. Still OPEN: soundness for
+the rules in a context of any depth (goal 1), which needs Lemma 2.8.
+
+What the statements become:
+
+    goal 1   K ⊢ Γ  →  Valid Γ
+    goal 8   for every Γ:  K ⊢ Γ,  or a finite model M given as data and
+             a state s with  not  M, s ⊨ Γ_F
+    goal 9   Valid Γ  →  K ⊢ Γ        (from 8: the model of 8 is two-valued)
+
+The relation "refutes" of the first version is in no statement now. It
+may return inside the proof of goal 8, as the invariant of the search.
+The source's form is kept in `statements.md` for comparison, with what
+is known of it:
+
+    ValidF Γ     iff   M, s ⊨ Γ_F for all M, s           (the source's words, read
+                                                          in the host logic)
+    ValidF Γ  →  Valid Γ                                 (immediate)
+    (∀ P : Prop, P ∨ ¬P)  →  (Valid Γ → ValidF Γ)        (immediate)
+    (∀ Γ, K ⊢ Γ → ValidF Γ)  →  ∀ P : Prop, P ∨ ¬P       (the screen above, with the
+                                                          proof of ◇p, [p̄] in K,
+                                                          which is by hand)
 
 ## Q3. What should run, and why?
 
@@ -218,6 +272,31 @@ finite model given as data, where forcing is decidable.
   by stopping at finished sequents (pp. 14–16; Lemma 2.22). In the
   explorer, `within` sets aside a `◇k_c` that adds a formula the box
   already has.
+* **Cyclic leaves: left out, and where they would go** (decision 3,
+  answered: left out for K). The source's `prove` stops at a leaf whose
+  set of formulas an inner node already carries (Definition 2.20), and
+  its model sends such a leaf back to that node. In K the search makes a
+  new box only for a formula `□A`, and puts into a box only the `A` of a
+  `□A` or `◇A` of its parent, so the nesting it adds is bounded by the
+  modal depth of the formulas of the sequent it started from, and the
+  search ends without the test (expected; it is goal 7). For a system where it is needed
+  (`4`, `5`), three places take a parameter, and nothing else changes:
+  1. the search takes a test "stop at this leaf", given the sets of
+     formulas on the path from the root; for K it is constantly false;
+  2. "finished" is said relative to that test: a sequent is finished if
+     each node is finished or is a leaf the test stops at;
+  3. the map from a finished sequent to a model takes a list of further
+     pairs for `→`, from the parent of a stopped leaf to the inner node
+     it repeats; for K the list is empty. The model as data is already
+     a list of pairs for `→`, not a tree, so its type and its checker do
+     not change.
+  The type of sequents, the family, the moves and the certificate are
+  not touched; goals 7, 8 and 9 are stated without cyclic leaves and keep
+  their statements, with a different measure in the proof of 7 (the
+  number of sets of subformulas, as in Lemma 2.22, in place of the modal
+  depth). The search and the model will be written with those three
+  parameters only when a system needs them: for K it is a note in the
+  files at the three places.
 
 ## Q4. How do people use it?
 
@@ -271,7 +350,7 @@ screens of "valid" above, and what derives for each type of sequents.
 |---|---|---|
 | a judgment as data | (a) a type holding a list of itself, `mk (fs : List Form) (boxes : List Seq)`: `DecidableEq` does not derive (tried). (b) the library's `RTree κ (List Form)`: its lookups and updates go by edge label, so each box needs a name, and sequents are then equal only up to renaming. (c) one list of items, each a formula or a box: everything derives (tried), but the formulas of a node are a filter. (d) `leaf (fs : List Form)` or `cons (inner) (rest)`, the node's boxes one at a time and then its formulas: `DecidableEq`, `Repr`, `ToExpr` derive, the functions tried are structural and reduce by `decide +kernel`, no axioms (tried) | (d). It is the source's displayed form `A₁,…,Aₘ,[Δ₁],…,[Δₙ]` and needs no groundwork for equality. A new box is added after the existing ones, so that the places of the others do not move |
 | how a rule, and a move, names what it acts on | (i) a context as data and an equation, `Γ = C{A ∧ B}`: reads as the figure; but `◇k_c` names a formula and a box, which a list holds at two places, so its conclusion would be an equation up to permutation. (ii) a path of box positions to the node, and in the node the main formula (and for `◇k_c` the position of the box) | (ii). The conclusion of every constructor is the variable `Γ`; the functions in the side conditions and premises are the ones `step` uses. `#rules` will then print each rule with "if the node at `a` has `A ∧ B`", and the rule table sets that beside the figure |
-| lists for multisets | exchange as a rule; or no rule, and exchange a theorem | no rule. A rule finds its formula anywhere in the node; that provability does not depend on the order is a goal |
+| lists for multisets | (a) a multiset as a quotient of lists: Lean rejects a type that holds a quotient of lists of itself (tried: the kernel refuses the declaration), so a nested sequent cannot hold a multiset of nested sequents, whatever is done for the formulas. (b) lists, with exchange as a rule. (c) lists, no exchange rule, and exchange a theorem | (c). Exchange is not left out of the theory, only out of the rules. A sequent calculus on lists needs an exchange rule when its rules act at a fixed end of the list; here every rule finds its main formula at any position of the node (and `◇k_c` its box at any position), so nothing has to be brought to the front. What remains is that a rule puts its result at a fixed place, so `K ⊢ Γ` for one order of `Γ` does not give `K ⊢ Γ′` for another by definition: it is goal 4, by induction on the derivation (apply the same rule at the permuted position; the premises are permutations of the old premises), with the same depth. OPEN until proved; if it failed, the encoding would be wrong and (b) the fallback |
 | the family: into `Type` or `Prop` | | `Type`: admissibility and cut elimination are functions on derivations, and depth is a function |
 | what holds | the family itself; or validity | the family itself, `Fam`, the method's default: a step is an instance of a rule |
 | two systems, and measures | two families; one with a parameter; functions on derivations | one family with a Boolean parameter that says whether `cut` is allowed. Depth and cut rank are functions on derivations. `K°` is a second family only if its lemma is proved through it (decision 3) |
@@ -290,13 +369,15 @@ any proof, at the gate of Prove.
     5  K ⊢ Γ{A, Ā}                                               (added)
     6  K° ⊢ Γ  →  K ⊢ Γ                                          (Lemma 2.14)
     7  the search terminates                                     (Lemma 2.22)
-    8  for every Γ:  K ⊢ Γ,  or a finite model that refutes Γ    (Thm 2.23)
+    8  for every Γ:  K ⊢ Γ,  or a finite model M, as data, and a state s
+       with  not  M, s ⊨ Γ_F                                     (Thm 2.23)
     9  Valid Γ → K ⊢ Γ;  the finite model property;  validity is decidable
                                                                  (Thm 2.23 i, Cor. 2.24, 2.25)
     10 K + cut ⊢ Γ  →  K ⊢ Γ                                     (Thm 2.35)
 
 `→ⁿ` means: with a proof of at most the same depth. `~` is permutation
-inside every node. Goal 8 is a function into a sum type. Goals 2 to 5 are
+inside every node. `Valid` is truth of `Γ_F` at every state of every
+two-valued model (Q2). Goal 8 is a function into a sum type. Goals 2 to 5 are
 stated in the encoding's terms at the gate of Prove; `Γ{…}` here is the
 source's notation.
 
@@ -307,8 +388,9 @@ source's notation.
 * Proposition 2.5 at `ρ = k`: used only by §2.2.
 * Deduction theorems: no notion of derivation from hypotheses in the
   source.
-* `ValidF` without the hypothesis of excluded middle: not provable within
-  the policy, as shown.
+* Soundness for `ValidF` (every model the host logic defines, two-valued
+  or not): it implies excluded middle, as shown, so it is not provable
+  within the policy.
 * Any statement of complexity: the source has only the bound of Lemma
   2.22.
 
@@ -319,8 +401,9 @@ for. Certifiers within the same list, which is `lean-certify`'s default.
 
 ## Dependencies
 
-Core Lean only. proof-tools at the worktree's commit `439bfd7` (the
-library as at `e6410cd`). Toolchain: `leanprover/lean4:v4.31.0`.
+Core Lean only. proof-tools at `main` as of 2026-11-23 (the library's
+Lean files as at `e6410cd`; later commits change documents and the skill
+only). Toolchain: `leanprover/lean4:v4.31.0`.
 
 ## Known non-theorems
 
@@ -355,23 +438,23 @@ None about this calculus or its logic. Used from proof-tools:
    by rule. Proposed: prove it first by the source's short route (p. 19),
    and decide at the report of Prove whether the procedure of §2.1.4 is a
    further goal. Or say now that the procedure is the goal.
-2. **What "valid" means**: `Valid`, with `ValidF` and the bridge under
-   excluded middle entered beside it. Proposed as above.
-3. **The search of the completeness proof.** The source's `prove` stops
-   at cyclic leaves (Definition 2.20) and its model then maps such a leaf
-   back to an inner node. At `X = ∅` the nesting of boxes is bounded by
-   the modal depth of the formulas, so the search ends without that test
-   and the model is the finished sequent's own tree. Proposed: without
-   cyclic leaves, logged as a divergence from Definition 2.20 and Theorem
-   2.23. It would be undone to add `4` or `5`. With it goes whether `K°`
-   is transcribed as a family of its own (proposed: yes, four rules, its
-   provisos as side conditions, since goal 6 is about it).
-4. **The encoding**: the table above, each row.
+2. **What "valid" means.** *Answered in part, 2026-11-23:* the reviewer
+   does not want the indirect form and asked whether a less absolute
+   direct one exists. It does: `Valid`, truth at every state of every
+   two-valued model (Q2, revised). To confirm: that this is the form
+   wanted.
+3. **The search of the completeness proof.** *Answered, 2026-11-23:*
+   cyclic leaves are left out for K, and the plan says how they would be
+   brought in (Q3, three parameters). Logged as a divergence from
+   Definition 2.20 and Theorem 2.23 when the search is written. Still to
+   confirm: that `K°` is transcribed as a family of its own (proposed:
+   yes, four rules, its provisos as side conditions, since goal 6 is
+   about it).
+4. **The encoding**: the table above, each row. The row "lists for
+   multisets" is rewritten to answer the reviewer's question about
+   exchange.
 5. **The added goals** 4 and 5, and the goals proposed beyond those by
    rule (2, 3, 6, 7, and decidability in 9).
-6. **The TeX source.** To cite labels and not printed numbers, the
-   operator would download `arxiv.org/src/1004.1845` (an archive; size
-   not known, the PDF is 563 kB) into a folder outside the repository and
-   compile it. Proposed: yes, before the rule table. Without it the rule
-   table cites figure and page.
+6. **The TeX source.** *Answered, 2026-11-23: yes.* Done; see "The
+   source" above.
 7. **Who relies on the answers** (Q3).
