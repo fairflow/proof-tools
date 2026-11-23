@@ -40,6 +40,11 @@ Read these first: no tool checks that they say what the source means.
 
 ## The statements
 
+When this file is started, at step 4 of Adopt, the proof system may not
+yet be written: the rule table is not signed. S1 and S2 are then entered
+as displayed below, with "not yet in Lean" for the name and the file,
+OPEN. The names are filled at step 5.
+
 For each: the source's item (by label where there is one), the statement
 as a displayed formula, the Lean name and file, the status, the axioms,
 what it was screened with, and the date the reviewer saw it.

@@ -93,7 +93,10 @@ the answer.
      will be fetched, and from where. Either way no file is fetched
      before the answer;
    - asked: where and when to push? The default is that you commit
-     locally and push nothing until the reviewer says;
+     locally and push nothing until the reviewer says. And how will a
+     report reach the reviewer while nothing is pushed: sent as a file,
+     or published as a page (rule 6)? A file in a folder the reviewer
+     cannot open has not reached them;
    - asked: is anything not to be touched? Only the reviewer contacts the
      source's authors.
 4. **When the answer has come**, read the rest of this file. Then make
@@ -104,6 +107,15 @@ the answer.
    words, your proposal and the reviewer's answer in their words. It is
    the one record of the target, the place and the rules of the project:
    every other file points to it. Commit, and begin the Survey.
+
+**Where the session has already gone further** before this text was
+read (the source read past its abstract, a plan drafted, files written:
+the command was not known where the session began, or the request came
+in other words), put the proposal all the same. Say in it what was read
+and what was written. What was drafted has no standing until the
+reviewer has answered. Write that history under the first entry of
+`gates.md`, and in the cost log's row that the operator did not start
+cold.
 
 ## The standing list
 
@@ -212,7 +224,10 @@ down (rule 8).
 7. **Do not change the libraries.** If an instance seems to need a change
    to `proof-tools`, stop and report it (part (iv) of the report): it is
    a finding about the library. A campaign under `calculi/` changes no
-   tracked file outside its own folder.
+   tracked file outside its own folder. One exception: the reviewer may
+   ask, during a campaign, for a change to this skill. Make it in a
+   commit of its own that changes the skill's files and nothing else,
+   record the reviewer's words in `gates.md`, and say it in the report.
 8. **The method learns.** Keep `method-notes.md` in the campaign folder:
    every place where this skill was wrong, silent or unclear, and what you
    did there. It feeds part (iv) of each report, and the closing report
@@ -254,7 +269,11 @@ Which results are goals of Prove:
 
 - **A standing result that holds of this system and has a source is a
   goal by rule; only the reviewer can set one aside, in their own words,
-  at the Survey's gate.**
+  at the Survey's gate.** Where such a result has more than one form
+  (that a rule is admissible; a procedure that removes it) or the
+  source proves it by more than one route, the goal by rule is the
+  statement the source states. The form and the route are proposed in
+  the plan (`reference/adopt.md` §2), and are the reviewer's to say.
 - One that holds of the logic and is proved elsewhere, or that has no
   source, is a goal only if the reviewer says so there.
 - Of the source's own theorems, soundness is a goal, and completeness

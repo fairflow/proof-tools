@@ -39,9 +39,16 @@ step of a part already says is not repeated here.
    check, a linter, a list of allowed modules: where the project existed
    before the campaign, run its whole test target before reporting.
 
+8. **A side condition that looks local and is not.** A proviso compared
+   the formulas, as sets, of two whole judgments. It looked the same as
+   "the formula added is not already at the node", and a test of four
+   lines, three sibling boxes, showed that it is not. A side condition
+   is transcribed as stated; a simpler form is a statement of yours,
+   tested before it is used.
+
 ## Prove
 
-8. **Putting part of the conclusion into a definition.** A model
+9. **Putting part of the conclusion into a definition.** A model
    construction carried as an invariant the lemma that the soundness proof
    was to establish. A structure that holds as a field what the proof was
    to show is a restructuring of the proof, not the proof. The same test
@@ -50,7 +57,11 @@ step of a part already says is not repeated here.
 
 ## Every report
 
-9. **Claims that could not be backed.** Two were taken out of a note
-   before it was sent. Before writing that something holds, name the
-   file, the test or the document that shows it; otherwise write
-   "not checked".
+10. **Claims that could not be backed.** Two were taken out of a note
+    before it was sent. Before writing that something holds, name the
+    file, the test or the document that shows it; otherwise write
+    "not checked".
+11. **An estimate written as a fact.** A time in `gates.md`, and the
+    value a test was to pin, were written from expectation, not from
+    the clock and not from Lean. Both were wrong. A time comes from
+    `date`; a pinned value from Lean's output: run it, then pin it.

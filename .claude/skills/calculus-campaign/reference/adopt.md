@@ -419,7 +419,10 @@ with `#rules`, screen it, and have it signed before anything rests on it.
   `#axiom_path ax d` does the same for any axiom, `sorryAx` included.
 - **Where the policy is to avoid `Classical.choice`.** On core Lean the
   known sources are the `String` functions that R4 of `lean-certify`
-  lists, and `omega` given a conjunction to prove (split the goal first).
+  lists, `omega` given a conjunction to prove (split the goal first),
+  and some library lemmas about lists (`List.mem_erase_of_ne` brought it
+  in, on Lean v4.31.0; a six-line induction replaced it). `by_cases` on
+  an equation in a type with decidable equality does not.
   On Mathlib also: `tauto` and `push_neg` are classical, and `simp` can
   be, through a library lemma. Everywhere: `choose` and `Nonempty.some`
   are choice, so a construction that must return a derivation returns
