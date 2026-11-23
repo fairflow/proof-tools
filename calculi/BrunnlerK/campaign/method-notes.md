@@ -344,3 +344,27 @@ checkout is behind `main`), which was written while this stage ran.
     that was not elaborated "rejected", and its column "kernel". A
     rejected certificate is a defect; a term too large to read is a
     flag. The script's words were corrected before the table was kept.
+
+## Stage 4 (Explore)
+
+53. **The stage's first input may be empty.** The skill takes what the
+    reviewer asked for at the reviewer's test as the first input of
+    Explore. The reviewer deferred the test, and then lifted the gates.
+    The stage was done from the plan's Q4 alone. The skill could say
+    what Explore is when Adopt's gate is still open.
+54. **Two gates need the reviewer's hands.** The reviewer's test and
+    the tutorial are not statements to sign: they are things to do at a
+    keyboard. "Decided by the operator" has no meaning for them. They
+    are recorded as put and not done, and the campaign ends with both
+    open. The skill's rule 6 could name them as the two gates that
+    lifting does not pass.
+55. **The suggestion of a pattern line takes the comment with it.** A
+    line `kmove or   -- a comment` is offered back as `kmove or` with
+    its arguments written after the comment. In the tutorial the
+    comments are on lines of their own.
+56. **A whole campaign in one session.** Five stages, from the command
+    to the closing report, with summaries of the earlier parts made by
+    the environment on the way. What was lost by it, if anything, the
+    operator cannot tell from inside: the documents were the memory, as
+    the skill intends, and each stage was begun by reading them and the
+    Lean files again.

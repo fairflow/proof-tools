@@ -13,6 +13,7 @@ start). A figure the environment does not give is written "not known".
 | 4 | Prove, to the reviewer's goal (completeness, cut elimination) | Claude Fable 5.2 (`claude-fable-5-2`); effort setting not known | no: the session of rows 1 to 3, after two summaries of its earlier parts; no brief (the reviewer's goal was the instruction) | 2026-11-23 17:30 GMT | at the report, 2026-11-23 18:00 GMT by the clock; of this, 17:36 to 17:53 GMT was at the statements' gate, with the contexts written meanwhile | under a minute in all: each module 1 to 3 s; the screens 2.4 s | not known | not known | not known | not known | 1 919 / 0 (theory 1 533: `Semantics` 169, `Context` 205, `Weight` 129, `Ctx` 268, `Soundness` 365, `Search` 345, `Completeness` 52; tests 343; `Play/Search.lean` 43) | the report; additions to the gates, the statements, the notes, this log; the skill's rule 6 |
 | 5 | Prove, the rest (goals 2 to 5, the finite model property) | Claude Fable 5.2 (`claude-fable-5-2`); effort setting not known | no: the session of rows 1 to 4; no brief | 2026-11-23 18:11 GMT, at the reviewer's "Yes continue" | at the report, 2026-11-23 18:33 GMT by the clock | under two minutes in all: each module 1 to 3 s | not known | not known | not known | not known | 2 135 / 0 (theory 2 044: `Structural` 514, `Identity` 126, `Invert` 727, `Contract` 451, `FiniteModel` 226; tests 91) | the report; additions to the gates, the statements, the notes, this log; the skill's rule 6, extended |
 | 6 | Run | Claude Fable 5.2 (`claude-fable-5-2`); effort setting not known | no: the session of rows 1 to 5; no brief | 2026-11-23 18:32 GMT, at the end of Prove | at the report, 2026-11-23 18:44 GMT by the clock | about three minutes: the executable 4 s; the measurements twice, under their deadlines; each module 1 to 3 s | not known | not known | not known | not known | 479 / 0 by hand (`Run` 177, the corpus 129, tests 81, `Main` 92); 496 generated (`Corpus/Facts.lean`); 10 changed in `Search.lean` | the report, the measurements; additions to the gates, the statements, the notes, this log |
+| 7 | Explore | Claude Fable 5.2 (`claude-fable-5-2`); effort setting not known | no: the session of rows 1 to 6; no brief | 2026-11-23 18:43 GMT, at the end of Run | at the closing report, 2026-11-23 18:47 GMT by the clock | under a minute | not known | not known | not known | not known | 319 / 0 (`Explore` 78, tests 33, the tutorial 208) | the user's guide, the closing report; additions to the gates, the notes, this log |
 
 Where the tokens and the cost come from: not known to the operator. The
 reviewer's application shows them.
@@ -52,7 +53,7 @@ the reading of the source was all in the first part.
 | 1 Adopt | 1 (the session of stage 0, continued) | 12 min by the clock to the rule table's gate note; 10 min from the signature to the report | under two minutes | not known | not known | the rule table: passed as put; the reviewer's test: put, not done | 2 / 0 / 0, and one question |
 | 2 Prove | 1 (the session of stages 0 and 1, continued) | from 17:30 GMT to the last report, 2026-11-23 18:33 GMT; 17 min of it at the statements' gate | under three minutes | not known | not known | the statements, first sending: signed as put; second sending: decided by the operator; done | 4 / 2 / 0, and one question |
 | 3 Run | 1 (the same session) | from 18:32 GMT to the report, 2026-11-23 18:44 GMT | about three minutes, most of it the measurements | not known | not known | the producers: decided by the operator; done | 0 / 0 / 0 |
-| 4 Explore | | | | | | | |
+| 4 Explore | 1 (the same session) | from 18:43 GMT to the closing report, 2026-11-23 18:47 GMT | under a minute | not known | not known | the tutorial: put, not worked through | 0 / 0 / 0 |
 
 ## Errors of transcription
 
@@ -127,3 +128,10 @@ families; the executable and the script of measurements; reading the
 figures; the change to the search that they called for. False starts:
 a missing import; a name that is a keyword; a table whose first wording
 called a flag a rejection. Not unaided: nothing.
+
+**Explore.** Unaided: the list of needs from the plan; the drawing of a
+sequent as its tree; the tactics of the calculus; the tutorial and the
+guide. False starts: the tree drew the boxes of a node in reverse order,
+seen at the first run; four lines of the tutorial did not do what their
+comments said, found by elaborating it. Not unaided: nothing. Not done
+by anyone: the tutorial worked through, and the reviewer's test.

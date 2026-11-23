@@ -24,6 +24,7 @@ import BrunnlerK.FiniteModel
 import BrunnlerK.Run
 import BrunnlerK.Corpus.Basic
 import BrunnlerK.Corpus.Facts
+import BrunnlerK.Explore
 import BrunnlerK.Tactic
 import BrunnlerK.Test.Sequent
 import BrunnlerK.Test.System
@@ -33,3 +34,4 @@ import BrunnlerK.Test.Ctx
 import BrunnlerK.Test.Search
 import BrunnlerK.Test.Structural
 import BrunnlerK.Test.Run
+import BrunnlerK.Test.Explore

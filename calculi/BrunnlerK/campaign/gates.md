@@ -404,3 +404,24 @@ Adopt is not passed, and Prove is begun in the session of stages 0 and 1.
   measurements: `measurements-2026-11-23.md`). Its statement did not
   change; the proofs that rest on it elaborate as before.
 * **Result**: decided by the operator.
+
+## 2026-11-23 18:47 GMT. Stage 4: what the explorer serves, and the tutorial
+
+* **What the gate would show**: `Play/BrunnlerKTutorial.lean`, to be
+  worked through; `campaign/users-guide.md`; `BrunnlerK/Explore.lean`.
+* **Decided by the operator**, the gates being lifted:
+  - the list of needs is the plan's Q4 alone. The reviewer's test of
+    Adopt was deferred by the reviewer and has not been made, so its
+    record, the first input of this stage by the skill, is empty;
+  - served: a sequent as its tree, on request (`NSeq.tree`: the plan's
+    Q4, not done in Adopt); the routine steps at once (`routine`); a
+    proof from the search, to read and to walk (`found`, `#walk`); the
+    countermodel of a failed attempt (`refute?`);
+  - not served, since the library lacks it, and reported: a tactic that
+    applies a tactic of the calculus to the goal in front of it; a goal
+    shown as a tree in the infoview.
+* **The tutorial is put, and not worked through.** Working through it
+  is the reviewer's; so is the reviewer's test of Adopt. Neither is
+  passed. The campaign is otherwise at its end.
+* **Result**: the stage's work is done; its gate, the tutorial, is put
+  and waits for the reviewer.
