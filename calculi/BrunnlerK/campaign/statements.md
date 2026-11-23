@@ -17,7 +17,7 @@ Status is exactly one of:
 
 **As of 2026-11-23 18:32 GMT.** Of the ten goals: goals 1, 2, 3, 4, 5, 8, 9 and 10
 are PROVED; goals 6 and 7 are set aside by the reviewer (`gates.md`, the
-entry "which goals stay, and the gates lifted"). Of our own: S1, S2, S3,
+entry "which goals stay, and the gates lifted"). Of our own: S1, S2, S3, S4,
 `SoundnessCut` and `TreeModelTwoValued` are PROVED. Nothing is OPEN and
 nothing is REFUTED. Every PROVED statement is checked by the kernel,
 with no `sorry`, within `[propext, Quot.sound]`. The statements of goals
@@ -45,6 +45,7 @@ Read these first: no tool checks that they say what the source means.
 | exchange: formulas and boxes permuted inside the nodes | `Exch`, `NSeq.swap`, `NSeq.withForms`, `BrunnlerK/Structural.lean` | none: the source's sequents are multisets | decided by the operator, 2026-11-23 |
 | a model with finitely many states; the levels of a tree as a model; the modal depth | `Model.Finite`, `Tree.level`, `Tree.model`, `Form.md`, `BrunnlerK/FiniteModel.lean` | Corollary 2.24 | decided by the operator, 2026-11-23 |
 | tools of the proofs, in no statement here: embedding (`NSeq.Sub`, `NSeq.SubR`), counting replaced occurrences (`Cnt`, `Inv`), mapping into (`NSeq.Hom`) | `BrunnlerK/Structural.lean`, `BrunnlerK/Invert.lean`, `BrunnlerK/Contract.lean` | none | not put |
+| the certifiers: trees of moves for a proof; finite trees against validity | `treeCert`, `scriptCert`, `noValid`, `noDerivable`, `BrunnlerK/Run.lean` | none | decided by the operator, 2026-11-23 |
 | what holds | the family itself, `Fam` | | the plan, passed 2026-11-23 |
 | the corresponding formula `Γ_F` of a sequent | `Form.bot`, `Form.disj`, `NSeq.boxForms`, `NSeq.form`, `BrunnlerK/Semantics.lean` | p. 7 | signed 2026-11-23 (`gates.md`, the entry "Stage 2: the definitions and the statements, first sending") |
 | the models, truth in a model, two-valued models, `Valid` | `Model`, `Model.sat`, `Model.TwoValued`, `Valid`, `BrunnlerK/Semantics.lean` | Definition 2.6, p. 12 | the form, with the plan (passed 2026-11-23); the Lean: signed 2026-11-23 |
@@ -100,6 +101,16 @@ a constructor is an instance of one of these. It is not, as lists:
 `fill` puts what fills the hole in front of the node's formulas, so a
 rule here acts on the first formula of its node. Exchange (goal 4) is
 what would close that.
+
+### S4. One side always answers (level 3)
+
+    ∀ Γ,  (∃ c, treeCert.check Γ c = true)  ∨  (∃ t, noValid.check Γ t = true)       (decided)
+    kEngine.Complete,  that is:  ∀ Γ, Derivable Γ → ∃ n ls, produce Γ n = .pass ls    (kEngine_complete)
+
+`BrunnlerK/Run.lean`. Source: none; it is goal 8 said of the certifiers:
+for every sequent a tree of moves checks, or a finite tree is accepted
+by the check against validity. Status: **PROVED**, within
+`[propext, Quot.sound]`.
 
 ### Goal 1. Soundness
 
@@ -356,4 +367,4 @@ valid.
 |---|---|---|---|
 | of the goals from the standing list (cut elimination, 10; the finite model property, in 9) | 2 | 0 | 0 |
 | of the other goals (1 to 8, and the rest of 9) | 7 (1, 2, 3, 4, 5, 8, the rest of 9); 6 and 7 set aside | 0 | 0 |
-| of our own (S1, S2, S3; `SoundnessCut`, `TreeModelTwoValued`) | 5 | 0 | 0 |
+| of our own (S1, S2, S3, S4; `SoundnessCut`, `TreeModelTwoValued`) | 6 | 0 | 0 |

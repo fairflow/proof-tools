@@ -310,3 +310,37 @@ checkout is behind `main`), which was written while this stage ran.
     not from the clock or from Lean. Both were caught in minutes (the
     commit's time; the elaborator). The rule holds for tests too: run
     it, then pin it.
+
+## Stage 3 (Run)
+
+48. **A producer that is proved, and reduces.** `lean-certify` is built
+    for a producer that is not trusted. Here Prove left a search that is
+    proved to end and to be right, and is structural, so the kernel can
+    run it: `by decide +kernel` proves `Valid Γ` or its negation. The
+    skill's Run stage does not consider this case. What was done: both
+    routes, measured against each other. At the sizes tried the kernel
+    running the search was the cheaper, and it has no certificate to
+    write out. `reference/certify.md` could say: where the plan reaches
+    level 3 by a structural function, try the direct decision first, and
+    keep the certifier for the proof as an object and for a producer
+    that is not proved.
+49. **A certificate as a term has limits of its own.** A tree of 2 335
+    moves, or one nested 256 deep, was not elaborated: Lean's limit on
+    recursion depth while reading the term, before the kernel is
+    reached. R6 and R8 of `lean-certify` speak of kernel time; this is
+    earlier. Chunking (`certify_chunks`) is for a long `List.all`, not
+    for a deep tree.
+50. **Measuring found a fault of the search at once.** The family
+    `late` was written to see where time goes, and showed proofs of
+    `2ⁿ⁺¹ − 1` steps for an instance of the axiom. `reference/certify.md`
+    §5 says the difference from a proof by hand "says what the search
+    should learn"; here it could be taught in ten lines, with no proof
+    changed. Worth saying in the skill that a fix found in Run may be
+    made in a module of Prove, and is recorded with Run's gate.
+51. **A word of the library is a keyword.** `size` cannot be the name of
+    a function in a file that imports `LeanCertify` (the syntax of
+    `certify_chunks … size n`). As note 31, for the tactic's name.
+52. **What the measurement measures.** The first table called a term
+    that was not elaborated "rejected", and its column "kernel". A
+    rejected certificate is a defect; a term too large to read is a
+    flag. The script's words were corrected before the table was kept.

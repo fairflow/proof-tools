@@ -10,11 +10,11 @@ sequents.  This one works at the root of a sequent and then inside one
 box at a time, and ends because a weight goes down
 (`BrunnlerK/Weight.lean`):
 
-1. while the root has a formula `A ∧ B`, `A ∨ B` or `□A`: the rule for
-   it, upwards, at the root;
-2. then the root has propositions, negated propositions and formulas
-   `◇B` only.  If it has `p` and `p̄`: the axiom;
-3. if not: for each box `[Δ]` of the root, search `Δ, B₁, …, Bₖ`, where
+1. if the root has `p` and `p̄`: the axiom;
+2. if not, while the root has a formula `A ∧ B`, `A ∨ B` or `□A`: the
+   rule for it, upwards, at the root, and from 1 again;
+3. then the root has propositions, negated propositions and formulas
+   `◇B` only: for each box `[Δ]` of the root, search `Δ, B₁, …, Bₖ`, where
    `◇B₁, …, ◇Bₖ` are the diamonds of the root.  A proof of one of these
    gives a proof of the whole (`◇k_c` `k` times, then `Fam.lift`).  If
    every one is refuted, the refuting trees are the children of a tree
@@ -292,6 +292,9 @@ what the recursion is on. -/
 def searchN : (n : Nat) → (Γ : NSeq) → Γ.weight < n → Found Γ
   | 0, _, h => absurd h (Nat.not_lt_zero _)
   | n + 1, Γ, h =>
+    match hc : findClash Γ.forms Γ.forms with
+    | some p => .inl (.ax [] p rfl (findClash_some hc).1 (findClash_some hc).2)
+    | none =>
     match hf : Γ.forms.find? (fun A => !A.basic) with
     | some (.and A B) =>
       have hm : A ⋏ B ∈ Γ.forms := List.mem_of_find?_eq_some hf
@@ -315,9 +318,6 @@ def searchN : (n : Nat) → (Γ : NSeq) → Γ.weight < n → Found Γ
     | some (.natom _) => absurd (List.find?_some hf) (by simp [Form.basic])
     | some (.dia _) => absurd (List.find?_some hf) (by simp [Form.basic])
     | none =>
-      match hc : findClash Γ.forms Γ.forms with
-      | some p => .inl (.ax [] p rfl (findClash_some hc).1 (findClash_some hc).2)
-      | none =>
         match sweep (P := fun Δ => K ((dias Γ.forms).foldl NSeq.add Δ))
             (Q := fun Δ u => ¬ ((dias Γ.forms).foldl NSeq.add Δ).sat treeModel u)
             Γ.boxes (fun Δ hΔ => searchN n _ (lt_of_kid hΔ h)) with

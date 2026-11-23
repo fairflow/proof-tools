@@ -366,3 +366,41 @@ Adopt is not passed, and Prove is begun in the session of stages 0 and 1.
   says so.
 * **Result**: decided by the operator. Built on it: nothing beyond the
   proofs of these statements.
+
+## 2026-11-23 18:44 GMT. Stage 3: the producers and the certificates: decided by the operator
+
+* **What the gate would show** (R10 of `lean-certify`; the skill's Run,
+  step 1), all in `BrunnlerK/Run.lean`:
+  1. for a proof: `Holds` is `K`; the certificate is a tree of moves
+     (`Cert S`), the certificate of record of the plan; the checker is
+     the library's `Cert.check`;
+     `treeCert : Certify.Certifier NSeq (Cert S) K`, sound by S1;
+  2. against validity: `Holds` is `fun Γ => Valid Γ → False`; the
+     certificate is a finite tree (`Tree`); the check is
+     `!Γ.form.holds t`;
+     `noValid : Certify.Certifier NSeq Tree (fun Γ => Valid Γ → False)`,
+     with `sound : ∀ Γ t, (!Γ.form.holds t) = true → Valid Γ → False`;
+     and `noDerivable`, the same against `Derivable`, by soundness;
+  3. the producer: the search of `BrunnlerK/Search.lean`, compiled
+     (`prove?`, `refute?`, `produce`, the executable `ksearch`); its
+     answer is checked before it is handed on;
+  4. the engine `kEngine`, and level 3 as two theorems: `decided` (for
+     every sequent a tree of moves checks or a finite tree is accepted)
+     and `kEngine_complete`.
+* **Decided, and why**:
+  - no second producer: the search is already there, ends on every
+    sequent and answers both ways. Who relies on the answers: as the
+    plan's Q3 says, the project itself;
+  - the model as data is the finite tree signed at the first sending of
+    Prove, not the list of pairs the plan proposed: the search returns a
+    tree, and its check needs no numbering of states;
+  - no decider (`Certify.Decider`) and no command-line decision tool: no
+    user is known. `ksearch` is a generator of facts and of
+    measurements only;
+  - the budget of `produce` is not used, since the search ends by
+    itself; nothing is ever flagged for a budget.
+* **Changed in a module of Prove**: `searchN` in `BrunnlerK/Search.lean`
+  now looks for an axiom before it applies a rule (found by the
+  measurements: `measurements-2026-11-23.md`). Its statement did not
+  change; the proofs that rest on it elaborate as before.
+* **Result**: decided by the operator.

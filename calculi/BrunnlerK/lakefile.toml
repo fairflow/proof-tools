@@ -11,3 +11,7 @@ path = "../.."
 [[lean_lib]]
 name = "BrunnlerK"
 globs = ["BrunnlerK", "BrunnlerK.+"]
+
+[[lean_exe]]
+name = "ksearch"
+root = "Main"

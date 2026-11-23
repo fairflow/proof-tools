@@ -21,6 +21,9 @@ import BrunnlerK.Identity
 import BrunnlerK.Invert
 import BrunnlerK.Contract
 import BrunnlerK.FiniteModel
+import BrunnlerK.Run
+import BrunnlerK.Corpus.Basic
+import BrunnlerK.Corpus.Facts
 import BrunnlerK.Tactic
 import BrunnlerK.Test.Sequent
 import BrunnlerK.Test.System
@@ -29,3 +32,4 @@ import BrunnlerK.Test.Semantics
 import BrunnlerK.Test.Ctx
 import BrunnlerK.Test.Search
 import BrunnlerK.Test.Structural
+import BrunnlerK.Test.Run
