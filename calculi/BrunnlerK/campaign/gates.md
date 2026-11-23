@@ -177,3 +177,18 @@ that the first act forbids had already been done.
   elimination (10). Beyond the rule: invertibility (2), the admissible
   rules `nec`, `wk`, `ctr` (3), exchange (4), general identity (5), `K°`
   into K (6), termination (7), decidability (in 9).
+
+## 2026-11-23 14:07 GMT. Between stages: where Adopt runs
+
+Not a gate. Recorded because it departs from rule 5 of the skill (a stage
+starts in a fresh session) and from the brief's first line of "Done".
+
+* **Put to the reviewer** (2026-11-23 09:36 GMT, the closing message of
+  stage 0): Adopt starts in a fresh session, opened with
+  `/calculus-campaign calculi/BrunnlerK/campaign/brief-1-1.md`, after a
+  pull of `main`.
+* **Answer** (2026-11-23, in the session): "Continue here with Adopt I
+  have pulled in, you continue in your worktree.  I think a single
+  session may be sensible, we'll see how much context is needed."
+* **Result**: Adopt runs in the session of stage 0, in the operator's
+  worktree, from `brief-1-1.md`. Nothing else of the brief changes.

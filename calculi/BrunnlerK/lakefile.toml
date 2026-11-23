@@ -1,0 +1,13 @@
+name = "brunnlerk"
+defaultTargets = ["BrunnlerK"]
+
+[leanOptions]
+autoImplicit = false
+
+[[require]]
+name = "proof-tools"
+path = "../.."
+
+[[lean_lib]]
+name = "BrunnlerK"
+globs = ["BrunnlerK", "BrunnlerK.+"]

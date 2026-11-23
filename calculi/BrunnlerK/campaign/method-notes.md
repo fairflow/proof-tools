@@ -110,3 +110,51 @@ checkout is behind `main`), which was written while this stage ran.
     counters**, which the skill forbids. Run with `--src` on a source
     that compiles, it reads the `.aux` and says so in its output. The
     skill's sentence about it is right; the script's help text is old.
+
+## Stage 1 (Adopt), to the rule table's gate
+
+19. **Rule 5 against the reviewer's word.** The skill starts a stage in
+    a fresh session. The reviewer: "Continue here with Adopt … I think a
+    single session may be sensible, we'll see how much context is
+    needed." What was done: the stage was run in the session of stage 0,
+    from `brief-1-1.md` as written, read as a fresh session would read
+    it. One line of the brief was false in that case (the scratch copy
+    of the source was still there, and was used). The summary the
+    session carried was enough with the brief; the parts of the skill
+    were read again in full.
+20. **The figure's letters and the encoding's.** A rule stated for a
+    context needs, in the constructor, a name for the whole sequent at
+    the node. The first draft called it `Δ`, and the figure's own `Δ`
+    (the box of `◇k_c`) became `Λ`: the constructor then read against
+    the figure with two letters moved. What was done: a letter the
+    figure does not use, `Θ`, for the node, so that every letter of the
+    figure keeps its meaning. `reference/adopt.md` §3 could say it:
+    letters of the figure stay; what the encoding adds takes new ones.
+21. **`#rules` prints names, and for a judgment that is not flat the
+    names carry the rule.** Each premise is `Γ.setNode a (…)`: the table
+    is unreadable without the definitions. What was done: three sections
+    the template does not have, "How a rule of the figure reads in
+    Lean", "The functions the rules use" (the definitions, extracted
+    from the file by a script, not retyped) and "What the reviewer is
+    asked to sign". `templates/rule-table.md` could carry them for §13's
+    case.
+22. **A side condition that looks local and is not.** The proviso of K°
+    compares the set sequents of whole sequents. It looked equivalent to
+    "the formula added is not already in the node". A test of three
+    sibling boxes showed it is not. The skill's rule (side conditions
+    are fields, transcribed as stated) was enough; the note is that the
+    simplification was tempting and a four-line test refuted it.
+23. **Tests of the family before its gate.** Step 4 says to write
+    nothing that names the family while the gate waits. It does not say
+    whether the family may be tested before the gate is put. What was
+    done: the source's one worked proof was written with the
+    constructors, as a check of the transcription, and is cited in the
+    rule table. No `Move`, no `step`.
+24. **A printer that writes a combining character.** `p̄` is the letter
+    and U+0304. A `#guard` whose expected text was typed with the
+    precomposed `ā` failed; the expected texts now spell `\u0304`. The
+    messages pinned by `#guard_msgs` at step 7 will meet the same thing.
+    `reference/explore.md` §10 could warn of it.
+25. **`statements.md` at step 4.** The template's S1 and S2 name the
+    proof system, which may not be written before the rule table is
+    signed. What was done: both entered as "not written", OPEN.
