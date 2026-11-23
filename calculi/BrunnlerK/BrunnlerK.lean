@@ -16,6 +16,8 @@ import BrunnlerK.Ctx
 import BrunnlerK.Soundness
 import BrunnlerK.Search
 import BrunnlerK.Completeness
+import BrunnlerK.Structural
+import BrunnlerK.Identity
 import BrunnlerK.Tactic
 import BrunnlerK.Test.Sequent
 import BrunnlerK.Test.System
@@ -23,3 +25,4 @@ import BrunnlerK.Test.Proof
 import BrunnlerK.Test.Semantics
 import BrunnlerK.Test.Ctx
 import BrunnlerK.Test.Search
+import BrunnlerK.Test.Structural
