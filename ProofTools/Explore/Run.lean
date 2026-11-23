@@ -145,14 +145,12 @@ theorem Cursor.step_ok {j : S.Judg} {c c' : Cursor S j} (hc : c.Ok) {l : Line S}
   split at h
   · cases h
   · next c₁ hs =>
-    obtain ⟨-, -, r₃, r₄⟩ := Cursor.seek_some hc hs
+    obtain ⟨-, -, -, r₄⟩ := Cursor.seek_some hc hs
     split at h
     · next nd hnd =>
       simp only [Except.ok.injEq] at h
       subst h
-      show l.goal = (Path.goalsL c₁.pos.z.path).length
-      rw [← r₃]
-      exact r₄
+      exact Cursor.ok_replace r₄ nd
     · cases h
 
 theorem Cursor.runFrom_eq_stepsFrom {j : S.Judg} : (ls : Script S) → (n : Nat) →

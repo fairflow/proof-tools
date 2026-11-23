@@ -30,6 +30,20 @@ and the three laws of `Zip.Deriv.Unplug`, so that `down`, `descend`,
 path of attempts is canonical (`Path.canon`): the direction is part of the
 crumb.
 
+**The next premise** (`Crumb.stepLeft`, `Crumb.stepRight`): the hole of a
+crumb moved one premise, in one step; with them attempts are an instance of
+`Zip.Deriv.Sibling`, and the zipper's `left` and `right` hold for them.
+PROVED: each is the node filled and opened again at the neighbouring
+premise,
+
+    (c.plug w).unplug d = some (c.stepLeft w)       for c at premise d + 1   (Crumb.unplug_plug_pred)
+    (c.plug w).unplug (d + 1) = c.stepRight w                                (Crumb.unplug_plug_succ)
+
+`goalsBefore z` is the number of open goals of the premises before the
+focus in its node, read off the nearest crumb; PROVED:
+
+    (goalsL z.path).length = (goalsL z.up.2.path).length + goalsBefore z     (length_goalsL)
+
 Core Lean only.
 -/
 import ProofTools.Audit.FileBound
@@ -62,6 +76,16 @@ def Atts.goalsRev : {o : Bool} → {ls : List S.Judg} → Atts S o ls → List S
 
 @[simp] theorem Atts.goalsRev_cons {o : Bool} {p : S.Judg} {ls : List S.Judg} (d : Att S o p)
     (l : Atts S o ls) : (Atts.cons d l).goalsRev = l.goalsRev ++ d.goals := rfl
+
+/-- Kept nearest first or in the order of the premises, the attempts have as
+many open goals.  (`goalsRev` appends on the left at each attempt; to count,
+`goals` is the one to run.) -/
+theorem Atts.length_goalsRev : {o : Bool} → {ls : List S.Judg} → (l : Atts S o ls) →
+    l.goalsRev.length = l.goals.length
+  | _, _, .nil => rfl
+  | _, _, .cons d l => by
+    simp only [Atts.goalsRev_cons, Atts.goals_cons, List.length_append, Atts.length_goalsRev l]
+    omega
 
 theorem Atts.goals_revAppend : {o : Bool} → {ls rs : List S.Judg} → (l : Atts S o ls) →
     (r : Atts S o rs) → (l.revAppend r).goals = l.goalsRev ++ r.goals
@@ -204,7 +228,91 @@ theorem Crumb.unplug_plug {o : Bool} {d : Nat} {p j : S.Judg} (c : Crumb S o d p
     (by simp) h (by simpa using h) (by simp) (by simp)]
   exact key _ _ (List.append_nil _) (Atts.append_nil_heq left) _ _
 
-/-! ## The instance, and the goals around a hole -/
+/-! ## The next premise -/
+
+/-- **The hole one premise to the right**: the attempt that filled the hole
+joins the left side, and the first attempt on the right is taken out.  One
+step, and the node's equation serves unchanged. -/
+def Crumb.stepRight {o : Bool} {d : Nat} {p j : S.Judg} : Crumb S o d p j → Att S o p →
+    Option ((p' : S.Judg) × Att S o p' × Crumb S o (d + 1) p' j)
+  | ⟨_, _, _, _, _, .nil, _⟩, _ => none
+  | ⟨m, lsr, _ :: rs, h, left, .cons w' right, hd⟩, w =>
+    some ⟨_, w', ⟨m, p :: lsr, rs, h, .cons w left, right, congrArg (· + 1) hd⟩⟩
+
+/-- **The hole one premise to the left**: there is one, since the hole is
+not premise number 0. -/
+def Crumb.stepLeft {o : Bool} {d : Nat} {p j : S.Judg} : Crumb S o (d + 1) p j → Att S o p →
+    (p' : S.Judg) × Att S o p' × Crumb S o d p' j
+  | ⟨_, _, _, _, .nil, _, hd⟩, _ => nomatch hd
+  | ⟨m, _ :: lsr, rs, h, .cons w' left, right, hd⟩, w =>
+    ⟨_, w', ⟨m, lsr, p :: rs, h, left, .cons w right, Nat.succ.inj hd⟩⟩
+
+theorem Crumb.plug_stepRight {o : Bool} {d : Nat} {p p' j : S.Judg} {c : Crumb S o d p j}
+    {w : Att S o p} {w' : Att S o p'} {c' : Crumb S o (d + 1) p' j}
+    (h : c.stepRight w = some ⟨p', w', c'⟩) : c'.plug w' = c.plug w := by
+  obtain ⟨m, lsr, rs, hs, left, right, hd⟩ := c
+  cases right with
+  | nil => simp [Crumb.stepRight] at h
+  | cons w₀ right =>
+    simp only [Crumb.stepRight, Option.some.injEq] at h
+    obtain ⟨rfl, hrest⟩ := Sigma.mk.inj h
+    obtain ⟨rfl, rfl⟩ := Prod.mk.inj (eq_of_heq hrest)
+    rfl
+
+theorem Crumb.plug_stepLeft {o : Bool} {d : Nat} {p j : S.Judg} (c : Crumb S o (d + 1) p j)
+    (w : Att S o p) : (c.stepLeft w).2.2.plug (c.stepLeft w).2.1 = c.plug w := by
+  obtain ⟨m, lsr, rs, hs, left, right, hd⟩ := c
+  cases left with
+  | nil => exact nomatch hd
+  | cons w₀ left => rfl
+
+/-- Right, then left, returns. -/
+theorem Crumb.stepLeft_stepRight {o : Bool} {d : Nat} {p p' j : S.Judg} {c : Crumb S o d p j}
+    {w : Att S o p} {w' : Att S o p'} {c' : Crumb S o (d + 1) p' j}
+    (h : c.stepRight w = some ⟨p', w', c'⟩) : c'.stepLeft w' = ⟨p, w, c⟩ := by
+  obtain ⟨m, lsr, rs, hs, left, right, hd⟩ := c
+  cases right with
+  | nil => simp [Crumb.stepRight] at h
+  | cons w₀ right =>
+    simp only [Crumb.stepRight, Option.some.injEq] at h
+    obtain ⟨rfl, hrest⟩ := Sigma.mk.inj h
+    obtain ⟨rfl, rfl⟩ := Prod.mk.inj (eq_of_heq hrest)
+    rfl
+
+/-- Left, then right, returns. -/
+theorem Crumb.stepRight_stepLeft {o : Bool} {d : Nat} {p j : S.Judg} (c : Crumb S o (d + 1) p j)
+    (w : Att S o p) : (c.stepLeft w).2.2.stepRight (c.stepLeft w).2.1 = some ⟨p, w, c⟩ := by
+  obtain ⟨m, lsr, rs, hs, left, right, hd⟩ := c
+  cases left with
+  | nil => exact nomatch hd
+  | cons w₀ left => rfl
+
+/-- **The step to the left is the node opened again one premise earlier.** -/
+theorem Crumb.unplug_plug_pred {o : Bool} {d : Nat} {p j : S.Judg} (c : Crumb S o (d + 1) p j)
+    (w : Att S o p) : (c.plug w).unplug d = some (c.stepLeft w) := by
+  rw [← Crumb.plug_stepLeft c w, Crumb.unplug_plug]
+
+/-- **The step to the right is the node opened again one premise later**; and
+there is no step where the node has no later premise. -/
+theorem Crumb.unplug_plug_succ {o : Bool} {d : Nat} {p j : S.Judg} (c : Crumb S o d p j)
+    (w : Att S o p) : (c.plug w).unplug (d + 1) = c.stepRight w := by
+  cases hr : c.stepRight w with
+  | some x =>
+    obtain ⟨p', w', c'⟩ := x
+    rw [← Crumb.plug_stepRight hr, Crumb.unplug_plug]
+  | none =>
+    obtain ⟨m, lsr, rs, h, left, right, hd⟩ := c
+    subst hd
+    cases right with
+    | cons w' right => simp [Crumb.stepRight] at hr
+    | nil =>
+      show Atts.unplugAux m (lsr.length + 1) (lsr := []) h .nil (left.revAppend (.cons w .nil))
+        (lsr.length + 1) _ = none
+      rw [Atts.unplugAux_revAppend m (lsr.length + 1) left .nil (.cons w .nil) 1 (lsr.length + 1)
+        (by omega) h (by simpa using h) (by simp) (by simp)]
+      rfl
+
+/-! ## The instances, and the goals around a hole -/
 
 -- `no_index`: for a system declared as an `abbrev`, `S.Judg` unfolds to the
 -- instance's own type, and would not be found under the key `S.Judg`.  The
@@ -220,6 +328,55 @@ instance (S : ProofSystem) (o : Bool) :
     | node m ps h ds => exact Atts.plug_unplugAux m d (lsr := []) h .nil ds d _ hu
   unplug_plug := fun {_ _ _ c} w _ => Crumb.unplug_plug c w
   canon_unplug := fun _ => trivial
+
+/-- **The next premise, on either side**: the zipper's `left` and `right`
+for attempts, in one step each. -/
+instance (S : ProofSystem) (o : Bool) :
+    Zip.Deriv.Sibling (I := no_index S.Judg) (no_index (attDeriv S o)) where
+  left := @fun d _ _ c w =>
+    match d, c with
+    | 0, _ => none
+    | d + 1, c => some ⟨d, (c.stepLeft w).1, (c.stepLeft w).2.1, (c.stepLeft w).2.2⟩
+  right := @fun d _ _ c w => (c.stepRight w).map fun x => ⟨d + 1, x.1, x.2.1, x.2.2⟩
+  plug_left := by
+    intro d d' i i' j c w w' c' h
+    cases d with
+    | zero => cases h
+    | succ d =>
+      simp only [Option.some.injEq] at h
+      obtain ⟨rfl, hrest⟩ := Sigma.mk.inj h
+      obtain ⟨rfl, hrest⟩ := Sigma.mk.inj (eq_of_heq hrest)
+      obtain ⟨rfl, rfl⟩ := Prod.mk.inj (eq_of_heq hrest)
+      exact Crumb.plug_stepLeft c w
+  plug_right := by
+    intro d d' i i' j c w w' c' h
+    simp only [Option.map_eq_some_iff] at h
+    obtain ⟨⟨p', w₀, c₀⟩, hs, he⟩ := h
+    obtain ⟨rfl, hrest⟩ := Sigma.mk.inj he
+    obtain ⟨rfl, hrest⟩ := Sigma.mk.inj (eq_of_heq hrest)
+    obtain ⟨rfl, rfl⟩ := Prod.mk.inj (eq_of_heq hrest)
+    exact Crumb.plug_stepRight hs
+  right_left := by
+    intro d d' i i' j c w w' c' h
+    cases d with
+    | zero => cases h
+    | succ d =>
+      simp only [Option.some.injEq] at h
+      obtain ⟨rfl, hrest⟩ := Sigma.mk.inj h
+      obtain ⟨rfl, hrest⟩ := Sigma.mk.inj (eq_of_heq hrest)
+      obtain ⟨rfl, rfl⟩ := Prod.mk.inj (eq_of_heq hrest)
+      show ((c.stepLeft w).2.2.stepRight (c.stepLeft w).2.1).map _ = _
+      rw [Crumb.stepRight_stepLeft c w]
+      rfl
+  left_right := by
+    intro d d' i i' j c w w' c' h
+    simp only [Option.map_eq_some_iff] at h
+    obtain ⟨⟨p', w₀, c₀⟩, hs, he⟩ := h
+    obtain ⟨rfl, hrest⟩ := Sigma.mk.inj he
+    obtain ⟨rfl, hrest⟩ := Sigma.mk.inj (eq_of_heq hrest)
+    obtain ⟨rfl, rfl⟩ := Prod.mk.inj (eq_of_heq hrest)
+    show some _ = _
+    rw [Crumb.stepLeft_stepRight hs]
 
 /-- Every path of attempts is canonical. -/
 theorem Path.canon {o : Bool} : {ds : List Nat} → {i k : S.Judg} → (p : Path S o ds i k) →
@@ -250,6 +407,21 @@ theorem Path.goals_plug {o : Bool} : {ds : List Nat} → {i k : S.Judg} → (p :
     show (Zip.Deriv.Path.plug p (c.plug d)).goals = _
     rw [Path.goals_plug p (c.plug d)]
     simp [Path.goalsL, Path.goalsR, List.append_assoc]
+
+/-- **The open goals before the focus in its node**: the number of open
+goals of the premises left of the focus, in the node the focus is a premise
+of.  Read off the nearest crumb (`Zip.Deriv.Zipper.crumb`). -/
+def goalsBefore {o : Bool} {d : Nat} {ds : List Nat} {i k : S.Judg}
+    (z : Zipper S o (d :: ds) i k) : Nat :=
+  (Zip.Deriv.Zipper.crumb z).left.goals.length
+
+/-- The goals left of the focus are those left of its node, and those before
+it in its node. -/
+theorem length_goalsL {o : Bool} {d : Nat} {ds : List Nat} {i k : S.Judg}
+    (z : Zipper S o (d :: ds) i k) :
+    (Path.goalsL z.path).length = (Path.goalsL z.up.2.path).length + goalsBefore z := by
+  rw [Zip.Deriv.Zipper.path_eq_cons z]
+  simp only [Path.goalsL, List.length_append, goalsBefore, Atts.length_goalsRev]
 
 end ProofTools.Explore
 

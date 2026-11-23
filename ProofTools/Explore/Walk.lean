@@ -6,19 +6,9 @@ An attempt or a derivation is a value: the term a tactic proof builds,
 file is for looking at one, position by position, with the motions of
 `ProofTools.Explore.Motion`.  Nothing here changes the attempt.
 
-**The view** at a position (`Cursor.view`), as text through the instance's
-printers (`Explorable`):
-
-      ⊢ ((p0 ∧ p1) → (p1 ∧ p0))   by impR          the nodes from the root
-        (p0 ∧ p1) ⊢ (p1 ∧ p0)   by andL p0 p1      down to the focus
-    >     p0, p1, (p0 ∧ p1) ⊢ (p1 ∧ p0)   by andR    the focus, marked `>`
-            0: ? p0, p1, (p0 ∧ p1) ⊢ p1              its premises, numbered:
-            1: p0, p1, (p0 ∧ p1) ⊢ p0   by ax   [closed]    open (`?`), or a node
-      at 0.0: 2 premises; open goals: 1 under the focus, 0 left of it, 1 in all
-
-The last line is the address of the focus (the premise numbers from the
-root), and where the open goals are.  The premises of the focus are drawn
-one line each: `down i` goes to premise `i`.
+What is shown at a position is the view (`Cursor.view`, in `View.lean`):
+the nodes from the root down to the focus, the focus marked `>`, its
+premises numbered, and a last line with its address and the open goals.
 
 **The command `#walk`** names an attempt and makes motions from its root:
 
@@ -51,6 +41,19 @@ turns the offer off.
 `#walk` also draws the attempt as a tree in the infoview, with nodes to
 click.
 
+**A tactic block** walks as well.  Its goal is `Walk d`, its lines are the
+motions, and Lean shows the view after each line as the goal there, so the
+infoview's goal follows the editor's cursor with no message in the file:
+
+    example : Walk d := by
+      down 0
+      down 0
+      up
+
+A motion that cannot be made is an error at its line.  The block needs no
+last line: the goal left is closed when the block ends.  `left` and `right`
+are also tactics of Lean; on any goal that is not a walk they are Lean's.
+
 `walkText d ms` is the view after the motions `ms`, as a function, for use
 without the command.
 
@@ -66,82 +69,11 @@ import ProofTools.Explore.Panel
 
 namespace ProofTools.Explore
 
-open Lean Meta Elab Command
+open Lean Meta Elab Command Tactic
 
 variable {S : ProofSystem}
 
-/-! ## The view -/
-
-/-- The nodes from the focus back to the root, nearest first: the judgment
-of each, and its move. -/
-def Path.spine {o : Bool} : {ds : List Nat} → {i k : S.Judg} → Path S o ds i k →
-    List (S.Judg × S.Move)
-  | _, _, _, .top => []
-  | _, _, _, .cons (j := j) ⟨mv, _, _, _, _, _, _⟩ p => (j, mv) :: Path.spine p
-
-/-- A node as lines: its judgment under an indentation and after a mark, its
-move beside a judgment of one line and below a longer one, a note after the
-move. -/
-def nodeLines [E : Explorable S] (ind mark : String) (j : S.Judg) (m : S.Move) (note : String) :
-    List String :=
-  match judgLines ind mark (E.showJudg j) with
-  | [l] => [l ++ "   by " ++ E.showMove m ++ note]
-  | ls => ls ++ [ind ++ "".pushn ' ' mark.length ++ "   by " ++ E.showMove m ++ note]
-
-/-- The nodes of a spine, root first, each one step further in. -/
-def spineLines [Explorable S] : List (S.Judg × S.Move) → String → List String
-  | [], _ => []
-  | (j, m) :: rest, ind => nodeLines ind "" j m "" ++ spineLines rest (ind ++ "  ")
-
-/-- The premises of a node, one after another from number `n`: an open goal
-is marked `?`, a node has its move and whether it is closed. -/
-def Atts.premiseLines [E : Explorable S] : {ps : List S.Judg} → Atts S true ps → Nat → String →
-    List String
-  | _, .nil, _, _ => []
-  | p :: _, .cons d ds, n, ind =>
-    (match d with
-      | .goal => judgLines ind s!"{n}: ? " (E.showJudg p)
-      | .node m _ _ _ =>
-        nodeLines ind s!"{n}: " p m
-          (if d.goals.length = 0 then "   [closed]" else s!"   [{d.goals.length} open]")) ++
-      Atts.premiseLines ds (n + 1) ind
-
-/-- The last line of a view: the address of the focus, and where the open
-goals are. -/
-def Cursor.viewFoot {j : S.Judg} (c : Cursor S j) : String :=
-  let addr := if c.pos.ds.isEmpty then "the root" else ".".intercalate (c.addr.map toString)
-  let total := c.toRoot.goals.length
-  if c.pos.z.focus.isGoal then
-    s!"at {addr}: open goal {c.left}; {total} open in all"
-  else
-    let n := c.pos.z.focus.premises.length
-    let prem := if n = 0 then "no premises" else if n = 1 then "1 premise" else s!"{n} premises"
-    let goals :=
-      if total = 0 then "no open goals"
-      else s!"open goals: {c.pos.z.focus.goals.length} under the focus, {c.left} left of it, " ++
-        s!"{total} in all"
-    s!"at {addr}: {prem}; {goals}"
-
-/-- **The view at a position**, as text: the nodes from the root down to the
-focus, each with its move; the focus, marked `>`; its premises, numbered;
-its address, and where the open goals are. -/
-def Cursor.view [E : Explorable S] {j : S.Judg} (c : Cursor S j) : String :=
-  let spine := (Path.spine c.pos.z.path).reverse
-  let ind := "".pushn ' ' (2 * spine.length)
-  let above := (spineLines spine "").map ("  " ++ ·)
-  let here :=
-    match c.pos.z.focus with
-    | .goal => judgLines ind "? " (E.showJudg c.pos.i)
-    | .node m _ _ _ => nodeLines ind "" c.pos.i m ""
-  let here :=
-    match here with
-    | [] => []
-    | l :: ls => ("> " ++ l) :: ls.map ("  " ++ ·)
-  let below :=
-    match c.pos.z.focus with
-    | .goal => []
-    | .node _ _ _ ds => Atts.premiseLines ds 0 ("  " ++ ind ++ "  ")
-  "\n".intercalate (above ++ here ++ below ++ ["  " ++ c.viewFoot])
+/-! ## The view after motions -/
 
 /-- **The view of `d` after the motions `ms`** from its root; or the number
 of the first motion that cannot be made, and why. -/
@@ -153,15 +85,8 @@ def walkText [Explorable S] {o : Bool} {j : S.Judg} (d : Att S o j) (ms : List M
 each motion made; and, if a motion cannot be made, its number and why. -/
 def walkViews [Explorable S] {o : Bool} {j : S.Judg} (d : Att S o j) (ms : List Motion) :
     List String × Option (Nat × String) :=
-  go 0 (Cursor.ofAtt d) ms
-where
-  /-- From a cursor, the motions numbered from `n`. -/
-  go (n : Nat) (c : Cursor S j) : List Motion → List String × Option (Nat × String)
-    | [] => ([c.view], none)
-    | m :: ms =>
-      match c.move m with
-      | some c' => let r := go (n + 1) c' ms; (c.view :: r.1, r.2)
-      | none => ([c.view], some (n, c.whyNot m))
+  let t := Cursor.trail 0 (Cursor.ofAtt d) ms
+  ((t.passed ++ [t.last]).map (·.view), t.failed)
 
 /-- **The motions offered after the walk `ms`** from the root of `d`, as
 they are written (`Cursor.motions`); none if a motion of `ms` cannot be
@@ -297,5 +222,96 @@ def elabWalk : CommandElab := fun stx => do
       let range := fileMap.utf8RangeToLspRange ⟨dEnd, mEnd⟩
       let props := data.setObjVal! "range" (toJson range)
       liftCoreM <| Widget.savePanelWidgetInfo walkPanelModule.javascriptHash (pure props) stx
+
+/-! ## The walker as a tactic block -/
+
+/-- **A walk of the attempt or derivation `d`**: the goal of a tactic block
+whose lines are motions, `ms` the motions made so far.
+
+    example : Walk d := by
+      down 0
+      up
+
+It is shown as the view after `ms` (`Cursor.view`), so the goal after each
+line is the view there.  It says nothing about `d`: every `Walk d ms` holds,
+by the instance below, and that is how the block's last goal is closed. -/
+class Walk {S : ProofSystem} {o : Bool} {j : S.Judg} (d : Att S o j) (ms : List Motion := []) :
+    Prop where
+  /-- A walk holds, whatever its motions. -/
+  intro ::
+
+instance {o : Bool} {j : S.Judg} (d : Att S o j) (ms : List Motion) : Walk d ms := ⟨⟩
+
+/-- What the goal `Walk d ms` is shown as: the view after the motions `ms`
+(`walkText`), or which motion cannot be made. -/
+def walkGoalText [Explorable S] {o : Bool} {j : S.Judg} (d : Att S o j) (ms : List Motion) :
+    String :=
+  match walkText d ms with
+  | .ok v => v
+  | .error (n, why) => s!"motion {n} cannot be made: {why}"
+
+open PrettyPrinter Delaborator SubExpr in
+/-- **A goal `Walk d ms` is shown as the view** of `d` after the motions
+`ms`, under the head `Walk d`. -/
+@[delab app.ProofTools.Explore.Walk]
+def delabWalk : Delab := do
+  let e ← getExpr
+  let (``Walk, #[sys, o, j, d, ms]) := e.getAppFnArgs | failure
+  if e.hasLooseBVars || e.hasFVar || e.hasMVar then failure
+  let inst ← try synthInstance (mkApp (mkConst ``Explorable) sys) catch _ => failure
+  let head := match (if d.isConst then headName d else none) with
+    | some n => s!"Walk {n}"
+    | none => "Walk"
+  shownAs head (mkApp6 (mkConst ``walkGoalText) sys inst o j d ms)
+
+/-- **One motion, as a tactic**: the goal `Walk d ms` is closed and the goal
+`Walk d (ms ++ [m])` takes its place, if the motion can be made
+(`Cursor.move`, through `walkShown`).  The new goal is one that Lean closes
+by the instance when the block ends, unless another motion replaces it.
+
+On a goal that is not a walk: an error, or, with `decline`, the syntax is
+declined, so that another tactic of the same name is tried. -/
+def walkStep (decline : Bool) (m : Syntax) : TacticM Unit := do
+  let g ← getMainGoal
+  let (``Walk, #[sys, o, j, d, ms]) := (← whnfR (← instantiateMVars (← g.getType))).getAppFnArgs
+    | if decline then throwUnsupportedSyntax
+      else throwErrorAt m "{m}: a motion is for a goal `Walk d`, and this goal is not one"
+  let some (_, made) := ms.listLit?
+    | throwError "{m}: the motions made so far are not a list written out"
+  let inst ← try synthInstance (mkApp (mkConst ``Explorable) sys) catch _ =>
+    throwError "{m}: there is no instance of{indentExpr (mkApp (mkConst ``Explorable) sys)}"
+  let me ← Tactic.elabTermEnsuringType (← liftMacroM (motionTerm m)) (some (mkConst ``Motion))
+  let ms' ← mkListLit (mkConst ``Motion) (made ++ [← instantiateMVars me])
+  let goal := mkApp5 (mkConst ``Walk) sys o j d ms'
+  if goal.hasMVar || goal.hasFVar then
+    throwError "{m}: the attempt walked must be a closed term"
+  let ((_, failed), _, _) ← evalShown
+    (mkAppN (mkConst ``walkShown) #[sys, inst, o, j, d, ms', mkConst ``false, mkConst ``false])
+  if let some (_, why) := failed then throwError "this motion cannot be made: {why}"
+  let new ← mkFreshExprMVar goal .synthetic
+  Term.registerSyntheticMVarWithCurrRef new.mvarId! (.typeClass none)
+  g.assign (mkApp5 (mkConst ``Walk.intro) sys o j d ms)
+  replaceMainGoal [new.mvarId!]
+
+/-- A motion, as a line of a tactic block whose goal is `Walk d`: `up`,
+`down i`, `top`, `goal k` (and `left`, `right`, which are Lean's tactics of
+those names, and motions on a walk).  The goal after the line is the view
+there.  Of low priority: where another tactic has the same form, that one
+is read. -/
+syntax (name := walkTac) (priority := low) walk_motion : tactic
+
+@[tactic walkTac, inherit_doc walkTac] def evalWalkTac : Tactic := fun stx =>
+  walkStep false stx[0]
+
+/-- `left`, on a goal `Walk d`: the motion to the premise before this one.
+On any other goal it declines, and the tactic is Lean's `left`.  On a walk
+its error is the one reported (`no_fallback`). -/
+@[tactic Lean.Parser.Tactic.left, no_fallback] def evalWalkLeft : Tactic := fun _ => do
+  walkStep true (← `(walk_motion| left))
+
+/-- `right`, on a goal `Walk d`: the motion to the premise after this one.
+On any other goal it declines, and the tactic is Lean's `right`. -/
+@[tactic Lean.Parser.Tactic.right, no_fallback] def evalWalkRight : Tactic := fun _ => do
+  walkStep true (← `(walk_motion| right))
 
 end ProofTools.Explore

@@ -1,0 +1,88 @@
+/-
+Template: the exercises file, `Play/‹Calculus›.lean`, with places to fill
+written `‹…›`.  COMPILED as `templates/Instance.lean.txt` says: filled for
+the same calculus, it elaborated with no error by
+`lake env lean Play/‹Calculus›.lean`.
+
+# `Play/‹Calculus›.lean`: ‹the calculus›, a move at a time
+
+The reviewer's file.  The operator prepared it (‹date›) and does not edit
+it again without saying so (`campaign/gates.md`).  It is in no library: no
+`lake build` builds it and nothing imports it.  Build the instance first
+(`lake build`), then open this file in the editor and type.
+
+`‹tactic›` is `apply_move` of proof-tools, fixed to ‹the calculus›
+(declared in `‹Calculus›/Tactic.lean`).  A goal is an attempt
+`Att S true j`, shown as `Att S   ‹the judgment›`: ‹how to read it›.
+
+**How to type a line.**
+
+    ‹tactic›             the moves that apply at goal 0; none is made
+    ‹tactic› an          those whose names begin with `an`
+    ‹tactic› andL        `andL` with its arguments left out: made if only one
+                         move of that form applies, else each is offered
+    ‹tactic› andL p _    `_` or `?_` for any argument
+    ‹tactic› … at 1      the same at goal 1
+    ‹tactic› where       the attempt so far, drawn, with goal 0 marked `>`;
+                         no move is made
+
+Click an offered line to write it in place of yours.  A line that offers
+makes no move.  A line that nothing completes is an error, and so is a
+query where no move applies.
+
+**The rules** (the table, with each rule's place in the source, is
+`campaign/rule-table.md`; keep it and the source's figure beside this
+file):
+
+    ‹each rule in one line: its name here, what it asks, what it leaves›
+
+`all_goals leave_open` at the end of an exercise leaves what is not yet
+proved open, without an error.  When a proof is done, delete that line and
+change `Att S true` to `Der S`: a derivation, which `famOfDer` carries to a
+derivation of the calculus as ‹the source› states it.
+
+Reference derivations: `‹Calculus›/Test.lean`.  They are not in this file
+on purpose.
+-/
+import ‹Calculus›.Tactic
+
+open ProofTools ProofTools.Explore ‹Calculus›
+
+-- The lines the tactic suggests write an atom by a name (`p`).  Declare
+-- each atom under that name here, so that a suggested line can be clicked
+-- and still parses.
+abbrev p : Form := .atom 0
+abbrev q : Form := .atom 1
+
+/-! ## 1. ‹the source's first derivation, with its place› -/
+
+example : Att S true ‹judgment› := by
+  ‹tactic›
+  all_goals leave_open
+
+/-! ## 2. ‹…› -/
+
+/-! ## ‹n›. A judgment that is not derivable: ‹which, and why›
+
+Go as far as the moves go.  What should happen: ‹where it stops, and with
+what message or what query›. -/
+
+example : Att S true ‹a non-theorem› := by
+  ‹tactic›
+  all_goals leave_open
+
+/-! ## To look at a derivation that is built
+
+Name one and walk it.  With `#walk`, a click on an offered motion writes
+it.  In a block whose goal is `Walk d`, each line is a motion (`down i`,
+`up`, `left`, `right`, `top`, `goal k`) and the goal shows the view there. -/
+
+def d : Der S ‹judgment› := by
+  ‹tactic› ‹move›
+  ‹…›
+
+#walk d
+#walk d down 0
+
+example : Walk d := by
+  down 0

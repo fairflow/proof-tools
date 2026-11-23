@@ -3,7 +3,9 @@
 
 A goal is an attempt `Att S o j` (or a derivation `Der S j`) at a closed
 judgment `j`.  The open goals of the calculus are Lean's open goals, so the
-infoview's goal list is the calculus's, and it follows the cursor.
+infoview's goal list is the calculus's, and it follows the cursor.  A goal
+is shown as its judgment, drawn by the instance's `showJudg` (`delabAtt`):
+`Att S   j`, or `Der S   j` where no goal may be left open.
 
 * `apply_move m` makes the move `m` at the first goal: it evaluates
   `S.step m j`, closes the goal with `Att.node m ps rfl …`, and puts one
@@ -20,10 +22,19 @@ infoview's goal list is the calculus's, and it follows the cursor.
   whose names begin with `im`.
 * A move one of whose premises adds nothing to its conclusion (the
   instance's `within`) is set aside while another move matches.
+* `apply_move where` is the other query: it draws the attempt so far, all
+  of it, with the first goal marked `>` (`where at k`: goal `k`), as a
+  message at its line.  `set_option apply_move.showWhere true` asks it
+  after every move, so that each line of a script shows where the proof is
+  after it, and the last line the derivation.  How the attempt is found
+  again, since the tactic keeps none: see "The attempt so far" below.
 * `apply_script ls` makes the lines of a script, so a stored script can be
   continued by hand; `leave_open` leaves the first goal open.
 * `declare_move_tactic t for S` declares `t` as `apply_move` fixed to the
   calculus `S`: a goal of another calculus is then an error.
+
+`Explorable`, what an instance supplies for all this, and the drawing of an
+attempt as text are in `View.lean`.
 
 **What is trusted.**  The tactic finds the premises by evaluating compiled
 code, and quotes them with the instance's `ToExpr`.  The proof term it
@@ -38,47 +49,13 @@ derivation.
 Core Lean only.
 -/
 import Lean
-import ProofTools.Explore.Script
+import ProofTools.Explore.View
 
 namespace ProofTools.Explore
 
 open Lean Meta Elab Tactic
 
-/-! ## What an instance supplies for the editor -/
-
-/-- **What an instance supplies for the editor.**  None of it is trusted.
-
-To declare an instance, the system must be an `abbrev` (or `@[reducible]`),
-so that `S.Judg` unfolds to the instance's own type where Lean looks for
-instances and notations. -/
-class Explorable (S : ProofSystem) where
-  /-- Moves to try at a judgment; those that apply are offered, and
-  patterns are matched against them. -/
-  candidates : S.Judg → List S.Move
-  /-- A judgment as text, for `Att.render`. -/
-  showJudg : S.Judg → String
-  /-- A move as text, for `Att.render`. -/
-  showMove : S.Move → String
-  /-- Judgments as terms: the goals the tactic leaves are literals. -/
-  quoteJudg : ToExpr S.Judg
-  /-- Moves as terms. -/
-  quoteMove : ToExpr S.Move
-  /-- `within p j`: the premise `p` adds nothing to the conclusion `j`.  A
-  move with such a premise is offered only if no other applies. -/
-  within : S.Judg → S.Judg → Bool := fun _ _ => false
-  /-- A move as Lean source, as `apply_move` is to be given it, for the
-  lines the tactic suggests.  Where it gives nothing, the move's term
-  (`quoteMove`) is printed by Lean. -/
-  moveSource : S.Move → Option String := fun _ => none
-  /-- How the tactic proves a node's equation `S.step m j = .ok ps`.  By
-  `rfl` (`false`, the default): the premises as quoted must be, by
-  definition, what `step` computes.  By deciding the equality (`true`):
-  they need only be equal, and an instance of `DecidableEq S.Judg` is
-  needed.  An instance whose judgments hold functions needs the second,
-  since a function quoted is seldom the function computed. -/
-  eqByDecide : Bool := false
-
-variable {S : ProofSystem}
+/-! ## What the tactic asks of an instance -/
 
 /-- The premises of `m` at `j`, as terms. -/
 def Explorable.premises (S : ProofSystem) [E : Explorable S] (m : S.Move) (j : S.Judg) :
@@ -99,34 +76,6 @@ def Explorable.applicable (S : ProofSystem) [E : Explorable S] (j : S.Judg) :
 def Explorable.quoteScript (S : ProofSystem) [E : Explorable S] (ls : Script S) :
     List (Nat × Expr) :=
   ls.map fun l => (l.goal, E.quoteMove.toExpr l.move)
-
-/-- A judgment's text under an indentation; `mark` goes before its first
-line, and as many spaces before the others. -/
-def judgLines (ind mark text : String) : List String :=
-  match text.splitOn "\n" with
-  | [] => [ind ++ mark]
-  | l :: ls => (ind ++ mark ++ l) :: ls.map fun x => ind ++ "".pushn ' ' mark.length ++ x
-
-mutual
-/-- The lines of an attempt drawn as text: each node its judgment and its
-move, the premises indented below; an open goal is marked `?`.  A judgment
-of one line has its move beside it, a longer one below it. -/
-def Att.lines [E : Explorable S] : {o : Bool} → {j : S.Judg} → Att S o j → String → List String
-  | _, j, .goal, ind => judgLines ind "? " (E.showJudg j)
-  | _, j, .node m _ _ ds, ind =>
-    (match judgLines ind "" (E.showJudg j) with
-      | [l] => [l ++ "   by " ++ E.showMove m]
-      | ls => ls ++ [ind ++ "   by " ++ E.showMove m]) ++ ds.lines (ind ++ "  ")
-/-- `Att.lines` on a list. -/
-def Atts.lines [E : Explorable S] : {o : Bool} → {ps : List S.Judg} → Atts S o ps → String →
-    List String
-  | _, _, .nil, _ => []
-  | _, _, .cons d ds, ind => d.lines ind ++ ds.lines ind
-end
-
-/-- **An attempt drawn as text.** -/
-def Att.render [Explorable S] {o : Bool} {j : S.Judg} (d : Att S o j) : String :=
-  "\n".intercalate (d.lines "")
 
 /-! ## Evaluating -/
 
@@ -164,6 +113,12 @@ unsafe def evalScriptU (e : Expr) : MetaM (List (Nat × Expr)) :=
   evalExpr (List (Nat × Expr)) (listTy (prodTy (mkConst ``Nat) exprTy)) e
 /-- Evaluate a closed term of type `List (Nat × Expr)`. -/
 @[implemented_by evalScriptU] opaque evalScript (e : Expr) : MetaM (List (Nat × Expr))
+
+/-- See `evalString`. -/
+unsafe def evalStringU (e : Expr) : MetaM String := evalExpr String (mkConst ``String) e
+/-- Evaluate a closed term of type `String`: a judgment or a view, drawn by
+the instance's printers. -/
+@[implemented_by evalStringU] opaque evalString (e : Expr) : MetaM String
 
 /-! ## Goals -/
 
@@ -241,6 +196,130 @@ def goalAt (tac : String) (gs : List MVarId) (k : Nat) : MetaM MVarId := do
   let some g := gs[k]? | throwError "there is no goal {k}: the open goals are 0 to {gs.length - 1}"
   return g
 
+/-- The text a goal is shown as: `head`, then the text of the term `text`
+(closed, of type `String`) evaluated, beside the head if it is one line and
+below it if it is more.  Lean prints the text as it stands. -/
+def shownAs (head : String) (text : Expr) : PrettyPrinter.Delaborator.Delab := do
+  let t ← try evalString text catch _ => failure
+  let sep := if t.contains '\n' then "\n" else "   "
+  return ⟨Syntax.node .none strLitKind #[Syntax.atom .none (head ++ sep ++ t)]⟩
+
+/-- The last part of the name of the constant at the head of a term: the
+constructor of a move, the name of a calculus. -/
+def headName (m : Expr) : Option String :=
+  match m.getAppFn.constName? with
+  | some (.str _ s) => some s
+  | _ => none
+
+open PrettyPrinter Delaborator SubExpr in
+/-- **A goal `Att S o j` is shown as its judgment**, drawn by the instance's
+`showJudg`: `Att S   j` where open goals are allowed, `Der S   j` where they
+are not, the judgment below the head if it is drawn on several lines.  For a
+calculus with an instance of `Explorable` and a closed judgment; any other
+goal is printed by Lean. -/
+@[delab app.ProofTools.Explore.Att]
+def delabAtt : Delab := do
+  let e ← getExpr
+  let (``Att, #[sys, o, j]) := e.getAppFnArgs | failure
+  if e.hasLooseBVars || e.hasFVar || e.hasMVar then failure
+  let some name := headName sys | failure
+  let kind ← if o.isConstOf ``Bool.true then pure "Att " else
+    if o.isConstOf ``Bool.false then pure "Der " else failure
+  let inst ← try synthInstance (mkApp (mkConst ``Explorable) sys) catch _ => failure
+  shownAs (kind ++ name) (mkApp3 (mkConst ``Explorable.showJudg) sys inst j)
+
+/-! ## The attempt so far
+
+`apply_move` keeps no state.  The attempt so far is the value, assigned in
+part, of the metavariable the proof began with, and Lean does not hand a
+tactic that metavariable.  It is found again in the metavariable context,
+from a goal: among the metavariables that are assigned and whose value, with
+every assignment put in, still mentions the goal, those of type `Att S o j`
+are the attempts the goal is part of, and the one made first holds the
+others.  (Going up from the goal through the assignments as they are stored
+does not find it: Lean rewrites an assignment when it puts the later ones
+in, and the chain is then broken.)
+
+The value is read as a closed term of type `Att S true j`: `o` is set to
+`true` at each node, each open goal becomes `Att.goal`, and a part that was
+not built by moves (a constant given with `exact`, say) is taken through
+`Att.toAtt`.  That term is drawn by evaluating `Att.whereText` on it. -/
+
+/-- The metavariables that hold an attempt which the goal `g` is part of,
+the first made first; then `g`. -/
+def attemptsAround (g : MVarId) : MetaM (List MVarId) := do
+  let mctx ← getMCtx
+  let mut found : Array (Nat × MVarId) := #[]
+  for (m, _) in mctx.eAssignment do
+    let some decl := mctx.findDecl? m | continue
+    if ((← instantiateMVars (.mvar m)).findMVar? (· == g)).isSome then
+      if (← whnfR (← instantiateMVars decl.type)).isAppOf ``Att then
+        found := found.push (decl.index, m)
+  return (found.qsort (·.1 < ·.1)).toList.map (·.2) ++ [g]
+
+mutual
+/-- Read a term of type `Att S o j`, its metavariables put in, as a closed
+term of type `Att S true j`; the open goals met are kept, in order. -/
+partial def readAtt (e : Expr) : StateT (Array MVarId) MetaM Expr := do
+  let e := e.consumeMData
+  match e.getAppFnArgs with
+  | (``Att.node, #[s, _, j, m, ps, h, ds]) =>
+    return mkApp7 (mkConst ``Att.node) s (mkConst ``Bool.true) j m ps h (← readAtts ds)
+  | _ =>
+    if let .mvar g := e then
+      match (← whnfR (← instantiateMVars (← g.getType))).getAppFnArgs with
+      | (``Att, #[s, _, j]) =>
+        modify (·.push g)
+        return mkApp2 (mkConst ``Att.goal) s j
+      | _ => throwError "not an attempt:{indentExpr e}"
+    else if e.hasMVar || e.hasFVar then
+      throwError "a part of it is not built by moves, and is not a closed term:{indentExpr e}"
+    else
+      match (← whnfR (← inferType e)).getAppFnArgs with
+      | (``Att, #[s, o, j]) => return mkApp4 (mkConst ``Att.toAtt) s o j e
+      | _ => throwError "not an attempt:{indentExpr e}"
+/-- `readAtt` on the premises of a node. -/
+partial def readAtts (e : Expr) : StateT (Array MVarId) MetaM Expr := do
+  let e := e.consumeMData
+  match e.getAppFnArgs with
+  | (``Atts.cons, #[s, _, p, ps, d, ds]) =>
+    let d ← readAtt d
+    return mkApp6 (mkConst ``Atts.cons) s (mkConst ``Bool.true) p ps d (← readAtts ds)
+  | (``Atts.nil, #[s, _]) => return mkApp2 (mkConst ``Atts.nil) s (mkConst ``Bool.true)
+  | _ =>
+    if e.hasMVar || e.hasFVar then
+      throwError "a part of it is not built by moves, and is not a closed term:{indentExpr e}"
+    else
+      match (← whnfR (← inferType e)).getAppFnArgs with
+      | (``Atts, #[s, o, ps]) => return mkApp4 (mkConst ``Atts.toAtts) s o ps e
+      | _ => throwError "not the premises of a node:{indentExpr e}"
+end
+
+/-- **Show where a goal is**: the attempt so far drawn in full, the goal
+`cur` marked (`Att.whereText`), as a message at `ref`.  `roots` are the
+metavariables that may hold the attempt, the widest first
+(`attemptsAround`): the first that can be read is drawn.  With no `cur`, or
+one that is not in the attempt, the root is marked. -/
+def showWhere (ref : Syntax) (gi : GoalInfo) (roots : List MVarId) (cur : Option MVarId) :
+    MetaM Unit := do
+  let mut why : MessageData := .nil
+  let mut skipped := false
+  for r in roots do
+    try
+      let (``Att, #[_, _, j]) := (← whnfR (← instantiateMVars (← r.getType))).getAppFnArgs
+        | throwError "not an attempt"
+      let (d, gs) ← (readAtt (← instantiateMVars (.mvar r))).run #[]
+      let k : Option Nat := cur.bind (gs.idxOf? ·)
+      let text ← evalString (mkApp5 (mkConst ``Att.whereText) gi.sys gi.inst j d (toExpr k))
+      let note := if skipped then
+        "\n  (an attempt around this one is not drawn: a part of it is not built by moves)" else ""
+      logInfoAt ref (text ++ note)
+      return
+    catch e =>
+      why := why ++ m!"\n{e.toMessageData}"
+      skipped := true
+  throwError "the attempt so far cannot be drawn:{why}"
+
 /-! ## Lines -/
 
 /-- `apply_move.tryThis`: show the line a pattern was filled to. -/
@@ -249,8 +328,19 @@ register_option apply_move.tryThis : Bool := {
   descr := "apply_move shows the line it made from a pattern as a `Try this` suggestion"
 }
 
-/-- The move and the goal number of a line: `m`, `m at k`, or nothing. -/
-syntax applyMoveArgs := (ppSpace colGt term)? (" at " num)?
+/-- `apply_move.showWhere`: show where the proof is after each move. -/
+register_option apply_move.showWhere : Bool := {
+  defValue := false
+  descr := "apply_move shows the attempt so far after each move it makes, with the goal the \
+    next line acts on marked, as `apply_move where` does"
+}
+
+/-- The query that draws the attempt so far, in the place of a move. -/
+syntax whereQuery := "where"
+
+/-- The move and the goal number of a line: `m`, `m at k`, or nothing; or
+`where`, `where at k`. -/
+syntax applyMoveArgs := (ppSpace colGt (whereQuery <|> term))? (" at " num)?
 
 /-- Drop the parentheses around a term. -/
 partial def unparen (stx : Syntax) : Syntax :=
@@ -379,12 +469,6 @@ def movesApply (n : Nat) (h : Option String) : String :=
   | some h, 1 => s!"1 move whose name begins with `{h}` applies"
   | some h, n => s!"{n} moves whose names begin with `{h}` apply"
 
-/-- The name of the constructor at the head of a move. -/
-def headName (m : Expr) : Option String :=
-  match m.getAppFn.constName? with
-  | some (.str _ s) => some s
-  | _ => none
-
 /-- **The body of `apply_move`**: `tac` is the tactic's name, `sys?` the
 calculus it is fixed to, if any. -/
 def applyMoveCore (tac : String) (sys? : Option Name) (ref : Syntax) (line? : Option Syntax)
@@ -395,13 +479,23 @@ def applyMoveCore (tac : String) (sys? : Option Name) (ref : Syntax) (line? : Op
   if let some s := sys? then
     unless ← g.withContext (isDefEq gi.sys (mkConst s)) do
       throwError "{tac}: the goal is not an attempt in `{s}`"
+  -- the query `where`: no move is made
+  if line?.any (·.isOfKind ``whereQuery) then
+    showWhere ref gi (← attemptsAround g) (some g)
+    return
   let ctors ← moveCtors gi.moveTy
   let ns := ctors.map (·.1)
   let applicable : TacticM (List (Cand × Bool)) :=
     evalApplicable (mkApp3 (mkConst ``Explorable.applicable) gi.sys gi.inst gi.j)
   let make (m : Expr) : TacticM Unit := do
+    -- the attempt is found from `g` while `g` is still open
+    let roots ← if apply_move.showWhere.get (← getOptions) then attemptsAround g else pure []
     let new ← applyMoveAt tac g m k
-    setGoals (gs.take k ++ new ++ gs.drop (k + 1))
+    let gs' := gs.take k ++ new ++ gs.drop (k + 1)
+    setGoals gs'
+    unless roots.isEmpty do
+      try showWhere ref gi roots (gs'[k]? <|> gs'.head?)
+      catch e => logInfoAt ref m!"{tac}: {e.toMessageData}"
   let offerAll (ms : List Cand) (h : Option String) : TacticM Unit := do
     let whose := match h with | some h => s!" whose name begins with `{h}`" | none => ""
     if ms.isEmpty then throwError "{tac}: no move{whose} applies at goal {k}"

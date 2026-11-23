@@ -67,12 +67,8 @@ end
 
 /-- The cursor after the motions of `ms` that can be made, up to the first
 that cannot. -/
-def Cursor.movesWhile {j : S.Judg} (c : Cursor S j) : List Motion → Cursor S j
-  | [] => c
-  | m :: ms =>
-    match c.move m with
-    | some c' => c'.movesWhile ms
-    | none => c
+def Cursor.movesWhile {j : S.Judg} (c : Cursor S j) (ms : List Motion) : Cursor S j :=
+  (Cursor.trail 0 c ms).last
 
 /-- **What the panel is given**, as JSON text: the attempt `d` as a tree
 (`tree`), and the address that the motions `ms` reach from its root
