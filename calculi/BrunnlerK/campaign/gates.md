@@ -269,7 +269,20 @@ Adopt is not passed, and Prove is begun in the session of stages 0 and 1.
   every premise true and the conclusion not; the empty sequent, `[∅]`
   and the six sequents of the exercises that are not derivable each
   have a refutation among those trees; four derivable ones have none.
-* **Answer**: not yet given.
+* **Asked again** (2026-11-23 17:46 GMT, at `9444116`), after the
+  reviewer's message on contexts (the next entry), which did not answer
+  this gate.
+* **Answer** (2026-11-23 17:53 GMT, in the session): "Signed and if I
+  set a goal that's a very deliberate thing to do so please modify the
+  instructions of the skill to allow a later command of mine to override
+  an earlier gate. As you call it. So yes "signed as put"."
+* **Result**: passed, as put: the five things are signed. The operator
+  stopped twice at this gate after the goal had been set; the reviewer's
+  word is that a goal set is the answer. The skill is amended (rule 6 of
+  "How a gate is run"; `templates/gates.md`), and under it the goal
+  "prove completeness and cut elimination" lifts the gates that lie
+  between here and those two theorems: what such a gate would show is
+  still displayed in the next note.
 
 ## 2026-11-23 17:46 GMT. Stage 1's report, decision 2: the rules in the figure's shape
 

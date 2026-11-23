@@ -10,7 +10,8 @@ project: [gates.md](gates.md), the first entry, as changed by the second
 Operator: Claude (Fable 5.2) for stages 0 and 1; see the cost log. The method:
 the skill `calculus-campaign`, read at commit `e6410cd` of proof-tools
 and amended on 2026-11-23 at the reviewer's word (the default folder; the
-letters Lean reserves).
+letters Lean reserves; a later command of the reviewer overrides a
+gate).
 
 ## Status
 
@@ -18,7 +19,7 @@ letters Lean reserves).
 |---|---|---|---|
 | 0. Survey | done | the target: passed, 2026-11-23; the plan: passed, 2026-11-23, at its second putting | [plan.md](plan.md), [report-0-2026-11-23.md](report-0-2026-11-23.md) |
 | 1. Adopt | done, but for its last gate: the package, formulas and sequents, the two families, the rule table, the proof system, the tactic `kmove`, the tests, the exercises file | the rule table: signed 2026-11-23; the reviewer's test: put 2026-11-23, deferred by the reviewer, not done | [rule-table.md](rule-table.md), [statements.md](statements.md), [report-1-2026-11-23.md](report-1-2026-11-23.md), `Play/BrunnlerK.lean` |
-| 2. Prove | begun 2026-11-23 at the reviewer's word, for completeness and cut elimination, in the session of stages 0 and 1: the semantics and the statements of goals 1, 8, 9, 10 are in Lean, screened, not proved | the statements, first sending: put 2026-11-23, not answered; goals PROVED: 0 of 10 (S1, S2 of our own: PROVED) | [statements.md](statements.md), `BrunnlerK/Semantics.lean` |
+| 2. Prove | begun 2026-11-23 at the reviewer's word, for completeness and cut elimination, in the session of stages 0 and 1: the semantics and the statements of goals 1, 8, 9, 10 are in Lean, screened, not proved | the statements, first sending: signed as put, 2026-11-23; goals PROVED: 0 of 10 (S1, S2 of our own: PROVED) | [statements.md](statements.md), `BrunnlerK/Semantics.lean` |
 | 3. Run | not started | the producers: not put | |
 | 4. Explore | not started | the tutorial: not put | |
 

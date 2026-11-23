@@ -273,6 +273,25 @@ done is recorded with the gate, and is the first input of stage 4.
    (`brief-<stage number>-<k>.md`) and end. **After a gate that ends a
    stage**, always write the brief and end. Whoever runs the campaign
    opens the next session with `/calculus-campaign` and the brief's path.
+6. **A later command of the reviewer overrides a gate.** A gate is the
+   operator's stop, and the reviewer is free to lift it. Where the
+   reviewer gives a command that cannot be carried out without going
+   past a gate (a goal set for the session, "go on to", "prove"), the
+   command is the answer, whether the gate was already put or is still
+   ahead. A goal that is set is deliberate: do not stop at the gate and
+   do not ask again. Then:
+   - record it in `gates.md` with the reviewer's words and the result
+     **overridden by the reviewer**, which is not "passed";
+   - still write what the gate would have shown (the definitions, the
+     statements, the table), screen it, and display it in the next note
+     the reviewer gets, so that it can be refused afterwards;
+   - in that note, list what was built on it as resting on a thing that
+     is not signed.
+
+   This holds for a gate inside a stage and for one that ends a stage
+   (the reviewer's test, the brief and the fresh session). It does not
+   lift what was fixed with the target (where to push, what is not to be
+   touched), nor what only the reviewer may do.
 
 ### Stage 0, Survey
 

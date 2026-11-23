@@ -31,7 +31,9 @@ the folder point here.*
 * **Answer** (<date>, <how it came: in the session, by message>):
   "<the reviewer's words>"
 * **Result**: passed / passed with changes (<which, made in commit …>) /
-  not passed (<what is to change before it is asked again>).
+  not passed (<what is to change before it is asked again>) /
+  overridden by the reviewer (<the later command, in the reviewer's
+  words; what was then built on the thing that is not signed>).
 
 For the plan (stage 0), also:
 
