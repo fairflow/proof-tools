@@ -5,6 +5,7 @@ Tests of the depth of a proof, of `nec`, `wk` and exchange
 -/
 import BrunnlerK.Structural
 import BrunnlerK.Identity
+import BrunnlerK.Contract
 import BrunnlerK.Test.System
 
 namespace BrunnlerK.Test
@@ -53,5 +54,38 @@ example : gaxEx.depth = 4 := by decide +kernel
 -- In the source's shape, `Γ{A, Ā}`, two boxes deep.
 example : K (mk [c] [mk [] [mk [◇a ⋏ b, □(∼a) ⋎ ∼b] []]]) :=
   Fam.gaxC (Ctx.at_ (mk [c] [mk [] [mk [] []]]) [0, 0] rfl) (◇a ⋏ b)
+
+/-! ## The inverse rules, and contraction: each used once -/
+
+-- From `□(a ∨ ā)`, `[a ∨ ā]`; from that, `[a, ā]`: each at most as deep.
+example : ∃ d : K (mk [] [mk [a ⋎ ∼a] []]), d.depth ≤ 2 :=
+  inv_box_C (Ctx.root (.leaf [])) (a ⋎ ∼a)
+    (.box [] (a ⋎ ∼a) rfl (by decide) <|
+     .or [0] a (∼a) rfl (by decide) <|
+     .ax [0] 4 rfl (by decide) (by decide))
+
+example : ∃ d : K (mk [] [mk [a, ∼a] []]), d.depth ≤ 1 :=
+  inv_or_C (Ctx.at_ (mk [] [mk [] []]) [0] rfl) a (∼a)
+    (.or [0] a (∼a) rfl (by decide) <|
+     .ax [0] 4 rfl (by decide) (by decide))
+
+-- From `(a ∨ ā) ∧ b` with `b̄`, the right premise `b, b̄`.
+example : ∃ d : K (mk [b, ∼b] []), d.depth ≤ 2 :=
+  inv_andR_C (Ctx.root (mk [∼b] [])) (a ⋎ ∼a) b
+    (.and [] (a ⋎ ∼a) b rfl (by decide)
+      (.or [] a (∼a) rfl (by decide) <| .ax [] 4 rfl (by decide) (by decide))
+      (.ax [] 5 rfl (by decide) (by decide)))
+
+-- `ctr`: from `Γ{Δ, Δ}`, `Γ{Δ}`.  Here `Δ` is `◇a, [ā]`, twice at the root.
+example : ∃ d : K (mk [◇a] [mk [∼a] []]), d.depth ≤ 1 :=
+  ctr (Ctx.root (.leaf [])) (mk [◇a] [mk [∼a] []])
+    (.dia [] 0 a rfl (by decide) rfl <|
+     .ax [0] 4 rfl (by decide) (by decide))
+
+-- and in a box, `Δ` a formula: from `[a ∨ ā, a ∨ ā]`, `[a ∨ ā]`.
+example : ∃ d : K (mk [] [mk [a ⋎ ∼a] []]), d.depth ≤ 1 :=
+  ctr (Ctx.at_ (mk [] [mk [] []]) [0] rfl) (.leaf [a ⋎ ∼a])
+    (.or [0] a (∼a) rfl (by decide) <|
+     .ax [0] 4 rfl (by decide) (by decide))
 
 end BrunnlerK.Test
