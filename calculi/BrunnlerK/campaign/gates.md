@@ -192,3 +192,31 @@ starts in a fresh session) and from the brief's first line of "Done".
   session may be sensible, we'll see how much context is needed."
 * **Result**: Adopt runs in the session of stage 0, in the operator's
   worktree, from `brief-1-1.md`. Nothing else of the brief changes.
+
+## 2026-11-23 15:45 GMT. Stage 1: the rule table
+
+* **Put to the reviewer** (2026-11-23 14:19 GMT, at `8ebe5e6`):
+  `campaign/rule-table.md`, with its five things to sign: how a rule
+  names its place (a path, the whole node `Θ`, the main formula by
+  membership, and the functions `node?`, `setNode`, `add`, `erase`,
+  `addBox`, `box?`, `setBox`); where a rule puts what it adds (in front;
+  a new box last; the first occurrence erased); the axiom by membership;
+  K° (the side condition of `□°` as D10, the proviso as `sameSet`, no
+  proviso on the axiom); the divergences D1 to D14.
+* **Asked by the reviewer first** (2026-11-23, in the session): "So the
+  paper puts no constructors in the rule conclusion?"
+* **Answered by the operator**: the paper's conclusions do carry
+  structure, `Γ{A ∧ B}`; the structure is not made of constructors,
+  since filling a hole and the comma of multisets are functions. A
+  conclusion `Fam c (C.fill (Δ.add (A ⋏ B)))` would be a computed index;
+  a conclusion of constructors only would say "at the root, at the head"
+  and need rules the source does not have. So the pattern is stated as
+  hypotheses on a variable (D2). Nothing proves that the two readings
+  agree: the evidence is the table row by row and Example 2.3 as a term.
+  Offered: after the signature, a type of contexts with `fill`, and each
+  rule in the figure's own shape as a derived rule, for example
+  `Fam c (C.fill (Δ.add A)) → Fam c (C.fill (Δ.add B)) → Fam c (C.fill (Δ.add (A ⋏ B)))`.
+* **Answer** (2026-11-23, in the session): "As put thanks"
+* **Result**: passed, as put. The five things are signed; no constructor
+  changes. The offer of the derived rules was not taken up and not
+  refused: it is carried to the report of the stage as a question.

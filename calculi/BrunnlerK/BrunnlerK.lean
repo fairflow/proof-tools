@@ -8,5 +8,8 @@ import BrunnlerK.Sequent
 import BrunnlerK.System
 import BrunnlerK.SystemO
 import BrunnlerK.Show
+import BrunnlerK.Proof
+import BrunnlerK.Tactic
 import BrunnlerK.Test.Sequent
 import BrunnlerK.Test.System
+import BrunnlerK.Test.Proof

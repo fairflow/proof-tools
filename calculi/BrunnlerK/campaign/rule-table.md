@@ -14,10 +14,13 @@ are those of v1.
 
 The families: `BrunnlerK.Fam` in `BrunnlerK/System.lean` (system K at
 `Fam false`, K + cut at `Fam true`), and `BrunnlerK.FamO` in
-`BrunnlerK/SystemO.lean` (system K°). The proof system: not written; it
-is step 5 of Adopt, after the signature.
+`BrunnlerK/SystemO.lean` (system K°). The proof system: `BrunnlerK.S` in
+`BrunnlerK/Proof.lean`, written after the signature; its moves are in the
+last column of the first table, and "The proof system" below says how
+`step` is tied to the family.
 
-Signed by the reviewer: not yet.
+Signed by the reviewer: 2026-11-23, as put ("As put thanks"; `gates.md`, the
+entry "Stage 1: the rule table").
 
 Written 2026-11-23 14:16 GMT.
 
@@ -78,16 +81,16 @@ figure's. `Θ`, `a` and `i` are not in the figure.
 
 ## The rules of system K, and cut
 
-| # | rule, as the source names it | as printed: premises / conclusion / side condition, and where | the constructor | agrees with `#rules` below? | the move, and what `step` asks and leaves (filled after the signature) |
+| # | rule, as the source names it | as printed: premises / conclusion / side condition, and where | the constructor | agrees with `#rules` below? | the move, and what `step` asks and leaves |
 |---|---|---|---|---|---|
-| 1 | the axiom | no premise; `Γ{p, p̄}`; no side condition. Figure 2.3, p. 10. "A proof … is a derivation … where all premises are instances of the axiom `Γ{p, p̄}`", p. 9 | `Fam.ax` | yes, read with D2, D4: `p` and `p̄` are asked for by membership in the node | |
-| 2 | `∧` | premises `Γ{A}` and `Γ{B}`; conclusion `Γ{A ∧ B}`; no side condition. Figure 2.3 | `Fam.and` | yes, read with D2, D3: one `A ∧ B` is taken out of the node and `A` (or `B`) put in front | |
-| 3 | `∨` | premise `Γ{A, B}`; conclusion `Γ{A ∨ B}`; none. Figure 2.3 | `Fam.or` | yes, read with D2, D3: the node then begins `A, B` | |
-| 4 | `□` | premise `Γ{[A]}`; conclusion `Γ{□A}`; none. Figure 2.3 | `Fam.box` | yes, read with D2, D3: one `□A` is taken out and the box `[A]` put after the node's boxes | |
-| 5 | `◇k_c` (printed with a dot over `k`: the rule for the axiom k, with contraction built in) | premise `Γ{◇A, [Δ, A]}`; conclusion `Γ{◇A, [Δ]}`; none. Figure 2.3 | `Fam.dia` | yes, read with D2, D3: `◇A` is in the node and stays; the box at position `i` is `[Δ]`, and `A` is put in front of `Δ` | |
-| | `◇d_c`, `◇t_c`, `◇b_c`, `◇4_c`, `◇5_c` | Figure 2.3 | none | left out at the target's gate: the system is K alone | |
-| 6 | `cut` | premises `Γ{A}` and `Γ{Ā}`; conclusion `Γ{∅}`; none. Figure 2.4, p. 10 | `Fam.cut` | yes, read with D2, D3, D6: allowed only where `c = true`; `A` (or `Ā`) is put in front of the node | |
-| | `nec`, `wk`, `ctr` | Figure 2.4 | none | not rules of K: the source shows them admissible (Lemma 2.4, `l:stradm`). They are goal 3 | |
+| 1 | the axiom | no premise; `Γ{p, p̄}`; no side condition. Figure 2.3, p. 10. "A proof … is a derivation … where all premises are instances of the axiom `Γ{p, p̄}`", p. 9 | `Fam.ax` | yes, read with D2, D4: `p` and `p̄` are asked for by membership in the node | `ax a p`. Asks: a node `Θ` at `a`; `p ∈ Θ`; `p̄ ∈ Θ`. Leaves: no premise |
+| 2 | `∧` | premises `Γ{A}` and `Γ{B}`; conclusion `Γ{A ∧ B}`; no side condition. Figure 2.3 | `Fam.and` | yes, read with D2, D3: one `A ∧ B` is taken out of the node and `A` (or `B`) put in front | `and a A B`. Asks: a node `Θ` at `a`; `A ∧ B ∈ Θ`. Leaves the constructor's two premises, in its order |
+| 3 | `∨` | premise `Γ{A, B}`; conclusion `Γ{A ∨ B}`; none. Figure 2.3 | `Fam.or` | yes, read with D2, D3: the node then begins `A, B` | `or a A B`. Asks: a node at `a`; `A ∨ B ∈ Θ`. Leaves the constructor's premise |
+| 4 | `□` | premise `Γ{[A]}`; conclusion `Γ{□A}`; none. Figure 2.3 | `Fam.box` | yes, read with D2, D3: one `□A` is taken out and the box `[A]` put after the node's boxes | `box a A`. Asks: a node at `a`; `□A ∈ Θ`. Leaves the constructor's premise |
+| 5 | `◇k_c` (printed with a dot over `k`: the rule for the axiom k, with contraction built in) | premise `Γ{◇A, [Δ, A]}`; conclusion `Γ{◇A, [Δ]}`; none. Figure 2.3 | `Fam.dia` | yes, read with D2, D3: `◇A` is in the node and stays; the box at position `i` is `[Δ]`, and `A` is put in front of `Δ` | `dia a i A`. Asks: a node at `a`; a box at position `i` of it; `◇A ∈ Θ`. Leaves the constructor's premise |
+| | `◇d_c`, `◇t_c`, `◇b_c`, `◇4_c`, `◇5_c` | Figure 2.3 | none | left out at the target's gate: the system is K alone | none |
+| 6 | `cut` | premises `Γ{A}` and `Γ{Ā}`; conclusion `Γ{∅}`; none. Figure 2.4, p. 10 | `Fam.cut` | yes, read with D2, D3, D6: allowed only where `c = true`; `A` (or `Ā`) is put in front of the node | none: the proof system is for system K, and `step_sound` is `S.SoundT K` with `K = Fam false`. A move for `cut` would need a second proof system |
+| | `nec`, `wk`, `ctr` | Figure 2.4 | none | not rules of K: the source shows them admissible (Lemma 2.4, `l:stradm`). They are goal 3 | none |
 
 The output of `#rules BrunnlerK.Fam`, pasted whole:
 
@@ -363,6 +366,44 @@ Example 2.3 as the constructors build it, each sequent printed by
 | `◇k_c` | `◇b, ◇(ā ∧ b̄), [b, b̄, a]` | `◇(ā ∧ b̄), [a, b̄, b], ◇b` |
 
 The same multisets on every line; the order differs, by D3.
+
+## The proof system (written after the signature)
+
+A move carries what its constructor carries, less the derivations and the
+proofs of the side conditions:
+
+    Move ::= ax a p | and a A B | or a A B | box a A | dia a i A
+
+`step m Γ` looks up the node at the move's path with `node?`, the function
+the constructors use, asks the constructor's side conditions as Boolean
+tests, and leaves the constructor's premises, written with the same
+functions (`setNode`, `erase`, `add`, `addBox`, `box?`, `setBox`). There is
+no move for `cut`, and none for K°: the proof system is for system K.
+
+Two theorems tie `step` to the family, both within
+`[propext, Quot.sound]` (`BrunnlerK/Proof.lean`):
+
+    step_sound : S.SoundT K                          (S1)
+    famToDer   : ∀ Γ, K Γ → Nonempty (Der S Γ)       (S2)
+
+S1 is one constructor for each move: `step` allows nothing the rules do
+not. S2 is one node for each constructor: `step` refuses no instance of a
+rule. So a sequent has a derivation in `K` exactly if it has one in the
+proof system. Neither says anything about the source: that the family is
+Figure 2.3 is what this table was signed for.
+
+What a refusal says, one message for each side condition:
+
+| the move | the side condition that fails | the message |
+|---|---|---|
+| any | `Γ.node? a = some Θ` | the sequent has no node at this path |
+| `ax` | `p ∈ Θ.forms` | the proposition is not in the node |
+| `ax` | `p̄ ∈ Θ.forms` | the negated proposition is not in the node |
+| `and` | `A ∧ B ∈ Θ.forms` | the conjunction is not in the node |
+| `or` | `A ∨ B ∈ Θ.forms` | the disjunction is not in the node |
+| `box` | `□A ∈ Θ.forms` | the formula □A is not in the node |
+| `dia` | `Θ.box? i = some Δ` | the node has no box at this position |
+| `dia` | `◇A ∈ Θ.forms` | the formula ◇A is not in the node |
 
 ## Divergences
 

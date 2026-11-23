@@ -9,6 +9,7 @@ start). A figure the environment does not give is written "not known".
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | 1 | Survey | Claude Fable 5.2 (`claude-fable-5-2`); effort setting not known | no: the command's session, and not cold (see `gates.md`) | 2026-11-23 07:23 GMT | first at its gate note, 2026-11-23 07:57 GMT; taken up again on the reviewer's answer (the clock read 09:06 at the first command) and at the gate again at 2026-11-23 09:12 GMT | none: no build; scratch runs of `lean` on seven files, a few seconds each; one run of `pdflatex` on the source | not known | not known | not known | not known | 0 / 0 | 815 added before the answer; after it, see the commits of 2026-11-23 |
 | 2 | Adopt, to the rule table's gate | Claude Fable 5.2 (`claude-fable-5-2`); effort setting not known | no: the session of row 1, at the reviewer's word (`gates.md`, the fourth entry); worked from `brief-1-1.md` | 2026-11-23 14:07 GMT | at the gate note, 2026-11-23 14:19 GMT by the clock | under a minute in all: the first build of the library's audit modules 6 s; each later build 1 to 3 s | not known | not known | not known | not known | 631 / 0 (of which tests 196) | 597 in `rule-table.md` and `statements.md`; additions to four other files |
+| 3 | Adopt, after the rule table's gate | Claude Fable 5.2 (`claude-fable-5-2`); effort setting not known | no: the session of rows 1 and 2, after a summary of its earlier part; worked from `brief-1-2.md` | 2026-11-23 15:45 GMT, at the reviewer's signature | at the report, 2026-11-23 15:55 GMT by the clock | under a minute in all: each module about 1 s; the tests file 1.5 s | not known | not known | not known | not known | 976 / 0 (`Proof.lean` 203, `Tactic.lean` 133, tests 439, the exercises file 201) | the report (184); additions to the rule table, the statements, the notes, this log |
 
 Where the tokens and the cost come from: not known to the operator. The
 reviewer's application shows them.
@@ -31,21 +32,25 @@ the reading of the source was all in the first part.
 | 6 | 2026-11-23 | 0 | decisions (three), corrections (two), questions (two) | the plan's gate, answered in part; the words are in `gates.md`, the second entry | decisions: the source may be fetched; cyclic leaves left out; the letters. Corrections: the place (`examples/` to `calculi/`, in the skill too); commits go to `main`. Questions: exchange (the plan's table says why); a less absolute "valid" (found: two-valued models) |
 | 7 | 2026-11-23 | 0 | decision | the plan's gate, put again: "Pass as proposed" | the plan is passed; all ten goals are goals; the brief for Adopt |
 | 8 | 2026-11-23 | 1 | decision | "Continue here with Adopt I have pulled in, you continue in your worktree. I think a single session may be sensible" | Adopt was run in the session of stage 0, not a fresh one |
+| 9 | 2026-11-23 | 1 | a question (none of the three classes) | at the rule table's gate: "So the paper puts no constructors in the rule conclusion?" | nothing in the Lean; the answer is in `gates.md`; an offer made (the rules in the figure's shape, as derived rules), carried to the report |
+| 10 | 2026-11-23 | 1 | decision | the rule table's gate: "As put thanks" | the table is signed; steps 5 to 9 of Adopt were done |
 
 ## By stage
 
 | stage | sessions | elapsed | of which waiting on builds | requests | cost | reached its gate? | decisions / corrections / rescues |
 |---|---|---|---|---|---|---|---|
 | 0 Survey | 1 | 34 min by the clock to the first gate note; the second part from 09:06 to 09:12 GMT | none | not known | not known | yes: the plan passed at its second putting; ended 09:36 GMT with the brief for Adopt | 7 / 3 / 0, and three questions |
-| 1 Adopt | 1 so far (the session of stage 0, continued) | 12 min by the clock to the rule table's gate note | under a minute | not known | not known | its first gate, the rule table: put, not answered | 1 / 0 / 0 |
+| 1 Adopt | 1 (the session of stage 0, continued) | 12 min by the clock to the rule table's gate note; 10 min from the signature to the report | under two minutes | not known | not known | the rule table: passed as put; the reviewer's test: put, not done | 2 / 0 / 0, and one question |
 | 2 Prove | | | | | | | |
 | 3 Run | | | | | | | |
 | 4 Explore | | | | | | | |
 
 ## Errors of transcription
 
-None found yet. The two families were put to the reviewer on 2026-11-23
-and are not signed.
+None found. The two families were signed by the reviewer on 2026-11-23,
+as put. After the signature: Example 2.3 built by the tactic maps out to
+the term written with the constructors before the signature (equal by
+`rfl`), and S2 found no instance of a rule that `step` refuses.
 
 ## What the operator did unaided, and what it did not
 
@@ -73,3 +78,14 @@ it. An older skill of the project (`calculus-adoption`,
 says to give the constructive form beside the classical one; this skill's
 `templates/statements.md` says to enter both, and nothing sends the
 Survey to look for the case.
+
+**Adopt, after the rule table.** Unaided: the proof system and both
+theorems that tie it to the family; the tactic, the syntax for
+sequents, the tests and the exercises. One false start: the case of
+`◇k_c` in S1 did not typecheck as a nested `match`, and was made a
+function of its own. Four pinned messages were wrong at the first run of
+the tests (a combining character; the order of two offered moves; a
+count; a name printed in full) and were corrected from Lean's output.
+Three statements in the first draft of the report were wrong and were
+corrected before it was committed: a build time that had not been
+measured, and two counts of what the exercises do.

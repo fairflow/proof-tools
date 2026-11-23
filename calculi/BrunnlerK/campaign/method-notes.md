@@ -158,3 +158,58 @@ checkout is behind `main`), which was written while this stage ran.
 25. **`statements.md` at step 4.** The template's S1 and S2 name the
     proof system, which may not be written before the rule table is
     signed. What was done: both entered as "not written", OPEN.
+
+## Stage 1 (Adopt), after the rule table's gate
+
+26. **The gate answered in the session.** The skill: "After a gate
+    inside a stage, go on in the same session if the answer comes while
+    it is open." It came; `brief-1-2.md` had been written in case, and
+    was read as the list of what to do. Nothing to change.
+27. **S1 for a rule that looks its node up.** The template's S1 is
+    `match m, j, hok, e' with`, each case a constructor: it relies on
+    `m.rule j` reducing once the move and the shape of the judgment are
+    known. Here every rule begins with `Γ.node? a`, which does not
+    reduce for a variable `Γ`. What was done: the rule is split in two,
+    `Move.ruleAt Γ Θ` (the rule, given the node) and `Move.rule` (look
+    the node up, then `ruleAt`), with a lemma `rule_some`; S1 matches on
+    `Γ.node? m.path` first and then is the template's match on `ruleAt`.
+    `◇k_c` looks up a second thing (the box), and the same split was
+    needed once more (`diaRule`, `diaSound`); a `match` on the second
+    lookup inside the first did not generalise the hypotheses.
+    `reference/explore.md` §13 could give the pattern.
+28. **S2 in Adopt.** With the split of note 27 it was forty lines, and
+    it found nothing wrong. Each case states `S.step m Γ = .ok [the
+    premises written out]` and proves it by `simp` with the side
+    conditions, since `(m.rule Γ).prems` does not reduce to the
+    constructor's premises. Worth doing in Adopt for a calculus of this
+    kind: it is the one check that `step` refuses nothing, and the
+    reviewer's test cannot show that.
+29. **`decide +kernel` on a step.** `reference/explore.md` §13 says to
+    try `by decide +kernel` on one `S.step m j = .ok ps`. Core Lean has
+    no `DecidableEq (Except String (List _))`. What was done: the kernel
+    checks are on `(S.step m j).toOption = some ps`. The reference could
+    say so.
+30. **The combining character, as note 24 expected.** The messages
+    pinned by `#guard_msgs` contain `a` and U+0304; text typed with the
+    precomposed letter failed. The tests file now says so at its head.
+    Also: the tool that writes files turned an escape `\u0304` typed in
+    Lean source into the character itself.
+31. **The tactic's name is a keyword.** `declare_move_tactic k for S`
+    would make `k` a token in every file that imports it. The name is
+    `kmove`. `reference/explore.md` §5 could warn that the name must not
+    be a likely identifier.
+32. **An exercise whose first query is an error.** The template writes
+    the first query of every exercise. For a sequent no move applies to,
+    that query is an error, and the file would not elaborate clean. What
+    was done: for the two such exercises the query is left for the
+    reviewer to type, and the text says what should happen.
+33. **What `within` should be.** The reference leaves it to the
+    instance. For this calculus the source has the notion already
+    (Definition 2.13, the set sequent): a premise adds nothing exactly
+    if it has the conclusion's set sequent. Where the source ends its
+    search by a proviso, that proviso is the first candidate.
+34. **Typing a judgment that is not flat.** The skill asks only that a
+    judgment be a closed term. A term syntax was written (`seq[…]`,
+    where an item in list brackets is a box): twelve lines of macro, no
+    syntax category. Without it every statement is `NSeq.cons` and
+    `NSeq.leaf`.

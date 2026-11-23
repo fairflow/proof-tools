@@ -17,8 +17,8 @@ letters Lean reserves).
 | stage | state | gate | where |
 |---|---|---|---|
 | 0. Survey | done | the target: passed, 2026-11-23; the plan: passed, 2026-11-23, at its second putting | [plan.md](plan.md), [report-0-2026-11-23.md](report-0-2026-11-23.md) |
-| 1. Adopt | steps 1 to 4 done: the package, formulas and sequents, the two families, the rule table | the rule table: put 2026-11-23, not signed; the reviewer's test: not put | [rule-table.md](rule-table.md), [statements.md](statements.md), [brief-1-2.md](brief-1-2.md) |
-| 2. Prove | not started | the statements: 0 of 10 seen in Lean; goals PROVED: 0 of 10 | [statements.md](statements.md) |
+| 1. Adopt | done, but for its last gate: the package, formulas and sequents, the two families, the rule table, the proof system, the tactic `kmove`, the tests, the exercises file | the rule table: signed 2026-11-23; the reviewer's test: put 2026-11-23, not done | [rule-table.md](rule-table.md), [statements.md](statements.md), [report-1-2026-11-23.md](report-1-2026-11-23.md), `Play/BrunnlerK.lean` |
+| 2. Prove | not started | the statements: 0 of 10 seen in Lean; goals PROVED: 0 of 10 (S1, S2 of our own: PROVED) | [statements.md](statements.md) |
 | 3. Run | not started | the producers: not put | |
 | 4. Explore | not started | the tutorial: not put | |
 
@@ -33,6 +33,8 @@ letters Lean reserves).
 * [method-notes.md](method-notes.md): where the skill was wrong, silent
   or unclear.
 * [report-0-2026-11-23.md](report-0-2026-11-23.md): the Survey's report.
+* [report-1-2026-11-23.md](report-1-2026-11-23.md): Adopt's report, with
+  what should happen at each exercise of the reviewer's test.
 
 * [brief-1-1.md](brief-1-1.md), [brief-1-2.md](brief-1-2.md): the briefs
   for Adopt, to the rule table's gate and after it.
@@ -55,7 +57,8 @@ toolchain (v4.31.0); the package requires `proof-tools` by its path.
 | `BrunnlerK/System.lean` | the family `Fam`: system K, and K + cut | `[propext, Quot.sound]` |
 | `BrunnlerK/SystemO.lean` | the family `FamO`: system K° | `[propext, Quot.sound]` |
 | `BrunnlerK/Show.lean` | formulas and sequents as text | none: code |
-| `BrunnlerK/Test/Sequent.lean`, `BrunnlerK/Test/System.lean` | tests | none: tests |
+| `BrunnlerK/Proof.lean` | the moves, `step`, the proof system `S`; S1 (`step_sound`) and S2 (`famToDer`) | `[propext, Quot.sound]` |
+| `BrunnlerK/Tactic.lean` | `seq[…]`; moves as text; the moves to try; `within`; `Explorable S`; the tactic `kmove` | none: code |
+| `BrunnlerK/Test/Sequent.lean`, `BrunnlerK/Test/System.lean`, `BrunnlerK/Test/Proof.lean` | tests | none: tests |
+| `Play/BrunnlerK.lean` | the reviewer's exercises; in no library (`lake env lean Play/BrunnlerK.lean`) | none |
 
-Not yet made: the proof system (`Move`, `step`), the tactic, the
-exercises file `Play/BrunnlerK.lean`.

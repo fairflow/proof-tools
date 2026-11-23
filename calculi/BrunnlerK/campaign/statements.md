@@ -15,12 +15,11 @@ Status is exactly one of:
 * **OPEN**: everything else. An OPEN statement is in Lean as a named
   proposition (`def Name : Prop := …`), not as a theorem with `sorry`.
 
-**As of 2026-11-23 every statement below is OPEN, and none is in Lean
-yet.** The goals are displayed as the plan has them, in the source's
-notation. Each is stated in Lean, in the encoding's terms, and shown to
-the reviewer at the gate of Prove, before its proof (`gates.md`, the
-third entry; the plan, "Goals"). S1 and S2 are stated when the proof
-system is written, after the rule table is signed.
+**As of 2026-11-23 the ten goals are OPEN, and none of them is in Lean
+yet; S1 and S2 are PROVED.** The goals are displayed as the plan has
+them, in the source's notation. Each is stated in Lean, in the
+encoding's terms, and shown to the reviewer at the gate of Prove, before
+its proof (`gates.md`, the third entry; the plan, "Goals").
 
 The axiom policy of the development: every theory file within
 `[propext, Quot.sound]`.
@@ -31,11 +30,12 @@ Read these first: no tool checks that they say what the source means.
 
 | definition | Lean name, file | the source's item | seen by the reviewer |
 |---|---|---|---|
-| formulas; the negation `Ā`; `⊃` | `Form`, `Form.dual`, `Form.imp`, `BrunnlerK/Form.lean` | "Formulas", p. 6 | put with the rule table, 2026-11-23 |
-| nested sequents; a place in a sequent | `NSeq`, `Path`, `NSeq.node?`, `NSeq.setNode`, `BrunnlerK/Sequent.lean` | "Nested sequents", "Sequent contexts, unary", pp. 6–8 | put with the rule table, 2026-11-23 |
-| set sequents: that two are equal | `NSeq.sameSet`, `BrunnlerK/Sequent.lean` | Definition 2.13, p. 14 | put with the rule table, 2026-11-23 |
-| the family of rules: K, and K + cut | `Fam`, `K`, `Kcut`, `BrunnlerK/System.lean` | Figures 2.3 (`fig:kx`), 2.4 (`fig:admissible`) | the rule table: put, not signed |
-| the family of rules: K° | `FamO`, `BrunnlerK/SystemO.lean` | p. 14 | the rule table: put, not signed |
+| formulas; the negation `Ā`; `⊃` | `Form`, `Form.dual`, `Form.imp`, `BrunnlerK/Form.lean` | "Formulas", p. 6 | signed with the rule table, 2026-11-23 |
+| nested sequents; a place in a sequent | `NSeq`, `Path`, `NSeq.node?`, `NSeq.setNode`, `BrunnlerK/Sequent.lean` | "Nested sequents", "Sequent contexts, unary", pp. 6–8 | signed with the rule table, 2026-11-23 |
+| set sequents: that two are equal | `NSeq.sameSet`, `BrunnlerK/Sequent.lean` | Definition 2.13, p. 14 | signed with the rule table, 2026-11-23 |
+| the family of rules: K, and K + cut | `Fam`, `K`, `Kcut`, `BrunnlerK/System.lean` | Figures 2.3 (`fig:kx`), 2.4 (`fig:admissible`) | the rule table: signed 2026-11-23 |
+| the family of rules: K° | `FamO`, `BrunnlerK/SystemO.lean` | p. 14 | the rule table: signed 2026-11-23 |
+| the proof system: moves, one step | `Move`, `step`, `S`, `BrunnlerK/Proof.lean` | none: the rules of Figure 2.3 as moves | the rule table's last column and its section "The proof system"; put with the report of Adopt |
 | what holds | the family itself, `Fam` | | the plan, passed 2026-11-23 |
 | the corresponding formula `Γ_F` of a sequent | not in Lean yet | p. 6 | |
 | the models, truth in a model, two-valued models, `Valid` | not in Lean yet | Definition 2.6, p. 12 | the form, with the plan (passed 2026-11-23); the Lean, at the gate of Prove |
@@ -49,16 +49,24 @@ Read these first: no tool checks that they say what the source means.
 
     S.SoundT K
 
-`step_sound`, not written. Source: none; it joins `step` to what holds,
-which is the family. Status: OPEN. With the family into `Type` it is a
-definition, and PROVED when the file that holds it builds within its
-bound. This is not the source's soundness theorem.
+that is, for every move `m`, sequent `Γ` and list of sequents `ps`:
+
+    S.step m Γ = .ok ps  →  Each K ps  →  K Γ
+
+`BrunnlerK.step_sound`, in `BrunnlerK/Proof.lean`. Source: none; it joins
+`step` to what holds, which is the family. Status: **PROVED**, within
+`[propext, Quot.sound]` (the family is into `Type`, so it is a
+definition: a function from derivations of the premises to a derivation
+of the conclusion). This is not the source's soundness theorem.
 
 ### S2. Every derivation of the family is a derivation of the proof system
 
     K Γ → Nonempty (Der S Γ)
 
-`FamToDer`, not written. Source: none. Status: OPEN.
+`BrunnlerK.famToDer : FamToDer`, in `BrunnlerK/Proof.lean`, from
+`der_of_fam : Fam c Γ → c = false → Nonempty (Der S Γ)` by induction on
+the derivation. Source: none. Status: **PROVED**, within
+`[propext, Quot.sound]`.
 
 ### Goal 1. Soundness
 
@@ -174,4 +182,4 @@ decided at the report of Prove. Status: OPEN.
 |---|---|---|---|
 | of the goals from the standing list (cut elimination, 10; the finite model property, in 9) | 0 | 0 | 2 |
 | of the other goals (1 to 8, and the rest of 9) | 0 | 0 | 9 |
-| of our own (S1, S2) | 0 | 0 | 2 |
+| of our own (S1, S2) | 2 | 0 | 0 |
