@@ -28,12 +28,13 @@ the reading of the source was all in the first part.
 | 4 | 2026-11-23 | 0 | decision | "Continue here" (over a fresh session) | the first act was done in this session |
 | 5 | 2026-11-23 | 0 | decision | the target gate: "Yes, as proposed" | the campaign folder; the Survey |
 | 6 | 2026-11-23 | 0 | decisions (three), corrections (two), questions (two) | the plan's gate, answered in part; the words are in `gates.md`, the second entry | decisions: the source may be fetched; cyclic leaves left out; the letters. Corrections: the place (`examples/` to `calculi/`, in the skill too); commits go to `main`. Questions: exchange (the plan's table says why); a less absolute "valid" (found: two-valued models) |
+| 7 | 2026-11-23 | 0 | decision | the plan's gate, put again: "Pass as proposed" | the plan is passed; all ten goals are goals; the brief for Adopt |
 
 ## By stage
 
 | stage | sessions | elapsed | of which waiting on builds | requests | cost | reached its gate? | decisions / corrections / rescues |
 |---|---|---|---|---|---|---|---|
-| 0 Survey | 1 | 34 min by the clock to the first gate note; the second part from 09:06 to 09:12 GMT | none | not known | not known | yes, the plan's gate is put, twice | 6 / 3 / 0, and three questions |
+| 0 Survey | 1 | 34 min by the clock to the first gate note; the second part from 09:06 to 09:12 GMT | none | not known | not known | yes: the plan passed at its second putting; ended 09:36 GMT with the brief for Adopt | 7 / 3 / 0, and three questions |
 | 1 Adopt | | | | | | | |
 | 2 Prove | | | | | | | |
 | 3 Run | | | | | | | |

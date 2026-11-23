@@ -6,9 +6,11 @@ The Survey's deliverable. It can be reviewed without opening any code.
 Written 2026-11-23 07:55 GMT. Revised 2026-11-23 09:11 GMT, after the
 reviewer's answer at the plan's gate (`gates.md`, the second entry):
 decisions 2, 3 and 6 are answered, the letters for sequents are fixed,
-and the files moved to `calculi/BrunnlerK/`. Reviewed: in part; the gate
-is not passed. The target and the rules of the project: `gates.md`, the
-first entry.
+and the files moved to `calculi/BrunnlerK/`. **Reviewed: passed, 2026-11-23 09:36 GMT**
+(`gates.md`, the third entry), as proposed: every open decision below
+went as recommended, and all ten goals are goals. The target and the
+rules of the project: `gates.md`, the first entry, as changed by the
+second.
 
 **This plan was written after the reading it reports.** The source was
 read, and an earlier plan written and published, before the target was
@@ -433,6 +435,11 @@ None about this calculus or its logic. Used from proof-tools:
 | 4 Explore | 1 | |
 
 ## Decisions reserved for the reviewer
+
+*All answered: decisions 2 (in part), 3 and 6 on 2026-11-23 at the first
+putting of the gate, the rest when the plan was passed as proposed
+(`gates.md`, the second and third entries). The text below is as it was
+put.*
 
 1. **Cut elimination: which route.** The statement of goal 10 is a goal
    by rule. Proposed: prove it first by the source's short route (p. 19),

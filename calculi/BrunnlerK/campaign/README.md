@@ -16,8 +16,8 @@ letters Lean reserves).
 
 | stage | state | gate | where |
 |---|---|---|---|
-| 0. Survey | done, waiting at its gate | the target: passed, 2026-11-23; the plan: put twice, not passed (answered in part 2026-11-23; revised and put again) | [plan.md](plan.md), [report-0-2026-11-23.md](report-0-2026-11-23.md) |
-| 1. Adopt | not started | the rule table: not put; the reviewer's test: not put | |
+| 0. Survey | done | the target: passed, 2026-11-23; the plan: passed, 2026-11-23, at its second putting | [plan.md](plan.md), [report-0-2026-11-23.md](report-0-2026-11-23.md) |
+| 1. Adopt | not started; its brief is written | the rule table: not put; the reviewer's test: not put | [brief-1-1.md](brief-1-1.md) |
 | 2. Prove | not started | the statements: 0 of 10 seen; goals PROVED: 0 of 10 | |
 | 3. Run | not started | the producers: not put | |
 | 4. Explore | not started | the tutorial: not put | |
@@ -34,7 +34,10 @@ letters Lean reserves).
   or unclear.
 * [report-0-2026-11-23.md](report-0-2026-11-23.md): the Survey's report.
 
-Not yet made: `rule-table.md`, `statements.md`, the briefs.
+* [brief-1-1.md](brief-1-1.md): the brief for the first session of
+  Adopt.
+
+Not yet made: `rule-table.md`, `statements.md`.
 
 ## Build
 

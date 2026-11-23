@@ -139,3 +139,41 @@ that the first act forbids had already been done.
   the rule); the route to cut elimination (decision 1); whether `K°` is
   a family of its own (in decision 3); the rest of the encoding table
   (decision 4); who relies on the answers (decision 7).
+
+## 2026-11-23 09:36 GMT. Stage 0: the plan, put again
+
+* **Put to the reviewer**: the revised plan with what changed after the
+  first answer, as one private page and on `main` at commit `f8609a9`
+  (`plan.md`; `report-0-2026-11-23.md`, its last section). Five things
+  were listed as still open: `Valid` over two-valued models; which
+  results are goals; the route to cut elimination; `K°` as a family of
+  its own and the rest of the table of encodings; who relies on the
+  answers.
+* **Asked**: "Pass the plan's gate with `Valid` over two-valued models
+  and the recommended goals ("Pass as recommended"), or changes first
+  ("Changes first")?"
+* **Answer** (2026-11-23, in the session): "Pass as proposed"
+* **Result**: passed. With it, as proposed in the plan at `f8609a9`:
+  - "valid" is `Valid`: truth of `Γ_F` at every state of every
+    two-valued model (decision 2);
+  - cut elimination: the statement first by the source's short route,
+    from completeness; whether the procedure of §2.1.4 is a further goal
+    is decided at the report of Prove (decision 1);
+  - the search has no cyclic leaves; `K°` is transcribed as a family of
+    its own (decision 3);
+  - the table of encodings, each row (decision 4);
+  - who relies on the answers: as the plan's Q3 proposes (decision 7);
+  - the folder `calculi/BrunnlerK/`, and commits to `main`, as the
+    second entry records. The name `calculi` was not objected to.
+* **Set aside by the reviewer**: none of the results that are goals by
+  rule. The plan's non-goals stand as proposed: Proposition 2.5 at
+  `ρ = k`; everything with `X ≠ ∅`, §2.2, §2.3 and Chapter 3 (left out at
+  the target gate); soundness for `ValidF`; any statement of complexity.
+  Deduction theorems, normalisation, the Church-Rosser property, the
+  disjunction property and the existence property do not apply to this
+  system (the plan's Q2).
+* **Made goals by the reviewer**: all ten goals of the plan. By rule:
+  soundness (1), completeness (8, 9), the finite model property (9), cut
+  elimination (10). Beyond the rule: invertibility (2), the admissible
+  rules `nec`, `wk`, `ctr` (3), exchange (4), general identity (5), `K°`
+  into K (6), termination (7), decidability (in 9).
