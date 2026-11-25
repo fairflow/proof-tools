@@ -119,19 +119,20 @@ transformed, and printed.
 
 ### A worked derivation: Löb's axiom
 
-Read from the root upwards. Each line is a sequent and the rule that
-concludes it; its premises are the lines one step in, below it.
+Read from the root upwards. Each line is a rule and the sequent it
+concludes; the premises of the rule are the lines one step in, below it.
 
-    ⇒ □(□p → p) → □p                              by →R
-      □(□p → p) ⇒ □p                              by GLR on □p
-        □p → p, □(□p → p), □p ⇒ p                 by →L on □p → p
-          □(□p → p), □p ⇒ □p, p                   by GLR on □p
-            □p → p, □(□p → p), p, □p, □p ⇒ p      by IdP
-          p, □(□p → p), □p ⇒ p                    by IdP
+    →R     ⇒ □(□p → p) → □p
+    GLR      □(□p → p) ⇒ □p
+    →L         □p → p, □(□p → p), □p ⇒ p
+    GLR          □(□p → p), □p ⇒ □p, p
+    IdP            □p → p, □(□p → p), p, □p, □p ⇒ p
+    IdP          p, □(□p → p), □p ⇒ p
 
-The first GLR puts `□p` on the left. After →L the left premise has `□p`
-on both sides, and a second GLR on it unboxes the `□p` on the left to
-`p`, which closes the branch. The derivation has height 5.
+Both uses of GLR are on `□p`. The first puts `□p` on the left. After →L
+on `□p → p` the left premise has `□p` on both sides, and the second GLR
+unboxes the `□p` on the left to `p`, which closes the branch. The
+derivation has height 5.
 
 In the editor the same derivation is six lines:
 
@@ -570,15 +571,15 @@ the second GLR.
 `impL □⊥ ⊥`, `glr ⊥`, `impL □⊥ ⊥`, `glr ⊥`, `botL`, `botL`, `botL`.
 Drawn:
 
-    ⇒ (□⊥ → ⊥) → □(□⊥ → ⊥) → ⊥                    by →R
-      □⊥ → ⊥ ⇒ □(□⊥ → ⊥) → ⊥                      by →R
-        □(□⊥ → ⊥), □⊥ → ⊥ ⇒ ⊥                     by →L on □⊥ → ⊥
-          □(□⊥ → ⊥) ⇒ □⊥, ⊥                       by GLR on □⊥
-            □⊥ → ⊥, □(□⊥ → ⊥), □⊥ ⇒ ⊥             by →L on □⊥ → ⊥
-              □(□⊥ → ⊥), □⊥ ⇒ □⊥, ⊥               by GLR on □⊥
-                □⊥ → ⊥, □(□⊥ → ⊥), ⊥, □⊥, □⊥ ⇒ ⊥  by ⊥L
-              ⊥, □(□⊥ → ⊥), □⊥ ⇒ ⊥                by ⊥L
-          ⊥, □(□⊥ → ⊥) ⇒ ⊥                        by ⊥L
+    →R     ⇒ (□⊥ → ⊥) → □(□⊥ → ⊥) → ⊥
+    →R       □⊥ → ⊥ ⇒ □(□⊥ → ⊥) → ⊥
+    →L         □(□⊥ → ⊥), □⊥ → ⊥ ⇒ ⊥
+    GLR          □(□⊥ → ⊥) ⇒ □⊥, ⊥
+    →L             □⊥ → ⊥, □(□⊥ → ⊥), □⊥ ⇒ ⊥
+    GLR              □(□⊥ → ⊥), □⊥ ⇒ □⊥, ⊥
+    ⊥L                 □⊥ → ⊥, □(□⊥ → ⊥), ⊥, □⊥, □⊥ ⇒ ⊥
+    ⊥L               ⊥, □(□⊥ → ⊥), □⊥ ⇒ ⊥
+    ⊥L           ⊥, □(□⊥ → ⊥) ⇒ ⊥
 
 It is the derivation of Löb's axiom with `⊥` for `p`, after two uses of
 →R and one of →L.
