@@ -6,7 +6,11 @@ to R11 hold here unchanged, and are not repeated; where that skill names
 its reviewer, read "the reviewer". Its rule R10 (statements first) is
 met here by displaying and screening the statements before their proofs
 (`SKILL.md`, stage 3, step 1): nothing waits for an answer, and the
-report that R10 speaks of is the closing page. This part
+report that R10 speaks of is the closing page. Read the file in the
+checkout, not a skill of the same name from your session's list: that
+may be a copy from another repository, and older. One that says its
+reviewer "is the gate" is the older text, and the file in the checkout
+holds. This part
 says only what a calculus
 brings to them: which of the six steps the explorer library has already
 done for every calculus, and which are written by hand for each.

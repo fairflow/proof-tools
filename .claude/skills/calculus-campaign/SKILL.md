@@ -539,7 +539,12 @@ Read `reference/adopt.md` §2, §5, §6 and §7, and Prove's pitfalls.
 
 ### Stage 3, Run
 
-Read `reference/certify.md` and the skill `lean-certify`.
+Read `reference/certify.md` and the skill `lean-certify`: the file
+`SKILL.md` at the root of the `proof-tools` checkout you work in. Read
+that file. Do not load, in its place, a skill of that name from your
+session's list: a session may offer a copy from another repository,
+which can be older. Where the two differ, the file in the checkout
+holds; a copy that says its reviewer "is the gate" is the older text.
 
 1. Decide the producers, and any certificate beyond those of the plan
    (the tree of moves or the script, and the model), and record why
