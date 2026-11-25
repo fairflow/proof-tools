@@ -116,7 +116,7 @@ the literature before anything is written: what the rules are; what has
 been proved about them; what should run, and why; how people use the
 calculus; which calculi it is related to. Then:
 
-| Stage | What is done | What the reviewer gets |
+| Stage | What is done | What it leaves |
 |---|---|---|
 | Survey | The five questions, answered from the sources. | A plan: goals, and what is left out. |
 | Adopt | The rules, transcribed as an inductive family; a first explorer. | The rules printed as figures beside the source, and derivations to type by hand. |
@@ -124,23 +124,26 @@ calculus; which calculi it is related to. Then:
 | Run | Search and countermodel procedures, each certified. | Verdicts with certificates the kernel checks. |
 | Explore | The explorer in full, with its guides. | A tutorial to work through. |
 
-No stage is automatic. An operator (a person, or a language model working
-with one) does the work, and a reviewer decides at the end of each stage.
+An operator (a person, or a language model) runs the campaign from the
+command to its closing page, deciding and recording as it goes, and does
+not wait for approval; the reviewer may redirect it at any time, and reads
+one page at the end.
 What is trusted is small: Lean's kernel, and two checkers per calculus, each
 with a theorem. `docs/campaign.md` has the detail.
 
 The procedure is written out as a Claude skill, in
 `.claude/skills/calculus-campaign/`: `SKILL.md`, a reference for each of
 adopting, certifying and exploring, a list of pitfalls, and templates (the
-plan, a stage's brief and report, the instance of the explorer, as
-compiled). In a Claude Code session whose project is a checkout of this
+plan, the log of decisions, the closing page, the instance of the
+explorer, as compiled). In a Claude Code session whose project is a checkout of this
 repository it is the command
 
     /calculus-campaign <the calculus, named in words>
 
-whose first act is one proposal to the reviewer (the source, the system,
-the results aimed at), after which it stops for an answer. A campaign's
-files go in a Lake package of their own under `calculi/`.
+whose first act fixes the target (the source, the system, the results
+aimed at) and tells the reviewer what was decided. It then goes on,
+without waiting, to a closing page. A campaign's files go in a Lake
+package of their own under `calculi/`.
 
 **If the command is unknown.** Then the session was not started in a
 checkout that has `.claude/skills/calculus-campaign/`: the checkout is older
@@ -151,7 +154,7 @@ existed does not register it afterwards, whatever is pulled or merged into
 its folder. Where a new session is not possible, open `SKILL.md` as a file
 and follow it from the top, which it allows for, and say that this was
 done. A campaign is not run from `docs/campaign.md`: that page describes
-the method and has none of the gates.
+the method and has none of the procedure.
 
 ## Using it
 
