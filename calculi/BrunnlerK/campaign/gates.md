@@ -468,3 +468,35 @@ Adopt is not passed, and Prove is begun in the session of stages 0 and 1.
 * **Result**: not a gate of a stage. The reviewer's word for a change
   outside the campaign's folder (the skill's rule 7, which says so since
   `9cbfec1`).
+
+## 2026-11-25 07:38 GMT. The skill rewritten so that the operator works independently
+
+* **The reviewer's remark** (2026-11-25, in the session): "the primary
+  purpose of the skill seems to have been to ensure an agent
+  implementing it cannot work independently, while my intention in
+  commissioning the skill was more to ensure an agent CAN work
+  independently.  comments please."
+* **Put to the reviewer**: the operator's comments, with figures from
+  `cost-log.md` (of seven gates one changed the work, the plan's; no
+  error was found at a gate; a little over two hours of work in a span
+  of 11 h 24 min; 2 933 of 6 459 Lean lines in the last 36 minutes,
+  where nothing waited), and the question whether to rewrite the skill
+  so that the operator works independently by default.
+* **Answer** (2026-11-25, in the session): "Yes, rewrite it"
+* **Done**:
+  - the skill, in commit `1611566`, which changes the skill's files and
+    nothing else: `SKILL.md`, the four references, nine templates
+    (`gates.md` is now `decisions.md`). What it now says:
+    `method-notes.md`, note 67;
+  - the library's own pages that describe the method, in commit
+    `4185324`: rule R10 of `lean-certify` (`SKILL.md` at the root and
+    `docs/outline.md`), `docs/campaign.md`, and three passages of
+    `README.md`;
+  - outside the repository: one bullet added to the reviewer's
+    `SOUL.md`, "Surfacing is not waiting".
+* **Not done**: the copy of the `lean-certify` skill in its own
+  repository still has R10 as it was. No branch of that repository is
+  agreed for the operator to push to.
+* **Result**: not a gate of a stage. The reviewer's word for a change
+  outside the campaign's folder (the skill's rule 7). This file keeps
+  its name: the campaign was run under the earlier text.

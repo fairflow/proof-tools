@@ -47,6 +47,8 @@ the reading of the source was all in the first part.
 | 17 | 2026-11-23 | after 4 | decision | "make the 16 remaining changes to the skill" | the skill, in commit `3186d6d`: `SKILL.md`, the three references, three templates; `method-notes.md`, the last section |
 | 18 | 2026-11-23 | after 4 | decision | "Yes, update them" (to: bring the skill's "Status" and "worked instance" paragraphs up to date) | `SKILL.md`, the two paragraphs, in commit `d5c7f14`; `method-notes.md`, note 60 |
 | 19 | 2026-11-23 | after 4 | decision | "turn the eighteen method notes into skill changes too" | the skill, in commits `5337dd4` (the eighteen) and `9cbfec1` (eight more, left out of the operator's list): `SKILL.md`, three references, six templates; `method-notes.md`, the last two sections |
+| 20 | 2026-11-25 | after 4 | a question, and a correction of the method | "the primary purpose of the skill seems to have been to ensure an agent implementing it cannot work independently, while my intention in commissioning the skill was more to ensure an agent CAN work independently. comments please." | the operator's comments, from this log's figures; nothing in the files |
+| 21 | 2026-11-25 | after 4 | decision | "Yes, rewrite it" | the skill rewritten so that the operator works without waiting (`gates.md`, the last entry; `method-notes.md`, notes 67 to 69) |
 
 ## By stage
 

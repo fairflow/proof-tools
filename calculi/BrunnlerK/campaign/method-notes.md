@@ -503,3 +503,50 @@ these are beyond that count, and are in a commit of their own.
     file of the skill cites one by number (searched).
 66. **Still not changed**: the last paragraph of `SKILL.md`, "checked
     against `proof-tools` at commit `3fa25c0`" (note 60).
+
+## After the campaign: the skill rewritten for an operator that works independently (2026-11-25)
+
+67. **What the rewrite changed.** The reviewer's word: `gates.md`, the
+    last entry. In the skill at commit `1611566`:
+
+    | before | now | where |
+    |---|---|---|
+    | the first act puts a proposal and stops | the operator decides the target by stated defaults, tells the reviewer, goes on | `SKILL.md`, the first act |
+    | seven gates, each a stop | each choice an entry of `decisions.md` with its cost to reverse (little, a stage, the campaign) | "Deciding, checking, stopping", 1; `templates/decisions.md` |
+    | the reviewer signs the rule table | a second transcription by a cold reader, compared row by row | `reference/adopt.md` §7; `templates/rule-table.md` |
+    | the reviewer sees each statement before its proof | each is screened, and read back from the Lean by a cold reader | `reference/adopt.md` §7; `templates/statements.md` |
+    | the reviewer's test, typed by a person | every exercise run by script in the tests; the file is a way in, at any time | `reference/explore.md` §10 |
+    | the tutorial worked through by the reviewer | every line elaborated, what it shows pinned | stage 4, step 3 |
+    | soundness before completeness | both before every other goal, as a check of the rule table | stage 2, step 4 |
+    | a report of five parts at each stage | a status board, and one closing page of six parts that asks nothing | `templates/report.md`, `templates/README.md` |
+    | a fresh session at each stage, begun by the reviewer | sessions are the operator's to arrange | rule 5 |
+    | a need of the library: stop and report | record it, work round it or leave the goal OPEN, go on | rule 7 |
+    | only the reviewer sets a goal aside, at the plan | the operator never sets one aside: a goal not reached is OPEN | "What a campaign proves" |
+    | gates lifted by a word of the reviewer | a gate only where the reviewer asks to pass a thing themselves | "Deciding, checking, stopping", 5 |
+
+    What still stops a campaign: what only the reviewer may do or allow;
+    an act that cannot be undone outside the folder; no source.
+68. **Not tested.** No campaign has been run from this text. The second
+    transcription and the reading back have not been tried at all: this
+    campaign had neither. Whether a cold reader's table can be compared
+    row by row with the operator's, for a calculus whose judgments are
+    not flat, is not known.
+69. **What the rewrite gives up.** At the plan's gate the reviewer chose
+    the direct form of `Valid` over two-valued models, where the
+    operator had proposed the indirect one (note 14). Nothing in the new
+    text makes that choice better: `reference/adopt.md` §5 now gives
+    the order of the forms, and the closing page puts such a decision
+    first, to be reversed afterwards.
+70. **The rewrite was read cold before it was committed.** A second
+    agent, given the files and the intent and not the operator's view
+    of them, reported thirty findings; all were applied. The serious
+    ones were in the new checks: the second transcription was to be
+    compared with "yours", which could have meant the column copied
+    from the source (it is now what `#rules` prints); the reading back
+    gave the reader Lean whose comments and names say what to find (now
+    an extract, with comments out and neutral names); and nothing kept
+    a subagent in the same checkout from opening the campaign folder
+    (the brief now names what may be opened). One finding is applied in
+    the text only: the worked derivations go in a test module that
+    imports the theory file alone, and the compiled template has no
+    such module.
