@@ -1,17 +1,16 @@
 # <CALCULUS>: the plan
 
-*Template: the Survey's deliverable. It can be reviewed without opening
-any code. **No Lean of the calculus until the reviewer has read it.** It
-is read again at every gate, and changed when an answer changes, with the
-date.*
+*Template: the Survey's deliverable. It can be read without opening any
+code. **No Lean of the calculus before it is written**, beyond the
+scratch screens it reports. It is read again at the start of every
+stage, and changed when a decision changes, with the date.*
 
-Written <date and time, from the clock>. Reviewed: <not yet / date; see
-`gates.md`>. The target, the place of the files and the rules of the
-project: `gates.md`, the first entry.
+Written <date and time, from the clock>. The target, the place of the
+files and the rules of the project: `decisions.md`, the first entry.
 
 ## The source
 
-* The paper: authors, title, venue, year, identifier; the version agreed.
+* The paper: authors, title, venue, year, identifier; the version fixed at the first act.
 * **Which file was read**, and whether in full.
 * The appendix: is there one, was it read, what is in it.
 * Other sources consulted (another version, an erratum, a thesis), and
@@ -29,8 +28,8 @@ project: `gates.md`, the first entry.
   which the source shows admissible.
 * Side conditions stated in the prose: <each, with its place>.
 * Rules against restrictions on proof search: <which lines are which>.
-* **Ambiguous or silent**, with a proposal for each (the reviewer's to
-  settle):
+* **Ambiguous or silent**, with what was decided for each (a divergence
+  of kind U, and an entry of `decisions.md`):
 
 ## Q2. What is proved about it?
 
@@ -41,16 +40,16 @@ not apply. The source is the paper and the number of the theorem, or the
 place where a proof is only stated, or "none found" with where you
 searched.
 
-| entry | value, and why | source, and the system its theorem is about | a goal? (by rule / the reviewer's to say / no) |
+| entry | value, and why | source, and the system its theorem is about | a goal? (by rule / decided: yes, why / no, why) |
 |---|---|---|---|
 
 **The source's theorems, and further results from the literature.**
 Soundness is a goal, and completeness where the source proves it. The
-rest are proposed, each with its size as far as it can be told (the
-length of the published proof, what it rests on): the reviewer says which
-are goals.
+rest are listed, each with its size as far as it can be told (the
+length of the published proof, what it rests on). Which are goals is
+decided here, with the reason (`SKILL.md`, "What a campaign proves").
 
-| result | where in the source | by which route | its size | a goal (by rule) / proposed as a goal / proposed to set aside (why) |
+| result | where in the source | by which route | its size | a goal (by rule) / decided: a goal, why / decided: not a goal, why |
 |---|---|---|---|---|
 
 The kinds of result among the goals (`reference/adopt.md` §2), and what
@@ -64,8 +63,9 @@ and of truth, with its place>. The term calculus, if a goal needs one:
 
 * Proof search, countermodels, or both; a decision procedure, or search
   with a budget.
-* Who will rely on the answers, so why they are certified. <Ask the
-  reviewer if the request does not say.>
+* Who will rely on the answers, so why they are certified. <Where the
+  request does not say: decide from Q4 and from what the calculus is
+  used for, and record it.>
 * **The certificate of record** for a derivation
   (`reference/certify.md` §1): the tree of moves, which is the default,
   or the script; and why.
@@ -80,8 +80,8 @@ and of truth, with its place>. The term calculus, if a goal needs one:
 ## Q4. How do people use it?
 
 * The source's worked derivations (each with its place): these are the
-  exercises of the reviewer's test. <If it has none: which derivations
-  are proposed, and that the choice is ours.>
+  exercises, and the first tests of the transcription. <If it has
+  none: which derivations are chosen, and that the choice is ours.>
 * The order in which rules are applied by hand; what a reader does without
   comment.
 * What the explorer should show: <how a judgment should read; which steps
@@ -94,7 +94,7 @@ and of truth, with its place>. The term calculus, if a goal needs one:
 * **Existing formalisations**, in any prover: what was found, and where
   you searched.
 
-## Choices of encoding, for the reviewer
+## Choices of encoding
 
 Read `reference/adopt.md` §3 and `reference/explore.md` §2 and §13 before
 filling this. Give the options you weighed, not only the one proposed, and
@@ -113,10 +113,10 @@ names (stage 0, step 3), not on the judgments alone:
 In the third column give the reason with the choice, and **what the
 choice does to the rules**: which rule of the source needs no
 constructor under it, and why (exchange, where a rule finds its formula
-by membership); which rule the encoding adds. A reviewer who has to ask
+by membership); which rule the encoding adds. A reader who has to ask
 why a rule of the figure is missing was not given the reason here.
 
-| choice | the options weighed | proposed, why, and what it does to the rules |
+| choice | the options weighed | chosen, why, and what it does to the rules |
 |---|---|---|
 | a judgment as data | | |
 | how a rule, and a move, names what it acts on | | |
@@ -129,8 +129,8 @@ why a rule of the figure is missing was not given the reason here.
 **Goals**, in order: the source's soundness theorem first; then the rest,
 a goal after those it rests on. Of each goal that is a lemma on the
 source's way to another goal, say which one: if the proofs take another
-route it falls off, and is put to the reviewer again (`SKILL.md`,
-stage 2, step 4).
+route it falls off, and is decided on again (`SKILL.md`, stage 2,
+step 4).
 
 **Non-goals**, with the reason for each:
 
@@ -164,13 +164,15 @@ If none, say so.
 
 ## Budget
 
-A guess is enough: its use is to say when to stop and report.
+A guess is enough: its use is to say when a stage is closed with goals
+still OPEN.
 
-| stage | sessions expected | what would make me stop and report |
+| stage | time expected, by the clock | what closes the stage short of its goals: a time by the clock, or a number of routes tried on one goal |
 |---|---|---|
 
-## Decisions reserved for the reviewer
+## The decisions that cost the campaign to reverse
 
 Anything that is a choice about what is true or what is meant, not about
-how to prove it. Always among them: which results are goals, beyond those
-that are goals by rule.
+how to prove it: the source and the system, what "holds" means, the
+axiom policy. Each is entered in `decisions.md` and comes first on the
+closing page; what "holds" means is screened first (stage 0, step 3).

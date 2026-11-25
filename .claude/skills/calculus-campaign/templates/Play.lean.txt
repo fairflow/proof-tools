@@ -6,8 +6,10 @@ the same calculus, it elaborated with no error by
 
 # `Play/‹Calculus›.lean`: ‹the calculus›, a move at a time
 
-The reviewer's file.  The operator prepared it (‹date›) and does not edit
-it again without saying so (`campaign/gates.md`).  It is in no library: no
+A file for a person who wants to try the calculus.  The operator prepared
+it (‹date›) and runs every exercise in the tests; a change to it after
+its first commit is recorded (`campaign/decisions.md`).  It is in no
+library: no
 `lake build` builds it and nothing imports it.  Build the instance first
 (`lake build`), then open this file in the editor and type.
 
@@ -69,7 +71,7 @@ what message or what query›. -/
 
 -- Where no move applies to the judgment as it stands, the query below is
 -- an error, and this file must elaborate with none: leave the line out,
--- and say in the text above that the reviewer types it and what the
+-- and say in the text above that the user types it and what the
 -- message will be.
 example : Att S true ‹a non-theorem› := by
   ‹tactic›

@@ -3,7 +3,11 @@
 Covers the Run stage. **The authority is the skill `lean-certify`**
 (`SKILL.md` at the root of `proof-tools`): its six steps and its rules R1
 to R11 hold here unchanged, and are not repeated; where that skill names
-its reviewer, read "the reviewer". This part says only what a calculus
+its reviewer, read "the reviewer". Its rule R10 (statements first) is
+met here by displaying and screening the statements before their proofs
+(`SKILL.md`, stage 3, step 1): nothing waits for an answer, and the
+report that R10 speaks of is the closing page. This part
+says only what a calculus
 brings to them: which of the six steps the explorer library has already
 done for every calculus, and which are written by hand for each.
 
@@ -14,7 +18,7 @@ checks. Names of Lean declarations (`step_sound`, `Fam`, `Derivable`,
 `treeCert`, `scriptCert`) are those of `templates/Instance.lean.txt`.
 
 Contents: 1 the six steps, for a calculus; 2 what is by hand; 3 the
-refutation side and its levels; 4 the producer; 5 gates, tests and
+refutation side and its levels; 4 the producer; 5 statements, tests and
 measurements; 6 deciders.
 
 ## 1. The six steps, for a calculus
@@ -76,7 +80,7 @@ built from the tactics of the calculus, which gives scripts
 (`reference/explore.md` §8); an attempt with open goals, which has no
 tree; and the yes side of the library's `engine` (§3), which is the
 script certifier. A campaign may use both; the plan says which is the
-certificate of record (Q3), and the reviewer signs that with the plan.
+certificate of record (Q3), and it is recorded with the plan.
 
 **Which functions are "the checkers".** What you write and prove sound is
 `step` (and the check of a model). `Cert.check` and `derives` are the
@@ -238,14 +242,15 @@ Where the search is not structural (well-founded recursion, a budget),
 the kernel does not run it: R3. This route is then closed, and the
 certifier is the only one.
 
-## 5. Gates, tests, measurements
+## 5. Statements, tests, measurements
 
-**Gate (R10, and the campaign's).** The library's two certifiers of
-derivations and the certifier against what holds were signed with the
-plan: what holds, the certificate of record, the level, the notion of
-model. Before any producer is written, the reviewer sees: which producers
-and why (who relies on the answers); and for any certifier of your own,
-`Holds`, the certificate, and the type of `sound`.
+**Statements first (R10).** The library's two certifiers of derivations
+and the certifier against what holds were fixed in the plan: what holds,
+the certificate of record, the level, the notion of model. Before any
+producer is written, record in `decisions.md` which producers, and why
+(who relies on the answers); and for any certifier of your own, enter
+`Holds`, the certificate, and the type of `sound` in `statements.md`,
+displayed and screened.
 
 **Negative tests (R9).** For each certifier, one corrupted certificate,
 rejected in the kernel and pinned. For a tree and for a script, two each:
@@ -273,7 +278,7 @@ reported. There is no driver for this in the library: the same executable
 serves, run under a deadline imposed from outside (the operating system's
 `timeout`), with a case that is cut off reported as a flag.
 
-**Measure** (R8), and put the figures in the report, with the machine and
+**Measure** (R8), and put the figures in `measurements.md`, with the machine and
 the date:
 
 - kernel time against the size of the certificate (Lean's profiler,

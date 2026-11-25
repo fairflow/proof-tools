@@ -1,6 +1,6 @@
 ---
 name: calculus-campaign
-description: Take a proof calculus from its paper to mechanised use in Lean 4 with the proof-tools libraries, as one campaign of five stages - survey the source, transcribe the rules and test the transcription with a first proof explorer, prove what the literature proves about the calculus (statements first), run proof search and countermodel procedures whose answers the kernel checks, and finish the explorer. Started by the command /calculus-campaign followed by the calculus, named in words. Use when asked to adopt, formalise, port or mechanise a calculus (sequent, nested sequent, tableau, natural deduction, labelled, refutation) from a paper or a book; to make a calculus that is already in Lean explorable a move at a time (`apply_move`, scripts, `#walk`); to certify its proof search or its countermodels; or to plan, brief, report on or resume one stage of such a campaign.
+description: Take a proof calculus from its paper to mechanised use in Lean 4 with the proof-tools libraries, as one campaign of five stages - survey the source, transcribe the rules and test the transcription with a first proof explorer, prove what the literature proves about the calculus (statements first), run proof search and countermodel procedures whose answers the kernel checks, and finish the explorer. Started by the command /calculus-campaign followed by the calculus, named in words. Use when asked to adopt, formalise, port or mechanise a calculus (sequent, nested sequent, tableau, natural deduction, labelled, refutation) from a paper or a book; to make a calculus that is already in Lean explorable a move at a time (`apply_move`, scripts, `#walk`); to certify its proof search or its countermodels; or to resume such a campaign from its folder or from a brief.
 argument-hint: "[the calculus, named in words | the path of a stage's brief]"
 ---
 
@@ -15,9 +15,9 @@ What was typed after the command's name is put here by Claude Code:
 > $ARGUMENTS
 
 - **It names a calculus** (as in `/calculus-campaign Gentzen's LJ`): that
-  is the **target** of a new campaign. Read "The first act" and "The
-  standing list" below, do the first act, and stop where it says. The
-  rest of this file is for when the reviewer has answered.
+  is the **target** of a new campaign. Read this file to the end; then
+  do the first act and go on to the Survey. The campaign runs from the
+  command to its closing page without waiting for the reviewer.
 - **It names a brief** (`brief-<stage number>-<k>.md`) **or a campaign
   folder**: a campaign in progress. Read this file from "The method" on,
   then the brief (in a folder: `README.md`, then the latest brief), and go
@@ -27,95 +27,112 @@ What was typed after the command's name is put here by Claude Code:
   command). Look for a line beginning `ARGUMENTS:` at the very end of this
   text, then in the request that brought you here, and treat what you find
   as one of the two cases above. If you find nothing, ask which calculus
-  is meant, and wait for the answer.
+  is meant, and wait for the answer: this is a stop ("Deciding, checking,
+  stopping", 3).
 
 The files this text calls `reference/…` and `templates/…` are beside it,
 in the skill's folder: `${CLAUDE_SKILL_DIR}` (if that shows as a name in
 braces, it is the folder this file is in).
 
-## The first act: the target, fixed with the reviewer
+## The first act: the target
 
 The **reviewer** is the person who typed the command, unless they name
 another; you are the **operator**. The target is a name in words. It does
 not yet say which paper, which of the paper's systems, or what is to be
-proved, and you do not decide those. Nothing is written to disk before
-the answer.
+proved. You decide those, by the defaults below, write the decision
+down, tell the reviewer in one short message what was decided, and go
+on. You do not wait for an answer. The reviewer may give one at any
+time, and it holds from when it comes ("Deciding, checking, stopping",
+4).
 
 1. **Is a campaign on this calculus already begun?** A campaign is a
-   folder `campaign/` whose `gates.md` opens with an entry "the target".
-   Look for one that names this calculus under the directory you were
-   started in. One that exists is resumed (the second case above), not
-   begun again.
+   folder `campaign/` whose `decisions.md` opens with an entry "the
+   target" (in a campaign begun before 2026-11-25 the file is
+   `gates.md`). Look for one that names this calculus under the
+   directory you were started in. One that exists is resumed (the second
+   case above), not begun again. One that is closed (it has a closing
+   page, or a closing report) is not run again: a request that names it
+   asks for further work on it, which is recorded as a new entry and
+   done under this text. One begun under `gates.md` keeps its files as
+   they are: go on under this text, record new choices in a
+   `decisions.md` beside it, and decide what its unanswered gates left
+   open.
 2. **Find the candidates**: the papers where the calculus is defined, and
    their versions (conference, journal, thesis, preprint); the systems
    each defines (a paper often has several: with and without cut, a base
    system and its extensions, a variant for proof search); the results
    each claims for them. Read no further than abstracts, introductions
    and the lists of theorems and figures: this is not the Survey. Nothing
-   goes into the proposal from memory alone: each candidate and each
-   result has a place you can cite. A source you cannot get is named in
-   the proposal as one the reviewer must supply.
-3. **Put one proposal to the reviewer, and stop.** One message, saying
-   what is proposed and what is asked:
-   - the paper, and the version to be read; the other candidates, a line
-     each, with why not;
-   - the system in it, under the paper's own name for it, and what is
-     left out (its extensions, its variants);
-   - the results aimed at: the entries of the standing list that the
+   is decided from memory alone: each candidate and each result has a
+   place you can cite. A source you cannot get is not the target: take
+   the best one you can get, and say which you could not.
+3. **Decide the target.** Each part has a default:
+   - **the paper, and the version to be read**: the most complete
+     version you can get (a journal version or a thesis before a
+     conference paper; the latest revision of a preprint). The other
+     candidates get a line each, with why not;
+   - **the system**: the one the command's words name, under the paper's
+     own name for it. Where they fit several, the base system: without
+     the extensions, and in the form the source proves its theorems
+     for. An extension is a campaign of its own (pitfall 2). Say what is
+     left out;
+   - **the results aimed at**: the entries of the standing list that the
      literature appears to have for this system, and anything else the
      request mentions. This is the aim; the Survey makes it exact;
-   - the path: adopted from the paper, which is what this file describes;
-     or, if you found the calculus already in Lean, or it has no source,
-     one of the "Two shorter paths";
-   - where the files go, and a short name `<Calculus>` for them, fit to be
-     a Lean module name. A calculus has **a repository of its own** only
-     if the reviewer says so; the directory you were started in is not one
-     by default. Otherwise the default is the folder `calculi/<Calculus>/`
-     of the library `proof-tools`, with core Lean only;
-   - asked: is there a checkout of the library, and a branch, to work in?
-     The default is that you clone `https://github.com/fairflow/proof-tools`
-     and use a commit that has the files `ProofTools/Explore/Cert.lean` and
-     `ProofTools/Explore/Session.lean`;
-   - said, if you were started in a checkout of the library: whether it is
-     up to date. Compare the commit you are on with the remote's `main`
-     (`git ls-remote origin refs/heads/main`, which writes nothing). If
-     the remote's commit is not an ancestor of yours, or the checkout
-     does not have it, the library and this text may both be old: say so,
-     with the two commits, and ask whether to update before anything
-     else. A
+   - **the path**: adopted from the paper, which is what this file
+     describes; or, if you found the calculus already in Lean, or it has
+     no source, one of the "Two shorter paths";
+   - **the place**, and a short name `<Calculus>` fit to be a Lean
+     module name: the folder `calculi/<Calculus>/` of the library
+     `proof-tools`, with core Lean only. A calculus has a repository of
+     its own only if the reviewer has said so; the directory you were
+     started in is not one by default;
+   - **the library**: the checkout you were started in, where it is one
+     of `proof-tools`; otherwise clone
+     `https://github.com/fairflow/proof-tools` and use a commit that has
+     the files `ProofTools/Explore/Cert.lean` and
+     `ProofTools/Explore/Session.lean`. In a checkout, compare the
+     commit you are on with the remote's `main`
+     (`git ls-remote origin refs/heads/main`, which writes nothing): a
      session's folder is often cut from a local `main` that nobody has
-     pulled;
-   - asked: may the agreed source be fetched: its LaTeX archive where
-     there is one (arXiv gives it for many papers), otherwise its PDF;
-     and may the LaTeX be compiled, to read the printed numbers
-     (`reference/adopt.md` §1)? Where your environment lets you download
-     a file without the reviewer's word, do not ask: say that the source
-     will be fetched, and from where. Either way no file is fetched
-     before the answer;
-   - asked: where and when to push? The default is that you commit
-     locally and push nothing until the reviewer says. And how will a
-     report reach the reviewer while nothing is pushed: sent as a file,
-     or published as a page (rule 6)? A file in a folder the reviewer
-     cannot open has not reached them;
-   - asked: is anything not to be touched? Only the reviewer contacts the
-     source's authors.
-4. **When the answer has come**, read the rest of this file. Then make
-   the campaign folder, `<the place>/campaign/` (by default
-   `calculi/<Calculus>/campaign/`), from `templates/README.md`,
-   `plan.md`, `cost-log.md` and `gates.md`; start the cost log and
-   `method-notes.md`. The first entry of `gates.md` holds the command's
-   words, your proposal and the reviewer's answer in their words. It is
-   the one record of the target, the place and the rules of the project:
-   every other file points to it. Commit, and begin the Survey.
+     pulled. If the remote's commit is not an ancestor of yours, the
+     library and this text may both be old: update where that loses
+     nothing of anyone's, read this text again if it changed, and
+     record the two commits;
+   - **the source's files**: fetch the LaTeX archive where there is one
+     (arXiv gives it for many papers), otherwise the PDF, and compile
+     the LaTeX to read the printed numbers (`reference/adopt.md` §1).
+     Where your environment will not download a file without the
+     reviewer's word, that is a stop of the environment and the one
+     question of the first act: ask it in the message of step 4, with
+     the file's name, place and size, and go on meanwhile with what can
+     be read without it;
+   - **pushing**: as the project's standing instructions say (its
+     `CLAUDE.md`, the reviewer's instructions to you). Where they say
+     nothing, commit locally and push nothing; the closing page then
+     reaches the reviewer another way: sent as a file, or published as
+     a private page (rule 6). A file in a folder the reviewer cannot
+     open has not reached them;
+   - **what is not touched**: what the project's instructions name.
+     Only the reviewer contacts the source's authors.
+4. **Record it, say it, go on.** Make the campaign folder,
+   `calculi/<Calculus>/campaign/`, from `templates/README.md`,
+   `plan.md`, `cost-log.md` and `decisions.md`; start the cost log and
+   `method-notes.md`. The first entry of `decisions.md` holds the
+   command's words and what step 3 decided, each part with the
+   alternative that was not taken. It is the one record of the target,
+   the place and the rules of the project: every other file points to
+   it. Commit. Tell the reviewer in one message of a few lines: the
+   paper, the system, the results aimed at, the place. It is
+   information, and it asks nothing (except the download, where the
+   environment needs it). Begin the Survey in the same turn.
 
 **Where the session has already gone further** before this text was
 read (the source read past its abstract, a plan drafted, files written:
 the command was not known where the session began, or the request came
-in other words), put the proposal all the same. Say in it what was read
-and what was written. What was drafted has no standing until the
-reviewer has answered. Write that history under the first entry of
-`gates.md`, and in the cost log's row that the operator did not start
-cold.
+in other words), say in the first entry what was read and what was
+written, and in the cost log's row that the operator did not start
+cold. What was drafted is checked against this text like anything else.
 
 ## The standing list
 
@@ -144,14 +161,21 @@ skill holds.
 | (b) | **lean-certify** | a checker proved sound, an untrusted producer, the kernel checking each answer | `LeanCertify` | `reference/certify.md`; the authority is the skill `lean-certify` (`SKILL.md` at the root of proof-tools) |
 | (c) | **the proof explorer** | derivations and unfinished derivations as data: built a move at a time, by script or by program, looked at, and mapped out to the calculus's own derivations | `ProofTools.Explore`, on `ProofTools.Zipper` | `reference/explore.md`. The library's guide, `docs/explore.md`, is the reference for what the library proves: consult it; no stage asks you to read it whole |
 
-The reviewer owns the statements, the definitions and the rule tables,
-and decides at each gate whether to go on. The reviewer reads statements
-and tries things, and is not asked to read proofs. No stage is automatic:
-the tools make each stage's result checkable without trusting the
-operator.
+**The operator runs the campaign, from the command to the closing page,
+without waiting for anyone.** It makes the choices, records each one
+where it can be reversed, and runs the checks that stand in for a second
+reader ("Deciding, checking, stopping"). The reviewer owns what leaves
+the project (contact with the source's authors, publication to anyone
+but the reviewer, pushing to a place not agreed), and may redirect the
+campaign at any time, in a word. The reviewer is not asked to read
+proofs, and is not asked to approve steps: the campaign ends with one
+page, which says what to read and what was decided. What a result may be relied on for is settled by
+the kernel, by the checks the operator ran, and by that page being short
+enough to read.
 
 Read a part when a stage sends you to it, and the stage's entries of
-`reference/pitfalls.md` with it. Compiled Lean to read beside the parts:
+`reference/pitfalls.md` with it; its entries under "Every record",
+before the first document is written. Compiled Lean to read beside the parts:
 
 - **the templates** `templates/Instance.lean.txt` and `Play.lean.txt`:
   the files of an instance, compiled for the library's example calculus;
@@ -176,33 +200,29 @@ two outside the library's tests:
 
 **Status.** The three parts have been used separately. The whole, from a
 paper to an explorer, has been run once: on Brünnler's system K, on
-2026-11-23, by an operator that is a language model. That run does not
-test all of this text:
+2026-11-23, by an operator that is a language model, under an earlier
+text in which the reviewer passed a gate before each step. That run's
+record (its cost log) shows: of seven gates one changed the work, the
+plan's; no error was found at a gate, each was found by a tool, a test
+or a screen that the operator ran; the reviewer lifted every gate in the
+middle of Prove; and most of the day was spent waiting.
 
-- the operator did not start cold: it had read the source and written a
-  first plan before it had the skill;
-- the five stages were one session, at the reviewer's word, so no stage
-  was begun by a fresh session from its brief (rule 5);
-- the reviewer lifted every gate in the middle of Prove, and from there
-  the operator decided what the gates would have put: the statements of
-  the later goals, the producers, what the explorer serves;
-- the reviewer's test and the tutorial were put, and not done;
-- this text was amended during that run and after it (the changes are
-  listed in the run's closing report and in its notes on the method),
-  and the text as it now stands has not been run.
+This text was rewritten on 2026-11-25 so that the operator works
+independently. **As it stands it has not been run.** New in it, and
+untested: the second transcription and the reading back
+(`reference/adopt.md` §7), the decisions recorded by what they cost to
+reverse, and the closing page. Where this text leaves you without an
+instruction, decide, and write it down (rules 8 and 9).
 
-So a run by an operator starting cold, with a fresh session at each
-stage and every gate put to the reviewer, has not yet been made. Where
-this text leaves you without an instruction, that is a finding: write it
-down (rule 8).
-
-## Eight rules for every stage
+## Nine rules for every stage
 
 1. **Read the source at source.** A rule table comes from the paper, not
    from a summary, a survey, memory, or an example in this skill. The
    prose carries side conditions that the figure does not.
 2. **Statements before proofs.** A definition, a rule table or a statement
-   goes to the reviewer before anything is built on it.
+   is written down, displayed in its document and screened before
+   anything is built on it. Nobody is waited for: the order is yours to
+   keep.
 3. **PROVED, REFUTED, OPEN.** PROVED means the kernel has checked it, with
    no `sorry`, within the axioms its file allows. Anything else that is
    not refuted is OPEN. A refuted statement is kept, with its countermodel.
@@ -211,27 +231,38 @@ down (rule 8).
    an axiom enters: `#choice_path`. A paper's item numbers: compile it and
    read the `.aux`. And read your own check's output: one that counts the
    wrong thing reports success.
-5. **A stage starts in a fresh session, from a written brief**
-   (`templates/brief.md`): a long session pays to read its own history
-   again at every step. The command's session is stage 0's. A stage may
-   take several sessions, and a gate inside it is the place to end one.
-   The reviewer may say that a stage is run in the session of the one
-   before ("continue here"): "How a gate is run", 5, says what is then
-   done.
-6. **A stage's work ends when the reviewer can read its report**: pushed,
-   sent in full, or published. A clean build is not the end, and a file
-   in a temporary folder is not a report.
+5. **Sessions are yours to arrange.** A long session pays to read its own
+   history again at every step. When that cost shows, hand the next
+   stage to a fresh agent that you start yourself, with a written brief
+   (`templates/brief.md`), and take its result back. This needs no word
+   of the reviewer. End a session before the campaign is done only
+   where the environment forces it: write the brief, and enter the end
+   in `decisions.md` as a stop, since someone must then open a session
+   with `/calculus-campaign` and the brief's path.
+   The documents are the campaign's memory: a session that goes on from
+   one stage to the next reads them again, and does not work from what
+   it remembers of them, nor from a summary the environment made.
+6. **The campaign ends when the reviewer can read its closing page**:
+   pushed, sent in full, or published. A clean build is not the end, and
+   a file in a temporary folder is not a page. Until then the status
+   board (`README.md` of the campaign folder) is true at every commit.
 7. **Do not change the libraries.** If an instance seems to need a change
-   to `proof-tools`, stop and report it (part (iv) of the report): it is
-   a finding about the library. A campaign under `calculi/` changes no
-   tracked file outside its own folder. One exception: the reviewer may
-   ask, during a campaign, for a change to this skill. Make it in a
-   commit of its own that changes the skill's files and nothing else,
-   record the reviewer's words in `gates.md`, and say it in the report.
+   to `proof-tools`, do not make it, and do not stop: it is a finding
+   about the library. Record it, work round it in the campaign's own
+   folder, or leave the goal that needs it OPEN with the reason, and go
+   on. A campaign under `calculi/` changes no tracked file outside its
+   own folder. One exception: the reviewer may ask, during a campaign,
+   for a change to this skill. Make it in a commit of its own that
+   changes the skill's files and nothing else, record the reviewer's
+   words in `decisions.md`, and say it on the closing page.
 8. **The method learns.** Keep `method-notes.md` in the campaign folder:
-   every place where this skill was wrong, silent or unclear, and what you
-   did there. It feeds part (iv) of each report, and the closing report
+   each place where this skill was wrong, silent or unclear, and what you
+   did there. Keep it to what would change this text. The closing page
    proposes the changes.
+9. **Decide, record, go on.** Where the source, the plan or this text
+   leaves a choice, make it, write it in `decisions.md`, and go on. Do
+   not end a turn to ask what you can decide. The few things that do
+   stop a campaign are listed in "Deciding, checking, stopping", 3.
 
 ## Before anything: five questions
 
@@ -268,33 +299,39 @@ believe holds, with no source found, is reported as that.
 Which results are goals of Prove:
 
 - **A standing result that holds of this system and has a source is a
-  goal by rule; only the reviewer can set one aside, in their own words,
-  at the Survey's gate.** Where such a result has more than one form
-  (that a rule is admissible; a procedure that removes it) or the
-  source proves it by more than one route, the goal by rule is the
-  statement the source states. The form and the route are proposed in
-  the plan (`reference/adopt.md` §2), and are the reviewer's to say.
+  goal by rule.** The operator does not set one aside: a goal that is
+  not reached ends OPEN, with what was tried, or why it was not begun.
+  The reviewer may set one aside at any time, in their own words. Where
+  such a result has more than one form (that a rule is admissible; a
+  procedure that removes it) or the source proves it by more than one
+  route, the goal by rule is the statement the source states. The form
+  and the route beyond that are decided in the plan
+  (`reference/adopt.md` §2), and recorded.
 - One that holds of the logic and is proved elsewhere, or that has no
-  source, is a goal only if the reviewer says so there.
+  source, is a goal where a goal by rule rests on it, or where the
+  plan's budget has room for it and a use the plan names wants it.
 - Of the source's own theorems, soundness is a goal, and completeness
   where the source proves it.
 - The source's other theorems, and other important technical results
-  found in the literature, are proposed in the plan, each with its size
-  as far as you can tell it. The reviewer says which are goals.
+  found in the literature, are listed in the plan, each with its size
+  as far as you can tell it. Which are goals is decided there: first
+  those a goal rests on, then those that what the calculus is wanted
+  for (Q3, Q4) asks for, within the budget. The rest are listed as not
+  goals, with the reason.
 
-Each goal is stated in Lean and shown to the reviewer before it is proved
-(rule 2), and ends PROVED or OPEN. A statement of it that is refuted on
-the way is kept as REFUTED, and replaced (rule 3).
+Each goal is stated in Lean, displayed in `statements.md` and screened
+before it is proved (rule 2), and ends PROVED or OPEN. A statement of it
+that is refuted on the way is kept as REFUTED, and replaced (rule 3).
 
 ## The five stages
 
-| | stage | the work | components | the gate: in front of the reviewer | kept |
+| | stage | the work | components | the checks, run by the operator before anything rests on the work | kept |
 |---|---|---|---|---|---|
-| 0 | **Survey** | the first act; the five questions, from the sources | (a); Q3 and Q4 look ahead to (b) and (c) | the target; then the plan, with its results, before any Lean of the calculus | `plan.md` |
-| 1 | **Adopt** | the rules as an inductive family; a first explorer instance | (a), (c) | the rule table beside the source's figure; then **the reviewer's test**: the source's own derivations, typed by the reviewer | `rule-table.md`; the exercises file |
-| 2 | **Prove** | the plan's goals, the source's soundness theorem first | (a) | the definitions and each statement, before its proof | `statements.md`; in each theory file its bound on axioms |
-| 3 | **Run** | search and countermodel procedures, each an untrusted producer whose output a checker certifies | (b), (c) | which producers and which further certificates, before they are written | the procedures, the corpus, the project's settings for `lean-certify` |
-| 4 | **Explore** | the explorer in full | (c) | **the tutorial**, worked through | the tutorial, a user's guide, the retrospective |
+| 0 | **Survey** | the first act; the five questions, from the sources | (a); Q3 and Q4 look ahead to (b) and (c) | scratch screens of the encoding and of what "holds" will mean; the plan's choices recorded as decisions, before any Lean of the calculus | `plan.md` |
+| 1 | **Adopt** | the rules as an inductive family; a first explorer instance | (a), (c) | `#rules` beside the source's figure; **a second transcription** by a cold reader; the source's own derivations, as terms of the family and run through the explorer | `rule-table.md`; the exercises file |
+| 2 | **Prove** | the plan's goals, the source's soundness theorem first | (a) | each definition and statement displayed, screened, and **read back** by a cold reader, before its proof; soundness and completeness before the other goals | `statements.md`; in each theory file its bound on axioms |
+| 3 | **Run** | search and countermodel procedures, each an untrusted producer whose output a checker certifies | (b), (c) | `Holds`, the certificate and each soundness statement displayed before they are proved; a negative test of each certifier | the procedures, the corpus, the project's settings for `lean-certify` |
+| 4 | **Explore** | the explorer in full | (c) | every line of the tutorial elaborated, what it shows pinned in the tests | the tutorial, a user's guide, the closing page |
 
 After stage 1 the order is not fixed: a countermodel found in Run screens a
 statement of Prove; a derivation found by hand in the explorer is the
@@ -303,104 +340,85 @@ a producer of Run.
 
 **The explorer appears twice on purpose.** The first instance, in Adopt,
 is a probe: a rule that does not behave as the source says shows itself
-when a person applies it. Expect the reviewer to go to what is missing,
-not through the exercises in order. What was asked for and could not be
-done is recorded with the gate, and is the first input of stage 4.
+when it is applied. Run the source's own derivations through it, and try
+what the source's prose says cannot be done. The exercises file is also
+the reviewer's way in, at any time they choose: what the reviewer tries
+and reports is recorded in `decisions.md`, and is input of stage 4.
 
-### How a gate is run
+### Deciding, checking, stopping
 
-1. **Stop.** At a gate you build nothing that rests on the thing being
-   reviewed. **While a gate is open** you may go on with what does not
-   rest on it:
-   - what rests on signed things only: lemmas about the data and the
-     functions of a table that is already signed, the printers, tests
-     of what is signed;
-   - the screening of the thing that waits (`reference/adopt.md` §5):
-     a statement refuted while it waits is taken back and put again;
-     for a family, the source's worked derivations written with its
-     constructors (stage 1, step 4);
-   - the documents.
+1. **Decide, record, go on.** Each choice gets an entry in
+   `decisions.md` (`templates/decisions.md`): the date; what was
+   decided; the alternatives; why; what rests on it; and what it would
+   cost to reverse:
+   - *little*: a name, a letter, the place of a file;
+   - *a stage*: the form of a goal, an encoding, which results are
+     goals;
+   - *the campaign*: the source, the system, what "holds" means, the
+     axiom policy.
 
-   What names the thing that waits, and is not a screen of it, is not
-   written: a `Move` or a `step` before the rule table is signed, a
-   proof of a statement that has not been sent. Say in the next note
-   the reviewer gets what was done while the gate was open, and what
-   each thing rests on.
-2. **Send a gate note**: the thing itself where the reviewer can read it,
-   and what is asked. At the end of a stage the stage's report is the
-   gate note; the Survey's report goes with the plan. Commit the
-   documents when a gate note is sent.
-3. **Record the answer** in `gates.md` (`templates/gates.md`): the date,
-   what was looked at, the reviewer's words. An answer that comes after
-   your session has ended is recorded by the next session before anything
-   else.
-4. **A gate is passed when its record says so.** With no record it has not
-   been passed, whatever was built after it. A gate that is refused is
-   recorded too: change the thing, and ask again. **An answer may
-   settle a part only**: it decides some of what was asked, changes a
-   thing an earlier gate fixed, asks a question back, and says nothing
-   of the rest. Its entry has the result **answered in part**, and
-   lists each of the four. Do what the answer settled, build on that
-   and on nothing else, and put the gate again for the rest, as a new
-   entry.
-5. **After a gate inside a stage**, go on in the same session if the
-   answer comes while it is open; otherwise write the brief
-   (`brief-<stage number>-<k>.md`) and end. **After a gate that ends a
-   stage**, always write the brief and end. Whoever runs the campaign
-   opens the next session with `/calculus-campaign` and the brief's path.
+   Take care in proportion. What "holds" means is screened before it
+   is fixed (stage 0, step 3); the source and the system are fixed at
+   the first act, by its defaults. The closing page lists the
+   decisions, the costliest first, so that the reviewer reads the few
+   that matter and can reverse any of them.
+2. **Run the checks of meaning.** No tool checks that a definition says
+   what the source means ("What is trusted"). Four checks give evidence
+   of it, and the operator runs all four:
+   - **the tools, on the transcription**: `#rules` beside the figure,
+     and `#slime` (stage 1, steps 3 and 4);
+   - **the source's own worked derivations**: as terms of the family
+     (stage 1, step 4), and as scripts of the explorer (steps 7 and 8);
+   - **a second reading by a cold reader** (`reference/adopt.md` §7):
+     for the rule table, a second transcription made from the source
+     alone; for the definitions and the statements, a reading back into
+     ordinary notation made from the Lean alone. The transcription is
+     compared with what `#rules` prints for your family, the reading
+     back with the source's items; every difference is settled from
+     the source;
+   - **soundness and completeness, proved first** (stage 2, step 4).
+     Against a semantics that is stated without the rules, they fix the
+     set of derivable judgments. They do not fix each rule: a result
+     about this particular system (cut elimination, a rule admissible, a
+     bound on depth) still rests on the comparison rule by rule.
 
-   **Where the reviewer says to go on in the same session** after a
-   gate that ends a stage, write the brief all the same, and begin the
-   stage from it as a fresh session would: read the brief, the
-   documents and the Lean files it names, and the parts of this skill
-   the stage names, again and in full. What the session remembers of
-   them, or a summary the environment made of its earlier part, is not
-   a reading. Correct any line of the brief that is false in a session
-   that goes on (a scratch file that is still there). The cost log's
-   row says "no, at the reviewer's word" under "fresh session from a
-   brief?". A whole campaign may be run so: the documents are then its
-   memory, and each stage is begun by reading them.
-6. **A later command of the reviewer overrides a gate.** A gate is the
-   operator's stop, and the reviewer is free to lift it. Where the
-   reviewer gives a command that cannot be carried out without going
-   past a gate (a goal set for the session, "go on to", "prove"), the
-   command is the answer, whether the gate was already put or is still
-   ahead. A goal that is set is deliberate: do not stop at the gate and
-   do not ask again. Then:
-   - record it in `gates.md` with the reviewer's words and the result
-     **overridden by the reviewer**, which is not "passed";
-   - still write what the gate would have shown (the definitions, the
-     statements, the table), screen it, and display it in the next note
-     the reviewer gets, so that it can be refused afterwards;
-   - in that note, list what was built on it as resting on a thing that
-     is not signed.
+   A check that finds a fault: repair it, run the check again, and
+   enter the fault: under "Errors of transcription" in `rule-table.md`
+   where it is in a rule; in the entry of `statements.md` where it is in
+   another definition or in a statement. A check that was not run is
+   named on the closing page as not run.
+3. **The stops.** End a turn to wait for the reviewer only for:
+   - what only the reviewer may do or allow: contact with anyone outside
+     (the source's authors above all); publication to anyone but the
+     reviewer (a private page that carries the closing page to the
+     reviewer is delivery, and no stop); pushing to a place that is not
+     agreed; an act your environment will not make without their word
+     (a download, where it says so);
+   - an act that destroys something or cannot be undone, outside the
+     campaign's own folder;
+   - no source that can be got, or a command that no calculus fits.
 
-   This holds for a gate inside a stage and for one that ends a stage
-   (the brief and the fresh session). It does not lift what was fixed
-   with the target (where to push, what is not to be touched), nor what
-   only the reviewer may do.
-
-   **The reviewer may lift every gate at once** ("act independently",
-   "stop asking me to approve"). From then on a gate is a record and not
-   a stop: at each one the operator decides, writes in `gates.md` what
-   the gate would have shown, what was decided and why, with the result
-   **decided by the operator**, and goes on, until the goals are done or
-   a thing that only the reviewer may do is reached. Reports still
-   display the definitions and the statements, as information and not
-   as a question; they end with what was decided, not with what to
-   sign. The reviewer can refuse any of it afterwards.
-
-   **Two gates are passed by neither: the reviewer's test (Adopt) and
-   the tutorial (Explore).** They are not things to sign. Each is done
-   by the reviewer at a keyboard, and no decision of the operator
-   stands in for it. A command, or the lifting of every gate, lets the
-   operator go on past them. Their entries in `gates.md` then have the
-   result **put, and not done**, with the reviewer's words; they stay
-   open until the reviewer has typed; part (v) of each later report
-   lists them as the reviewer's, stated and not asked for; and a
-   campaign may end with them open, which its closing report says.
-   What the reviewer finds when one is made is entered then, and is
-   work of the stage it belongs to.
+   At a stop, ask the one thing, and go on meanwhile with whatever does
+   not rest on the answer. Nothing else is a stop. A statement refuted
+   is entered REFUTED and replaced. A divergence from the source is
+   logged. A need of the library is a finding (rule 7). A budget reached
+   closes the stage with what is OPEN. Doubt about a choice is a line in
+   its entry of `decisions.md`.
+4. **A word of the reviewer holds from when it comes.** Record it in
+   `decisions.md` with the words copied, not summarised, and in the cost
+   log. Apply it; say what it changes of what is already built; rebuild
+   that. A command overrides any decision of the operator. A question
+   is answered, and is not a reason to wait.
+5. **A supervised campaign.** Where the reviewer asks to pass a thing
+   themselves ("put the rule table to me", "I will sign the statements",
+   "supervised"), that thing becomes a gate, and only that thing. Send
+   it where the reviewer can read it, with the one question. Build
+   nothing that rests on it until the answer; go on meanwhile with what
+   does not (what rests on things already passed, the screening of the
+   thing that waits, the documents). Record the answer with the
+   reviewer's words. An answer may settle a part only: do what it
+   settled, and ask again for the rest. A later command that cannot be
+   carried out without passing the gate is the answer to it.
 
 ### Stage 0, Survey
 
@@ -419,31 +437,32 @@ Read `reference/adopt.md` §1 to §3, and the Survey's pitfalls.
    not kept: what `deriving` gives (`DecidableEq`, `Repr`,
    `Lean.ToExpr`) for **every type the plan names**, not for the
    judgments alone: the formulas, the judgments, the moves, and the
-   types of models and of certificates that Q3 proposes. A type signed
-   with the plan and found awkward in Prove costs a construction: a
+   types of models and of certificates that Q3 proposes. A type fixed
+   in the plan and found awkward in Prove costs a construction: a
    type that holds a list of itself gets no `DecidableEq`, and a model
    built on its members then cannot test them for equality. Say in the
    plan what was tried and what Lean answered, type by type.
 
-   **A statement the plan proposes may be screened now too**, in the
-   same way. Where the plan fixes what a word of the goals will mean
-   in Lean (what "valid" is; the form of a standing result) and a small
-   case could show the form to be wrong, write the fragment the screen
-   needs (formulas, a model, truth in it) in a scratch file, outside
-   the campaign's folder and not kept, and say in the plan what was
-   screened, with what, and what it showed. The form is the reviewer's
-   to sign with the plan, and a form refuted after the gate is a gate
-   run again.
+   **A statement the plan proposes is screened now too**, in the same
+   way. Where the plan fixes what a word of the goals will mean in Lean
+   (what "valid" is; the form of a standing result) and a small case
+   could show the form to be wrong, write the fragment the screen needs
+   (formulas, a model, truth in it) in a scratch file, outside the
+   campaign's folder and not kept, and say in the plan what was
+   screened, with what, and what it showed. What "valid" means costs
+   the campaign to reverse: a form of it refuted after Prove has begun
+   is every theorem stated again. The form of one goal costs a stage.
 
-   Nothing else of the calculus is written in Lean before the plan's
-   gate.
-4. Send the plan, with the Survey's report. **Gate: the plan.** The
-   reviewer passes it, and says which results are goals, as "What a
-   campaign proves" lays down.
+   Nothing else of the calculus is written in Lean before the plan is:
+   its choices come first because they are the costly ones.
+4. Enter the plan's choices in `decisions.md`, each with its cost to
+   reverse: which results are goals ("What a campaign proves"), what
+   "holds" means, the encoding, the axiom policy. Commit, bring the
+   status board up to date, and go on to Adopt.
 
 ### Stage 1, Adopt
 
-Read `reference/adopt.md` §3 and §4; `reference/explore.md` §1 to §10 and
+Read `reference/adopt.md` §3, §4 and §7; `reference/explore.md` §1 to §10 and
 §12, and §13 where judgments are not flat; the two Lean templates; Adopt's
 pitfalls.
 
@@ -454,72 +473,81 @@ pitfalls.
 4. Fill `rule-table.md`: each rule of the figure, the output of `#rules`
    for its constructor, every divergence; where judgments are not flat,
    the template's three further sections (`reference/adopt.md` §4).
-   Start `statements.md`. Before the table is sent, check the
-   transcription on the source's own worked derivations: each written
-   as a term of the family, with its constructors, in the tests, and
-   cited in the table. That is a screen of the family and nothing built
-   on it ("How a gate is run", 1), so it may be done while the gate
-   waits too. **Gate: the rule table.** While it waits, write nothing
-   else that names the family or follows its rules (`Move`, `step`):
-   the printers of formulas and judgments may be written.
+   Start `statements.md`. Then check the transcription, before anything
+   follows its rules:
+   - on the source's own worked derivations: each written as a term of
+     the family, with its constructors, and cited in the table. They
+     go in a test module of their own that imports the theory file
+     only: the tests of step 7 import the tactic, which does not exist
+     yet;
+   - by a second transcription (`reference/adopt.md` §7): made by a
+     cold reader from the source alone, compared with yours row by
+     row, the comparison entered in the table.
+
+   Settle every difference from the source before step 5.
 5. The proof system: `Move`, `step`, and the soundness of the moves for
    the family (`reference/explore.md` §2 to §4). Fill the table's column
    for the moves.
 6. What the editor needs, the tactic, and how a goal is shown
    (`reference/explore.md` §5).
 7. Tests, every message pinned (the list is `reference/explore.md` §10).
-8. The exercises file, for the reviewer (`templates/Play.lean.txt`).
-   Check that it elaborates.
-9. Report, saying for each exercise what should happen. **Gate: the
-   reviewer's test.** The reviewer types; the operator's own typing of
-   the exercises does not count.
+8. The exercises file (`templates/Play.lean.txt`). Check that it
+   elaborates. Every exercise is also run in the tests, by script, with
+   its outcome pinned: the file is for a person who wants to try the
+   calculus, and the tests are the check.
+9. Bring the status board up to date, and go on to Prove.
 
 ### Stage 2, Prove
 
-Read `reference/adopt.md` §2, §5 and §6, and Prove's pitfalls.
+Read `reference/adopt.md` §2, §5, §6 and §7, and Prove's pitfalls.
 
 1. Where a goal is about a semantics: the models and the forcing relation,
    as definitions in a theory file of their own. Likewise a term calculus,
    where a goal is about one: its terms, its typing and its reduction are
-   a second transcription, with a rule table of its own.
+   a further transcription, with a rule table of its own, checked as
+   the first is.
 2. `statements.md`: each goal of the plan as a Lean statement, displayed,
-   OPEN. **Gate: the definitions of step 1 and the statements**, sent
-   together or in batches, before any proof; one entry of `gates.md` for
-   each sending.
+   OPEN, before any proof.
 3. Screen each statement for counterexamples before deciding how to prove
-   it (`reference/adopt.md` §5).
-4. **Soundness before completeness.** "Soundness" here is the source's
-   theorem (what is derivable is valid), not the soundness of the moves
-   of Adopt, which says only that the moves follow the rules.
-   Completeness against a rule table that allows too much is nearly free;
-   the content is in soundness. Then the goals in the plan's order, a
-   goal after those it rests on.
+   it (`reference/adopt.md` §5), and have the definitions the goals are
+   about, and the goals' statements, read back by a cold reader
+   (`reference/adopt.md` §7 says which, and how).
+4. **Soundness, then completeness where it is a goal, before every other
+   goal.** "Soundness" here is the source's theorem (what is derivable
+   is valid), not the soundness of the moves of Adopt, which says only
+   that the moves follow the rules. Completeness against a rule table
+   that allows too much is nearly free; the content is in soundness.
+   Together they are the fourth check of meaning ("Deciding, checking,
+   stopping", 2): a rule transcribed wrongly, so that it changes what
+   is derivable, fails one of them. Then the goals in the plan's order,
+   a goal after those it rests on.
 
    **That order is the source's route, and the proofs may take
    another.** A lemma that the encoding gives and the source lacks can
    make the source's lemmas on the way unnecessary: the theorem they
    led to is then proved without them. Goals that fall off the route
-   are still goals. Say which they are in the next note the reviewer
-   gets; leave them OPEN; and put each to the reviewer in the report:
-   proved for its own sake, or set aside. Only the reviewer sets a
-   goal aside, and `statements.md` then lists it under "Set aside"
-   with the reviewer's words.
+   are still goals. Decide of each whether it is proved for its own
+   sake: yes where another goal or a use the plan names wants it, and
+   the budget has room. Otherwise it ends OPEN, entered as "not on the
+   route taken, not attempted". The operator does not set a goal aside.
 5. Each theory file ends with its bound on axioms.
-6. Report: each statement PROVED, REFUTED or OPEN, with its axioms. The
-   stage ends when every goal is PROVED, or is OPEN with what was tried:
-   the route, where it stopped (as a named hypothesis, where there is
-   one), and what the screening showed; or when the plan's budget is
-   reached.
+6. Bring `statements.md` and the status board up to date: each statement
+   PROVED, REFUTED or OPEN, with its axioms. The stage ends when every
+   goal is PROVED, or is OPEN with what was tried: the route, where it
+   stopped (as a named hypothesis, where there is one), and what the
+   screening showed; or when the plan's budget is reached.
 
 ### Stage 3, Run
 
 Read `reference/certify.md` and the skill `lean-certify`.
 
-1. Propose the producers, and any certificate beyond those the plan
-   signed (the tree of moves or the script, and the model), in a gate
-   note, with why each is wanted. **Gate: this proposal**, with `Holds`, the
-   certificate and the type of each soundness theorem (rule R10 of
-   `lean-certify`).
+1. Decide the producers, and any certificate beyond those of the plan
+   (the tree of moves or the script, and the model), and record why
+   each is wanted. For each certifier of your own (the library's were
+   fixed with the plan), enter `Holds`, the certificate and the type of
+   its soundness theorem in `statements.md`, displayed and screened,
+   before it is proved (rule R10 of `lean-certify`: statements first).
+   They have no item of the source, and are not read back.
 2. Follow `lean-certify`'s six steps; `reference/certify.md` says what the
    explorer library gives for a calculus, and what is written by hand.
 3. A negative test for each certifier; the corpus; timings; kernel time
@@ -530,37 +558,38 @@ Read `reference/certify.md` and the skill `lean-certify`.
    search is. The repair changes no statement: afterwards every theory
    file is within its bound, and every proof and every pinned test is
    as it was, or builds again unchanged. One that would change a
-   statement is not a repair, and goes to the reviewer. It is recorded
-   with Run's gate in `gates.md` and in part (iv) of the report, and
-   the report says of each figure whether it was measured before the
-   repair or after.
-5. Report: the verdicts, the measurements, and the frontier, named: the
-   smallest inputs the procedures do not settle within their budget.
+   statement is not a repair: it is a new statement, entered and
+   screened like any other. The repair is recorded in `decisions.md`,
+   and `measurements.md` says of each figure whether it was measured
+   before the repair or after.
+5. Write `measurements.md` in the campaign folder: the verdicts, the
+   measurements with the machine and the date, and the frontier, named:
+   the smallest inputs the procedures do not settle within their budget.
+   Bring the status board up to date.
 
-Where the source gives no route to countermodels, the campaign stops at
-level 1 unless the reviewer asks for more. A tableau built to give
+Where the source gives no route to countermodels, Run aims at level 1,
+unless a goal of the plan gives a construction of models (a finite model
+property) or the reviewer has asked for more. A tableau built to give
 countermodels is a calculus of its own, with its own campaign.
 
 ### Stage 4, Explore
 
 Read `reference/explore.md` §11.
 
-1. List what Q4 asked for, and what the reviewer found missing at the
-   reviewer's test (`gates.md`). **Where the reviewer's test has not
-   been made** (put off by the reviewer, or passed over by a command),
-   the list is Q4's alone: say so at its head and in the report. The
-   stage is then done on half of its input, and it does not settle
-   what the explorer needs. When the test is made, what the reviewer
-   asked for and could not do is a further sending of this stage,
-   begun from that entry of `gates.md`; the tutorial and the user's
-   guide are changed with it.
-2. Serve each from what the library has. What it lacks is reported, not
-   built into the library (rule 7).
+1. List what Q4 asked for; what your own runs of the source's
+   derivations through the first instance showed to be missing or
+   awkward (stage 1, steps 7 and 8); and anything the reviewer has
+   reported from the exercises file (`decisions.md`).
+2. Serve each from what the library has. What it lacks is recorded as a
+   finding, not built into the library (rule 7).
 3. The tutorial (`Play/<Calculus>Tutorial.lean`) and the user's guide.
-   **Gate: the tutorial.**
-4. The closing report. Its last part is the retrospective: what the
-   campaign adopted, proved and runs, what is OPEN, and the changes to
-   make to this skill and its templates, from `method-notes.md`.
+   Elaborate every line of the tutorial, and pin in the tests what each
+   step shows: a comment that says what happens is a claim, and is
+   checked like one.
+4. The closing page (`templates/report.md`): what the campaign adopted,
+   proved and runs, what is OPEN, what to read, what was decided, and
+   the changes to make to this skill and its templates, from
+   `method-notes.md`. Deliver it as the first act fixed (rule 6).
 
 ## What is trusted
 
@@ -571,7 +600,7 @@ moves with conclusion `j`; the Boolean `o` says whether open goals are
 allowed, and a **derivation** `Der S j` is an attempt where they are not.
 
 Trusted: Lean's kernel, and for each calculus **two functions, each with
-one theorem** (their Lean is in `reference/explore.md` §4 and
+one theorem** (their Lean is in `reference/explore.md` §3 and §4, and
 `reference/certify.md` §3):
 
 - the **step function**, which says whether a move applies at a judgment
@@ -589,9 +618,10 @@ left), and the map out, `Att.mapOut` and `Der.mapOut`.
 **Trusted too, and no tool checks them: the definitions the two theorems
 are about.** The formulas, the judgments, the family of rules, the
 semantics, what holds. A wrong definition compiles, passes every bound on
-axioms and proves its theorems. This is why the reviewer reads the rule
-table and the statements, and why the reviewer's test is typed by a
-person.
+axioms and proves its theorems. This is why the four checks of meaning
+are run ("Deciding, checking, stopping", 2), and why the closing page
+lists these definitions, each with its file and its length, as the thing
+to read.
 
 **Not trusted:** the operator; everything an instance gives the editor
 (`Explorable`: the candidates, the printers, the quoting); the tactics;
@@ -601,7 +631,8 @@ failure and cannot become a wrong theorem. One caution: the kernel does
 not read a printer, but the reviewer does. Pin the display of a goal in
 the tests, and keep the source's notation.
 
-**What holds** is a choice, made in the plan and signed with it.
+**What holds** is a choice, made in the plan and recorded as a decision
+that costs the campaign to reverse.
 
 - *The family as transcribed*, `Fam`: the method's default when a
   calculus is adopted from a source. The theorem then says that every
@@ -624,36 +655,58 @@ goes through infinite models in general cannot.
   **each theory file ends with its bound**, an upper bound; for a policy
   without `Classical.choice`, `#axioms_within_file [propext, Quot.sound]`.
   Files of code (producers, printers, tactics) carry no bound. An
-  exception is the reviewer's to grant, one declaration at a time. The
-  commands, and what to do when a bound fails, are in
-  `reference/adopt.md` §6.
+  exception is a decision of its own, one declaration at a time:
+  recorded with the path that `#choice_path` shows, and listed on the
+  closing page (part 4) with the theorem it touches. The commands, and what to
+  do when a bound fails, are in `reference/adopt.md` §6.
 - **Certifiers have their own list.** `lean-certify` checks every
   `Certifier` and `Engine` against `Harness.config.axioms`, which is
   `[propext, Quot.sound]` unless the project's `Harness.config` says
   otherwise (rule R4 there). A policy that allows a certifier more says
   so in that constant, or names the exception in its `axiomExceptions`.
 
-## Reports, the folder, the log
+## The closing page, the folder, the log
 
-**Every report has the same five parts** (`templates/report.md`, kept as
-`report-<stage number>-<date>.md`): (i) what was done, with the commit,
-and what it cost; (ii) the statements, each PROVED, REFUTED or OPEN; (iii)
-what to look at or try, and what should happen; (iv) what differed, from
-the plan, from the source, from this skill, and anything asked of the
-library; (v) what the reviewer must decide, or, where the reviewer has
-lifted the gates, what was decided (the template has both forms).
+**One page closes the campaign** (`templates/report.md`, kept as
+`report.md`). It is the one thing the reviewer is expected to read, and
+it asks nothing. Six parts:
 
-**The campaign folder** holds `README.md` (a status board), `gates.md`,
-`plan.md`, `skeleton.md`, `rule-table.md`, `statements.md`, `cost-log.md`
-(a row for each session, its times from the clock; every exchange with
-the reviewer, classed), `method-notes.md`, the briefs and the reports. It
-is written as the work goes: a record written afterwards is a different
-document, and says so at its top. Commit the Lean when a build is clean
-and the documents when a gate note is sent; a report names its commit.
+1. what the campaign adopted, proved and runs: each goal displayed, with
+   PROVED, REFUTED or OPEN, its axioms, and the commit;
+2. what to read: the definitions that no tool checks, each with its file
+   and its length;
+3. the checks of meaning: which were run, what each found, which were
+   not run;
+4. the decisions, the costliest to reverse first;
+5. what is the reviewer's: what only they may do; what they may try (the
+   exercises, the tutorial), stated and not asked for;
+6. what it cost, and the changes proposed to this skill.
+
+Keep it to a few screens: it points at files and does not repeat them.
+
+**No report is written at the end of a stage.** The status board is
+brought up to date in the commit that ends the stage, and that is all.
+Where a campaign is interrupted (a stop, a session that ends), the board
+and the brief say where it stands.
+
+**The campaign folder** holds `README.md` (the status board),
+`decisions.md`, `plan.md`, `skeleton.md`, `rule-table.md`,
+`statements.md`, `measurements.md`, `cost-log.md` (a row for each
+session, its times from the clock; every word of the reviewer, and what
+it changed), `method-notes.md`, `users-guide.md` (from stage 4) and
+`report.md`; and a brief, where a session was handed on. It is written as
+the work goes: a record written afterwards is a different document, and
+says so at its top. Commit the Lean when a build is clean, and the
+documents with it; push as the first act fixed.
 
 ## Two shorter paths
 
-The first act's proposal says which path is taken.
+The first act's decision says which path is taken. On both,
+`templates/record.md`, kept as `record.md`, stands in place of `plan.md`,
+and the status board lists it. The stages that follow run as written,
+less what needs a source: there is no second transcription, and the
+reading back is compared with the record's own account of the rules and
+of the reading of a judgment.
 
 - **The calculus is already mechanised** (its rules and theorems exist in
   Lean). Survey is the record of what exists (`templates/record.md`),
@@ -661,8 +714,9 @@ The first act's proposal says which path is taken.
   (`reference/explore.md` §2 to §5): expect it to be small, and to need no
   change to the library.
 - **The calculus was designed, not adopted.** There is no source to be
-  faithful to. In place of the rule table against a source, the reviewer
-  gets, as statements before their proofs: the rules, the reading of a
+  faithful to. In place of the rule table against a source, these are
+  entered as statements, and screened, before their proofs: the rules,
+  the reading of a
   judgment, and whatever its correctness rests on (with a search and a
   model construction: the measure of termination, and the truth lemma,
   which says that an open saturated attempt is a model).

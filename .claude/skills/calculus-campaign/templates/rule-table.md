@@ -1,7 +1,7 @@
 # <CALCULUS>: the rule table
 
-*Template. This page lies beside the source's figure when the reviewer
-signs the transcription, and again at the reviewer's test. One row for
+*Template. This page lies beside the source's figure for anyone who
+reads the transcription. One row for
 each rule of the figure, in the figure's order. Nothing is retyped from
 memory: the "as printed" column is copied from the source, and the output
 of `#rules` is pasted as Lean printed it, never paraphrased.*
@@ -10,9 +10,10 @@ Source: <paper>, <figure and page>, read from <which file>. Numbers are
 those of <which version>.
 
 The family: `<name>`, in `<file>`. The proof system (filled at step 5 of
-Adopt, after the signature): `<name>`, in `<file>`.
+Adopt): `<name>`, in `<file>`.
 
-Signed by the reviewer: <not yet / date; see `gates.md`>.
+Checked: <the source's worked derivations, n of m as terms; the second
+transcription, run on <date> with n differences, or not run and why>.
 
 ## How a rule of the figure reads in Lean
 
@@ -34,7 +35,7 @@ which are not in the figure.
 
 ## The rules
 
-| # | rule, as the source names it | as printed: premises / conclusion / side condition, and where | the constructor | agrees with `#rules` below? | the move, and what `step` asks and leaves (filled after the signature) |
+| # | rule, as the source names it | as printed: premises / conclusion / side condition, and where | the constructor | agrees with `#rules` below? | the move, and what `step` asks and leaves (filled at step 5) |
 |---|---|---|---|---|---|
 | 1 | | | | yes / no: see D<n> | |
 
@@ -94,6 +95,19 @@ script>, not retyped:
 * `#slime` on the two controls: <the output: the clean one passes, the
   other is reported>.
 * `#slime <family>`: <the output; it must report no computed index>.
+* The source's worked derivations, as terms of the family: <each, with
+  its place in the source and its name in the tests>.
+
+## The second transcription
+
+Made on <date> by <the cold reader: which agent, given which pages>,
+from the source alone (`reference/adopt.md` §7). <Or: not run, and why.>
+
+| # | rule | the second reading: premises / conclusion / side condition | agrees with what `#rules` prints for the constructor? | settled from the source at | what was changed here |
+|---|---|---|---|---|---|
+
+Ambiguities that one reader found and the other did not: <each; or
+"none">.
 
 ## Divergences
 
@@ -109,18 +123,20 @@ states, what is done here, and why. Three kinds:
 |---|---|---|---|---|---|---|
 | D1 | | | | | | |
 
-## What the reviewer is asked to sign
+## What the table rests on
 
 *Only where judgments are not flat.* The transcription, row by row, and
-these choices, which the plan left open: <each in a line, with its
+these choices, which the plan left open, each an entry of
+`decisions.md`: <each in a line, with its
 divergence: how a rule names its place; where a rule puts what it adds,
 and which occurrence it removes; the functions above; the divergences
 D1 to D<n>>.
 
 ## Errors of transcription
 
-Each, with when it was found: at the rule table, at the reviewer's test,
-or after it. After a repair the table is signed again.
+Each, with what found it: `#rules`, a worked derivation, the second
+transcription, soundness or completeness, a person, or later use. After
+a repair, what was built on the faulty rule is built again.
 
-| what | found when | repaired in (commit) | signed again |
+| what | found by | repaired in (commit) | what was built again |
 |---|---|---|---|

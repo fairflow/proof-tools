@@ -5,17 +5,18 @@ are the commands of `ProofTools.Audit`: `import ProofTools.Audit`, with no
 `open`.
 
 Contents: 1 the source; 2 the kinds of result; 3 the transcription;
-4 the rule table; 5 statements and their screening; 6 proving.
+4 the rule table; 5 statements and their screening; 6 proving; 7 a
+second reading.
 
 ## 1. The source
 
-**Which source** was fixed at the first act (`gates.md`, the first entry).
-The version agreed there rules: do not replace it, or the file you were
-handed, by another without asking.
+**Which source** was fixed at the first act (`decisions.md`, the first
+entry). The version fixed there rules. Replacing it by another is a
+decision that costs the campaign to reverse, and is recorded as one.
 
 **Get the source, not a rendering of it.**
 
-- Read the agreed version, in LaTeX where that version's source can be
+- Read the version fixed at the first act, in LaTeX where that version's source can be
   had (arXiv gives it for many papers), otherwise its PDF. The LaTeX of
   another version serves for labels and for searching, and for nothing
   that is transcribed. Say in the plan which file was read, and whether
@@ -42,11 +43,11 @@ handed, by another without asking.
   `pdflatex` or no `.aux`, "items will carry no numbers"). Read that
   line before a number from the file is cited.
 - **Fetching is a download.** `--arxiv` downloads an archive, and so
-  does getting the PDF. Whether the source may be fetched and compiled
-  was asked at the first act (`gates.md`, the first entry): do as it
-  was answered there. With no answer, read what the reviewer supplied,
-  write the skeleton by hand with the printed numbers, and say so in
-  the plan. An archive that was fetched is data that is not trusted:
+  does getting the PDF. The first act says how it is done (`SKILL.md`,
+  the first act, step 3): fetch and compile. Where your environment
+  needs the reviewer's word for a download and it has not come, read
+  what can be read without one, write the skeleton by hand with the
+  printed numbers, and say so in the plan. An archive that was fetched is data that is not trusted:
   unpack it in a folder of its own, and run nothing from inside it.
 
 **Read the prose around the figure, not the figure alone.** Before any
@@ -65,8 +66,8 @@ the source:
   proof search**. They are not interchangeable, and the figure does not
   say which is which;
 - which rules are primitive and which the paper shows admissible;
-- where the source is ambiguous or silent, and what you propose. These are
-  the reviewer's to settle.
+- where the source is ambiguous or silent, and what you decided. Each is
+  a divergence of kind U (§4) and an entry of `decisions.md`.
 
 **The standing list** (`SKILL.md`) is answered entry by entry in Q2. The
 paper that defines a calculus is often not the one that proves a given
@@ -96,11 +97,11 @@ statement of it.
 | soundness and completeness for a semantics | a structure of models with a forcing relation; soundness by induction on derivations; completeness by a model construction or through a second calculus | make the model construction return data (a `Type`), since it is then the search of the Run stage |
 | cut elimination, admissible structural rules | two families, with and without the rule, or one with a parameter (§3); a measure carried by the statement; induction on it | decide how the measure is carried before the family is typed (§3). Say which form is the goal: that the rule is admissible, or a procedure that removes it. Where rules act at a place inside a judgment, §6 has the form of the proofs |
 | a property stated of models (the finite model property) | a construction of a model with the property | return the model as data: it is then a producer of countermodels for Run |
-| a result about a term calculus (normalisation, confluence) | terms, typing, and reduction as a relation: a second transcription, with a rule table of its own | how binding is represented is a choice of encoding for the plan |
+| a result about a term calculus (normalisation, confluence) | terms, typing, and reduction as a relation: a further transcription, with a rule table of its own, checked as the first is (§7) | how binding is represented is a choice of encoding for the plan |
 | a result read off derivations (the disjunction and existence properties) | a function on derivations, or on derivations of a special form | it may need another result first (cut-free derivations, a normal form): order the goals so. With the family into `Type` what is read off is data |
 | termination, decidability | a well-founded order on judgments, and a procedure | the bound that makes the proof easy is seldom runnable: prove with it, and search without it (Run) |
 | conservativity, a translation | two calculi and a map, a theorem each way | computed indices (§3) |
-| completeness of a search strategy | a restricted calculus, complete for the unrestricted one | a restriction that the source states by a classification of formulas is a statement-level decision: get it signed |
+| completeness of a search strategy | a restricted calculus, complete for the unrestricted one | a restriction that the source states by a classification of formulas is a statement-level decision: record it, with the classification as the source states it |
 | the subformula property | a closure and an invariant on derivations | it is where the side conditions of the rule table become visible: if it fails, suspect the table |
 
 ## 3. The transcription
@@ -135,7 +136,7 @@ each rule asking for its formula by membership (`A ∈ Γ`) and adding at the
 head, so that exchange, weakening and contraction are admissible and need
 no rule (the form that has kept earlier developments free of casts); or a
 list with an exchange rule added. Either is a divergence of
-representation (§4): propose one in the plan and have it signed.
+representation (§4): choose one in the plan, and record it.
 
 **No computed index in a conclusion.** In a constructor's return type
 every index must be a variable or a constructor applied to variables,
@@ -255,8 +256,7 @@ Example.Fam — 1 indices, 2 constructors, 0 carrying green slime
 in the figure's order: the rule as printed, the constructor, the output of
 `#rules` for it, and whether they agree. What is in the Lean and not in
 the figure has a table of its own. The column for the move of the proof
-system is empty when the table is signed; it is filled at step 5 of Adopt
-and is read at the reviewer's test.
+system is empty until step 5 of Adopt.
 
 **Where judgments are not flat** (`reference/explore.md` §13), `#rules`
 prints each premise as functions applied to a variable
@@ -269,10 +269,11 @@ sections for this case, to be left out otherwise:
   for what the rule changes there;
 - *The functions the rules use*: their definitions, copied from the Lean
   file by a command or a script, never retyped;
-- *What the reviewer is asked to sign*: the rows, and with them the
-  choices those functions make that the plan left open (how a rule
-  names its place; where a rule puts what it adds; which occurrence it
-  removes).
+- *What the table rests on*: the rows, and with them the choices those
+  functions make that the plan left open (how a rule names its place;
+  where a rule puts what it adds; which occurrence it removes). Each
+  is an entry of `decisions.md`, and is on the closing page's list of
+  what to read.
 
 A **divergence** is recorded when it is made, never afterwards. Three
 kinds, kept apart:
@@ -285,11 +286,12 @@ kinds, kept apart:
   a multiset, an equation field for a computed index. Say what in the
   Lean stands for what in the source.
 
-The reviewer signs the table before anything is built on the family. It is
-also the page that lies beside the source's figure at the reviewer's
-test. An error of transcription found later is repaired in the family,
-entered in the table's last section with when it was found, and the table
-is signed again.
+The table is complete, and checked (the source's worked derivations,
+and the second transcription of §7), before anything is built on the
+family. It is the page that lies beside the source's figure for anyone
+who reads the transcription. An error of transcription found later is
+repaired in the family and entered in the table's last section with
+when it was found; what was built on the faulty rule is built again.
 
 ## 5. Statements, and screening them
 
@@ -298,12 +300,13 @@ refutable by a small countermodel before any proof was attempted.
 
 **Which statements.** The goals of the plan, the two that join `step` to
 the family (S1 and S2, `reference/explore.md` §4), and any statement of
-your own that a report will cite. Lemmas on the way are not entered. A
+your own that the closing page will cite. Lemmas on the way are not entered. A
 goal whose proof the literature only states is entered like the others:
 it is OPEN until the kernel has a proof, whoever says it is proved.
 
-**Each goes to the reviewer displayed, before its proof**, in
-`statements.md` (`templates/statements.md`), with status OPEN.
+**Each is displayed before its proof**, in `statements.md`
+(`templates/statements.md`), with status OPEN, and is screened (below)
+and read back (§7) before its proof is begun.
 
 **Where an OPEN statement lives in Lean.** As a named proposition with no
 proof, in a theory file:
@@ -363,7 +366,7 @@ Look for them in this order:
 
 The first reads as the source does. Which form is used is a choice about what is meant: it
 is in the plan ("what holds"), screened there (stage 0, step 3), and
-signed with it. Compiled: `calculi/BrunnlerK/BrunnlerK/Semantics.lean`
+recorded with it. Compiled: `calculi/BrunnlerK/BrunnlerK/Semantics.lean`
 of `proof-tools`.
 
 **Every quantified statement is attacked before you decide how to prove
@@ -388,19 +391,19 @@ is stopped loses nothing.
 model checker until one is written. The check of a model of part (b)
 (`reference/certify.md` §3) is the screen, so where the plan has a
 semantics, write it before the proofs of this stage and not after them:
-its notion of model was signed with the plan, and no gate of Run waits
-for it.
+its notion of model was fixed in the plan, and nothing of Run has to
+come first.
 With it, the simplest screen of a soundness theorem goes rule by rule: for
 each rule, small instances of its premises and conclusion, and small
 models, and no model may refute the conclusion while refuting no premise.
 A completeness statement is screened on the known non-theorems (each
 should have a small countermodel) and, once there is a search, on small
 valid judgments (each should get a derivation). Until that check exists,
-screen small cases by evaluation, and say in the report what each
+screen small cases by evaluation, and say in `statements.md` what each
 statement was screened with.
 
 A rule that is being designed, not transcribed, gets the same: print it
-with `#rules`, screen it, and have it signed before anything rests on it.
+with `#rules`, and screen it before anything rests on it.
 
 ## 6. Proving
 
@@ -409,7 +412,8 @@ with `#rules`, screen it, and have it signed before anything rests on it.
   may use fewer axioms than its file allows and none outside them. For
   one declaration, `#axioms_within d [...]`; for whole libraries, from a
   file that imports them, `#axiom_sweep [Lib] allowing [...]`. An
-  exception is the reviewer's to grant, one declaration at a time:
+  exception is a decision of its own (`SKILL.md`, "Axioms"), one
+  declaration at a time:
   `#axioms_within_file [...] except [d]`.
 - **When a bound fails**, do not guess: the axiom is as often in a tactic
   or a library lemma as in the argument. `#choice_path d` gives the
@@ -505,7 +509,7 @@ Four things met on the way:
   not an instance: there it was the function that carries a proof of
   an inner judgment to a proof of the whole (`Fam.lift`), which keeps
   the depth.
-- **The statements are for the reviewer, the relations are not**: what
+- **The statements are in the source's form, the relations are not**: what
   is entered in `statements.md` is each rule in the source's form (for
   a context `Γ{ }`), obtained from the theorem; the relation is a lemma
   on the way (§5).
@@ -513,3 +517,82 @@ Four things met on the way:
 Compiled, in `calculi/BrunnlerK/BrunnlerK/` of `proof-tools`:
 `Structural.lean` (`Sub`, `Sub.node`, `Fam.sub`), `Invert.lean` (`SubR`,
 `Fam.invert`), `Contract.lean` (`Hom`, `Hom.node`, `Fam.hom`).
+
+## 7. A second reading
+
+Two of the four checks of meaning (`SKILL.md`, "Deciding, checking,
+stopping", 2) need a reader who has not seen your work: a **cold
+reader**. With a language model as operator, that is a fresh agent that
+you start, with a brief that holds only what is listed below. It is not
+an agent that inherits your context (a fork): that one has seen
+everything. A reader who has seen your transcription tends to confirm
+it. So the brief does not contain it, nor your view of where the source
+is hard; and it names the files the reader may open, and says that it
+opens no others. An agent started in the same checkout can otherwise
+read the campaign folder and the Lean.
+
+**The second transcription** (Adopt, step 4).
+
+- *Given*: the source, by file and page: the figure, and the prose
+  around it that carries side conditions; the source's definitions of
+  formulas and judgments; the name of the system.
+- *Asked*: write out each primitive rule of that system, in the
+  source's notation, as a table: premises, conclusion, side conditions,
+  and the place in the source. List every place where the source is
+  ambiguous or silent. No Lean.
+- *Not given, and not to be opened*: the campaign folder (`plan.md` and
+  `skeleton.md` hold your reading of the side conditions and of the
+  ambiguities; `rule-table.md` holds the transcription), and the
+  modules of the calculus.
+
+Compare its table, row by row, with **what `#rules` prints for each
+constructor of your family**, read through your table's notation: the
+number of rules; each premise; each side condition. The "as printed"
+column of your own table is a copy of the source, and agreement with it
+shows only that two readers copied alike. Settle every difference from
+the source, by page and line. An ambiguity that only one reader found is
+settled in the same way; where the source does not settle it, it is a
+divergence of kind U (§4) and an entry of `decisions.md`. Enter the
+comparison in `rule-table.md` (the section "The second transcription"),
+and a difference that was a fault of yours under "Errors of
+transcription".
+
+**The reading back** (Prove, step 3).
+
+*What is read back*: the definitions the goals are about (formulas,
+judgments, the models and truth in them, what a judgment means in a
+model, `Valid`), and the statement of each goal of the plan. Not S1 and
+S2, and not the certifiers' statements of Run: they have no item of the
+source to be compared with, and are screened only.
+
+- *Given*: an extract made for the purpose. It holds those definitions
+  and statements as Lean, with every definition a statement unfolds to
+  (the family, the functions the rules use). Comments and doc comments
+  are taken out, and the theorems' names are made neutral (`T1`, `T2`):
+  a comment that cites the source, or a name such as `completeness`,
+  tells the reader what to find.
+- *Asked*: say in ordinary mathematical notation what each definition
+  defines and what each statement claims; and name anything that looks
+  unusual: a class that is restricted, a hypothesis, an order of
+  quantifiers.
+- *Not given, and not to be opened*: the source, the campaign folder,
+  the modules of the calculus. This reader is not the one that made the
+  second transcription, which has read the source.
+
+Compare what comes back with the source's item. Where they agree, write
+"read back, agrees" in the statement's entry. Where they differ, the
+difference is in the Lean, or in the reading, or is a choice you made (a
+class of models restricted, §5): settle which, and write it in the
+entry.
+
+**After a repair**, the check is run again on what changed, by a new
+cold reader: the first has seen the faulty version.
+
+**Where no cold reader can be had** (no agent can be started), neither
+check is run, and the closing page lists both as not run. Reading your
+own table a second time is not this check.
+
+**What a second reading gives.** Agreement of two readings is evidence,
+and no more: two readers make the same mistake where the source
+misleads both. The other two checks do not depend on a reader: the
+source's worked derivations, and soundness with completeness.

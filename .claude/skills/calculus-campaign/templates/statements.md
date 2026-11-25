@@ -2,8 +2,10 @@
 
 *Template. Started in Adopt (S1 and S2 below), filled in Prove. Every
 statement the campaign will cite, displayed as Lean, with its status. A
-statement is entered here, OPEN, and shown to the reviewer before its
-proof is begun. Nothing is removed: a refuted statement stays, with its
+statement is entered here, OPEN, and screened before its proof is begun;
+the statement of a goal is also read back (`reference/adopt.md` §5 and
+§7; S1, S2 and the certifiers' statements have no item of the source, and
+are not). Nothing is removed: a refuted statement stays, with its
 countermodel. Lemmas on the way are not entered. Every goal of the plan
 has an entry.*
 
@@ -17,8 +19,9 @@ Status is exactly one of:
   proposition (`def Name : Prop := …`), not as a theorem with `sorry`.
   What tests show about it may be noted; it stays OPEN.
 
-A result that is not a goal is *set aside* in the plan; it is listed at
-the end here, without a status. A goal ends PROVED or OPEN: where a
+A result that is not a goal is listed at the end here, without a
+status: *not a goal* (decided in the plan), or *set aside* (by the
+reviewer, in their words). A goal ends PROVED or OPEN: where a
 statement of it is REFUTED, the statement that replaces it is entered
 after it.
 
@@ -28,12 +31,12 @@ The axiom policy of the development: <from the plan>.
 
 Read these first: no tool checks that they say what the source means.
 
-| definition | Lean name, file | the source's item | seen by the reviewer |
+| definition | Lean name, file | the source's item | read back (`reference/adopt.md` §7) |
 |---|---|---|---|
 | formulas | | | |
 | judgments | | | |
-| the family of rules | | | (the rule table) |
-| what holds: the family, or `Valid` | | | (the plan) |
+| the family of rules | | | (the second transcription, in the rule table) |
+| what holds: the family, or `Valid` | | | |
 | the models, and truth in a model | | | |
 | a finite model as data, and `refutes` | | | |
 | the term calculus: terms, typing, reduction (where a goal needs it) | | | (its own rule table) |
@@ -41,13 +44,13 @@ Read these first: no tool checks that they say what the source means.
 ## The statements
 
 When this file is started, at step 4 of Adopt, the proof system may not
-yet be written: the rule table is not signed. S1 and S2 are then entered
+yet be written: the rule table is not yet checked. S1 and S2 are then entered
 as displayed below, with "not yet in Lean" for the name and the file,
 OPEN. The names are filled at step 5.
 
 For each: the source's item (by label where there is one), the statement
 as a displayed formula, the Lean name and file, the status, the axioms,
-what it was screened with, and the date the reviewer saw it.
+what it was screened with, and what the reading back gave.
 
 ### S1. The soundness of the moves
 
@@ -71,7 +74,8 @@ theorem.
 
 Source: <the paper and the number of the theorem; or "a proof is stated,
 not given, at …">. Screened: <which of the four directions were run, with
-what, on what, and the result>. Status: OPEN. Seen: <date>.
+what, on what, and the result>. Read back: <agrees / differs, and how
+that was settled / not run>. Status: OPEN.
 
 ### S4 and on
 
@@ -91,9 +95,9 @@ a line on how it stands to the source's wording.
 | statement | the countermodel, or the proof of the negation | where it is checked | what replaced the statement |
 |---|---|---|---|
 
-## Set aside
+## Not goals, and set aside
 
-| result | why, and the reviewer's word (the entry of `gates.md`) |
+| result | not a goal (the plan's reason), or set aside (the reviewer's words, and the entry of `decisions.md`) |
 |---|---|
 
 ## Summary
@@ -102,4 +106,4 @@ a line on how it stands to the source's wording.
 |---|---|---|---|
 | of the goals from the standing list | | | |
 | of the other goals | | | |
-| of our own (S1, S2, and what reports cite) | | | |
+| of our own (S1, S2, and what the closing page cites) | | | |

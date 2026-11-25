@@ -1,80 +1,99 @@
-# <CALCULUS>, stage <stage number> (<its name>): report
+# <CALCULUS>: the closing page
 
-*Template, kept as `report-<stage number>-<date>.md`. Keep the five parts
-and their order. Write what is so; where something was not checked, say
-"not checked". A gate note in the middle of a stage has the same parts,
-as short as they can be. The Survey's report goes with the plan: its
-part (ii) is the plan's Q2.*
+*Template, kept as `report.md`. The one document the reviewer is expected
+to read. It asks nothing. Keep it to a few screens: point at files, and
+do not repeat them. Write what is so; where something was not checked,
+say "not checked". No report is written at the end of a stage: the
+status board (`README.md`) carries that.*
 
-Written <date and time, from the clock>, for <the reviewer>. Stage begun
-on the word of <date>: "<the words>".
+Written <date and time, from the clock>. Commit `<…>` on `<branch>`.
+To build: `<the command, naming its folder>`.
 
-## (i) What was done
+## 1. What was adopted, proved, and runs
 
-Branch `<…>`, commit `<…>`.
+<Two or three lines: the calculus, the logic, the source, the system.>
 
-1. <Each thing made, one line, with its file.>
+**The goals**, those from the standing list first. Each PROVED statement
+is checked by the kernel, with no `sorry`, within the axioms named:
 
-What it cost: <the rows of `cost-log.md` for this stage, or their totals>.
+    <statement>                                   (<name>, <file>)
+    PROVED, within <axioms>
 
-## (ii) The statements
+**OPEN**: <each goal not reached: what was tried and where it stopped, or
+"not on the route taken, not attempted". A statement that only tests
+support is OPEN.>
 
-**PROVED**, checked by the kernel, no `sorry`, within <the bound>:
+**REFUTED**: <each, with its countermodel and what replaced it; or
+"nothing">.
 
-    <statement>                                                  (<name>)
+**Runs**: <the procedures and the level; the frontier, in a line;
+`measurements.md`>.
 
-**OPEN**: <each; whether attempted; what tests show about it, and on how
-many cases. A statement that only tests support is OPEN>.
+## 2. What to read
 
-**REFUTED**: <each, with its countermodel; or "nothing">.
+No tool checks that these say what the source means. They are what a
+reader trusts beyond the kernel.
 
-**The goals** (in the report of Prove, and in the closing report): <each
-goal of the plan, those from the standing list first: PROVED or OPEN>.
+| definition | file, lines | length | the source's item |
+|---|---|---|---|
+| formulas | | | |
+| judgments | | | |
+| the family of rules (with `rule-table.md` beside the figure) | | | |
+| the functions the rules use, where judgments are not flat | | | |
+| the models, truth in a model, `Valid` | | | |
+| `step` (S1 and S2 tie it to the family) | | | |
 
-## (iii) What to look at, and what to try
+Total: <n> lines.
 
-The file: `<…>`. To build: `<command, naming its folder>`.
+## 3. The checks of meaning
 
-What should happen, item by item:
+| check | run? | what it found |
+|---|---|---|
+| `#rules` and `#slime`, beside the figure | | |
+| the source's worked derivations (<n>), as terms and by script | | |
+| the second transcription, by a cold reader | | <the differences, and how each was settled from the source> |
+| the reading back of the definitions and the statements | | |
+| soundness and completeness, before the other goals | | |
+| S2: `step` refuses no instance of a rule | PROVED / OPEN | |
 
-* <an exercise or a command>: <what the reviewer should see>.
+Errors of transcription found: <n, and by which check>. What these
+checks do not show: <in a line or two: no second reading could be had;
+completeness is OPEN, so the rules are not fixed against the semantics;
+results about this system rest on the comparison rule by rule>.
 
-Measurements, with the machine and the date: <timings; sizes; kernel time
-against certificate size>.
+## 4. The decisions
 
-## (iv) What differed
+The costliest to reverse first, each by its entry in `decisions.md`.
 
-1. **From the plan**: <…>
-2. **From the source**: <each divergence added to the log at this stage>.
-3. **From the skill**: <from `method-notes.md`: every place it was wrong,
-   silent or unclear, and what was done there>.
-4. **Asked of the library**: <any change `proof-tools` would have needed;
-   none was made>.
+| decided | not taken | cost to reverse | doubt |
+|---|---|---|---|
 
-## (v) For you to decide
+Divergences from the source (`rule-table.md`): W <n>, U <n>, R <n>. Those
+that change what a statement says: <each, in a line; or "none">.
 
-1. <The gate of this stage: pass, or what to change. At the Survey's
-   gate: which results are goals, beyond those that are goals by rule.>
-2. <Each open choice, with a recommendation.>
+Exceptions to the axiom policy: <none / each declaration, the theorem
+it touches, and the path that `#choice_path` shows>.
 
-*Where the reviewer has lifted the gates (`SKILL.md`, "How a gate is
-run", 6), nothing is asked, and this part has another form:*
+## 5. The reviewer's
 
-## (v) What was decided
+Stated, and not asked for.
 
-1. <One line for each gate the stage met: what it would have shown, what
-   was decided, why, and its entry in `gates.md`.>
+* **Only the reviewer may**: <contact the source's authors about …;
+  publish; push to …; or "nothing arose">.
+* **To try, at any time**: the exercises (`Play/<Calculus>.lean`) and the
+  tutorial (`Play/<Calculus>Tutorial.lean`). Every exercise was run by
+  script in the tests; no person has typed them.
+* **To fill, if the method is to be costed**: the columns of
+  `cost-log.md` that the operator cannot know (requests, tokens, cost).
+* **Words of the reviewer during the campaign**: <n, and the stops among
+  them; `decisions.md`>.
 
-**The reviewer's, and not done**: <the reviewer's test and the tutorial,
-where they are open; what only the reviewer may do. Stated, and not asked
-for.>
+## 6. Cost, and the method
 
-*The message that carries such a report ends in the same way: with what
-was decided, and not with a thing to sign or a choice to make.*
+<From `cost-log.md`: the clock time from the command to this page; of
+it, the time waiting at a stop; the sessions; the Lean lines.>
 
----
+Findings about the library (none was changed): <each; or "none">.
 
-*In the closing report (after stage 4) part (iv) ends with the
-retrospective: what the campaign adopted, proved and runs; what is OPEN;
-and the changes to make to the skill and its templates, each with the
-place in the text.*
+Changes proposed to the skill, from `method-notes.md`, each with its
+place in the text: <each; or "none">.

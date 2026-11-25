@@ -1,7 +1,7 @@
 # Part (c): the proof explorer
 
-Covers the second half of Adopt (the first instance, and the reviewer's
-test) and the Explore stage. The library is `ProofTools.Explore`. This
+Covers the second half of Adopt (the first instance, its tests and the
+exercises file) and the Explore stage. The library is `ProofTools.Explore`. This
 part is the procedure: what to write, in what order, and how to check each
 piece. Its Lean is that of `templates/Instance.lean.txt`, which was
 compiled; read the template beside §2 to §5 and §10. The library's guide,
@@ -11,7 +11,7 @@ the library proves.
 Contents: 1 the project; 2 judgments and moves; 3 `step`; 4 the proof
 system, its theorem and the map out; 5 the editor's part; 6 building with
 `apply_move`; 7 scripts and trees of moves; 8 tactics of the calculus;
-9 looking, and changing; 10 tests, exercises, the reviewer's test; 11 the
+9 looking, and changing; 10 tests and the exercises file; 11 the
 full exploration; 12 notes and limits; 13 judgments that are not flat.
 
 Words, as the library uses them. An **attempt** `Att S o j` is a tree of
@@ -36,7 +36,7 @@ its path:
       lake-manifest.json      written by Lake; committed
       <Calculus>.lean         the root module: it imports the others
       <Calculus>/…            the modules of the calculus
-      Play/<Calculus>.lean    the reviewer's exercises, in no library
+      Play/<Calculus>.lean    the exercises, in no library
       campaign/               the campaign folder
 
 ```toml
@@ -90,8 +90,8 @@ packages hold modules of the same names.
 - **Three places for files.** Theory files (definitions, `step`,
   theorems), each ending with its bound on axioms. Code for the editor
   and the tests, with no bound. Both are modules of the library
-  (`Basic`, `Tactic`, `Test` in the template). And the reviewer's
-  exercises file, in **no** library: `Play/<Calculus>.lean`, outside
+  (`Basic`, `Tactic`, `Test` in the template). And the exercises
+  file, in **no** library: `Play/<Calculus>.lean`, outside
   every glob, so that no build touches it and nothing imports it. It
   imports the library; check it from the command line with
   `lake env lean Play/<Calculus>.lean`.
@@ -165,8 +165,8 @@ An `abbrev`, so that `S.Judg` unfolds to your own type where Lean looks
 for instances and notations.
 
 **S1, the soundness of the moves**, for what holds as the plan chose it.
-Its statement is fixed once that choice is, so the reviewer has seen it
-with the plan. The library has two forms. For a family `T` over the
+Its statement is fixed once that choice is: it was recorded with the
+plan. The library has two forms. For a family `T` over the
 judgments into any sort, with `Each T ps` one `T p` for each premise, by
 position (`Each T [a, b]` is `T a ×' T b ×' PUnit`):
 
@@ -202,16 +202,18 @@ maps out to a function from derivations of its goals to a derivation of
 its root: a derived rule.
 
 **S2, the other direction, is not asked by the library, and is to be
-stated.** S1 does not say that `step` allows every instance of every rule:
-a `step` that refuses a legitimate instance is sound and unfaithful, and
-only the reviewer's test would show it. Where there is a family, enter
-this in `statements.md` during Adopt, PROVED or OPEN:
+stated.** S1 does not say that `step` allows every instance of every
+rule: a `step` that refuses a legitimate instance is sound and
+unfaithful, and the tests show it only at the instances they happen to
+run. Where there is a family, enter this in `statements.md` during Adopt,
+PROVED or OPEN:
 
     Fam j → Nonempty (Der S j)
 
 by induction on the derivation, each constructor a node (the template has
-the form, compiled). It is not needed to pass the reviewer's test, and it
-may stay OPEN.
+the form, compiled). Prove it in Adopt where you can: it is the one
+check that `step` refuses no instance of a rule. Where it stays OPEN, the
+closing page says so among the checks.
 
 ## 5. The editor's part
 
@@ -244,8 +246,8 @@ declare_move_tactic mycalc for S
   rename, do not quote.
 - `candidates` should propose every move that could apply: queries offer
   from it, and a line with holes is matched against it. Too many costs
-  nothing (those that do not apply are dropped); one missing is a move the
-  reviewer is never offered.
+  nothing (those that do not apply are dropped); one missing is a move a
+  user is never offered.
 - `within p j` is yours to define: the premise `p` has nothing that the
   conclusion `j` lacks. A move with such a premise is set aside while
   another move applies, and offered when none does. Look in the source
@@ -266,7 +268,7 @@ declare_move_tactic mycalc for S
   `showJudg` writes it (below the head, if it takes several lines): the
   library does this for every instance, and there is no delaborator to
   write. One exception: a goal stated as `Der S j` is printed by Lean, as
-  a term, until the first move. Pin what the reviewer will see with
+  a term, until the first move. Pin what a user will see with
   `trace_state` under `#guard_msgs` (§10).
 
 ## 6. Building: `apply_move`
@@ -398,9 +400,9 @@ to a line: the goal after each line is the view there, so the infoview
 follows the editor's cursor and no message is written. It offers nothing
 to click; `#walk` does.
 
-What looking is for in a campaign: showing the reviewer what a search
-found; showing what an attempt left open, and where; reading a long
-derivation a node at a time.
+What looking is for in a campaign: showing what a search found; showing
+what an attempt left open, and where; reading a long derivation a node at
+a time.
 
 **Changing an attempt that is built**, at the position of a cursor, is
 in the library as functions, with what each does to the open goals
@@ -422,7 +424,7 @@ not a certificate: the certificate is read off its result
 session**: in the editor an attempt is changed only by a move at an open
 goal.
 
-## 10. Tests, the exercises file, and the reviewer's test
+## 10. Tests, and the exercises file
 
 **The tests file** (a module of the library, every message pinned with
 `#guard_msgs`). The template's `Test.lean` is the compiled model of all
@@ -465,32 +467,37 @@ against output that looks the same.
   typed the escape. Read back what is in the file.
 
 **The exercises file** (`templates/Play.lean.txt`), in no library. It is
-the reviewer's. Its header says how to type a line and gives the rule
+for a person who wants to try the calculus: the reviewer, at any time
+they choose, or a new user. Its header says how to type a line and gives
+the rule
 table in brief; each exercise is a statement with the first query already
 written. One exception: where no move applies to the judgment as it
 stands, a query is an error, and the file must elaborate with none. For
-such an exercise the query is left for the reviewer to type, and the
+such an exercise the query is left for the user to type, and the
 text says so, and says what the message will be. Comments are on lines
 of their own (§6). The reference derivations stay in the tests file,
 not here.
 Where the source has no worked derivations, take the simplest instances of
 its theorems, or the axioms of the logic, and say that the choice is
-yours. Check that the file elaborates (§1) before the report. Once the
-reviewer has it, do not change it without saying so: a fault found at the
-reviewer's test is repaired in the calculus's modules, and a change to
-the file itself is recorded in `gates.md`.
+yours. Check that the file elaborates (§1).
 
-**The reviewer's test** is the gate of Adopt. The reviewer types the
-source's derivations, with `rule-table.md` beside the source's figure. In
-the report's part (iii) say, for each exercise, what should happen: which
-moves are offered, where a non-theorem stops and how. Afterwards, in
-`gates.md`: what was typed, what happened, and what was asked for that the
+**Every exercise is also in the tests file, run by script, with its
+outcome pinned**: which moves are offered at its first step; the
+derivation, where there is one; where a non-theorem stops, and how. That
+is the check, and the operator runs it. The file is the way in for a
+person, and nothing waits for anyone to type it.
+
+A fault that someone finds with the file is repaired in the calculus's
+modules. A change to the file after it was first committed is recorded
+in `decisions.md`. So is what the reviewer reports from it, when they
+do: what was typed, what happened, and what was asked for that the
 instance could not do.
 
 ## 11. The full exploration
 
-From Q4 and from the record of the reviewer's test, list what a user of
-this calculus needs. Then serve each from what exists:
+From Q4, from your own runs of the source's derivations, and from what
+the reviewer has reported from the exercises (`decisions.md`), list what
+a user of this calculus needs. Then serve each from what exists:
 
 | need | from |
 |---|---|
@@ -499,19 +506,20 @@ this calculus needs. Then serve each from what exists:
 | a failed attempt, to see why | while building, `where`; afterwards `leave_open`, then `#walk d goal k` |
 | a proof kept and replayed | `d.script`, `apply_script` |
 | a result used in the mathematics | `Der.mapOut`, `Att.mapOut`: the calculus's own derivation, as data where the family is into `Type` (an attempt is a derived rule, from its open goals to its root); at a proposition, `Der.sound`, `Att.sound` |
-| a branch taken back, and tried another way | in the editor: delete the lines and type others. As functions: a session (§9). No tactic or command runs a session: report the need |
+| a branch taken back, and tried another way | in the editor: delete the lines and type others. As functions: a session (§9). No tactic or command runs a session: record the need as a finding |
 
 **The tutorial**, `Play/<Calculus>Tutorial.lean`: a Lean file in the form
 of the exercises file, in no library, with its prose in comments, that
 takes a new user through building, a query, a pattern, a script, a tactic
 of the calculus, a walk, and one non-theorem. Unlike the exercises it
 explains each step and shows the answers. Its comments are on lines of
-their own, never after a line of the tactic (§6). The reviewer works
-through it: that is the gate.
+their own, never after a line of the tactic (§6). Elaborate every line
+of it, and pin in the tests what each step shows: a comment that says
+what happens is a claim, and is checked like one.
 
-**The user's guide**: a page in the campaign folder: how a goal reads,
-the moves with their rules, the lines of the tactic, the messages. The
-section "Lean tactics" of the library's guide is the model.
+**The user's guide**, `users-guide.md` in the campaign folder: how a goal
+reads, the moves with their rules, the lines of the tactic, the messages.
+The section "Lean tactics" of the library's guide is the model.
 
 ## 12. Notes from instances, and limits
 
@@ -550,7 +558,7 @@ In some calculi a judgment has structure inside it (a tree, a list of
 sequents, sequents within sequents), and a rule acts at a place inside
 one. How such a judgment is represented, how a rule and a move name the
 place they act at, and what a move carries, are the plan's choices of
-encoding, signed by the reviewer with the plan. This section gives the
+encoding, recorded with the plan. This section gives the
 options and what each costs. It chooses nothing, and it gives no rule of
 any calculus. One instance is of this kind: `calculi/BrunnlerK/` of
 `proof-tools`, nested sequents by the second option below.
@@ -627,8 +635,8 @@ Whatever is chosen:
   kind it is worth its lines (forty, in the instance above): the
   premises of `step` and of the family are the same functions applied
   at a place, and S2 is the one check that `step` refuses no instance
-  of a rule. The reviewer's test shows a refusal only at the instances
-  the reviewer happens to type;
+  of a rule. The tests show a refusal only at the instances they
+  happen to run;
 - **a term syntax for judgments.** A judgment in a statement, a test
   or an exercise is a closed term, and written with the constructors
   it cannot be read against the source. Write a syntax that reads as
@@ -636,7 +644,7 @@ Whatever is chosen:
   an item in list brackets is an inner judgment and anything else a
   formula. One `syntax "seq[" term,* "]" : term` and one `macro_rules`
   that sorts the items did it, in a dozen lines, with no syntax
-  category. The kernel sees the term the macro gives, and the reviewer
+  category. The kernel sees the term the macro gives, and a reader
   sees the notation: pin in the tests, by `rfl`, that a judgment so
   written is the term meant, as the display of a goal is pinned.
   Compiled: `calculi/BrunnlerK/BrunnlerK/Tactic.lean`;

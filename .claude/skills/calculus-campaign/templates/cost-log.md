@@ -18,35 +18,38 @@ the tool's usage report, if the method is to be costed; the line below
 the table says who filled them and from what. What the operator can
 measure, it measures: the clock, the builds, the lines.
 
-| # | stage | operator (person, or model and settings) | fresh session from a brief? | began | ended | waiting on builds (the sum of the build commands' times) | requests | output tokens | input read again (cached) | cost | Lean lines added / removed (`git diff --stat`) | document lines |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1 | Survey | | yes / no / no, at the reviewer's word | | | | | | | | | |
+| # | stage | operator (person, or model and settings) | started cold, or handed on from a brief, or went on in the session | began | ended | waiting on builds (the sum of the build commands' times) | waiting at a stop | requests | output tokens | input read again (cached) | cost | Lean lines added / removed (`git diff --stat`) | document lines |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | Survey | | | | | | | | | | | | |
 
 Where the tokens and the cost come from: <the tool's usage report, read
 by the reviewer on <date>; the transcript; "not known to the operator,
 and not filled">.
 
-## Exchanges with the reviewer
+## Words of the reviewer
 
-Every message from the reviewer during the campaign, classed:
+Every message from the reviewer during the campaign, classed. An
+independent campaign may have none after the command.
 
-* **decision**: one the method asks for: a gate, a choice in the plan, an
-  answer to a question the operator put;
+* **command**: a goal set, a redirection, a thing to do;
 * **correction**: the operator was wrong or unclear and was put right;
 * **rescue**: the operator was stuck and could not have gone on alone;
 * **question**: the reviewer asks about the mathematics or about the
-  method, and neither decides nor corrects. Say what it led to (a
-  screen, a section of the plan), or that it changed nothing.
+  method. Say what it led to, or that it changed nothing;
+* **answer at a stop**: to the one thing the operator asked
+  (`decisions.md`, "Stops");
+* **a thing to pass**: the reviewer asks to pass a thing themselves,
+  which makes it a gate;
+* **a report from the exercises file**.
 
-A message that is two of these (a signature, and a correction of the
-method with it) is entered once, with both classes.
+A message that is two of these is entered once, with both classes.
 
 | # | date | stage | class | the reviewer's words, in brief | what it changed |
 |---|---|---|---|---|---|
 
 ## By stage
 
-| stage | sessions | elapsed | of which waiting on builds | requests ("not known", where the rows say so) | cost (the same) | reached its gate? | decisions / corrections / rescues / questions |
+| stage | sessions | elapsed | of which waiting on builds | of which waiting at a stop | requests ("not known", where the rows say so) | cost (the same) | words of the reviewer, by class |
 |---|---|---|---|---|---|---|---|
 | 0 Survey | | | | | | | |
 | 1 Adopt | | | | | | | |
@@ -54,12 +57,17 @@ method with it) is entered once, with both classes.
 | 3 Run | | | | | | | |
 | 4 Explore | | | | | | | |
 
+From the command to the closing page: <elapsed, by the clock>; working:
+<the sum of the sessions>; waiting at a stop: <the sum>.
+
 ## Errors of transcription
 
-The list is in `rule-table.md`. Here, the count: found at the rule table
-<n>; at the reviewer's test <n>; later <n>.
+The list is in `rule-table.md`. Here, the count, by what found each:
+`#rules` or `#slime` <n>; a worked derivation <n>; the second
+transcription <n>; soundness or completeness <n>; a person <n>; later
+use <n>.
 
 ## What the operator did unaided, and what it did not
 
 <A few lines for each stage. Include what the operator knew that the skill
-did not tell it.>
+did not tell it, and each place where it stopped and need not have.>

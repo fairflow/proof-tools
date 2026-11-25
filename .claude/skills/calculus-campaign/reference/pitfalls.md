@@ -37,7 +37,8 @@ step of a part already says is not repeated here.
    could not match what it was looking for.
 7. **A project's own checks that do not know the new library.** An import
    check, a linter, a list of allowed modules: where the project existed
-   before the campaign, run its whole test target before reporting.
+   before the campaign, run its whole test target before a stage is
+   closed.
 
 8. **A side condition that looks local and is not.** A proviso compared
    the formulas, as sets, of two whole judgments. It looked the same as
@@ -55,13 +56,13 @@ step of a part already says is not repeated here.
    catches a certificate format called a calculus: a tree with an external
    checker cannot be inducted on.
 
-## Every report
+## Every record
 
 10. **Claims that could not be backed.** Two were taken out of a note
     before it was sent. Before writing that something holds, name the
     file, the test or the document that shows it; otherwise write
     "not checked".
-11. **An estimate written as a fact.** A time in `gates.md`, and the
+11. **An estimate written as a fact.** A time in a campaign's record, and the
     value a test was to pin, were written from expectation, not from
     the clock and not from Lean. Both were wrong. A time comes from
     `date`; a pinned value from Lean's output: run it, then pin it.
