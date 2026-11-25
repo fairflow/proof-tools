@@ -4,3 +4,13 @@ import GLS.Source
 import GLS.Proof
 import GLS.Tactic
 import GLS.Test
+import GLS.Semantics
+import GLS.Screen
+import GLS.Lemmas
+import GLS.Soundness
+import GLS.Identity
+import GLS.TreeModel
+import GLS.Measure
+import GLS.Search
+import GLS.Completeness
+import GLS.SearchTest
