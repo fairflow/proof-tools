@@ -383,6 +383,40 @@ the folder point here.*
   in one step (it is five lines from S10); its reading back was made
   after: `statements.md`, S24.
 
+## 2026-11-25 13:33 GMT. A second word of the reviewer, relayed; and the target as it ended
+
+* **The words**: "permission to dowload publicly available materials
+  such as PhD theses should be a standard part of the relevant skills".
+  Typed by the reviewer in the session that started this one, in reply
+  to the question of 08:55; relayed by that session in a message that
+  reached the operator at 13:33, after the closing page was pushed. (The
+  reviewer's own answer in this session, at 13:14, had already been
+  acted on.) The reading that the relaying session gives, which is its
+  and not the reviewer's: public material the campaign needs is fetched
+  without asking; a file that is not public is still the reviewer's to
+  supply. It is now the skill's text (commit `28e3aa8`).
+* **What it changes**: nothing in what was done. The one file fetched
+  is recorded above (13:14: name, place, size; a folder of its own,
+  nothing run).
+* **Decided, the target as it ended**: the thesis's chapter 12 stands in
+  place of the paper of 2021, which could not be got (the publisher's
+  paywall; the open copy did not answer). The thesis says the chapter
+  is that paper's content; the operator could not check this, since the
+  paper was not read. The first entry's clause "where they differ, the
+  paper's system rules" therefore could not be applied.
+* **Whose numbering is cited**: the rule table, the skeleton and
+  `statements.md` cite the Coq files of `ianshil/CE_GLS` (commit
+  `3dd8619`) by file and line, and the thesis by its own numbers and
+  pages (Figure 12.1, Definitions 12.2.2 and 12.2.3, Lemmas 12.5.1 to
+  12.5.5, Theorems 12.6.1 to 12.7.2). The paper's numbering is cited
+  nowhere.
+* **Not taken**: to stop until the paper could be had.
+* **Cost to reverse**: the campaign, if the paper's figure shows
+  another system; a pass over the rule table, if it shows the same one
+  with other numbers. Doubt: the paper is the earlier text, and a rule
+  may have been changed between it and the thesis; the Coq files, which
+  the paper's theorems are about, agree with the thesis.
+
 ## Stops
 
 *Each time the reviewer's word was needed (`SKILL.md`, "Deciding,

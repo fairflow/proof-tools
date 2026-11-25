@@ -1,7 +1,8 @@
 # GLS: the closing page
 
 Written 2026-11-25 13:31 GMT. The work is commit `96dad49` on `main` of
-`fairflow/proof-tools` (this page is the commit after it). To build:
+`fairflow/proof-tools` (this page is in the commits after it; one entry of `decisions.md`
+and one row of the cost log were added at 13:33). To build:
 
     (cd ~/Lean/Sources/proof-tools && git pull)
     (cd ~/Lean/Sources/proof-tools/calculi/GLS && lake build GLS glsrun)
@@ -114,6 +115,7 @@ The costliest to reverse first, each by its entry in
 
 | decided | not taken | cost to reverse | doubt |
 |---|---|---|---|
+| the thesis's chapter 12 stands in place of the paper, which could not be got; the Coq files and the thesis's numbers and pages are what is cited | to stop until the paper could be had | the campaign, if the paper's figure shows another system | the paper is the earlier text and was not read |
 | `Valid`: truth at every world of every two-valued model of GL (transitive, conversely well-founded) | every model (gives excluded middle from `⇒ p, p → ⊥`); the indirect form; finite models only | the campaign | two-valuedness is the operator's restriction; classically it is no restriction |
 | what holds for the explorer's moves is the family, into `Type` | validity as what holds | the campaign | none |
 | every theory file within `[propext, Quot.sound]` | choice in the completeness file | the campaign, to tighten later | none: held throughout |
@@ -149,9 +151,11 @@ Stated, and not asked for.
 * **To fill, if the method is to be costed**: the columns of
   [`cost-log.md`](https://github.com/fairflow/proof-tools/blob/96dad49/calculi/GLS/campaign/cost-log.md) that the operator cannot
   know (requests, tokens, cost).
-* **Words of the reviewer during the campaign**: 2: the command, and
-  the answer at the one stop (the download of the thesis, asked 08:55,
-  answered 13:14). The work did not wait for it.
+* **Words of the reviewer during the campaign**: 3: the command, and
+  two answers at the one stop (the download of the thesis, asked 08:55;
+  answered in this session at 13:14, and in the session that started
+  it, relayed at 13:33 after this page was first pushed). The work did
+  not wait for either.
 
 ## 6. Cost, and the method
 

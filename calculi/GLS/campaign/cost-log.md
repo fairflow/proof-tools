@@ -28,6 +28,7 @@ Every message from the reviewer during the campaign, classed.
 |---|---|---|---|---|---|
 | 1 | 2026-11-25 08:46 | the first act | command | "the sequent calculus GLS for provability logic GL, from Goré, Ramanayake and Shillito (TABLEAUX 2021); you may download the paper" (through a brief) | it began the campaign |
 | 2 | 2026-11-25 13:14 | Run, Explore (the comparison owed since the Survey) | answer at a stop | "yes you can download the thesis and any other materials to which you have online access that may assist you in the formalisation." | the thesis fetched; the comparison with the prose made |
+| 3 | 2026-11-25 13:33 (when it reached the operator; typed earlier, in the session that started this one) | after the closing page | answer at the same stop, relayed | "permission to dowload publicly available materials such as PhD theses should be a standard part of the relevant skills" | nothing in what was done; an entry of `decisions.md` on the target as it ended |
 
 ## By stage
 
