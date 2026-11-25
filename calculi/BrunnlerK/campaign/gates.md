@@ -500,3 +500,23 @@ Adopt is not passed, and Prove is begun in the session of stages 0 and 1.
 * **Result**: not a gate of a stage. The reviewer's word for a change
   outside the campaign's folder (the skill's rule 7). This file keeps
   its name: the campaign was run under the earlier text.
+
+## 2026-11-25 08:41 GMT. The lean-certify skill, which the campaign follows in Run
+
+* **The reviewer's words** (2026-11-25, in the session): "Now, is the
+  Lean Certify skill called directly as the calculus campaign unfolds?
+  If it is, then we need to also amend that skill so that it can
+  proceed unaided."
+* **Found**: it is. Stage 3 says to read "the skill `lean-certify`",
+  and a session lists a skill of that name loaded from the repository
+  `lean-certify`, not from this one. That copy still had rule R10 as
+  "He is the gate"; the copy at the root of this repository was amended
+  in `4185324`.
+* **Done**: the campaign skill names the file to read and says it holds
+  where the two differ, in commit `af3d56e`. In the repository
+  `lean-certify`: the same amendment of R10 (`SKILL.md`,
+  `docs/outline.md`), committed locally on a private branch at
+  `3080ec9`, on top of its remote `main`.
+* **Not done**: that commit is not pushed. No branch of
+  `lean-certify` is agreed for the operator to push to.
+* **Result**: not a gate of a stage.
