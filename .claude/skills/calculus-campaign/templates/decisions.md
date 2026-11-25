@@ -29,8 +29,9 @@ the folder point here.*
   the place the reviewer named>.
 * **The library**: <the checkout and its commit; the remote's `main` at
   <commit>; updated, or why not>.
-* **The source's files**: <fetched from …, and compiled; or: asked of the
-  reviewer on <date>, because the environment needs their word>.
+* **The source's files**: <each file fetched: its name, where from, its
+  size; compiled or not. Public material needs no asking (`SKILL.md`,
+  "Downloading"). Not public, and asked of the reviewer on <date>: …>.
 * **Pushing**: <where, and by which standing instruction; or: nothing is
   pushed, and the closing page is delivered by …>.
 * **Not touched**: <…>. Only the reviewer contacts the source's authors.

@@ -102,11 +102,8 @@ time, and it holds from when it comes ("Deciding, checking, stopping",
    - **the source's files**: fetch the LaTeX archive where there is one
      (arXiv gives it for many papers), otherwise the PDF, and compile
      the LaTeX to read the printed numbers (`reference/adopt.md` §1).
-     Where your environment will not download a file without the
-     reviewer's word, that is a stop of the environment and the one
-     question of the first act: ask it in the message of step 4, with
-     the file's name, place and size, and go on meanwhile with what can
-     be read without it;
+     The reviewer's word for this is standing ("Downloading", below):
+     what is publicly available is fetched without asking;
    - **pushing**: as the project's standing instructions say (its
      `CLAUDE.md`, the reviewer's instructions to you). Where they say
      nothing, commit locally and push nothing; the closing page then
@@ -124,8 +121,30 @@ time, and it holds from when it comes ("Deciding, checking, stopping",
    the place and the rules of the project: every other file points to
    it. Commit. Tell the reviewer in one message of a few lines: the
    paper, the system, the results aimed at, the place. It is
-   information, and it asks nothing (except the download, where the
-   environment needs it). Begin the Survey in the same turn.
+   information, and it asks nothing. Begin the Survey in the same turn.
+
+**Downloading: the reviewer's standing word.** Whoever starts a campaign
+with this command permits, by it, the download of publicly available
+material that the campaign needs: papers and preprints, theses, the
+LaTeX archive of a source, the files of a published formalisation.
+(Matthew, 2026-11-25: "permission to dowload publicly available
+materials such as PhD theses should be a standard part of the relevant
+skills".) So a download of such material is not a stop, and nothing is
+asked: not for the source the command names, not for another version of
+it, and not for a work of the literature that Q2 or Q5 needs.
+
+- **Record each file** in `decisions.md`: its name, where it came from,
+  its size.
+- **What is fetched is data that is not trusted**: a folder of its own,
+  and nothing run from inside it (`reference/adopt.md` §1).
+- **Where the source named cannot be got** (a paywall, a server that
+  refuses), take the fullest public version of it: a thesis, a preprint,
+  an author's copy. That changes the target, so it is a decision that
+  costs the campaign to reverse: record it, and say whose numbering the
+  rule table cites.
+- **Still the reviewer's**: a file that is not public (one that needs a
+  login, a payment, or terms to be accepted), which the reviewer
+  supplies; and anything fetched to be run, not read.
 
 **Where the session has already gone further** before this text was
 read (the source read past its abstract, a plan drafted, files written:
@@ -392,8 +411,9 @@ and reports is recorded in `decisions.md`, and is input of stage 4.
      (the source's authors above all); publication to anyone but the
      reviewer (a private page that carries the closing page to the
      reviewer is delivery, and no stop); pushing to a place that is not
-     agreed; an act your environment will not make without their word
-     (a download, where it says so);
+     agreed; an act your environment will not make without their word.
+     A download of public material is not one: the first act has the
+     reviewer's standing word for it ("Downloading");
    - an act that destroys something or cannot be undone, outside the
      campaign's own folder;
    - no source that can be got, or a command that no calculus fits.

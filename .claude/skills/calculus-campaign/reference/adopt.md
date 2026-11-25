@@ -43,12 +43,16 @@ decision that costs the campaign to reverse, and is recorded as one.
   `pdflatex` or no `.aux`, "items will carry no numbers"). Read that
   line before a number from the file is cited.
 - **Fetching is a download.** `--arxiv` downloads an archive, and so
-  does getting the PDF. The first act says how it is done (`SKILL.md`,
-  the first act, step 3): fetch and compile. Where your environment
-  needs the reviewer's word for a download and it has not come, read
-  what can be read without one, write the skeleton by hand with the
-  printed numbers, and say so in the plan. An archive that was fetched is data that is not trusted:
-  unpack it in a folder of its own, and run nothing from inside it.
+  does getting the PDF. The reviewer's word for it is standing
+  (`SKILL.md`, "Downloading"): public material is fetched without
+  asking, and each file is recorded in `decisions.md` with its name,
+  its source and its size. Where the source cannot be got (a paywall,
+  a server that refuses), take the fullest public version of it (a
+  thesis, a preprint, an author's copy), and say which. Where none can
+  be got, read what can be read as pages, write the skeleton by hand
+  with the printed numbers, and say so in the plan. An archive that
+  was fetched is data that is not trusted: unpack it in a folder of
+  its own, and run nothing from inside it.
 
 **Read the prose around the figure, not the figure alone.** Before any
 rule is transcribed, write down in `plan.md` (Q1), each with its place in
