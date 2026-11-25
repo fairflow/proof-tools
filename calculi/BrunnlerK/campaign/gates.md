@@ -517,6 +517,8 @@ Adopt is not passed, and Prove is begun in the session of stages 0 and 1.
   `lean-certify`: the same amendment of R10 (`SKILL.md`,
   `docs/outline.md`), committed locally on a private branch at
   `3080ec9`, on top of its remote `main`.
-* **Not done**: that commit is not pushed. No branch of
-  `lean-certify` is agreed for the operator to push to.
+* **Pushed** (2026-11-25 08:43 GMT): asked where it should go, the reviewer
+  answered "Push to main please". `lean-certify`'s `main` is at
+  `3080ec9`; the operator's worktree and branch there are removed. The
+  reviewer's own checkout loads it after a pull.
 * **Result**: not a gate of a stage.
