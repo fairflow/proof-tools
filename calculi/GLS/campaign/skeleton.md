@@ -29,3 +29,37 @@ False)`, and a height is `derrec_height` (`general/dd_fc.v`, l. 131).
 | 16 | `mhd`; `RA_mhd_decreases` | the same, 1598, 1605 | `mhd s` is that maximal height; it is smaller at each premise of an instance of a PSGLS rule than at its conclusion |
 | 17 | `GLS_cut_adm_main` | `GLS_additive_cut.v`, 32 | cut admissibility, by induction on the size of the cut formula and then on `mhd` of the conclusion |
 | 18 | `GLS_cut_adm` | the same, 692 | if `Γ0, Γ1 ⇒ Δ0, A, Δ1` and `Γ0, A, Γ1 ⇒ Δ0, Δ1` are derivable in GLS then so is `Γ0, Γ1 ⇒ Δ0, Δ1` |
+
+## The printed numbers (added 2026-11-25 13:21 GMT, from the thesis)
+
+I. Shillito, PhD thesis (ANU, 2023), chapter 12. Read from the PDF; the
+numbers are the thesis's, and those of the paper (TABLEAUX 2021) are
+not known, since the paper was not got. The column "#" is the row of
+the table above.
+
+| the thesis's item | page | # | statement, in words |
+|---|---|---|---|
+| Definition 12.2.1 | 168 | 1 | the size of a formula |
+| Definition 12.2.2 | 168 | | a GL-Kripke frame: transitive, and converse well-founded ("no infinite ascending sequences") |
+| Definition 12.2.3 | 168 | | forcing: `p` by the interpretation, `⊥` never, `→` by implication, `□ϕ` at every `v` with `wRv` |
+| Theorem 12.2.1 | 169 | | the Hilbert calculus GLH is sound for local consequence over GL-models |
+| Theorem 12.2.3 | 169 | | `∅ ⊢ ϕ` in GLH iff `ϕ` is valid on GL-models (Segerberg, cited) |
+| Figure 12.1 | 171 | 3, 4 | the sequent calculus GLS: (IdP), (⊥L), (→L), (→R), (GLR) |
+| Examples 12.4.1, 12.4.2 | 171 | | four worked derivations; the second example is a loop of naive backward search |
+| the rule (cut) | 171 | | additive: from `Γ ⇒ Δ, ϕ` and `ϕ, Γ ⇒ Δ` to `Γ ⇒ Δ` |
+| Theorem 12.4.1 | 171 | | `(Γ, ϕ) ∈ GLL` iff some finite `Γ' ⊆ Γ` has `Γ' ⇒ ϕ` provable in GLS + (cut) (cited, not proved) |
+| Lemma 12.5.1 | 172 | 8 | exchange is admissible in GLS |
+| Lemma 12.5.2 | 172 | 6 | every `ϕ, Γ ⇒ Δ, ϕ` has a proof |
+| Lemma 12.5.3 | 172 | 9 | weakening, height-preserving |
+| Lemma 12.5.4 | 174 | 10 | the implication rules are invertible, height-preserving |
+| Lemma 12.5.5 | 176 | 11 | contraction, height-preserving |
+| (IdentBox), (NoInit) | 178 | 5 | PSGLS: GLS with (IdB), and (GLR) only where the conclusion is no instance of (IdP), (⊥L), (IdB) |
+| Definition 12.6.1 | 178 | 12 | `imp`, the usable boxes `ub`, their number `β`, the measure `Θ = (β, imp)` |
+| Lemma 12.6.1 | 179 | 13, 14 | `Θ` falls from the conclusion of a rule of PSGLS to each premise |
+| Lemma 12.6.2 | 180 | | every sequent has a finite list of its PSGLS premises |
+| Theorem 12.6.1 | 180 | 15 | every sequent has a PSGLS derivation of maximum height |
+| Lemma 12.6.3 | 181 | 16 | `mhd` falls from conclusion to premise in PSGLS |
+| Proposition 12.6.1 | 181 | | provable in PSGLS iff provable in GLS |
+| Theorem 12.6.2, Corollary 12.6.1 | 182 | 7 (in part) | provability in PSGLS, and in GLS, is decidable |
+| Theorem 12.7.1 | 182 | 17, 18 | the additive cut rule is admissible in GLS |
+| Theorem 12.7.2 | 186 | | the additive cut rule is eliminable from GLS + (cut) |

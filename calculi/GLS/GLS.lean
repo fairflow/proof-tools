@@ -14,8 +14,17 @@ import GLS.Measure
 import GLS.Search
 import GLS.Completeness
 import GLS.SearchTest
+import GLS.Structural
+import GLS.Invert
+import GLS.Contract
+import GLS.PS
+import GLS.Cut
+import GLS.CutRule
+import GLS.CutTest
 import GLS.Run
 import GLS.RunTest
+import GLS.SetSearch
+import GLS.SetSearchTest
 import GLS.Explore
 import GLS.ExploreTest
 import GLS.Corpus.Basic

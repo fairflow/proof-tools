@@ -18,6 +18,9 @@ campaign is the first run. Kept to what would change that text.
    should say that a permission to download "the paper" is to be read as
    covering every version of it that the first act may choose, or the
    command's hint should invite "you may download its sources".
+   (Settled while this campaign ran: commit `28e3aa8` of proof-tools,
+   13:16, makes the download of public material the reviewer's
+   standing word. Notes 2 and 3 are answered by the same change.)
 2. **A paper that is named and cannot be got.** Step 2 says "a source
    you cannot get is not the target: take the best one you can get". The
    paper here was behind a paywall and its open copy unreachable; the
@@ -138,3 +141,74 @@ campaign is the first run. Kept to what would change that text.
     "the direct decision": a fast search that is not proved, wrapped as
     `if check then … else the proved decision`, is a decision procedure
     the kernel runs, and needs no proof about the fast search.
+
+## Stage 2, Prove, continued: the delegated goals
+
+18. **Handing three goals on by brief worked.** A fresh agent, with
+    `brief-2-1.md` and the statements already in Lean as named types,
+    returned the seven structural functions, the equivalence with PSGLS
+    and the source's cut, all within the axiom policy, in 15 minutes
+    (225 816 tokens by its own report). What it changed in the route
+    the brief gave: recursion on a derivation needs the sequent as a
+    variable index, so each function is stated for `Fam s` with the
+    lists recovered by equations; every permutation is proved by one
+    tactic that counts occurrences; `omega` on a goal with a
+    disjunction brought `Classical.choice` in and was replaced by
+    `Nat` lemmas. *Proposed*: say in `prove.md` that a brief which
+    gives the statements as named Lean types and the tests the result
+    must pass (`CutTest.lean` was written by the operator from the
+    brief's list) is enough, and that the operator builds and runs the
+    result before recording PROVED.
+19. **A commit taken while an agent was writing included the agent's
+    half-made file** (`Structural.lean`, first version, in `c9880e8`).
+    It built, so the board was not false, but the commit's message
+    names it. *Proposed*: rule 7 or the delegation section should say:
+    an agent of the campaign works in the same tree, so name its files
+    in the brief and leave them out of commits until it reports.
+
+## The session, and the stop
+
+20. **The session ended with a command running, and was resumed three
+    hours later** (about 09:57 to 13:14). The scratchpad had been
+    emptied; nothing of the campaign was in it except the downloaded
+    Coq files, which were not needed again. Every file of the campaign
+    was in the worktree. *Proposed*: none; the rule that the folder
+    carries the state held.
+21. **The answer to the first act's stop came after Explore was
+    through.** The skill's text assumes the comparison with the prose
+    precedes the proofs. What was done on the answer: the thesis read,
+    the figure compared rule by rule by the operator and by a second
+    cold reader on the pages (no difference), the skeleton given its
+    numbers and pages, the sources of four statements filled in, and
+    one new goal (cut elimination from GLS + (cut), the thesis's
+    Theorem 12.7.2) entered and proved. Nothing proved before had to
+    be built again. *Proposed*: `survey.md` should say what is owed
+    when the source arrives late: the comparison, the skeleton's
+    numbers, a pass over the standing list against the source's
+    results, and nothing else unless the comparison finds a difference.
+22. **A repository's "download" link returned an error page.** The
+    thesis's `/bitstreams/<id>/download` gave HTTP 500; the same
+    repository's `/server/api/core/bitstreams/<id>/content` gave the
+    PDF. Worth a line in the Survey's notes on fetching (DSpace 7).
+23. **`pdftotext` drops the box.** In the text taken from the thesis,
+    `□` and `⊠` are missing, so GLR reads as a rule with no modality.
+    The figure was read from a rendered image of the page. *Proposed*:
+    `adopt.md` §1 should say to read every figure of rules from the
+    page's image, never from extracted text.
+24. **A definition of the operator's turned out to be in the source.**
+    The models, GL frames and truth were stated at the Survey as "the
+    usual semantics, none in the source's Coq files"; the thesis has
+    them (Definitions 12.2.2 and 12.2.3) and they agree. The table of
+    definitions in `statements.md` has a column for the source's item,
+    which made the correction one cell.
+25. **Reading back after the proof.** S24 was entered, proved and read
+    back in that order, in ten minutes, since its proof is seven lines
+    over S10. The skill's order would have cost nothing more. Recorded
+    as a departure.
+26. **A fault of the operator's own code that looked like a frontier.**
+    `dedup` called itself twice on each element in compiled code; three
+    families were cut off at sizes the first search handled. Found by
+    comparing the two searches' times on the same input, not by any
+    check of the skill. *Proposed*: `certify.md` §5: when a second
+    search is slower than the first on a small member, suspect the
+    code before the calculus.

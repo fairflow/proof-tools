@@ -181,7 +181,10 @@ the folder point here.*
 * **Cost to reverse**: the campaign. Doubt: **the semantics is not in
   the source's Coq files.** It is the standard one for GL (transitive,
   conversely well-founded frames), stated here by the operator; the
-  closing page lists it among the definitions to read.
+  closing page lists it among the definitions to read. (13:21: the
+  thesis has it, Definitions 12.2.2 and 12.2.3, p. 168, in these
+  words. What remains the operator's own: the restriction to two-valued
+  models, and truth of a sequent with several formulas on the right.)
 
 ## 2026-11-25 09:07 GMT. Stage 0: the axiom policy
 
@@ -308,6 +311,78 @@ the folder point here.*
   `GLS/Structural.lean` (goal 4).
 * **Cost to reverse**: little.
 
+## 2026-11-25 13:14 GMT. A word of the reviewer
+
+* **The words**: "yes you can download the thesis and any other
+  materials to which you have online access that may assist you in the
+  formalisation." (typed by the reviewer in the operator's session,
+  which had ended at about 09:57 with a command still running; this is
+  the next message after it).
+* **What it is**: an answer at a stop (the one question of the first
+  act, asked at 08:55), and wider than the question: every source that
+  can be reached may be fetched.
+* **What it changes**: the thesis is fetched and read; the comparison
+  of the rules with a figure in prose, owed since the Survey, is made
+  (the rule table, "The comparison with the figure in prose"); the
+  plan's Q1 and the skeleton get the printed numbers. What was built on
+  the Coq files is built again only where the comparison finds a
+  difference: the entry after this one says what it found.
+
+* **The file fetched**, at 13:17: "Ian Shillito_Thesis_2023.pdf",
+  1 481 279 bytes, from the Australian National University's open
+  repository
+  (`openresearch-repository.anu.edu.au/server/api/core/bitstreams/0bbb4f8c-19b1-4e28-96e8-4ca795c863bf/content`;
+  DOI 10.25911/8F2P-AA86). Kept in a folder of its own outside the
+  repository; read as text and as images of its pages; nothing in it
+  was run. Not in the repository. Nothing else was fetched: the paper
+  of 2021 is behind the publisher's paywall and its open copy
+  (`publik.tuwien.ac.at`) did not answer.
+
+## 2026-11-25 13:21 GMT. The comparison with the prose: what it found
+
+* **Decided**: nothing built on the Coq files is built again. The
+  thesis's Figure 12.1 and its definition of PSGLS (pp. 171, 178) state
+  the rules that `GLS_PSGLS_calcs.v` states; the comparison is in the
+  rule table, row by row. The decision of 09:07 (to transcribe from the
+  Coq files) is thereby settled at its lower cost.
+* **What the thesis adds**, each taken in: Theorem 12.7.2, cut
+  elimination from GLS + (cut), a goal by rule (the entry below); a
+  source for goal 5 (Proposition 12.6.1) and for the decidability of
+  provability in GLS (Corollary 12.6.1); the semantics, which the
+  operator had stated from the logic's usual presentation, is the
+  thesis's Definitions 12.2.2 and 12.2.3; four worked derivations
+  (Examples 12.4.1, 12.4.2), now terms of the family.
+* **Not taken**: to make the thesis's own formulation of termination
+  (`mhd`, Theorem 12.6.1) a goal after all: S9 states the termination,
+  and the cut by the source's induction (S19) was made on the measure
+  itself, so nothing rests on `mhd`.
+* **Doubt**: the paper itself (TABLEAUX 2021) has still not been read.
+  The command names it. What stands in for it: its abstract, the Coq
+  development it is about, and the thesis chapter by one of its
+  authors, which says of itself that it presents that work. If the
+  paper's figure differs from the thesis's, the campaign has not seen
+  it.
+* **Cost to reverse**: little.
+
+## 2026-11-25 13:21 GMT. Stage 2: cut elimination from GLS + (cut) is a goal
+
+* **Decided**: S24, the thesis's Theorem 12.7.2: a third family,
+  `FamCut`, the five rules of GLS and the additive cut as the thesis
+  prints it (p. 171); and a function from its derivations to those of
+  `Fam`. Proved twice, as cut admissibility is: with the source's
+  construction at each cut (`cutElimination`), and with the search at
+  each cut (`cutEliminationBySearch`).
+* **Not taken**: to leave entry 1 of the standing list at
+  admissibility, which is what the Coq files of the paper state: the
+  version fixed to be read is the thesis, and "the goal by rule is the
+  statement the source states".
+* **Why**: the plan had listed it as a non-goal "to be looked at again
+  when the prose is read".
+* **Rests on it**: `GLS/CutRule.lean`.
+* **Cost to reverse**: little. The statement was put in Lean and proved
+  in one step (it is five lines from S10); its reading back was made
+  after: `statements.md`, S24.
+
 ## Stops
 
 *Each time the reviewer's word was needed (`SKILL.md`, "Deciding,
@@ -317,4 +392,4 @@ that does not rest on the answer went on.*
 
 | date | what was asked, and why only the reviewer can answer it | what went on meanwhile | the answer, in the reviewer's words |
 |---|---|---|---|
-| 2026-11-25 08:55 | May the thesis's PDF be downloaded ("Ian Shillito_Thesis_2023.pdf", 1.41 MB, `openresearch-repository.anu.edu.au/bitstreams/0bbb4f8c-19b1-4e28-96e8-4ca795c863bf/download`)? The operator's environment makes no download without the reviewer's word, and his words covered "the paper". | The campaign folder; the literature for Q2 and Q5; the authors' Coq formalisation read as web pages; the scratch screens of the encoding. No rule is entered in the rule table before a source in prose is read. | (not yet answered) |
+| 2026-11-25 08:55 | May the thesis's PDF be downloaded ("Ian Shillito_Thesis_2023.pdf", 1.41 MB, `openresearch-repository.anu.edu.au/bitstreams/0bbb4f8c-19b1-4e28-96e8-4ca795c863bf/download`)? The operator's environment makes no download without the reviewer's word, and his words covered "the paper". | The campaign folder; the literature for Q2 and Q5; the authors' Coq formalisation read as web pages; then, by the decision of 09:07, Adopt, Prove, Run and Explore from the Coq files, with the comparison with the prose owed. | 2026-11-25 13:14, in the operator's session: "yes you can download the thesis and any other materials to which you have online access that may assist you in the formalisation." Waited: 4 h 19 min by the clock, of which the work went on for the first hour; the session was not running from about 09:57 to 13:14. |

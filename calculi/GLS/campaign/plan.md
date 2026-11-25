@@ -37,6 +37,58 @@ rules of the project: `decisions.md`, the first entry.
   results of four web searches (which papers exist; who formalised
   what), named where they are used.
 
+### 2026-11-25 13:21 GMT: the thesis read, and what it changes
+
+The reviewer allowed the download at 13:14 (`decisions.md`). Read then,
+from the PDF of the thesis (246 pages; "Ian Shillito_Thesis_2023.pdf",
+ANU Open Research), chapter 12, "Classical Provability Logic": sections
+12.2 to 12.4 (pp. 168-171) in full, the figure from the page's image
+(the text extraction loses `□` and `⊠`); of sections 12.5 to 12.7
+(pp. 171-186) every numbered statement and the definition of PSGLS, and
+of the proofs that of Theorem 12.7.2. The chapter has no appendix.
+Sections 2.1, 4.2 and 5.1, which it cites for the language, the notion
+of principal formula and the notion of model, were not read. The paper
+itself could still not be got (the TU Wien host timed out again at
+13:16).
+
+* **Q1 is confirmed.** Figure 12.1 (p. 171) has the five rules of
+  `GLS_rules`, on multisets ("we consider here sequents based on finite
+  multisets, in our formalisation sequents are based on lists", p. 171),
+  with GLR printed as `⊠Γ, □ψ ⇒ ψ` over `Φ, □Γ ⇒ □ψ, □Δ, Ψ` and the
+  caption "Φ and Ψ do not contain any boxed formulas"; `⊠Γ` is
+  `ϕ₁, □ϕ₁, …, ϕₙ, □ϕₙ` (p. 168). PSGLS (p. 178) is GLS with "(IdentBox)
+  an additional identity rule (IdB)" and "(NoInit) the conclusion of the
+  rule (GLR) is not permitted to be an instance of either (IdP) or (⊥L)
+  or (IdB)". The comparison row by row is in the rule table. **No
+  difference** from the Coq file's rules was found, and nothing built on
+  them is built again.
+* **The semantics stated by the operator is the thesis's.** Definition
+  12.2.2 (p. 168): a GL-Kripke frame is transitive and "converse
+  well-founded, i.e. there are no infinite ascending sequences";
+  Definition 12.2.3: the four forcing clauses, as in the plan. The
+  thesis proves soundness and (citing Segerberg) completeness for the
+  Hilbert calculus GLH (Theorems 12.2.1 and 12.2.3, p. 169), and cites
+  Sambin and Valentini for "GLS + (cut) … a sequent calculus for GLL"
+  (Theorem 12.4.1, p. 171). It states no soundness or completeness
+  theorem for GLS itself, and no finite model property.
+* **Q2, a goal more.** Theorem 12.7.2 (p. 186): "The additive cut rule
+  is eliminable from GLS + (cut)", by recursion on a derivation with
+  cuts, using Theorem 12.7.1 at each cut. With Theorem 12.7.1 it is
+  entry 1 of the standing list in the form the source states: **a goal
+  by rule**, entered as S24.
+* **Q2, two results get a source.** Proposition 12.6.1 (p. 181): a
+  sequent has a proof in PSGLS iff it has one in GLS (goal 5).
+  Corollary 12.6.1 (p. 182): provability in GLS is decidable (part of
+  goal 2; the thesis's proof is by `mhd`, ours by the search).
+* **Entry 3 of the standing list** stays "does not apply": the thesis
+  proves a deduction theorem for its Hilbert calculus of K (Theorem
+  4.1.1, as cited on p. 38), which is another system, and states none
+  for GLS.
+* **Q4, the source's worked derivations**: Examples 12.4.1 and 12.4.2
+  (p. 171): four derivations, of which one is a proof and three have
+  open leaves. They are in `GLS/Source.lean` as terms. Example 12.4.2
+  is the loop that the plan's Q3 describes.
+
 ## Q1. What are the rules?
 
 All places are in `GL/GLS_PSGLS_calcs.v` unless another file is named.

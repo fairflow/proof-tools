@@ -26,16 +26,17 @@ Read these first: no tool checks that they say what the source means.
 
 | definition | Lean name, file | the source's item | read back |
 |---|---|---|---|
-| formulas | `GLS.Form`, `GLS/Form.lean` | `MPropF`, the Coq file l. 41 | agrees: "A ::= pₙ \| ⊥ \| A → B \| □A" |
+| formulas | `GLS.Form`, `GLS/Form.lean` | `MPropF`, the Coq file l. 41; the thesis, "connectives {⊥, →, □}", p. 168 | agrees: "A ::= pₙ \| ⊥ \| A → B \| □A" |
 | sequents | `GLS.Seq`, `GLS/Form.lean` | `rel (list (MPropF V))` | agrees: "a pair of lists … Lists, not multisets or sets" |
 | the boxed part of an antecedent | `GLS.xbox`, `GLS.Form.xb`, `GLS/Form.lean` | `XBoxed_list (top_boxes Γ)`, l. 154, 161 | agrees: "deletes every non-boxed formula and replaces each occurrence of □B by the two formulas B, □B (in that order, in place, multiplicities kept)" |
-| the family of rules of GLS | `GLS.Fam`, `GLS/System.lean` | `GLS_rules`, l. 306 | the second transcription, in the rule table: no difference. The reading back drew the five rules as the table has them |
-| the family of rules of PSGLS | `GLS.PSFam`, `GLS/System.lean` | `PSGLS_rules`, l. 314 | the same; "The → rules have no such restriction" |
+| the family of rules of GLS | `GLS.Fam`, `GLS/System.lean` | `GLS_rules`, l. 306; the thesis, Figure 12.1, p. 171 | the two second transcriptions, in the rule table: no difference. The reading back drew the five rules as the table has them |
+| the family of rules of PSGLS | `GLS.PSFam`, `GLS/System.lean` | `PSGLS_rules`, l. 314; the thesis, (IdentBox) and (NoInit), p. 178 | the same; "The → rules have no such restriction" |
 | the height of a derivation | `GLS.Fam.height`, `GLS/System.lean` | `derrec_height`, `general/dd_fc.v` l. 131 | agrees: "a rule with no premises … gets 1, not 0" |
 | what holds: the family | `GLS.Fam` | | |
-| the models, and truth in a model | `GLS.Model`, `Model.sat`, `Model.GL`, `Model.TwoValued`, `Model.Finite`, `Model.satSeq`, `GLS/Semantics.lean` | **none in the source's Coq files**; the operator's, the usual semantics of GL | agrees with what was meant, clause by clause; `GL`: "R is transitive, and the converse of R is well-founded in Lean's accessibility sense … constructively stronger than 'no infinite chain'"; a model may be empty |
-| validity | `GLS.Valid`, `GLS/Semantics.lean` | none in the source | agrees, and the reader names the restriction: "Valid quantifies only over GL models in which every formula is true-or-not at every world. With excluded middle every model is TwoValued … Without excluded middle … T1 (soundness) is a weaker claim than the textbook one and T3 (completeness) a stronger one". This is the choice of `decisions.md`, "what valid means" |
+| the models, and truth in a model | `GLS.Model`, `Model.sat`, `Model.GL`, `Model.TwoValued`, `Model.Finite`, `Model.satSeq`, `GLS/Semantics.lean` | none in the source's Coq files; **the thesis, Definitions 12.2.2 and 12.2.3, p. 168** (found after they were written: `decisions.md`, 13:21). `TwoValued`, `Finite` and `satSeq` are the operator's | agrees with what was meant, clause by clause; `GL`: "R is transitive, and the converse of R is well-founded in Lean's accessibility sense … constructively stronger than 'no infinite chain'"; a model may be empty |
+| validity | `GLS.Valid`, `GLS/Semantics.lean` | none in the source for a sequent (the thesis has local consequence `Γ ⊨ ϕ` over GL-models, p. 169, which is this for one formula on the right) | agrees, and the reader names the restriction: "Valid quantifies only over GL models in which every formula is true-or-not at every world. With excluded middle every model is TwoValued … Without excluded middle … T1 (soundness) is a weaker claim than the textbook one and T3 (completeness) a stronger one". This is the choice of `decisions.md`, "what valid means" |
 | a finite model as data | `GLS.Tree`, `Tree.desc`, `treeModel`, `subModel`, `Form.holds`, `Seq.refutedAt`, `Refutation`, `GLS/Semantics.lean` | none in the source | agrees: "W = the type of all finite trees; R t u iff … u is equal as a tree to some proper subtree of t … Worlds are trees up to structural equality, not node positions"; `Refutation`: "the negation of the implication … not … 'all of Γ true and all of Δ false'" (the two are proved to agree: `refutedAt_of_not_satSeq`, `not_satSeq_of_refutedAt`, `GLS/TreeModel.lean`) |
+| GLS + (cut) | `GLS.FamCut`, `GLS/CutRule.lean` | the thesis, the rule (cut), p. 171, and `GLS_cut_rules`, p. 186 | agrees (the reading back of S24) |
 | the premise relation of PSGLS | `GLS.PSPrem`, `GLS/Semantics.lean` | the premises of `PSGLS_rules` | agrees: "p is a premise of some instance of a premise-bearing rule of Fam2 with conclusion c" |
 
 **The reading back** (`reference/adopt.md` §7 of the skill). Made on
@@ -101,9 +102,10 @@ So `step` refuses no instance of a rule of `Fam`.
 
     ∀ s : Seq,  Fam s → Valid s
 
-`Soundness`, proved as `soundness`, `GLS/Soundness.lean`. Source: not in
-the source's Coq files; literature, Sambin and Valentini 1982 (not
-read). Screened: rule by rule, on `seqs1` and `seqsSmall`, no world of
+`Soundness`, proved as `soundness`, `GLS/Soundness.lean`. Source: none
+for GLS; the thesis has soundness for the Hilbert calculus GLH (Theorem
+12.2.1, p. 169) and cites Sambin and Valentini 1982 for the sequent
+calculus with cut (Theorem 12.4.1, p. 171; neither read). Screened: rule by rule, on `seqs1` and `seqsSmall`, no world of
 the 964 refutes a conclusion while refuting no premise (for GLR: while
 no descendant refutes the premise); on the whole, no sequent of the
 1 024 that the bounded search derives is refuted at a world. Read back:
@@ -142,7 +144,9 @@ Quot.sound]`.
     (s : Seq) → Decidable (Nonempty (Fam s))
 
 `ValidDecidable`, `DerivableDecidable`, defined as `validDecidable`,
-`derivableDecidable`, `GLS/Completeness.lean`. Read back: agrees, with
+`derivableDecidable`, `GLS/Completeness.lean`. Source, for the second:
+the thesis, Corollary 12.6.1, p. 182, "Provability in GLS is
+decidable" (proved there from `mhd`; here from the search). Read back: agrees, with
 the caution above. Status: **PROVED**, within `[propext, Quot.sound]`.
 
 ### S7. The finite model property (goal 2; entry 2 of the standing list)
@@ -175,7 +179,8 @@ formula.
 
 `PSTermination`, proved as `psTermination`, `GLS/Measure.lean`. Source:
 `PSGLS_termin` and `RA_mhd_decreases`, `PSGLS_termination.v` l. 1563,
-1605, **in another form**: the source shows that every sequent has an
+1605 (the thesis, Theorem 12.6.1 and Lemma 12.6.3, pp. 180-181; the
+step `PSPrem.step` is its Lemma 12.6.1, p. 179), **in another form**: the source shows that every sequent has an
 unfinished PSGLS derivation of maximal height, and that this height
 falls from conclusion to premise; here the premise relation is
 well-founded. The source's measure is used (the usable boxes, then the
@@ -193,8 +198,8 @@ one strategy"). Status: **PROVED**, within `[propext, Quot.sound]`.
       Fam (Γ0 ++ Γ1 ⇒ Δ0 ++ Δ1)
 
 `CutAdmissible`, defined as `cutAdmissible`, `GLS/Completeness.lean`.
-Source: `GLS_cut_adm`, `GLS_additive_cut.v` l. 692, of which this is the
-statement letter for letter. Screened: for 16 antecedents, 15
+Source: `GLS_cut_adm`, `GLS_additive_cut.v` l. 692 (the thesis, Theorem
+12.7.1, p. 182), of which this is the statement letter for letter. Screened: for 16 antecedents, 15
 succedents and the nineteen small formulas as cut formula, wherever the
 bounded search derives both premises within height 7 it derives the
 conclusion within 9. Read back: agrees ("admissibility of cut,
@@ -203,9 +208,10 @@ cut-elimination argument from one going through T1 and T2"). Status:
 **PROVED**, within `[propext, Quot.sound]`, **by the semantic route**:
 the two premises are valid (S3), so the conclusion is, so the search
 (S4) returns a derivation of it. That derivation is not made from the
-two given ones. The source's construction is S19.
+two given ones. The source's construction is S19, a second definition
+of this type: both are PROVED.
 
-### S11 to S18. The source's structural theorems, with heights (goal 4)
+### S11 to S17. The source's structural theorems, with heights (goal 4)
 
 Each is a function that returns a derivation no higher than the one it
 is given. Source: the Coq files named. Screened, each on `seqsSmall` by
@@ -230,25 +236,49 @@ the premises in this family's form; S16, S17 `GLS_hpadm_ctr_L`, `_R`
 (`GLS_ctr.v` l. 1051, 1064), letter for letter ("the later occurrence is
 the one removed", the reader). Names in Lean, all in
 `GLS/Semantics.lean`: `Exchange`, `WeakeningL`, `WeakeningR`,
-`InversionImpR`, `InversionImpL`, `ContractionL`, `ContractionR`.
-Status: **OPEN**, each.
+`InversionImpR`, `InversionImpL`, `ContractionL`, `ContractionR`. In the
+thesis: Lemma 12.5.1 (p. 172, with no height), Lemma 12.5.3 (p. 172),
+Lemma 12.5.4 (p. 174), Lemma 12.5.5 (p. 176).
+
+Status: **PROVED**, each, within `[propext, Quot.sound]`: `exchange`,
+`weakeningL`, `weakeningR` (`GLS/Structural.lean`), `inversionImpR`,
+`inversionImpL` (`GLS/Invert.lean`), `contractionL`, `contractionR`
+(`GLS/Contract.lean`). By the agent of `brief-2-1.md`; built and run by
+the operator (`GLS/CutTest.lean`). The route: one function `Fam.wk`,
+which carries a derivation of `Γ ⇒ Δ` to one no higher of any `Γ' ⇒ Δ'`
+with `Γ'` a permutation of `Γ ++ Ξ` and `Δ'` of `Δ ++ Ξ'`, gives
+exchange and both weakenings; the inversions are stated up to a
+permutation (`Fam.invR`, `Fam.invL`); contraction is on the left and the
+right together, by recursion on a bound of the height, with the
+inversions. Every permutation is proved by counting occurrences.
 
 ### S18. The two systems derive the same sequents (goal 5)
 
     (s : Seq) → (Fam s → PSFam s) × (PSFam s → Fam s)
 
-`PSEquivalent`, `GLS/Semantics.lean`. Source: none found in the Coq
-files as a theorem (IdB is derived there by `Id_all_form`); the
-statement is the operator's. Read back: agrees ("No claim that they are
-mutually inverse, and no height relation"). Status: **OPEN**.
+`PSEquivalent`, defined as `psEquivalent`, `GLS/PS.lean`. Source: the
+thesis, Proposition 12.6.1, p. 181 ("Γ ⇒ Δ has a proof in PSGLS iff
+Γ ⇒ Δ has a proof in GLS"; found after the statement was written, which
+was the operator's). Read back: agrees ("No claim that they are
+mutually inverse, and no height relation"). Status: **PROVED**, within
+`[propext, Quot.sound]`, by the thesis's argument: at a GLR whose
+conclusion is an axiom of PSGLS, that axiom; IdB by the identity.
 
 ### S19. Cut admissibility, by the source's induction (goal 6)
 
 The type of S10. A second definition of that type, which makes its
 derivation from the two given ones, by induction on the size of the cut
 formula and then on the termination measure. Source:
-`GLS_cut_adm_main`, `GLS_additive_cut.v` l. 32. Status: **OPEN** (no
-such definition yet).
+`GLS_cut_adm_main`, `GLS_additive_cut.v` l. 32 (the proof of the
+thesis's Theorem 12.7.1, pp. 182-185). Status: **PROVED**:
+`cutBySource`, `GLS/Cut.lean`, within `[propext, Quot.sound]`. It uses
+no model, no search, no soundness and no completeness (the file imports
+`GLS/Contract.lean` and `GLS/Search.lean`, and of the second only
+`classify` and the finders). The secondary induction is on `weight U`
+of the conclusion, where the source's is on `mhd`: both fall along the
+premises of PSGLS. The kernel evaluates it (`GLS/CutTest.lean`: a cut
+on `□p`, principal on both sides, by `decide +kernel`). On the
+tutorial's cut both functions return a derivation of height 4.
 
 ### S20. A refutation is a finite countermodel (our own)
 
@@ -278,16 +308,18 @@ first). No item of the source, so not read back.
 `noValid`, `noDerivable`, `GLS/Run.lean`. No budget in `Holds`. Screened
 (`GLS/Screen.lean`): no sequent of the 1 024 that the bounded search
 derives is accepted with any of the 964 trees; the plan's five
-non-theorems are each accepted with one. Status: OPEN until
-`GLS/Run.lean` builds.
+non-theorems are each accepted with one. Status: **PROVED**,
+within `[propext, Quot.sound]` (`GLS/Run.lean`); negative tests:
+`GLS/RunTest.lean`.
 
 ### S22. One side always answers (stage 3, level 3; our own)
 
     ∀ s : Seq,  (∃ c, treeCert.check s c = true) ∨ (∃ t, noValid.check s t = true)
 
 `decided`, `GLS/Run.lean`; and that the engine's producer answers `pass`
-for every derivable sequent (`Certify.Engine.Complete`). Status: OPEN
-until `GLS/Run.lean` builds.
+for every derivable sequent (`glsEngine_complete :
+glsEngine.Complete`). Status: **PROVED**, within `[propext,
+Quot.sound]`.
 
 ### S23. Trees of moves over sets, checked for derivability (stage 3; our own)
 
@@ -316,7 +348,29 @@ the general form `Fam.wk`): a derivation of a sequent less its repeated
 formulas gives one of the sequent. Screened (`GLS/SetSearchTest.lean`):
 on the 1 024 small sequents, for each move that applies, if the bounded
 search derives every premise with its repetitions removed then it
-derives the conclusion. Status: OPEN until `GLS/SetSearch.lean` builds.
+derives the conclusion; a control shows the screen able to say no.
+Status: **PROVED**, within `[propext, Quot.sound]`; negative tests and
+the agreement of the two searches on the 1 024 small sequents and the
+corpus: `GLS/SetSearchTest.lean`.
+
+### S24. Cut elimination (the standing list's entry 1, in the source's second form)
+
+    (s : Seq) → FamCut s → Fam s
+
+`CutElimination`, `GLS/CutRule.lean`, with `FamCut` the family of GLS +
+(cut). Source: the thesis, Theorem 12.7.2, p. 186: "The additive cut
+rule is eliminable from GLS + (cut)", in Coq `forall s, (GLS_cut_prv s)
+-> (GLS_prv s)`. Entered on 2026-11-25 at 13:20, when the thesis was
+read, and proved in the same step (`decisions.md`). Screened: on a
+derivation with two cuts, one above the other, both definitions return
+a derivation of GLS, of height 4 (`GLS/CutTest.lean`). Read back, after
+the proof: agrees ("Fam3 = Fam plus r6, nothing else changed … the cut
+rule, in its additive (context-sharing) form … every derivation of
+Γ ⇒ Δ with cut yields a cut-free derivation"; "the type demands no
+relation between input and output derivation beyond the shared end
+sequent"). Status: **PROVED**, twice, within `[propext, Quot.sound]`:
+`cutElimination` (each cut removed by `cutBySource`, S19: the source's
+proof) and `cutEliminationBySearch` (each cut removed by S10).
 
 ## Refuted
 
@@ -328,13 +382,16 @@ None.
 |---|---|
 | `mhd`, the maximal height of an unfinished PSGLS derivation (`PSGLS_termination.v` l. 1598) | not a goal: a lemma on the source's route; termination is S9, and the induction of S19 can be on the measure itself. Decided again if S19 needs it |
 | the decidability of the applicability of each rule (`GLS_PSGLS_dec.v`) | not a goal of Prove: it is `step`, with S1 and S2 |
-| a cut-elimination procedure for a calculus with a cut rule | not a goal: a second family; the source's Coq files state admissibility. To be looked at again when the prose is read |
+| a cut-elimination procedure for a calculus with a cut rule | **a goal after all**, since the thesis states it (Theorem 12.7.2): S24, PROVED |
 | interpolation; arithmetical completeness; a Hilbert system for GL | not goals: about other systems |
 
 ## Summary
 
 | | PROVED | REFUTED | OPEN |
 |---|---|---|---|
-| of the goals from the standing list (S7, S10) | 2 | 0 | 0 |
-| of the other goals (S3 to S6, S8, S9; S11 to S19) | 6 | 0 | 9 |
-| of our own (S1, S2, S20) | 3 | 0 | 0 |
+| of the goals from the standing list (S7; S10 with S19; S24) | 3 | 0 | 0 |
+| of the other goals (S3 to S6, S8, S9; S11 to S18) | 14 | 0 | 0 |
+| of our own (S1, S2, S20 to S23) | 6 | 0 | 0 |
+
+Counted by entry, with S11 to S17 seven entries and S19 counted with
+S10 (one statement, two definitions).

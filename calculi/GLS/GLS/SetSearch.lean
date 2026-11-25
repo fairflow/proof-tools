@@ -22,11 +22,17 @@ open ProofTools ProofTools.Explore
 
 /-! ## Removing repeated formulas -/
 
+/-- `A` put before a list, unless it is there already. -/
+def insertNew (A : Form) (Γ : List Form) : List Form := if A ∈ Γ then Γ else A :: Γ
+
 /-- A list less its repeated formulas: of several occurrences the last is
-kept. -/
+kept.  (Written through `insertNew` so that the recursive call is made
+once: with the `if` written out in place, the compiled function made it
+twice, and its time doubled with each formula of the list.  Found by the
+measurements, `campaign/measurements.md`.) -/
 def dedup : List Form → List Form
   | [] => []
-  | A :: Γ => if A ∈ dedup Γ then dedup Γ else A :: dedup Γ
+  | A :: Γ => insertNew A (dedup Γ)
 
 /-- The occurrences that `dedup` removes. -/
 def dropped : List Form → List Form
@@ -38,22 +44,22 @@ theorem mem_dedup {A : Form} {Γ : List Form} : A ∈ dedup Γ ↔ A ∈ Γ := b
   | nil => simp [dedup]
   | cons C Γ ih =>
     by_cases hC : C ∈ dedup Γ
-    · simp only [dedup, hC, if_true, List.mem_cons, ih]
+    · simp only [dedup, insertNew, hC, if_true, List.mem_cons, ih]
       constructor
       · exact .inr
       · rintro (rfl | h)
         · exact ih.1 hC
         · exact h
-    · simp only [dedup, hC, if_false, List.mem_cons, ih]
+    · simp only [dedup, insertNew, hC, if_false, List.mem_cons, ih]
 
 theorem dedup_perm (Γ : List Form) : Γ.Perm (dedup Γ ++ dropped Γ) := by
   induction Γ with
   | nil => exact List.Perm.refl _
   | cons C Γ ih =>
     by_cases hC : C ∈ dedup Γ
-    · simp only [dedup, dropped, hC, if_true]
+    · simp only [dedup, insertNew, dropped, hC, if_true]
       exact (ih.cons C).trans List.perm_middle.symm
-    · simp only [dedup, dropped, hC, if_false, List.cons_append]
+    · simp only [dedup, insertNew, dropped, hC, if_false, List.cons_append]
       exact ih.cons C
 
 /-- A sequent less its repeated formulas, on each side. -/

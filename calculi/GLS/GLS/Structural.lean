@@ -104,32 +104,40 @@ def FamLe.glr (A : Form) {Γ Δ : List Form} {n : Nat} (h : □A ∈ Δ)
 
 /-! ## Weakening, up to a permutation -/
 
-/-- **Weakening and exchange in one**: a derivation of `Γ ⇒ Δ` gives one no
-higher of `Γ' ⇒ Δ'`, where `Γ'` is a permutation of `Γ` with `Ξ` and `Δ'`
-one of `Δ` with `Ξ'`.  At GLR the premise is weakened by `xbox Ξ` on the
-left and by nothing on the right. -/
-def Fam.wk : {Γ Δ : List Form} → (d : Fam (Γ ⇒ Δ)) → (Ξ Ξ' Γ' Δ' : List Form) →
-    Γ'.Perm (Γ ++ Ξ) → Δ'.Perm (Δ ++ Ξ') → FamLe (Γ' ⇒ Δ') d.height
-  | _, _, .idP p hΓ hΔ, _, _, _, _, hΓ', hΔ' =>
+/-- Weakening and exchange in one (`Fam.wk`), by matching on the
+derivation.  The sequent is a variable `s`, so that the recursion is on a
+part of the derivation: Lean's structural recursion asks that the index of
+the family be a variable.  At GLR the premise is weakened by `xbox Ξ` on
+the left and by nothing on the right. -/
+def Fam.wkAux : {s : Seq} → (d : Fam s) → (Ξ Ξ' Γ' Δ' : List Form) →
+    Γ'.Perm (s.ant ++ Ξ) → Δ'.Perm (s.suc ++ Ξ') → FamLe (Γ' ⇒ Δ') d.height
+  | _, .idP p hΓ hΔ, _, _, _, _, hΓ', hΔ' =>
       ⟨.idP p (hΓ'.mem_iff.2 (List.mem_append_left _ hΓ))
         (hΔ'.mem_iff.2 (List.mem_append_left _ hΔ)), Nat.le_refl _⟩
-  | _, _, .botL h, _, _, _, _, hΓ', _ =>
+  | _, .botL h, _, _, _, _, hΓ', _ =>
       ⟨.botL (hΓ'.mem_iff.2 (List.mem_append_left _ h)), Nat.le_refl _⟩
-  | _, _, .impR A B h d, Ξ, Ξ', Γ', Δ', hΓ', hΔ' =>
+  | _, .impR A B h d, Ξ, Ξ', Γ', Δ', hΓ', hΔ' =>
       have h' : A ⟶ B ∈ Δ' := hΔ'.mem_iff.2 (List.mem_append_left _ h)
-      .impR A B h' (d.wk Ξ Ξ' (A :: Γ') (B :: Δ'.erase (A ⟶ B)) (by perm_count [hΓ'])
+      .impR A B h' (d.wkAux Ξ Ξ' (A :: Γ') (B :: Δ'.erase (A ⟶ B)) (by perm_count [hΓ'])
         (by perm_count [hΔ', perm_cons_erase h, perm_cons_erase h']))
-  | _, _, .impL A B h d₁ d₂, Ξ, Ξ', Γ', Δ', hΓ', hΔ' =>
+  | _, .impL A B h d₁ d₂, Ξ, Ξ', Γ', Δ', hΓ', hΔ' =>
       have h' : A ⟶ B ∈ Γ' := hΓ'.mem_iff.2 (List.mem_append_left _ h)
       .impL A B h'
-        (d₁.wk Ξ Ξ' (Γ'.erase (A ⟶ B)) (A :: Δ')
+        (d₁.wkAux Ξ Ξ' (Γ'.erase (A ⟶ B)) (A :: Δ')
           (by perm_count [hΓ', perm_cons_erase h, perm_cons_erase h']) (by perm_count [hΔ']))
-        (d₂.wk Ξ Ξ' (B :: Γ'.erase (A ⟶ B)) Δ'
+        (d₂.wkAux Ξ Ξ' (B :: Γ'.erase (A ⟶ B)) Δ'
           (by perm_count [hΓ', perm_cons_erase h, perm_cons_erase h']) hΔ')
-  | _, _, .glr A h d, Ξ, _, Γ', _, hΓ', hΔ' =>
+  | _, .glr A h d, Ξ, _, Γ', _, hΓ', hΔ' =>
       .glr A (hΔ'.mem_iff.2 (List.mem_append_left _ h))
-        (d.wk (xbox Ξ) [] (xbox Γ' ++ [□A]) [A] (by perm_count [xbox_perm hΓ'])
+        (d.wkAux (xbox Ξ) [] (xbox Γ' ++ [□A]) [A] (by perm_count [xbox_perm hΓ'])
           (by perm_count []))
+
+/-- **Weakening and exchange in one**: a derivation of `Γ ⇒ Δ` gives one no
+higher of `Γ' ⇒ Δ'`, where `Γ'` is a permutation of `Γ` with `Ξ` and `Δ'`
+one of `Δ` with `Ξ'`. -/
+def Fam.wk {Γ Δ : List Form} (d : Fam (Γ ⇒ Δ)) (Ξ Ξ' Γ' Δ' : List Form)
+    (hΓ : Γ'.Perm (Γ ++ Ξ)) (hΔ : Δ'.Perm (Δ ++ Ξ')) : FamLe (Γ' ⇒ Δ') d.height :=
+  d.wkAux Ξ Ξ' Γ' Δ' hΓ hΔ
 
 /-- Weakening and exchange in one, for a derivation with a bound on its
 height. -/
