@@ -311,7 +311,9 @@ and does not see out of a `have` or of a block inside a term.
 **No comment after a pattern.** A line `mycalc andL   -- a comment` is
 offered back as `mycalc andL` with the move's arguments written after
 the comment. In a file a person types in (the exercises, the tutorial),
-put each comment on a line of its own.
+put each comment on a line of its own. Comment lines directly below a
+pattern line are taken with it in the same way: put the comment above
+the line.
 
 The node the tactic builds carries the equation `S.step m j = .ok ps`,
 which the kernel proves by evaluating `step` when the declaration is
@@ -428,7 +430,10 @@ goal.
 
 **The tests file** (a module of the library, every message pinned with
 `#guard_msgs`). The template's `Test.lean` is the compiled model of all
-nine kinds; the library's own tests have more of each.
+nine kinds; the library's own tests have more of each. A description
+above a pinned message is a `--` comment: a doc comment before
+`/-- error: … -/ #guard_msgs in` makes two doc comments, which is a
+parse error.
 
 1. each rule by `#guard` on `step`: where it applies, and where it is
    refused;

@@ -35,7 +35,8 @@ the folder point here.*
 * **Pushing**: <where, and by which standing instruction; or: nothing is
   pushed, and the closing page is delivered by …>.
 * **Not touched**: <…>. Only the reviewer contacts the source's authors.
-* **Told to the reviewer**: <date and time; the message, in full>.
+* **Told to the reviewer**: <date and time, filled from the clock after
+  the message is sent; the message, in full>.
 * **Before this text was read**: <what the session had read and written;
   or "nothing">.
 

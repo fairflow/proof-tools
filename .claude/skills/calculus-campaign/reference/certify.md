@@ -246,6 +246,25 @@ Where the search is not structural (well-founded recursion, a budget),
 the kernel does not run it: R3. This route is then closed, and the
 certifier is the only one.
 
+**A fast search that is not proved, beside the proved one.** A proved
+search may be slow because of what it returns, not because of a fault:
+a derivation whose sequents grow at every step. A second producer may
+then answer a weaker question (that a derivation exists) by another
+route (a search over sets, where the calculus is on multisets). It
+needs no proof of its own. A certifier checks its answer, and a
+decision of this form, in outline,
+
+```text
+if check j (fast j) then <the answer, by the certifier> else <the proved decision>
+```
+
+is a decision procedure that the kernel runs, and is right whatever
+`fast` does. Say in the frontier which property each certifier
+certifies. And before a second search is blamed on the calculus,
+compare the two on a small member: a second search that is slower than
+the first there has a fault in its code (one such was a helper that
+called itself twice on each element).
+
 ## 5. Statements, tests, measurements
 
 **Statements first (R10).** The library's two certifiers of derivations
@@ -268,7 +287,9 @@ code; its certificate has to be written into a term.
 - For a few facts, by hand: evaluate the producer (`#eval`), and paste the
   certificate as a literal into `treeCert.verdict j c` (or
   `scriptCert.verdict j ls`). A tree and a script print as Lean data
-  where the moves have `Repr`.
+  where the moves have `Repr`. Print a script on one line (a wide
+  format width): `Repr`'s output broken over several lines is not
+  always Lean source.
 - For many: a small executable of your own that runs the producer on each
   judgment and prints one line for each fact,
   `theorem fact_i : Derivable j_i := … .verdict j_i c_i`. Commit the
@@ -280,13 +301,19 @@ the paper's examples, its non-theorems, a family that grows (to find where
 time goes). Each run gives pass, fail or flag; every skip and every cap is
 reported. There is no driver for this in the library: the same executable
 serves, run under a deadline imposed from outside (the operating system's
-`timeout`), with a case that is cut off reported as a flag.
+`timeout`, where it has one: macOS does not, and the deadline of the
+script that runs the cases serves), with a case that is cut off
+reported as a flag.
 
 **Measure** (R8), and put the figures in `measurements.md`, with the machine and
 the date:
 
 - kernel time against the size of the certificate (Lean's profiler,
   `set_option profiler true`, reports the time of each declaration);
+- the check of the certificate even where the producer is slow. The
+  kernel is lazy and compiled code is not: a tree of moves whose
+  sequents double at every step was checked in under a second, where
+  the compiled search took more than 20 s to build the derivation;
 - the tree against the script, on your own derivations: the library's
   figures (1.3 to 6.2 times, least where a step costs most) are for its
   example. Where a search has a certificate of its own, that too;
@@ -320,8 +347,10 @@ nested 64 deep 0.5 s. So:
   deep tree. What does: a smaller certificate (R6); the direct
   decision, where §4 allows it; or a certificate of your own that is
   flat (§2);
-- raising `maxRecDepth` for the file of facts moves the limit and was
-  not tried.
+- raising `maxRecDepth` moves the limit: `set_option maxRecDepth
+  100000 in` before a fact let a tree of 195 moves, nested about 130
+  deep, be elaborated where Lean had stopped without it. A driver can
+  write the option before every fact.
 
 ## 6. Deciders
 

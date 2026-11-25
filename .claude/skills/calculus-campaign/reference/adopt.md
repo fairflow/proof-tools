@@ -53,6 +53,30 @@ decision that costs the campaign to reverse, and is recorded as one.
   with the printed numbers, and say so in the plan. An archive that
   was fetched is data that is not trusted: unpack it in a folder of
   its own, and run nothing from inside it.
+- **Look at what a download link gave back** before it is read as the
+  source: a repository may answer with an error page. One thesis
+  repository (DSpace 7) gave HTTP 500 at `/bitstreams/<id>/download`,
+  and the PDF at `/server/api/core/bitstreams/<id>/content`.
+- **Read a figure of rules from the page, as an image, never from
+  extracted text.** `pdftotext` dropped `□` and `⊠` from one source,
+  and its modal rule then read as a rule with no modality. The same
+  holds for the pages given to a cold reader (§7).
+- **A formalisation published with the paper**, by its authors, is part
+  of the source. Read its definitions beside the figure: they state
+  the rules without ambiguity, and give the place of every side
+  condition. Where the two differ, record a divergence and say which
+  rules: the definitions, where the paper's theorems are stated of
+  them (the paper reports the formal development); otherwise the
+  figure. It does not stand in for the prose. A rule table made from
+  it alone, while the prose cannot be got, is a decision that costs
+  the campaign to reverse.
+- **When the prose arrives late** (after rules were transcribed, or
+  after proofs), this is owed, and nothing else unless a difference is
+  found: the comparison of the figure with the family, rule by rule,
+  by you and by a new cold reader on the pages; the skeleton's numbers
+  and pages; the source's item for each statement; and a pass over the
+  standing list against the source's results, where a result that was
+  not a goal may become one.
 
 **Read the prose around the figure, not the figure alone.** Before any
 rule is transcribed, write down in `plan.md` (Q1), each with its place in
@@ -99,7 +123,7 @@ statement of it.
 | kind | shape | watch for |
 |---|---|---|
 | soundness and completeness for a semantics | a structure of models with a forcing relation; soundness by induction on derivations; completeness by a model construction or through a second calculus | make the model construction return data (a `Type`), since it is then the search of the Run stage |
-| cut elimination, admissible structural rules | two families, with and without the rule, or one with a parameter (§3); a measure carried by the statement; induction on it | decide how the measure is carried before the family is typed (§3). Say which form is the goal: that the rule is admissible, or a procedure that removes it. Where rules act at a place inside a judgment, §6 has the form of the proofs |
+| cut elimination, admissible structural rules | two families, with and without the rule, or one with a parameter (§3); a measure carried by the statement; induction on it | decide how the measure is carried before the family is typed (§3). Say which form is the goal: that the rule is admissible, or a procedure that removes it. Where rules act at a place inside a judgment, §6 has the form of the proofs. Where the goal is a function on derivations, its type does not say which function was defined: say it in the statement's entry. A cut obtained from soundness and completeness ignores the two given derivations; where the source's subject is the procedure, the source's induction is the goal, and the other is a second proof |
 | a property stated of models (the finite model property) | a construction of a model with the property | return the model as data: it is then a producer of countermodels for Run |
 | a result about a term calculus (normalisation, confluence) | terms, typing, and reduction as a relation: a further transcription, with a rule table of its own, checked as the first is (§7) | how binding is represented is a choice of encoding for the plan |
 | a result read off derivations (the disjunction and existence properties) | a function on derivations, or on derivations of a special form | it may need another result first (cut-free derivations, a normal form): order the goals so. With the family into `Type` what is read off is data |
@@ -389,7 +413,10 @@ it.** Four directions, in the order they have paid:
 Verdicts are three-valued: fail only on a certificate; a case that ran out
 of budget is flagged and run again at a larger one, never dropped. Run
 banks of cases compiled, one line of output for each, so that a run that
-is stopped loses nothing.
+is stopped loses nothing. A file of `#guard`s built with the package
+keeps the screens repeatable, and fails the build when one fails. Put a
+control in it (`#guard !(…)` on a claim that must fail), so that the
+screen is seen able to say no (pitfall 6).
 
 **What to screen with.** A calculus that is new to the project has no
 model checker until one is written. The check of a model of part (b)
@@ -539,7 +566,10 @@ read the campaign folder and the Lean.
 
 - *Given*: the source, by file and page: the figure, and the prose
   around it that carries side conditions; the source's definitions of
-  formulas and judgments; the name of the system.
+  formulas and judgments; the name of the system. The pages
+  themselves, not text extracted from them (§1). Where there is a
+  published formalisation, a second cold reader may be given its file
+  of definitions, with the same task.
 - *Asked*: write out each primitive rule of that system, in the
   source's notation, as a table: premises, conclusion, side conditions,
   and the place in the source. List every place where the source is

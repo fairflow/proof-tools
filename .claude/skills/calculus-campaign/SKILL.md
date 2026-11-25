@@ -122,6 +122,9 @@ time, and it holds from when it comes ("Deciding, checking, stopping",
    it. Commit. Tell the reviewer in one message of a few lines: the
    paper, the system, the results aimed at, the place. It is
    information, and it asks nothing. Begin the Survey in the same turn.
+   Where another session started this one, the reviewer is still the
+   person: say these lines in your own output, where the reviewer reads
+   them, and do not end the turn after a message to that session.
 
 **Downloading: the reviewer's standing word.** Whoever starts a campaign
 with this command permits, by it, the download of publicly available
@@ -204,7 +207,7 @@ before the first document is written. Compiled Lean to read beside the parts:
   calculus as an inductive family), and their tests.
 
 **The worked instances** are not needed to follow this skill. There are
-two outside the library's tests:
+three outside the library's tests:
 
 - **the subframe tableau** for propositional lax logic, in
   [lax-logic-in-lean](https://github.com/fairflow/lax-logic-in-lean)
@@ -213,9 +216,17 @@ two outside the library's tests:
   `calculi/BrunnlerK/` of `proof-tools`: adopted from its source
   (Brünnler, *Nested Sequents*, arXiv:1004.1845) by a campaign under
   this skill. Its judgments are not flat (`reference/explore.md` §13).
-  The campaign's record is in its folder `campaign/`: the plan, the
-  rule table, the statements, the gates, the reports, the cost log and
-  the notes on the method.
+  The campaign's record is in its folder `campaign/`, in the earlier
+  form: the plan, the rule table, the statements, the gates, the
+  reports, the cost log and the notes on the method;
+- **GLS**, the sequent calculus on multisets for the provability logic
+  GL, in `calculi/GLS/` of `proof-tools`: adopted by a campaign under
+  this text as rewritten, from the authors' Coq files and chapter 12 of
+  Shillito's thesis (the paper, Goré, Ramanayake and Shillito, TABLEAUX
+  2021, could not be got). Its judgments are flat. Its folder
+  `campaign/` has the record in the present form: the decisions, the
+  closing page (`report.md`), and a brief by which three goals were
+  handed to an agent.
 
 **Status.** The three parts have been used separately. The whole, from a
 paper to an explorer, has been run once: on Brünnler's system K, on
@@ -227,17 +238,37 @@ or a screen that the operator ran; the reviewer lifted every gate in the
 middle of Prove; and most of the day was spent waiting.
 
 This text was rewritten on 2026-11-25 so that the operator works
-independently. **As it stands it has not been run.** New in it, and
-untested: the second transcription and the reading back
-(`reference/adopt.md` §7), the decisions recorded by what they cost to
-reverse, and the closing page. Where this text leaves you without an
-instruction, decide, and write it down (rules 8 and 9).
+independently, and has been run once as rewritten: on GLS, the same
+day, by an operator that started cold. What that run shows, and what it
+does not:
+
+- the five stages ran in 71 minutes, with one question to the reviewer
+  (a download, since made the reviewer's standing word), which the work
+  did not wait on; every goal ended PROVED;
+- the session then ended under a running command and stood idle for
+  three hours, until the reviewer typed in it; the closing page was
+  written after that. So a run from the command to the closing page
+  with no word of the reviewer has not yet been made;
+- the second transcription and the reading back were carried out as
+  written (`reference/adopt.md` §7), and found no fault. No other check
+  found one either, so what they can catch is not known;
+- rule 1 was not kept to the letter: the rules were transcribed from
+  the authors' formalisation before any prose could be read, and were
+  compared with the prose afterwards;
+- this text was amended after that run, from its notes, and as it now
+  stands it has not been run.
+
+Where this text leaves you without an instruction, decide, and write it
+down (rules 8 and 9).
 
 ## Nine rules for every stage
 
 1. **Read the source at source.** A rule table comes from the paper, not
    from a summary, a survey, memory, or an example in this skill. The
-   prose carries side conditions that the figure does not.
+   prose carries side conditions that the figure does not. A
+   formalisation that the authors published with the paper is part of
+   the source: it is read beside the figure, and not in place of the
+   prose (`reference/adopt.md` §1).
 2. **Statements before proofs.** A definition, a rule table or a statement
    is written down, displayed in its document and screened before
    anything is built on it. Nobody is waited for: the order is yours to
@@ -254,7 +285,12 @@ instruction, decide, and write it down (rules 8 and 9).
    history again at every step. When that cost shows, hand the next
    stage to a fresh agent that you start yourself, with a written brief
    (`templates/brief.md`), and take its result back. This needs no word
-   of the reviewer. End a session before the campaign is done only
+   of the reviewer. To hand goals on, a brief that gives the statements
+   as named Lean types, and the tests the result must pass, is enough.
+   Name in it the files the agent will write; an agent of the campaign
+   works in your tree, so leave those files out of your commits until
+   it reports; and build and run its result yourself before anything is
+   recorded as PROVED. End a session before the campaign is done only
    where the environment forces it: write the brief, and enter the end
    in `decisions.md` as a stop, since someone must then open a session
    with `/calculus-campaign` and the brief's path.
@@ -265,6 +301,9 @@ instruction, decide, and write it down (rules 8 and 9).
    pushed, sent in full, or published. A clean build is not the end, and
    a file in a temporary folder is not a page. Until then the status
    board (`README.md` of the campaign folder) is true at every commit.
+   Write the page as soon as the goals are settled, before anything
+   that is optional: a measurement still running is added to it
+   afterwards.
 7. **Do not change the libraries.** If an instance seems to need a change
    to `proof-tools`, do not make it, and do not stop: it is a finding
    about the library. Record it, work round it in the campaign's own
@@ -331,6 +370,13 @@ Which results are goals of Prove:
   plan's budget has room for it and a use the plan names wants it.
 - Of the source's own theorems, soundness is a goal, and completeness
   where the source proves it.
+- **Where the source has no semantics** (it is proof theory only), the
+  fourth check of meaning and the "no" side of Run still want one.
+  State the logic's usual semantics, from a place in the literature
+  that you cite. It is a decision that costs the campaign to reverse,
+  and is among the definitions to read on the closing page. Soundness
+  and completeness for it are then goals, of the kind "holds of the
+  logic, proved elsewhere".
 - The source's other theorems, and other important technical results
   found in the literature, are listed in the plan, each with its size
   as far as you can tell it. Which are goals is decided there: first
@@ -527,11 +573,15 @@ Read `reference/adopt.md` §2, §5, §6 and §7, and Prove's pitfalls.
    a further transcription, with a rule table of its own, checked as
    the first is.
 2. `statements.md`: each goal of the plan as a Lean statement, displayed,
-   OPEN, before any proof.
+   OPEN, before any proof. The Lean file of named statements
+   (`def Name : Prop := …`, or a named type) is where a statement is
+   displayed first; its entry in `statements.md` is written with it.
 3. Screen each statement for counterexamples before deciding how to prove
    it (`reference/adopt.md` §5), and have the definitions the goals are
    about, and the goals' statements, read back by a cold reader
-   (`reference/adopt.md` §7 says which, and how).
+   (`reference/adopt.md` §7 says which, and how). A cold reader takes
+   minutes: the proofs may begin while the reading back runs, and what
+   rests on a statement that it faults is then built again.
 4. **Soundness, then completeness where it is a goal, before every other
    goal.** "Soundness" here is the source's theorem (what is derivable
    is valid), not the soundness of the moves of Adopt, which says only
@@ -576,7 +626,9 @@ holds; a copy that says its reviewer "is the gate" is the older text.
 2. Follow `lean-certify`'s six steps; `reference/certify.md` says what the
    explorer library gives for a calculus, and what is written by hand.
 3. A negative test for each certifier; the corpus; timings; kernel time
-   against certificate size.
+   against certificate size. Commit before a measuring run, and give
+   every run a deadline of its own: a session can end under a long
+   command, and whoever goes on has only what is in the folder.
 4. **A fault of a search that the measurements show** (a proof many
    times longer than one made by hand; time that goes where it need
    not) may be repaired in this stage, in the module of Prove where the

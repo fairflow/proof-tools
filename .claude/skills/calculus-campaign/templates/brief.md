@@ -20,6 +20,11 @@ reviewer that changes one of them: which entry.>
 <One paragraph: the stage, and what "done" is. Then the list from the
 skill's stage, with anything the plan adds.>
 
+<Where goals are handed to an agent: each statement by its name in the
+Lean file; the tests the result must pass; the files the agent will
+write, which the operator keeps out of its commits until the agent
+reports.>
+
 ## Read, in this order
 
 Leave out what does not exist yet.
