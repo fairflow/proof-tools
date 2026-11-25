@@ -27,5 +27,6 @@ import GLS.SetSearch
 import GLS.SetSearchTest
 import GLS.Explore
 import GLS.ExploreTest
+import GLS.TutorialTest
 import GLS.Corpus.Basic
 import GLS.Corpus.Facts
