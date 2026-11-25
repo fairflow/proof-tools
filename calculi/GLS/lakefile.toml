@@ -1,0 +1,13 @@
+name = "gls"
+defaultTargets = ["GLS"]
+
+[leanOptions]
+autoImplicit = false
+
+[[require]]
+name = "proof-tools"
+path = "../.."
+
+[[lean_lib]]
+name = "GLS"
+globs = ["GLS", "GLS.+"]

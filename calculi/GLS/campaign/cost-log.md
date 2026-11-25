@@ -10,6 +10,7 @@ environment does not give is written "not known".
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | 1 | the first act | Claude Fable 5.2, in the Claude desktop app; effort not known to the operator | started cold, from a brief written by another session that had not read the paper | 2026-11-25 08:46 | 2026-11-25 08:56 | none | none (the question was sent and the work went on) | not known | not known | not known | not known | 0 | this folder's first four files |
 | 1 (went on) | Survey | the same session | went on in the session | 2026-11-25 08:56 | 2026-11-25 09:08 | 3 s (one build of the library, from a cloned `.lake`; two scratch files, 1 s each) | none: the question is unanswered and the work went on | not known | not known | not known | not known | 0 (two scratch files outside the repository, 190 lines, not kept) | `plan.md`, `skeleton.md`, six entries of `decisions.md` |
+| 1 (went on) | Adopt | the same session | went on in the session | 2026-11-25 09:08 | 2026-11-25 09:25 | under 1 minute in all (each build of the package 1 to 4 s); 10 minutes lost to a shell command of the operator's that waited on its input | none | not known | not known | not known | not known | 760 added (`GLS/*.lean`, `Play/GLS.lean`) | `rule-table.md` (287 lines), `statements.md` |
 
 Where the tokens and the cost come from: not known to the operator, and
 not filled.
