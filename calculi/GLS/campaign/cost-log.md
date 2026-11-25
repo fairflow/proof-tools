@@ -9,6 +9,7 @@ environment does not give is written "not known".
 | # | stage | operator (person, or model and settings) | started cold, or handed on from a brief, or went on in the session | began | ended | waiting on builds (the sum of the build commands' times) | waiting at a stop | requests | output tokens | input read again (cached) | cost | Lean lines added / removed (`git diff --stat`) | document lines |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | 1 | the first act | Claude Fable 5.2, in the Claude desktop app; effort not known to the operator | started cold, from a brief written by another session that had not read the paper | 2026-11-25 08:46 | 2026-11-25 08:56 | none | none (the question was sent and the work went on) | not known | not known | not known | not known | 0 | this folder's first four files |
+| 1 (went on) | Survey | the same session | went on in the session | 2026-11-25 08:56 | 2026-11-25 09:08 | 3 s (one build of the library, from a cloned `.lake`; two scratch files, 1 s each) | none: the question is unanswered and the work went on | not known | not known | not known | not known | 0 (two scratch files outside the repository, 190 lines, not kept) | `plan.md`, `skeleton.md`, six entries of `decisions.md` |
 
 Where the tokens and the cost come from: not known to the operator, and
 not filled.

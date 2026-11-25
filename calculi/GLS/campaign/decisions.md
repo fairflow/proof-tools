@@ -124,6 +124,119 @@ the folder point here.*
 * **Before this text was read**: nothing of the source. The brief that
   started the session says its writer has not read the paper.
 
+## 2026-11-25 09:07 GMT. Stage 0: the transcription is made from the authors' Coq files while the prose is not read
+
+* **Decided**: Q1 of the plan, and the rule table of Adopt, are written
+  from `GL/GLS_PSGLS_calcs.v` of `ianshil/CE_GLS` (commit `3dd8619`),
+  by file and line. The comparison with the figure and the prose (the
+  thesis, or the paper) is owed, and is made when one of them can be
+  read; every difference is then entered in the rule table, and what
+  rests on a rule that changes is built again.
+* **Not taken**: to end the turn and wait for the download. The skill's
+  stop says to go on with what does not rest on the answer; nearly
+  everything rests on the rules, and the Coq file states them without
+  ambiguity. To transcribe from memory of the paper: rule 1 forbids it.
+* **Why**: the paper's theorems are theorems about these Coq
+  definitions ("By formalising the GLS calculus and the proofs in Coq",
+  the abstract). A figure in prose can differ from them in notation and
+  in what it leaves implicit; where it does, the Coq definition is what
+  was proved.
+* **Rests on it**: the plan's Q1; the rule table; the family.
+* **Cost to reverse**: the campaign, if the prose shows another system;
+  little, if it shows the same one in other notation. Doubt: the second
+  transcription (`reference/adopt.md` §7) asks for a cold reader given
+  "the figure, and the prose around it". Until the prose is read the
+  cold reader is given the Coq file.
+
+## 2026-11-25 09:07 GMT. Stage 0: what holds is the family
+
+* **Decided**: the moves of the explorer are sound for the family `GLS`
+  as transcribed, into `Type` (the method's default for an adopted
+  calculus). Validity is a goal of Prove.
+* **Not taken**: validity as what holds: nothing would then tie `step`
+  to the transcribed rules except what is proved separately.
+* **Why**: a derivation of the explorer maps out to the calculus's own
+  derivation, as data; the search and cut admissibility are functions on
+  such derivations.
+* **Rests on it**: S1, S2, the certifiers of Run.
+* **Cost to reverse**: the campaign.
+
+## 2026-11-25 09:07 GMT. Stage 0: what "valid" means
+
+* **Decided**: `Valid (Γ ⇒ Δ)`: in every model whose relation is
+  transitive and conversely well-founded and in which every formula is
+  true or not true at every world, at every world: if every formula of
+  `Γ` is true then some formula of `Δ` is. Truth of `□A` at `w`: `A` at
+  every `v` with `w R v`.
+* **Not taken**: every model, two-valued or not: screened in scratch, it
+  gives `P ∨ ¬P` for every proposition `P` from the validity of
+  `⇒ p, p → ⊥`. The indirect form (no model refutes the sequent): the
+  reviewer's recorded preference is the direct form over the class the
+  literature means (the project's memory, 2026-11-23). Finite models
+  only: completeness would be the same theorem, soundness a weaker one.
+* **Why**: it is the classical notion under excluded middle. Screened:
+  GLR preserves it, with no axiom beyond `propext`, by induction along
+  the converse of the relation.
+* **Rests on it**: goals 1 to 3 of the plan; the no side of Run.
+* **Cost to reverse**: the campaign. Doubt: **the semantics is not in
+  the source's Coq files.** It is the standard one for GL (transitive,
+  conversely well-founded frames), stated here by the operator; the
+  closing page lists it among the definitions to read.
+
+## 2026-11-25 09:07 GMT. Stage 0: the axiom policy
+
+* **Decided**: every theory file within `[propext, Quot.sound]`.
+* **Not taken**: `Classical.choice` allowed in the completeness file.
+* **Why**: the countermodels are finite trees given as data, and
+  validity is over two-valued models.
+* **Rests on it**: every theory file's last line.
+* **Cost to reverse**: the campaign (to tighten later is a rewrite; to
+  loosen is one line).
+
+## 2026-11-25 09:07 GMT. Stage 0: the encoding
+
+* **Decided**: a sequent is a structure of two lists. A rule finds its
+  principal formula by membership and its premises remove one
+  occurrence of it (`List.erase`). The boxed part of GLR is one
+  function `xbox` on the antecedent. Moves name a rule by its formula.
+  Two families, `GLS` and `PSGLS`. The height is a function on
+  derivations.
+* **Not taken**: the Coq form with places in lists (`++` in every
+  conclusion: a computed index, and exchange at the cost it had in Coq,
+  140 000 characters); a principal formula kept in the premises (another
+  calculus: the number of implications no longer falls); one family
+  with a Boolean parameter.
+* **Why**: the plan, "Choices of encoding". Each is a divergence of
+  representation, entered in the rule table.
+* **Rests on it**: every Lean file.
+* **Cost to reverse**: a stage (Adopt and all of Prove).
+
+## 2026-11-25 09:07 GMT. Stage 0: which results are goals, and the route to cut
+
+* **Decided**: the goals of the plan, in its order: soundness;
+  completeness as data, with the finite model property and
+  decidability; cut admissibility; the source's structural theorems
+  with heights; the two systems derive the same sequents; cut
+  admissibility a second time by the source's induction.
+  **Soundness, completeness and the finite model property are goals
+  although the source's Coq files have no semantics**: the method wants
+  them as its fourth check of meaning, Run wants countermodels, and
+  entry 2 of the standing list is then proved for this calculus and not
+  only cited.
+  **Cut admissibility is proved first through the semantics**, and then
+  by the source's route.
+* **Not taken**: the source's route only: it is the longer (210 000
+  characters of Coq without exchange) and the semantic route's
+  ingredients are wanted anyway. The semantic route only: it ignores
+  the two given derivations, which is what the paper's abstract holds
+  against an earlier proof.
+* **Why**: `reference/adopt.md` §1 ("the shorter one is equally
+  published"), and stage 2, step 4.
+* **Rests on it**: `statements.md`.
+* **Cost to reverse**: a stage. Doubt: that the semantic route is "in
+  the literature" for GLS rests on a search result's report of Sambin
+  and Valentini 1982, which was not read.
+
 ## Stops
 
 *Each time the reviewer's word was needed (`SKILL.md`, "Deciding,
