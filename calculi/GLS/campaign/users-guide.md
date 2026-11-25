@@ -5,6 +5,10 @@ every step explained, is `Play/GLSTutorial.lean`; the exercises are
 `Play/GLS.lean`. Each rule beside its place in the source:
 [rule-table.md](rule-table.md).
 
+A tutorial to read, with thirty graded exercises and what is proved
+about the calculus: [tutorial.md](../tutorial.md), with
+`Play/GLSExercises.lean`.
+
     (cd ~/Lean/Sources/proof-tools/calculi/GLS && lake build)
 
 then open one of the two files of `Play/` in the editor, with the

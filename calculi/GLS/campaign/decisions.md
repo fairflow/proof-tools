@@ -427,3 +427,20 @@ that does not rest on the answer went on.*
 | date | what was asked, and why only the reviewer can answer it | what went on meanwhile | the answer, in the reviewer's words |
 |---|---|---|---|
 | 2026-11-25 08:55 | May the thesis's PDF be downloaded ("Ian Shillito_Thesis_2023.pdf", 1.41 MB, `openresearch-repository.anu.edu.au/bitstreams/0bbb4f8c-19b1-4e28-96e8-4ca795c863bf/download`)? The operator's environment makes no download without the reviewer's word, and his words covered "the paper". | The campaign folder; the literature for Q2 and Q5; the authors' Coq formalisation read as web pages; then, by the decision of 09:07, Adopt, Prove, Run and Explore from the Coq files, with the comparison with the prose owed. | 2026-11-25 13:14, in the operator's session: "yes you can download the thesis and any other materials to which you have online access that may assist you in the formalisation." Waited: 4 h 19 min by the clock, of which the work went on for the first hour; the session was not running from about 09:57 to 13:14. |
+
+## 2026-11-25 16:30 GMT. A word of the reviewer, after the campaign
+
+* **The words**: "can you write me now a tutorial for the new calculus
+  with some graded exercises and an explanation of the key syntactic and
+  semantic properties you have formalised please" (typed in the session
+  that started this campaign's session).
+* **What it is**: a command.
+* **What it changes**: nothing that was decided or built. Added:
+  `tutorial.md` (a page to read: the calculus, the semantics, what is
+  proved, thirty graded exercises with solutions);
+  `Play/GLSExercises.lean` (the exercises, as stubs to type in; its
+  `sorry`s are the exercises, and nothing imports the file);
+  `GLS/TutorialTest.lean` (a solution of each, in the library, with
+  every output the page quotes pinned). `Play/GLS.lean` and
+  `Play/GLSTutorial.lean` are as they were. Written by the session that
+  started this one, not by the campaign's operator.
