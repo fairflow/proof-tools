@@ -212,3 +212,44 @@ campaign is the first run. Kept to what would change that text.
     check of the skill. *Proposed*: `certify.md` §5: when a second
     search is slower than the first on a small member, suspect the
     code before the calculus.
+
+## After the campaign: the notes made changes to the skill (2026-11-25 14:37 GMT)
+
+Written by the session that started this campaign, not by its operator.
+The reviewer's word, to the question whether to apply the changes this
+file proposes: "Yes, apply them". Made in commit `b20b7aa` of proof-tools,
+which changes the skill's files and nothing else.
+
+| note | what the skill now says | where |
+|---|---|---|
+| 1, 2 | downloading public material is the reviewer's standing word (commit `28e3aa8`, before this one) | `SKILL.md`, "Downloading" |
+| 3 | where another session started this one, the lines for the reviewer go in the session's own output, and the turn is not ended | `SKILL.md`, the first act, step 4 |
+| 4 | the time of "told to the reviewer" is filled after the message is sent | `templates/decisions.md` |
+| 5 | a formalisation published with the paper is part of the source: read beside the figure, not in place of the prose | `SKILL.md`, rule 1; `reference/adopt.md` §1 and §7 |
+| 6 | where the source has no semantics, the operator states the logic's usual one, as a decision that costs the campaign | `SKILL.md`, "What a campaign proves" |
+| 7 | where a goal is a function on derivations, the entry says which function; a cut from soundness and completeness is a second proof | `reference/adopt.md` §2 |
+| 8 | a description above a pinned message is a `--` comment | `reference/explore.md` §10 |
+| 9 | comment lines directly below a pattern line are taken with it | `reference/explore.md` §6 |
+| 10, 25 | the Lean file of named statements is where a statement is displayed first; the proofs may begin while the reading back runs | `SKILL.md`, stage 2, steps 2 and 3 |
+| 11 | screens as a file of `#guard`s in the build, with a control | `reference/adopt.md` §5 |
+| 13 | `maxRecDepth` was tried, and works | `reference/certify.md` §5 |
+| 14 | a script is printed on one line | `reference/certify.md` §5 |
+| 15 | macOS has no `timeout` | `reference/certify.md` §5 |
+| 16 | measure the kernel's check even where the producer is slow | `reference/certify.md` §5 |
+| 17, 26 | a fast search that is not proved, beside the proved one; suspect the code before the calculus | `reference/certify.md` §4 |
+| 18, 19 | what a brief gives when goals are handed on; the agent's files stay out of commits; the operator builds before PROVED | `SKILL.md`, rule 5; `templates/brief.md` |
+| 21 | what is owed when the prose arrives late | `reference/adopt.md` §1 |
+| 22 | look at what a download link gave back | `reference/adopt.md` §1 |
+| 23 | a figure of rules is read from the page's image | `reference/adopt.md` §1 and §7 |
+
+Not made changes: 12 and 24 report that the text held; 20 proposes
+none. Notes 18 and 21 name files the skill does not have (`prove.md`,
+`survey.md`): their changes went into rule 5 and `reference/adopt.md`
+§1.
+
+Added from the run's record, and in no note: the closing page is
+written when the goals are settled, and a commit is made before a
+measuring run (the session ended under a running command at 09:57 and
+stood idle until 13:14, with no closing page); the skill's "Status",
+which now says what this run does not show; this campaign as a third
+worked instance.
