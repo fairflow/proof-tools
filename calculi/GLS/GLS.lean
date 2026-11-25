@@ -14,3 +14,9 @@ import GLS.Measure
 import GLS.Search
 import GLS.Completeness
 import GLS.SearchTest
+import GLS.Run
+import GLS.RunTest
+import GLS.Explore
+import GLS.ExploreTest
+import GLS.Corpus.Basic
+import GLS.Corpus.Facts

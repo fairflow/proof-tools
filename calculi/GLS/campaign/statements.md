@@ -194,7 +194,7 @@ one strategy"). Status: **PROVED**, within `[propext, Quot.sound]`.
 
 `CutAdmissible`, defined as `cutAdmissible`, `GLS/Completeness.lean`.
 Source: `GLS_cut_adm`, `GLS_additive_cut.v` l. 692, of which this is the
-statement letter for letter. Screened: for 13 antecedents, 15
+statement letter for letter. Screened: for 16 antecedents, 15
 succedents and the nineteen small formulas as cut formula, wherever the
 bounded search derives both premises within height 7 it derives the
 conclusion within 9. Read back: agrees ("admissibility of cut,
@@ -262,6 +262,61 @@ such definition yet).
 Source: none. They say that the trees of S4 are countermodels in the
 sense of `Valid`. Not read back as statements (their definitions were).
 Status: **PROVED**, within `[propext, Quot.sound]`.
+
+### S21. The certifiers against validity and against derivability (stage 3; our own)
+
+Entered before their proofs (rule R10 of `lean-certify`: statements
+first). No item of the source, so not read back.
+
+    Spec  := Seq            Cert := Tree (a finite tree, as data)
+    check s t := s.refutedAt t
+    Holds s := Valid s → False                        (noValid)
+    Holds s := Nonempty (Fam s) → False               (noDerivable)
+    sound : ∀ s t, s.refutedAt t = true → Valid s → False
+    sound : ∀ s t, s.refutedAt t = true → Nonempty (Fam s) → False
+
+`noValid`, `noDerivable`, `GLS/Run.lean`. No budget in `Holds`. Screened
+(`GLS/Screen.lean`): no sequent of the 1 024 that the bounded search
+derives is accepted with any of the 964 trees; the plan's five
+non-theorems are each accepted with one. Status: OPEN until
+`GLS/Run.lean` builds.
+
+### S22. One side always answers (stage 3, level 3; our own)
+
+    ∀ s : Seq,  (∃ c, treeCert.check s c = true) ∨ (∃ t, noValid.check s t = true)
+
+`decided`, `GLS/Run.lean`; and that the engine's producer answers `pass`
+for every derivable sequent (`Certify.Engine.Complete`). Status: OPEN
+until `GLS/Run.lean` builds.
+
+### S23. Trees of moves over sets, checked for derivability (stage 3; our own)
+
+Entered before its proof (R10). Why it is wanted: `decisions.md`,
+"Stage 3: a certifier over sets". No item of the source, so not read
+back.
+
+    Spec := Seq        Cert := Cert SS  (a tree of moves, as for S)
+    SS   := the proof system of GLS's moves in which each premise has its
+            repeated formulas removed:
+            stepSet m j := if (m.rule j).ok then .ok ((m.rule j).prems.map Seq.dedup) else .error …
+    Holds s := Nonempty (Fam s)
+    the one obligation:   SS.Sound Derivable
+      :=  ∀ m j ps, SS.step m j = .ok ps → (∀ p ∈ ps, Derivable p) → Derivable j
+    sound : ∀ s c, Cert.check (S := SS) s c = true → Nonempty (Fam s)
+
+and, of the type of S6, a second decision of derivability:
+
+    (s : Seq) → Decidable (Nonempty (Fam s))
+
+by a search over sets whose answer is checked (by this certifier, or by
+`noDerivable`), with the procedure of S6 where a check fails.
+`stepSet_sound`, `setCert`, `derivableDecidableFast`, `GLS/SetSearch.lean`.
+No budget in `Holds`. The obligation rests on weakening (S12, S13, in
+the general form `Fam.wk`): a derivation of a sequent less its repeated
+formulas gives one of the sequent. Screened (`GLS/SetSearchTest.lean`):
+on the 1 024 small sequents, for each move that applies, if the bounded
+search derives every premise with its repetitions removed then it
+derives the conclusion. Status: OPEN until `GLS/SetSearch.lean` builds.
 
 ## Refuted
 

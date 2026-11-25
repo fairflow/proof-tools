@@ -237,6 +237,77 @@ the folder point here.*
   the literature" for GLS rests on a search result's report of Sambin
   and Valentini 1982, which was not read.
 
+## 2026-11-25 09:38 GMT. Stage 2: goals 4 to 6 handed to a fresh agent
+
+* **Decided**: the source's syntactic route (the structural theorems
+  with heights, the two systems, cut by the source's induction: S11 to
+  S19) is given to a fresh agent, started by the operator, with
+  [brief-2-1.md](brief-2-1.md), which holds the operator's design of
+  each proof. The operator goes on with stage 3 meanwhile, in the same
+  checkout: the agent creates five new files and changes no other.
+* **Not taken**: to write them in this session, one after another: the
+  session has read 400 000 characters of its own history, and stage 3
+  does not rest on these goals (rule 5).
+* **Why**: the statements are fixed in `GLS/Semantics.lean`; the kernel
+  checks what comes back, so the agent need not be trusted.
+* **Rests on it**: S11 to S19.
+* **Cost to reverse**: little.
+
+## 2026-11-25 09:39 GMT. Stage 3: the producers and the certificates
+
+* **Decided**: one producer, the search of `GLS/Search.lean` compiled,
+  with what it returns checked before it is handed on. Certificates: for
+  a derivation its tree of moves (the plan's certificate of record),
+  read off the derivation the search returns; against derivability and
+  against validity, the finite tree the search returns, checked by
+  `Seq.refutedAt` (certifiers of our own: S21). Level 3: S22. The kernel
+  running the search itself (`decide +kernel` on `Valid s`) is measured
+  beside the certificates.
+* **Not taken**: a second, faster search that is not proved: the
+  measurements decide whether one is wanted. A certificate of the
+  search's own.
+* **Why**: who relies on the answers (the plan, Q3): the campaign's
+  corpus, and a user of the explorer who wants the countermodel of a
+  goal no move closes.
+* **Rests on it**: `GLS/Run.lean`, the corpus, `measurements.md`.
+* **Cost to reverse**: little.
+
+## 2026-11-25 09:48 GMT. Stage 3: a certifier over sets
+
+* **What the measurements showed** (`measurements.md`): the producer
+  answers `□p → □¹⁷p` in 8 ms, `□p → □²¹p` in 132 ms, `□p → □²⁵p` in
+  2.2 s, and not `□p → □²⁹p` in 20 s: its time doubles with each box.
+  The same for the non-theorem `□ⁿ⁺¹⊥ → □ⁿ⊥`. The cause is the rule and
+  not the order of the search: the premise of GLR holds `B, □B` for
+  every boxed formula of the antecedent, counted with repetitions, and
+  a formula that is both a `□B` and the body of a `□□B` is there twice
+  after one GLR, and so on: the antecedents double. A derivation of
+  GLS, as a term of `Fam`, holds these sequents, and the compiled
+  search builds them and looks through them. (The kernel does not: it
+  evaluates lazily, and checked the tree of moves of `□p → □²⁵p` in
+  under a second, since no step of that tree looks beyond the head of
+  an antecedent. The kernel running the first search does look through
+  them, and was cut off at `n = 16`.)
+* **Decided**: a second certifier, `setCert`, for the proposition "there
+  is a derivation in GLS" (not for the derivation as data): trees of
+  moves checked by a `step` that removes the repeated formulas of each
+  premise. A search over sets as its producer, not proved; and a second
+  decision of derivability that runs it, checks its answer, and falls
+  back on the first. The statements: S23, entered before the proofs.
+  The first search, the first certifiers and every statement are as
+  they were.
+* **Not taken**: to change `search` (stage 3, step 4, allows a repair
+  that changes no statement): the search returns a derivation in `Fam`,
+  and that object is as large as it is; `search` is also what the
+  theorems of goals 2 and 3 are about. To leave the frontier at
+  `n = 28`: the answers that matter to a user (is it derivable; if not,
+  where is it false) do not need the derivation as data.
+* **Why**: a sequent less its repeated formulas is derivable exactly if
+  the sequent is (weakening one way, which is all soundness needs).
+* **Rests on it**: `GLS/SetSearch.lean`; `Fam.wk` of
+  `GLS/Structural.lean` (goal 4).
+* **Cost to reverse**: little.
+
 ## Stops
 
 *Each time the reviewer's word was needed (`SKILL.md`, "Deciding,
