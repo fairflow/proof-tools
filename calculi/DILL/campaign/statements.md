@@ -283,6 +283,24 @@ linear zone (`Sat.no_bang`), so the certificate exists only for the
 sequents whose failed search meets neither. Sixteen negative tests in
 the kernel (`DILL/SatTest.lean`).
 
+### S18. The engine, and one side always answering without `!` (stage 3; ours)
+
+    dillEngine : Certify.Engine Seq (Script S) (List Seq) Derivable
+    noDerivableDec : Certify.Certifier Seq Unit (fun j => Derivable j → False)
+    ∀ Δ C, (∀ A ∈ C :: Δ, A.bangFree = true) →
+      (∃ c, treeCert.check ([] ⨾ Δ ⟹ C) c = true) ∨ noDerivableDec.check ([] ⨾ Δ ⟹ C) () = true
+
+`DILL/Engine.lean`. The engine joins the certifier of scripts, the
+certifier of saturated sets (S16) and a producer that answers `flag`
+where the search finds nothing at its budget and no set is found: level
+2. `noDerivableDec` has no certificate: its check is the decision of S15,
+and it refuses every sequent outside that fragment. The last statement
+(`decidedBangFree`) is level 3 for the fragment with an empty
+unrestricted zone and no `!`, and for nothing more: with `!` no such
+statement can hold of sound checks with computable producers. Source:
+none. Entered 16:05, before the file was built. Not read back.
+**OPEN** at this commit: the file is written and not yet built (one builder at a time).
+
 ### S17. Validity does not depend on the order of the hypotheses (ours)
 
     Γ ~ Γ' → Δ ~ Δ' → (Valid (Γ ⨾ Δ ⟹ C) ↔ Valid (Γ' ⨾ Δ' ⟹ C))
