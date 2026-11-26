@@ -2,7 +2,7 @@
 
 Every statement the campaign cites, displayed as Lean, with its status.
 Each was fixed as a named Lean type in `DILL/Statements.lean` (commit
-`477cd38`, 15:20 GMT) before any proof of it was begun; this document
+`584b842` on `main`, 15:20 GMT) before any proof of it was begun; this document
 was first written at 15:27, while the proofs were being made by agents,
 and its statuses are those of the commit it is in.
 
