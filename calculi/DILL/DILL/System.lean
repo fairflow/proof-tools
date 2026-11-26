@@ -125,30 +125,38 @@ def CFDerivable (j : Seq) : Prop := Nonempty (CF j)
 
 /-! ## Exchange in the linear zone -/
 
+/-- Exchange in the linear zone, stated over a variable sequent so that
+Lean compiles it by structural recursion (a function whose argument has
+the index `Γ ⨾ Ξ ⟹ C` is compiled by well-founded recursion, and then
+does not reduce in the kernel). -/
+def Fam.exchAux {c : Bool} : {j : Seq} → Fam c j → (Ξ' : List Form) → j.lin ~ Ξ' →
+    Fam c (j.unr ⨾ Ξ' ⟹ j.goal)
+  | _, .init A h, _, e => .init A (e.symm.trans h)
+  | _, .copy A hΓ d, Ξ', e => .copy A hΓ (d.exchAux (A :: Ξ') (e.cons A))
+  | _, .tensorL A B Δ h d, _, e => .tensorL A B Δ (e.symm.trans h) d
+  | _, .tensorR Δ Δ' h d₁ d₂, _, e => .tensorR Δ Δ' (e.symm.trans h) d₁ d₂
+  | _, .oneL Δ h d, _, e => .oneL Δ (e.symm.trans h) d
+  | _, .oneR h, _, e => .oneR (e.symm.trans h)
+  | _, .lolliL A B Δ Δ' h d₁ d₂, _, e => .lolliL A B Δ Δ' (e.symm.trans h) d₁ d₂
+  | _, .lolliR (A := A) d, Ξ', e => .lolliR (d.exchAux (A :: Ξ') (e.cons A))
+  | _, .withL₁ A B Δ h d, _, e => .withL₁ A B Δ (e.symm.trans h) d
+  | _, .withL₂ A B Δ h d, _, e => .withL₂ A B Δ (e.symm.trans h) d
+  | _, .withR d₁ d₂, Ξ', e => .withR (d₁.exchAux Ξ' e) (d₂.exchAux Ξ' e)
+  | _, .topR, _, _ => .topR
+  | _, .zeroL Δ h, _, e => .zeroL Δ (e.symm.trans h)
+  | _, .plusL A B Δ h d₁ d₂, _, e => .plusL A B Δ (e.symm.trans h) d₁ d₂
+  | _, .plusR₁ d, Ξ', e => .plusR₁ (d.exchAux Ξ' e)
+  | _, .plusR₂ d, Ξ', e => .plusR₂ (d.exchAux Ξ' e)
+  | _, .bangL A Δ h d, _, e => .bangL A Δ (e.symm.trans h) d
+  | _, .bangR h d, _, e => .bangR (e.symm.trans h) d
+  | _, .cut hc A Δ Δ' h d₁ d₂, _, e => .cut hc A Δ Δ' (e.symm.trans h) d₁ d₂
+  | _, .cutU hc A d₁ d₂, Ξ', e => .cutU hc A d₁ (d₂.exchAux Ξ' e)
+
 /-- **Exchange in the linear zone** (CCP p. 2: "allow free exchange among
 the linear hypotheses"): the same rules, at the permuted zone. -/
-def Fam.exch {c : Bool} : {Γ Ξ Ξ' : List Form} → {C : Form} → Ξ ~ Ξ' →
-    Fam c (Γ ⨾ Ξ ⟹ C) → Fam c (Γ ⨾ Ξ' ⟹ C)
-  | _, _, _, _, e, .init A h => .init A (e.symm.trans h)
-  | _, _, _, _, e, .copy A hΓ d => .copy A hΓ (d.exch (e.cons A))
-  | _, _, _, _, e, .tensorL A B Δ h d => .tensorL A B Δ (e.symm.trans h) d
-  | _, _, _, _, e, .tensorR Δ Δ' h d₁ d₂ => .tensorR Δ Δ' (e.symm.trans h) d₁ d₂
-  | _, _, _, _, e, .oneL Δ h d => .oneL Δ (e.symm.trans h) d
-  | _, _, _, _, e, .oneR h => .oneR (e.symm.trans h)
-  | _, _, _, _, e, .lolliL A B Δ Δ' h d₁ d₂ => .lolliL A B Δ Δ' (e.symm.trans h) d₁ d₂
-  | _, _, _, _, e, .lolliR d => .lolliR (d.exch (e.cons _))
-  | _, _, _, _, e, .withL₁ A B Δ h d => .withL₁ A B Δ (e.symm.trans h) d
-  | _, _, _, _, e, .withL₂ A B Δ h d => .withL₂ A B Δ (e.symm.trans h) d
-  | _, _, _, _, e, .withR d₁ d₂ => .withR (d₁.exch e) (d₂.exch e)
-  | _, _, _, _, _, .topR => .topR
-  | _, _, _, _, e, .zeroL Δ h => .zeroL Δ (e.symm.trans h)
-  | _, _, _, _, e, .plusL A B Δ h d₁ d₂ => .plusL A B Δ (e.symm.trans h) d₁ d₂
-  | _, _, _, _, e, .plusR₁ d => .plusR₁ (d.exch e)
-  | _, _, _, _, e, .plusR₂ d => .plusR₂ (d.exch e)
-  | _, _, _, _, e, .bangL A Δ h d => .bangL A Δ (e.symm.trans h) d
-  | _, _, _, _, e, .bangR h d => .bangR (e.symm.trans h) d
-  | _, _, _, _, e, .cut hc A Δ Δ' h d₁ d₂ => .cut hc A Δ Δ' (e.symm.trans h) d₁ d₂
-  | _, _, _, _, e, .cutU hc A d₁ d₂ => .cutU hc A d₁ (d₂.exch e)
+def Fam.exch {c : Bool} {Γ Ξ Ξ' : List Form} {C : Form} (e : Ξ ~ Ξ')
+    (d : Fam c (Γ ⨾ Ξ ⟹ C)) : Fam c (Γ ⨾ Ξ' ⟹ C) :=
+  d.exchAux Ξ' e
 
 /-! ## The unrestricted zone: weakening, contraction, exchange -/
 
@@ -160,32 +168,40 @@ theorem cons_sub {A : Form} {Γ Γ' : List Form} (s : ∀ B, B ∈ Γ → B ∈ 
   | head => exact .head _
   | tail _ h => exact .tail _ (s B h)
 
+/-- The unrestricted zone replaced, stated over a variable sequent (as
+`Fam.exchAux`). -/
+def Fam.monoAux {c : Bool} : {j : Seq} → Fam c j → (Γ' : List Form) →
+    (∀ B, B ∈ j.unr → B ∈ Γ') → Fam c (Γ' ⨾ j.lin ⟹ j.goal)
+  | _, .init A h, _, _ => .init A h
+  | _, .copy A hΓ d, Γ', s => .copy A (s A hΓ) (d.monoAux Γ' s)
+  | _, .tensorL A B Δ h d, Γ', s => .tensorL A B Δ h (d.monoAux Γ' s)
+  | _, .tensorR Δ Δ' h d₁ d₂, Γ', s => .tensorR Δ Δ' h (d₁.monoAux Γ' s) (d₂.monoAux Γ' s)
+  | _, .oneL Δ h d, Γ', s => .oneL Δ h (d.monoAux Γ' s)
+  | _, .oneR h, _, _ => .oneR h
+  | _, .lolliL A B Δ Δ' h d₁ d₂, Γ', s =>
+      .lolliL A B Δ Δ' h (d₁.monoAux Γ' s) (d₂.monoAux Γ' s)
+  | _, .lolliR d, Γ', s => .lolliR (d.monoAux Γ' s)
+  | _, .withL₁ A B Δ h d, Γ', s => .withL₁ A B Δ h (d.monoAux Γ' s)
+  | _, .withL₂ A B Δ h d, Γ', s => .withL₂ A B Δ h (d.monoAux Γ' s)
+  | _, .withR d₁ d₂, Γ', s => .withR (d₁.monoAux Γ' s) (d₂.monoAux Γ' s)
+  | _, .topR, _, _ => .topR
+  | _, .zeroL Δ h, _, _ => .zeroL Δ h
+  | _, .plusL A B Δ h d₁ d₂, Γ', s => .plusL A B Δ h (d₁.monoAux Γ' s) (d₂.monoAux Γ' s)
+  | _, .plusR₁ d, Γ', s => .plusR₁ (d.monoAux Γ' s)
+  | _, .plusR₂ d, Γ', s => .plusR₂ (d.monoAux Γ' s)
+  | _, .bangL A Δ h d, Γ', s => .bangL A Δ h (d.monoAux (A :: Γ') (cons_sub s))
+  | _, .bangR h d, Γ', s => .bangR h (d.monoAux Γ' s)
+  | _, .cut hc A Δ Δ' h d₁ d₂, Γ', s => .cut hc A Δ Δ' h (d₁.monoAux Γ' s) (d₂.monoAux Γ' s)
+  | _, .cutU hc A d₁ d₂, Γ', s =>
+      .cutU hc A (d₁.monoAux Γ' s) (d₂.monoAux (A :: Γ') (cons_sub s))
+
 /-- **The unrestricted zone may grow, shrink to its members, and be
 reordered**: a derivation at `Γ` is one at every `Γ'` that has the
 members of `Γ`.  Weakening and contraction of the valid hypotheses (CCP
 Theorem 2, p. 11) are instances. -/
-def Fam.mono {c : Bool} : {Γ Γ' Ξ : List Form} → {C : Form} → (∀ B, B ∈ Γ → B ∈ Γ') →
-    Fam c (Γ ⨾ Ξ ⟹ C) → Fam c (Γ' ⨾ Ξ ⟹ C)
-  | _, _, _, _, _, .init A h => .init A h
-  | _, _, _, _, s, .copy A hΓ d => .copy A (s A hΓ) (d.mono s)
-  | _, _, _, _, s, .tensorL A B Δ h d => .tensorL A B Δ h (d.mono s)
-  | _, _, _, _, s, .tensorR Δ Δ' h d₁ d₂ => .tensorR Δ Δ' h (d₁.mono s) (d₂.mono s)
-  | _, _, _, _, s, .oneL Δ h d => .oneL Δ h (d.mono s)
-  | _, _, _, _, _, .oneR h => .oneR h
-  | _, _, _, _, s, .lolliL A B Δ Δ' h d₁ d₂ => .lolliL A B Δ Δ' h (d₁.mono s) (d₂.mono s)
-  | _, _, _, _, s, .lolliR d => .lolliR (d.mono s)
-  | _, _, _, _, s, .withL₁ A B Δ h d => .withL₁ A B Δ h (d.mono s)
-  | _, _, _, _, s, .withL₂ A B Δ h d => .withL₂ A B Δ h (d.mono s)
-  | _, _, _, _, s, .withR d₁ d₂ => .withR (d₁.mono s) (d₂.mono s)
-  | _, _, _, _, _, .topR => .topR
-  | _, _, _, _, _, .zeroL Δ h => .zeroL Δ h
-  | _, _, _, _, s, .plusL A B Δ h d₁ d₂ => .plusL A B Δ h (d₁.mono s) (d₂.mono s)
-  | _, _, _, _, s, .plusR₁ d => .plusR₁ (d.mono s)
-  | _, _, _, _, s, .plusR₂ d => .plusR₂ (d.mono s)
-  | _, _, _, _, s, .bangL A Δ h d => .bangL A Δ h (d.mono (cons_sub s))
-  | _, _, _, _, s, .bangR h d => .bangR h (d.mono s)
-  | _, _, _, _, s, .cut hc A Δ Δ' h d₁ d₂ => .cut hc A Δ Δ' h (d₁.mono s) (d₂.mono s)
-  | _, _, _, _, s, .cutU hc A d₁ d₂ => .cutU hc A (d₁.mono s) (d₂.mono (cons_sub s))
+def Fam.mono {c : Bool} {Γ Γ' Ξ : List Form} {C : Form} (s : ∀ B, B ∈ Γ → B ∈ Γ')
+    (d : Fam c (Γ ⨾ Ξ ⟹ C)) : Fam c (Γ' ⨾ Ξ ⟹ C) :=
+  d.monoAux Γ' s
 
 /-- **Weakening of the unrestricted zone** (CCP Theorem 2.1). -/
 def Fam.weakenU {c : Bool} {Γ Ξ : List Form} {C : Form} (A : Form)
@@ -248,27 +264,31 @@ def Fam.height {c : Bool} : {j : Seq} → Fam c j → Nat
   | _, .cut _ _ _ _ _ d₁ d₂ => max d₁.height d₂.height + 1
   | _, .cutU _ _ d₁ d₂ => max d₁.height d₂.height + 1
 
-theorem Fam.height_exch_aux {c : Bool} {j : Seq} (d : Fam c j) :
-    ∀ (Ξ' : List Form) (e : j.lin ~ Ξ'),
-      (Fam.exch (Γ := j.unr) (C := j.goal) e d).height = d.height := by
+theorem Fam.height_exchAux {c : Bool} {j : Seq} (d : Fam c j) :
+    ∀ (Ξ' : List Form) (e : j.lin ~ Ξ'), (d.exchAux Ξ' e).height = d.height := by
   induction d with
-  | _ => intros; simp_all [Fam.exch, Fam.height]
+  | _ => intros; simp_all [Fam.exchAux, Fam.height]
 
 /-- Exchange in the linear zone keeps the height. -/
 theorem Fam.height_exch {c : Bool} {Γ Ξ Ξ' : List Form} {C : Form} (e : Ξ ~ Ξ')
     (d : Fam c (Γ ⨾ Ξ ⟹ C)) : (d.exch e).height = d.height :=
-  Fam.height_exch_aux d Ξ' e
+  Fam.height_exchAux d Ξ' e
 
-theorem Fam.height_mono_aux {c : Bool} {j : Seq} (d : Fam c j) :
-    ∀ (Γ' : List Form) (s : ∀ B, B ∈ j.unr → B ∈ Γ'),
-      (Fam.mono (Ξ := j.lin) (C := j.goal) s d).height = d.height := by
+theorem Fam.height_monoAux {c : Bool} {j : Seq} (d : Fam c j) :
+    ∀ (Γ' : List Form) (s : ∀ B, B ∈ j.unr → B ∈ Γ'), (d.monoAux Γ' s).height = d.height := by
   induction d with
-  | _ => intros; simp_all [Fam.mono, Fam.height]
+  | _ => intros; simp_all [Fam.monoAux, Fam.height]
 
 /-- The unrestricted zone is changed with the height kept. -/
 theorem Fam.height_mono {c : Bool} {Γ Γ' Ξ : List Form} {C : Form}
     (s : ∀ B, B ∈ Γ → B ∈ Γ') (d : Fam c (Γ ⨾ Ξ ⟹ C)) : (d.mono s).height = d.height :=
-  Fam.height_mono_aux d Γ' s
+  Fam.height_monoAux d Γ' s
+
+-- the two functions reduce in the kernel
+example : ((Fam.init (c := false) (Γ := []) (.atom 0) (.refl _)).exch (.refl _)).height = 1 := by
+  decide
+example : ((Fam.init (c := false) (Γ := []) (.atom 0) (.refl _)).weakenU (.atom 1)).height = 1 := by
+  decide
 
 end DILL
 
