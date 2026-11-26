@@ -26,7 +26,7 @@ theorem disjunctionProperty : DisjunctionProperty := Res.disjunctionProperty cut
 /-- **Derivability is decidable where `!` does not occur and the
 unrestricted zone is empty**: the search without cut of
 `DILL/Decide.lean`, and cut elimination. -/
-def bangFreeDecidable : BangFreeDecidable := fun Δ C h =>
+@[reducible] def bangFreeDecidable : BangFreeDecidable := fun Δ C h =>
   @decidable_of_iff _ _ (Sem.derivable_iff_cf _).symm (decideCF Δ C h)
 
 /-! ## Refuted -/
