@@ -534,6 +534,20 @@ the argument, and attributes it.
 * **Cost to reverse**: little; the signs, once people type them, a
   little more.
 
+## 2026-11-26 22:54 GMT. `mallrun prove`: the first line says when the answer is beyond the kernel
+
+* **Whose decision**: the directing session's, against how this session
+  had left it (a comment in the file and an unchanged verdict line).
+* **Done**: the size was measured on two families (`measurements.md`).
+  The bound is 102 sequents, the largest set checked under 8 GB on both.
+  Above it the first line is "not derivable, by the compiled check only
+  (a set of N sequents; the kernel has checked sets of up to 102)"; the
+  exit code stays 1.
+* **Not taken**: 124, the largest set checked on either family (a set
+  of 119 on the other was not); a different exit code (the paragraph
+  fixes four).
+* **Cost to reverse**: little.
+
 ## Stops
 
 *Each time a turn ended to wait for the reviewer. None so far.*

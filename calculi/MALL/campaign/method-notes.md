@@ -241,7 +241,15 @@ a note says where a choice made here would, or would not, carry over.
     printed that the kernel does not check. *Proposed*: say what the
     command does when its own certificate is beyond the kernel (here: a
     comment in the file above 100 sequents, and the guide says so; the
-    verdict line is unchanged, which is the weak point).
+    verdict line is unchanged, which is the weak point). *Since*: the
+    directing session decided it, and the paragraph has the line "A
+    certificate beyond the kernel"; here the bound is measured (102
+    sequents, `measurements.md`) and the first line carries the
+    qualification above it. One thing the measuring showed that the
+    new line does not say: the size is not a sharp bound (124 checked
+    on one family, 119 not on another), so the line is qualified by
+    the largest size checked on every family tried, and says "has
+    checked", not "can check".
 
     (e) *"State each from the one certificate."* With the default
     argument of `Certifier.verdict` each fact runs the kernel's check

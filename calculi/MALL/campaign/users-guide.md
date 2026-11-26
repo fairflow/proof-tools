@@ -145,11 +145,21 @@ Three things to know:
   keyboard `bot` is the unit only and `^` the dual only.
 * **The "no" side** is a phase structure on a small cyclic group where
   one is found, and otherwise a saturated set of sequents. Either gives
-  `¬ Derivable` and `¬ Valid`. A set can be large, and then the kernel
-  may not check the file: a set of 86 sequents was checked in 3.4 s, and
-  the check of one of 238 was stopped at 8 GB of memory. Above 100
-  sequents the file says so in a comment. The verdict in the first line
-  is the program's, which is not trusted; the fact is the file's.
+  `¬ Derivable` and `¬ Valid`.
+* **A "not derivable" that the kernel may not check says so in its first
+  line.** A saturated set can be large. Under a cap of 8 GB of memory
+  the kernel checked the printed file for sets of up to 102 sequents
+  (the largest in 16.7 s); beyond that it was stopped at the cap, at
+  119 sequents on one family and 192 on another. So above 102 the first
+  line reads
+
+      -- not derivable, by the compiled check only (a set of 238 sequents; the kernel has checked sets of up to 102): ⊢ …
+
+  and the exit code is still 1. A plain `-- not derivable:` is an answer
+  of a size the kernel has been seen to check: a cyclic phase structure,
+  or a set of at most 102. In every case the fact is the file's, once
+  it is elaborated; the first line is the program's, which is not
+  trusted.
 
 Options: `--short`, the first line only; `--ascii`, the sequent in it
 with the signs of a keyboard; `--deadline=N`, seconds, 10 if not given.

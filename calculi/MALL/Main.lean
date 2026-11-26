@@ -163,6 +163,14 @@ def sequent : List Form := {srcForms Γ}
 def proveFoot : String :=
   "\nend MALL.Answer\n\n#axioms_within_file [propext, Quot.sound]\n"
 
+/-- **The largest saturated set the kernel has been seen to check on every
+family tried**, under `lake env lean -M 8000` (`campaign/measurements.md`,
+2026-11-26): 102 sequents, in 16.7 s.  Above it the check was stopped at
+the cap of 8 GB on one family at 119 sequents, and passed on another at
+124 (9.2 s) and was stopped at 192.  An answer whose set is larger than
+this says so in its first line. -/
+def kernelSeen : Nat := 102
+
 /-- The answer for what was found: the exit code, the verdict, and the
 rest of the file. -/
 def answerOf (Γ : List Form) : Found → UInt32 × String × String
@@ -202,12 +210,20 @@ theorem notValid : ¬ Valid sequent := noValidBy.verdict sequent countermodel re
 theorem notDerivable : ¬ Derivable sequent := noDerivableBy.verdict sequent countermodel refutes
 " ++ proveFoot)
   | .set D =>
-    let warn := if D.length > 100 then s!"
+    let beyond := D.length > kernelSeen
+    let verdict := if beyond then
+      s!"not derivable, by the compiled check only (a set of {D.length} sequents; the \
+kernel has checked sets of up to {kernelSeen})"
+      else "not derivable"
+    let warn := if beyond then s!"
 -- The set below has {D.length} sequents.  The kernel's check of a set grows
--- fast with its size: one of 86 was checked in 3.4 s, and the check of one
--- of 238 was stopped at 8 GB of memory.  This file may not be checked.
+-- fast with its size: under a cap of 8 GB of memory, sets of up to
+-- {kernelSeen} sequents were checked (the largest in 16.7 s), and of two
+-- families one was stopped at the cap at 119 and the other at 192.  This
+-- file may not be checked; if it is not, the answer rests on the compiled
+-- check of this program, which is not trusted.
 " else ""
-    (1, "not derivable", proveHead Γ ++ warn ++ s!"
+    (1, verdict, proveHead Γ ++ warn ++ s!"
 /-- A saturated set of sequents of which the sequent is a member: every
 rule that could conclude a member has a premise in the set. -/
 def refutation : List (List Form) :=

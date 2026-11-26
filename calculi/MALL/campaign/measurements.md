@@ -192,9 +192,43 @@ under the same cap, deadline 150 s):
 | `chain 3` and the same, 7 formulas | not derivable, a set of 3 347 | 24.8 s; **flag** at 5 s and at the default 10 s | not run |
 | `chain 10` and the same | flag at 5 s | | |
 
+**The size of saturated set the kernel checks**, measured with two
+families that grow and have no small cyclic countermodel: the converse
+of half-distributivity with `n` formulas `⊥` beside it (`bots`), and
+with `⅋ ⊥` added `n` times to its second formula (`plusbot`). Each
+printed file under `lake env lean -M 8000`, deadline 180 s, the process
+group ended at the deadline; the run stops a family at its second
+failure.
+
+| family | n | sequents in the set | found in | the printed file |
+|---|---|---|---|---|
+| bots | 0 | 17 | 0.03 s | checked, 1.2 s |
+| bots | 1 | 34 | 0.03 s | checked, 1.3 s |
+| bots | 2 | 51 | 0.03 s | checked, 2.0 s |
+| bots | 3 | 68 | 0.03 s | checked, 3.6 s |
+| bots | 4 | 85 | 0.03 s | checked, 7.0 s |
+| bots | 5 | 102 | 0.04 s | checked, 16.7 s |
+| bots | 6 | 119 | 0.06 s | **stopped at the 8 GB cap**, after 19.6 s |
+| bots | 7 | 136 | 0.11 s | stopped at the cap, after 86.7 s |
+| plusbot | 1 | 39 | 0.04 s | checked, 1.5 s |
+| plusbot | 2 | 73 | 0.03 s | checked, 3.2 s |
+| plusbot | 3 | 124 | 0.04 s | checked, 9.2 s |
+| plusbot | 4 | 192 | 0.06 s | **stopped at the cap**, after 20.3 s |
+| plusbot | 5 | 277 | 0.11 s | not checked, on two runs: refused after 104.8 s with a message of `decide` that the log cut short ("Tactic `decide` failed. The elaborator is able to red…"); then stopped at the cap after 19.7 s |
+
+The largest set checked on both families is 102. The size is not the
+whole of it: 124 was checked on one family and 119 was not on the other.
+`mallrun prove` takes 102 as the bound (`kernelSeen`, `Main.lean`): above
+it the first line reads "not derivable, by the compiled check only (a
+set of N sequents; the kernel has checked sets of up to 102)", the exit
+code staying 1, and the file says the same in a comment. Between 103 and
+124 the line is therefore qualified for some files that would check.
+What grows is memory, not time: the check is cut off by the cap well
+before the deadline. Why the kernel's evaluation of `refutedBy` needs so
+much memory was not looked into.
+
 So the answers the kernel checks are: every derivation tried; every
-cyclic structure tried; a saturated set to about a hundred sequents (86
-in 3.4 s, above; 238 not within 8 GB). A sequent with a derivable part
+cyclic structure tried; a saturated set of up to 102 sequents. A sequent with a derivable part
 that has many ⊗ and a part with no small cyclic countermodel is where
 the command prints a file that is not checked, or flags.
 
