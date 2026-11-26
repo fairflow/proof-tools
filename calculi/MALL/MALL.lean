@@ -7,3 +7,9 @@ import MALL.Tactic
 import MALL.Test
 import MALL.Semantics
 import MALL.Statements
+import MALL.Soundness
+import MALL.Completeness
+import MALL.Decide
+import MALL.DecideTest
+import MALL.FiniteModel
+import MALL.Results
