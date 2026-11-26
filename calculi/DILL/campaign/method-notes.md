@@ -28,3 +28,15 @@ what was done there. Kept to what would change that text.
    lacks, and each such result's entry says so. *Proposed*: a line under
    "Decide the target": a document whose author asks that it not be
    cited is read, not made the source of record.
+
+## Stage 0
+
+3. **Pitfall 11 again: a time typed before the clock was read.** The
+   plan and four entries of the decisions were written with times
+   three and six minutes ahead of `date` (15:02 and 15:05 for 14:59),
+   typed while the text was composed and the clock read afterwards. Put
+   right in the next commit. The pitfall's order of work ("evaluate,
+   read, paste") was known and not kept: a document is written in one
+   call and its time must exist before the call. *Proposed*: in
+   `templates/decisions.md` and `templates/plan.md`, say "run `date`
+   first, in a call of its own, and paste".

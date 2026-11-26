@@ -1,6 +1,6 @@
 # DILL: the plan
 
-Written 2026-11-26 15:02 GMT, before any Lean of the calculus beyond the
+Written 2026-11-26 14:59 GMT, before any Lean of the calculus beyond the
 scratch screens it reports. The target, the place of the files and the
 rules of the project: [decisions.md](decisions.md), the first entry.
 Read again at the start of every stage; changed, with the date, when a

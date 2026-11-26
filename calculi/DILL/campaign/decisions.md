@@ -140,7 +140,7 @@ the folder point here.*
 * **Before this text was read**: nothing of the calculus. The task named
   the skill as the first act, and it was.
 
-## 2026-11-26 15:05 GMT. Stage 0: what holds, and what "valid" means
+## 2026-11-26 14:59 GMT. Stage 0: what holds, and what "valid" means
 
 * **Decided**: what holds is the family with cut, `Fam true`. `Valid j`
   is satisfaction of the formula of the sequent,
@@ -171,7 +171,7 @@ the folder point here.*
   elsewhere", for a one-zone calculus with ⊥; nothing published is
   known to the operator that states it for two zones.
 
-## 2026-11-26 15:05 GMT. Stage 0: the encoding
+## 2026-11-26 14:59 GMT. Stage 0: the encoding
 
 * **Decided**: a sequent is a structure `Seq` (`unr`, `lin`, `goal`),
   written `Γ ; Δ ⟹ C`. The linear zone in MALL's form: a rule that
@@ -191,7 +191,7 @@ the folder point here.*
 * **Rests on it**: every file.
 * **Cost to reverse**: a stage and every proof after it.
 
-## 2026-11-26 15:05 GMT. Stage 0: which results are goals, and the level of Run
+## 2026-11-26 14:59 GMT. Stage 0: which results are goals, and the level of Run
 
 * **Decided**: the goals of the plan's section "Goals, non-goals,
   order". By rule: both cuts admissible and cut elimination; the two
@@ -214,7 +214,7 @@ the folder point here.*
 * **Rests on it**: `statements.md`, the briefs to agents.
 * **Cost to reverse**: a stage.
 
-## 2026-11-26 15:05 GMT. Stage 0: the axiom policy
+## 2026-11-26 14:59 GMT. Stage 0: the axiom policy
 
 * **Decided**: every theory file and every certifier within
   `[propext, Quot.sound]`.

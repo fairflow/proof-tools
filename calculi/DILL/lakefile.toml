@@ -1,0 +1,13 @@
+name = "dill"
+defaultTargets = ["DILL"]
+
+[leanOptions]
+autoImplicit = false
+
+[[require]]
+name = "proof-tools"
+path = "../.."
+
+[[lean_lib]]
+name = "DILL"
+globs = ["DILL", "DILL.+"]
