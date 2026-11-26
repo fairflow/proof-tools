@@ -852,37 +852,48 @@ theorem ui_spec (p : Nat) (Γ : List Form) :
 
 theorem uniformInterpolation : UniformInterpolation := fun p Γ => ⟨ui p Γ, ui_spec p Γ⟩
 
-/-- **The uniform interpolants of a formula**: `forallP p A` and
-`existsP p A`. -/
-theorem uniformInterpolationForFormulas : UniformInterpolationForFormulas := fun p A => by
-  have single : ∀ X : Form, ∀ a, a ∈ lettersL [X] → a ∈ X.letters := fun X a ha => by
-    obtain ⟨C, hC, haC⟩ := mem_lettersL.1 ha
-    rcases mem_cons.1 hC with rfl | hC
-    · exact haC
-    · cases hC
-  have free : ∀ B : Form, p ∉ B.letters → ∀ a ∈ lettersL [B], a ≠ p := fun B hB a ha e =>
-    hB (e ▸ single B a ha)
-  obtain ⟨l₁, b₁, g₁⟩ := ui_spec p [A]
-  obtain ⟨l₂, b₂, g₂⟩ := ui_spec p [Aᗮ]
-  refine ⟨⟨forallP p A, fun a ha => ⟨(l₁ a ha).1, single A a (l₁ a ha).2⟩, b₁, fun B hB h => ?_⟩,
-    ⟨existsP p A, fun a ha => ?_, ?_, fun B hB h => ?_⟩⟩
-  · -- B ⊢ A gives B ⊢ ∀p A
-    have := g₁ [Bᗮ] (free Bᗮ (by rw [Form.letters_neg]; exact hB)) (exch (.swap ..) h)
-    exact exch (.swap ..) this
+theorem UI.lettersL_single {X : Form} {a : Nat} (ha : a ∈ lettersL [X]) : a ∈ X.letters := by
+  obtain ⟨C, hC, haC⟩ := mem_lettersL.1 ha
+  rcases mem_cons.1 hC with rfl | hC
+  · exact haC
+  · cases hC
+
+/-- **`∀p A`**: without `p`, implies `A`, and is implied by every formula
+without `p` that implies `A`. -/
+theorem forallP_spec (p : Nat) (A : Form) :
+    (∀ a ∈ (forallP p A).letters, a ≠ p ∧ a ∈ A.letters) ∧ Derivable [(forallP p A)ᗮ, A] ∧
+    ∀ B : Form, p ∉ B.letters → Derivable [Bᗮ, A] → Derivable [Bᗮ, forallP p A] := by
+  obtain ⟨l, b, g⟩ := ui_spec p [A]
+  refine ⟨fun a ha => ⟨(l a ha).1, lettersL_single (l a ha).2⟩, b, fun B hB h => ?_⟩
+  have := g [Bᗮ] (fun a ha e => hB (by
+    have := lettersL_single ha
+    rw [Form.letters_neg] at this
+    exact e ▸ this)) (exch (.swap ..) h)
+  exact exch (.swap ..) this
+
+/-- **`∃p A`**: without `p`, implied by `A`, and implies every formula
+without `p` that `A` implies. -/
+theorem existsP_spec (p : Nat) (A : Form) :
+    (∀ a ∈ (existsP p A).letters, a ≠ p ∧ a ∈ A.letters) ∧ Derivable [Aᗮ, existsP p A] ∧
+    ∀ B : Form, p ∉ B.letters → Derivable [Aᗮ, B] → Derivable [(existsP p A)ᗮ, B] := by
+  obtain ⟨l, b, g⟩ := ui_spec p [Aᗮ]
+  refine ⟨fun a ha => ?_, exch (.swap ..) b, fun B hB h => ?_⟩
   · have ha' : a ∈ (ui p [Aᗮ]).letters := by
       have : a ∈ ((ui p [Aᗮ])ᗮ).letters := ha
       rwa [Form.letters_neg] at this
-    have := single Aᗮ a (l₂ a ha').2
+    have := lettersL_single (l a ha').2
     rw [Form.letters_neg] at this
-    exact ⟨(l₂ a ha').1, this⟩
-  · -- A ⊢ ∃p A
-    exact exch (.swap ..) b₂
-  · -- A ⊢ B gives ∃p A ⊢ B
-    have := g₂ [B] (free B hB) h
+    exact ⟨(l a ha').1, this⟩
+  · have := g [B] (fun a ha e => hB (e ▸ lettersL_single ha)) h
     show Derivable [(existsP p A)ᗮ, B]
     unfold existsP
     rw [Form.neg_neg]
     exact this
+
+/-- **The uniform interpolants of a formula**: `forallP p A` and
+`existsP p A`. -/
+theorem uniformInterpolationForFormulas : UniformInterpolationForFormulas := fun p A =>
+  ⟨⟨forallP p A, forallP_spec p A⟩, ⟨existsP p A, existsP_spec p A⟩⟩
 
 end MALL
 

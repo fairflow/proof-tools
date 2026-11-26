@@ -91,6 +91,8 @@ Theory (each ends with `#axioms_within_file [propext, Quot.sound]`):
 * `MALL/Model.lean`: finite phase structures as data, and their check.
 * `MALL/Run.lean`, `MALL/ModelRun.lean`: the certifiers, the producers,
   level 3.
+* `MALL/UniformLyndon.lean`: the condition on signs for the uniform
+  interpolant.
 * `MALL/Split.lean`, `MALL/Craig.lean`, `MALL/Uniform.lean`: Craig
   interpolation with Lyndon's condition as a function on derivations;
   uniform interpolation, the interpolant computed (added by command,

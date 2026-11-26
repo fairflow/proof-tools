@@ -354,8 +354,17 @@ before its proof: 21 formulas, both properties, against the decision
 procedure over 264 test formulas, no failure. A cold reader given the
 definitions and the four statements unnamed identified each and found
 none false or trivial. It asked for one more statement, a condition on
-signs for the uniform interpolant (every literal of `ui p Γ` a literal
-of `Γ`): **OPEN**, not a goal, screened on 21 formulas where it holds.
+signs for the uniform interpolant. The session that started this one
+then made it a goal (its decision, not a word of the reviewer), and it
+is S26:
+
+    ∀ (p : Nat) (Γ : List Form), ∃ I : Form, (∀ ℓ ∈ I.lits, ℓ ∈ litsL Γ) ∧ … the three clauses above …
+                                                                       (uniformInterpolationLyndon, MALL/UniformLyndon.lean)
+    PROVED: every literal of ui p Γ is a literal of Γ; and every literal of ∀p A and of ∃p A a literal of A
+
+Both forms were screened before the proof on 46 formulas for two
+letters, with the other polarity for `∃p A` as a control, which fails on
+21 of them. None of the sources read states such a condition.
 
 **The sources** were read by an agent after the proofs
 ([interpolation-sources.md](https://github.com/fairflow/proof-tools/blob/fe73047/calculi/MALL/campaign/interpolation-sources.md)):

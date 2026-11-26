@@ -496,6 +496,21 @@ the argument, and attributes it.
   for the uniform interpolant), are in `statements.md`.
 * **Cost to reverse**: little.
 
+## 2026-11-26 15:25 GMT. A goal by the starting session's decision: the condition on signs for the uniform interpolant
+
+* **Whose decision**: the session that started this one, in a message
+  at 15:23, in its words "That is my decision, not a word of the
+  reviewer: record it as such." It set a budget: "stop at an hour and
+  leave it OPEN with what was found", and asked that both forms be
+  screened for polarity, `existsP` being defined through a negation.
+* **Done**: S26. Named statements first (commit `7fb54d3`); both forms
+  screened, with the other polarity as a control that fails; proved in
+  about two minutes of work, since it follows the proof of the
+  condition on letters (`MALL/UniformLyndon.lean`). `forallP_spec` and
+  `existsP_spec` were split out of the proof of S25 so that the
+  interpolants of a formula have their properties by name.
+* **Cost to reverse**: none: it adds a statement.
+
 ## Stops
 
 *Each time a turn ended to wait for the reviewer. None so far.*

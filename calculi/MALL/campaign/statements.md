@@ -432,6 +432,39 @@ Source: Akbar Tabatabai and Jalali, Definition 4.1 (one letter, both
 interpolants); Alizadeh, Derakhshan and Ono state it for a set of letters
 and reduce to one (their Lemma 3.4). **PROVED.**
 
+### S26. Uniform interpolation, with the condition on signs
+
+    ∀ (p : Nat) (Γ : List Form), ∃ I : Form,
+      (∀ ℓ ∈ I.lits, ℓ ∈ litsL Γ) ∧
+      (∀ a ∈ I.letters, a ≠ p ∧ a ∈ lettersL Γ) ∧
+      Derivable (Iᗮ :: Γ) ∧
+      ∀ Δ : List Form, (∀ a ∈ lettersL Δ, a ≠ p) → Derivable (Γ ++ Δ) → Derivable (I :: Δ)
+
+    ∀ (p : Nat) (A : Form),
+      (∃ U : Form, (∀ ℓ ∈ U.lits, ℓ ∈ A.lits) ∧ … as S25 …) ∧
+      (∃ E : Form, (∀ ℓ ∈ E.lits, ℓ ∈ A.lits) ∧ … as S25 …)
+
+`UniformInterpolationLyndon`, `UniformInterpolationLyndonForFormulas`,
+proved by `uniformInterpolationLyndon` and
+`uniformInterpolationLyndonForFormulas`, `MALL/UniformLyndon.lean`, with
+the same interpolants `ui p Γ`, `forallP p A`, `existsP p A` (`ui_lits`,
+`forallP_lits`, `existsP_lits`). Source: none found: of the sources
+read, none states a condition on signs for a uniform interpolant
+(Alizadeh, Derakhshan and Ono, and Akbar Tabatabai and Jalali, state
+conditions on variables). Asked by the cold reader of S22 to S25; made a
+goal by the session that started this one, not by a word of the reviewer
+(`decisions.md`). Entered as named types before its proof (commit
+`7fb54d3`). Screened before the proof: both forms, for two letters, on 46
+formulas; and, as a control on the polarity of `∃p A`, which is defined
+through a negation, the other polarity (literals of `∃p A` among those of
+`A⊥`), which fails on 21 of the 46 (`#guard`s of `MALL/UniformTest.lean`).
+The proof follows that of the condition on letters: the simplifying
+connectives add no literal, and each disjunct of the interpolant is built
+from interpolants of sequents whose formulas are formulas of `Γ` or
+immediate subformulas of one. For `∃p A` the two negations cancel
+(`Form.mem_lits_neg`, `Form.neg_neg`). Not read back by a cold reader.
+**PROVED.**
+
 ### The reading back of S22 to S25
 
 Made on 2026-11-26 by a fresh agent given only an extract of 124 lines
@@ -455,8 +488,7 @@ checked the polarity side of `Interpolant` on the four divisions of
   is `ui`, and `ui_spec` has the three clauses for it;
 * **S24 has no condition on signs** though S22 has one. That every
   literal of `ui p Γ` is a literal of `Γ` is the natural strengthening.
-  **OPEN**: not stated as a goal and not proved; screened on 21 formulas
-  (`MALL/UniformTest.lean`), where it holds;
+  It was then made a goal and is S26, PROVED;
 * the division of S22 is written `Γ ++ Δ`: the function is `CF.interp`,
   which takes any `Ξ ~ Γ ++ Δ`;
 * the two ways of saying "without `p`" in S24 and S25 could be one; the
@@ -490,3 +522,4 @@ Nothing was set aside by the reviewer.
 | of the other goals (S4, S5, S9, S10, S13, S14, S15, S16; S11, S12 as refutations) | 8 | 2 | 0 |
 | of our own (S1, S2, S3, S18, S19, S20, S21) | 7 | 0 | 0 |
 | added by command after the closing page (interpolation: S22 to S25) | 4 | 0 | 0 |
+| added by the starting session's decision (S26) | 1 | 0 | 0 |

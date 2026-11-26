@@ -5,7 +5,7 @@ small formulas, and the theorems used.
 
 Every pinned value was printed by Lean first.
 -/
-import MALL.Uniform
+import MALL.UniformLyndon
 import MALL.Results
 import LeanCertify
 
@@ -84,10 +84,22 @@ instance (Γ : List Form) : Decidable (Derivable Γ) := decDerivable Γ
 
 #guard small.length == 264
 
--- A screen of a statement that is NOT proved here: Lyndon's condition for
--- the uniform interpolant, that every literal of `∀p A` is a literal of `A`
--- (a cold reader's question).  It holds on these 21 formulas.
-#guard tests.all fun A => (forallP 0 A).lits.all fun ℓ => A.lits.contains ℓ
+/-! ## The condition on signs (Lyndon's), screened before its proof
+
+A cold reader's question, made a goal.  Every literal of `∀p A`, and of
+`∃p A`, is a literal of `A`: for two letters, on the 21 formulas, their
+negations, and four more.  And a control: the other polarity for `∃p A`
+(its literals among those of `A⊥`) fails on 21 of the 46. -/
+
+def more : List Form := tests ++ tests.map Form.neg ++
+  [(pᗮ ⅋ q) & (qᗮ ⅋ r), pᗮ ⅋ (q ⊗ (qᗮ ⅋ r)), (p ⊗ qᗮ) ⊕ (q & rᗮ), (pᗮ & q) ⅋ (p ⊕ qᗮ)]
+
+#guard more.length == 46
+#guard [0, 1].all fun x => more.all fun A => (forallP x A).lits.all fun ℓ => A.lits.contains ℓ
+#guard [0, 1].all fun x => more.all fun A => (existsP x A).lits.all fun ℓ => A.lits.contains ℓ
+#guard (more.filter fun A => !((existsP 1 A).lits.all fun ℓ => Aᗮ.lits.contains ℓ)).length == 21
+#guard [[pᗮ ⅋ q, p ⅋ r], [pᗮ ⊗ q, p ⅋ r], [p, pᗮ, q], [p ⊗ qᗮ, q, pᗮ ⊕ r]].all fun Γ =>
+  [0, 1].all fun x => (ui x Γ).lits.all fun ℓ => (litsL Γ).contains ℓ
 
 /-! ## The theorems, used -/
 
@@ -98,5 +110,7 @@ example : Derivable [forallP 0 ((p ⊗ q) ⅋ pᗮ), qᗮ] :=
 #certify_axioms MALL.uniformInterpolation
 #certify_axioms MALL.uniformInterpolationForFormulas
 #certify_axioms MALL.ui_spec
+#certify_axioms MALL.uniformInterpolationLyndon
+#certify_axioms MALL.uniformInterpolationLyndonForFormulas
 
 end MALL.UniformTest

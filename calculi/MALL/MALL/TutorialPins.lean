@@ -9,6 +9,7 @@ import MALL.Source
 import MALL.Refute
 import MALL.Craig
 import MALL.Uniform
+import MALL.UniformLyndon
 import ProofTools.Audit.Statement
 
 open MALL
@@ -200,6 +201,35 @@ PROVED · axioms: Quot.sound, propext
 #guard_msgs in #statement MALL.uniformInterpolationForFormulas
 
 /--
+info: theorem MALL.uniformInterpolationLyndon : UniformInterpolationLyndon
+  where MALL.UniformInterpolationLyndon :=
+    ∀ (p : Nat) (Γ : List Form),
+      ∃ (I : Form),
+        (∀ (ℓ : Form), ℓ ∈ I.lits → ℓ ∈ litsL Γ) ∧
+          (∀ (a : Nat), a ∈ I.letters → a ≠ p ∧ a ∈ lettersL Γ) ∧
+            Derivable (Iᗮ :: Γ) ∧
+              ∀ (Δ : List Form), (∀ (a : Nat), a ∈ lettersL Δ → a ≠ p) → Derivable (Γ ++ Δ) → Derivable (I :: Δ)
+PROVED · axioms: Quot.sound, propext
+-/
+#guard_msgs in #statement MALL.uniformInterpolationLyndon
+
+/--
+info: theorem MALL.uniformInterpolationLyndonForFormulas : UniformInterpolationLyndonForFormulas
+  where MALL.UniformInterpolationLyndonForFormulas :=
+    ∀ (p : Nat) (A : Form),
+      (∃ (U : Form),
+          (∀ (ℓ : Form), ℓ ∈ U.lits → ℓ ∈ A.lits) ∧
+            (∀ (a : Nat), a ∈ U.letters → a ≠ p ∧ a ∈ A.letters) ∧
+              Derivable [Uᗮ, A] ∧ ∀ (B : Form), ¬p ∈ B.letters → Derivable [Bᗮ, A] → Derivable [Bᗮ, U]) ∧
+        ∃ (E : Form),
+          (∀ (ℓ : Form), ℓ ∈ E.lits → ℓ ∈ A.lits) ∧
+            (∀ (a : Nat), a ∈ E.letters → a ≠ p ∧ a ∈ A.letters) ∧
+              Derivable [Aᗮ, E] ∧ ∀ (B : Form), ¬p ∈ B.letters → Derivable [Aᗮ, B] → Derivable [Eᗮ, B]
+PROVED · axioms: Quot.sound, propext
+-/
+#guard_msgs in #statement MALL.uniformInterpolationLyndonForFormulas
+
+/--
 info: theorem MALL.soundness : Soundness
   where MALL.Soundness :=
     ∀ (Γ : List Form), Derivable Γ → Valid Γ
@@ -289,6 +319,9 @@ PROVED · axioms: Quot.sound, propext
 #guard_msgs (drop info) in #statement_location MALL.uiStep
 #guard_msgs (drop info) in #statement_location MALL.uiN_below
 #guard_msgs (drop info) in #statement_location MALL.uiN_greatest
+#guard_msgs (drop info) in #statement_location MALL.ui_lits
+#guard_msgs (drop info) in #statement_location MALL.forallP_lits
+#guard_msgs (drop info) in #statement_location MALL.existsP_lits
 #guard_msgs (drop info) in #statement_location MALL.PhaseStructure.sat_iff_holds
 #guard_msgs (drop info) in #statement_location MALL.PhaseStructure.holds_cons
 #guard_msgs (drop info) in #statement_location MALL.synCF
