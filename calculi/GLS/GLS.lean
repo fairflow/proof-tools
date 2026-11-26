@@ -28,5 +28,9 @@ import GLS.SetSearchTest
 import GLS.Explore
 import GLS.ExploreTest
 import GLS.TutorialTest
+import GLS.Connectives
+import GLS.Interpolation
+import GLS.ConnectiveRules
+import GLS.InterpolationTest
 import GLS.Corpus.Basic
 import GLS.Corpus.Facts

@@ -46,6 +46,12 @@ is [report.md](report.md).
 * [users-guide.md](users-guide.md): how a goal reads, the moves, the
   tactic's lines.
 * `brief-2-1.md`: the brief on which goals 4 to 6 were handed to an agent.
+* [2026-11-26-ui.md](2026-11-26-ui.md): uniform interpolation for GL, PROVED
+  through GLS, and how the proof compares with the literature.
+* [2026-11-26-intuitionistic.md](2026-11-26-intuitionistic.md): iGL, iSL, KM,
+  mHC: the literature, what would transfer, and why they are consistent with GL.
+* [2026-11-26-connectives.md](2026-11-26-connectives.md): `∧` and `∨` defined,
+  their rules derived, the sides exchanged.
 
 ## Build
 
@@ -74,6 +80,10 @@ Theory files are each within `[propext, Quot.sound]`
 * `GLS/PS.lean`: S18. Theory.
 * `GLS/Cut.lean`: S19, the source's cut. Theory.
 * `GLS/CutRule.lean`: GLS + (cut); S24. Theory.
+* `GLS/Connectives.lean`: `¬`, `⊤`, `∧`, `∨`, `◇` defined; their truth at a tree. Theory.
+* `GLS/Interpolation.lean`: uniform interpolation for GL; the interpolant as the bisimulation quantifier; its modal depth. Theory.
+* `GLS/ConnectiveRules.lean`: the derived rules of the defined connectives, their inverses, switching sides. Theory.
+* `GLS/InterpolationTest.lean`: the tests of the last three, and their statements pinned. Code.
 * `GLS/Run.lean`: the certifiers, the producer, the engine; S21, S22. Theory.
 * `GLS/SetSearch.lean`: the proof system over sets, its certifier, the fast search, the checked decisions; S23. Theory (the fast search is code: nothing is proved of it).
 * `GLS/Explore.lean`: the countermodel drawn, the routine moves, `found`. Code.
