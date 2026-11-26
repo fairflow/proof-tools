@@ -444,3 +444,33 @@ that does not rest on the answer went on.*
   every output the page quotes pinned). `Play/GLS.lean` and
   `Play/GLSTutorial.lean` are as they were. Written by the session that
   started this one, not by the campaign's operator.
+
+## 2026-11-26 22:28 GMT. After the campaign: `glsrun prove`, and what it checks before it prints
+
+By the owner of `calculi/GLS`, at the directing session's request
+(the round's organisation since 2026-11-26: a directing session, and an
+owner for each calculus).
+
+* **Decided**: the command answers by the search over sets, checks the
+  answer in the program, and falls back on the proved search where the
+  check fails. It prints only facts whose certificate the program has
+  checked. For a derivation: the tree of moves replayed on multisets
+  under a cap (no side of a sequent longer than 4 096 formulas), then
+  `treeCert.check`; beyond the cap, the proposition `Derivable` alone,
+  by `setCert.check`. For a tree of worlds: a table of truth values
+  (`GLS/FastCheck.lean`), which is not the certifier's check and is
+  compared with it in `GLS/ParseTest.lean`.
+* **Not taken**: to print the derivation as data beyond the cap without
+  checking it in the program (the kernel checks such a tree in under a
+  second, and it would pass: a move that applies to a set of formulas
+  applies to any multiset with those members; but that is not proved in
+  Lean). To check a tree of worlds by `noDerivable.check` compiled: the
+  first run returned a flag for `consis 32`.
+* **Why**: a file made at a shell that Lean then refuses is worse than
+  a weaker fact.
+* **Also decided**: a text with no arrow is one formula `A`, read as
+  `⇒ A`. The signs `¬ ⊤ ◇ ∧ ∨` are read by the definitions of
+  `GLS/Connectives.lean`; the printers write `→ ⊥ □` only.
+* **Rests on it**: `GLS/Parse.lean`, `GLS/FastCheck.lean`, the `prove`
+  part of `Main.lean`, `Corpus/prove_corpus.py`.
+* **Cost to reverse**: little.

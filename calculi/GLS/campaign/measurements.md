@@ -153,3 +153,80 @@ family measured (5 s at `kChain 512`, 3.6 s at `binTree 12`, under
 Not measured: a member of a family between the last that passed and the
 first that was cut off; memory; anything outside the four families and
 the corpus. The build of the whole package from clean was not timed.
+
+## `glsrun prove` on the corpus and on members of the families
+
+Added 2026-11-26 22:28 GMT. The command of `reference/certify.md` §5, "A judgment
+typed at a shell". Run by `python3 -I Corpus/prove_corpus.py
+--elaborate`, from `calculi/GLS/` after `lake build GLS glsrun`: each
+sequent is given as text three times (the source's notation, Lean
+source, the signs of a keyboard: `glsrun corpus`, `glsrun families`),
+the exit code is compared with the recorded status, and the printed
+file is elaborated under `lake env lean -M 8000` with a deadline of
+120 s that ends the whole process group.
+
+| sequent | recorded | from the source's notation | from Lean source | from the signs of a keyboard | the answer | elaborated |
+|---|---|---|---|---|---|---|
+| `axK` | derivable | derivable | derivable | derivable | derivable, the derivation as data | yes |
+| `ax4` | derivable | derivable | derivable | derivable | derivable, the derivation as data | yes |
+| `axLob` | derivable | derivable | derivable | derivable | derivable, the derivation as data | yes |
+| `idBoxImp` | derivable | derivable | derivable | derivable | derivable, the derivation as data | yes |
+| `exFalsoBox` | derivable | derivable | derivable | derivable | derivable, the derivation as data | yes |
+| `godel2` | derivable | derivable | derivable | derivable | derivable, the derivation as data | yes |
+| `boxLobBody` | derivable | derivable | derivable | derivable | derivable, the derivation as data | yes |
+| `lobRuleShape` | derivable | derivable | derivable | derivable | derivable, the derivation as data | yes |
+| `notT` | not derivable | not derivable | not derivable | not derivable | not derivable, a countermodel | yes |
+| `notAtom` | not derivable | not derivable | not derivable | not derivable | not derivable, a countermodel | yes |
+| `notConsistency` | not derivable | not derivable | not derivable | not derivable | not derivable, a countermodel | yes |
+| `notBoxT` | not derivable | not derivable | not derivable | not derivable | not derivable, a countermodel | yes |
+| `notConverseK` | not derivable | not derivable | not derivable | not derivable | not derivable, a countermodel | yes |
+| `notConverse4` | not derivable | not derivable | not derivable | not derivable | not derivable, a countermodel | yes |
+| `notLobBody` | not derivable | not derivable | not derivable | not derivable | not derivable, a countermodel | yes |
+| `notLinear` | not derivable | not derivable | not derivable | not derivable | not derivable, a countermodel | yes |
+| `boxChain_3` | derivable | derivable | derivable | derivable | derivable, the derivation as data | yes |
+| `boxChain_8` | derivable | derivable | derivable | derivable | derivable, the derivation as data | yes |
+| `boxChain_32` | derivable | derivable | derivable | derivable | derivable, the proposition only | yes |
+| `kChain_4` | derivable | derivable | derivable | derivable | derivable, the derivation as data | yes |
+| `kChain_12` | derivable | derivable | derivable | derivable | derivable, the derivation as data | yes |
+| `consis_3` | not derivable | not derivable | not derivable | not derivable | not derivable, a countermodel | yes |
+| `consis_32` | not derivable | not derivable | not derivable | not derivable | not derivable, a countermodel | yes |
+| `binTree_2` | not derivable | not derivable | not derivable | not derivable | not derivable, a countermodel | yes |
+| `binTree_4` | not derivable | not derivable | not derivable | not derivable | not derivable, a countermodel | yes |
+
+25 sequents (the 16 of the corpus and 9 members of the families). By
+verdict: derivable 13, not derivable 12, flag 0. By kind of answer: the
+derivation as data 12, the proposition only 1 (`boxChain 32`), a
+countermodel 12. Disagreeing with the recorded status, or answered
+differently from two of the three texts: 0. Printed files elaborated:
+25 of 25, each with named declarations and
+`#axioms_within_file [propext, Quot.sound]` at its foot.
+
+One file of each kind with its certificate altered, each refused by
+Lean:
+
+* altered `axLob` (derivable, the derivation as data; the last move IdP p made IdP p7): refused
+* altered `boxChain_32` (derivable, the proposition only; the last move IdP p made IdP p7): refused
+* altered `notT` (not derivable, a countermodel; p made true at the root): refused
+
+**A first run returned a flag for `consis 32`** (and exit code 3 where 1
+was recorded): the compiled check of the tree of worlds by
+`Seq.refutedAt` did not end in the 10 s of the default deadline, where
+the search over sets finds the tree in a millisecond and the kernel
+checks it in 0.3 s. The program now checks a tree by a table
+(`GLS/FastCheck.lean`); the figures above are after that change. With
+it: `□ⁿ⁺¹⊥ → □ⁿ⊥` answered in 0.6 s at `n = 32`, 0.05 s at 128, 0.4 s at
+256 (one run each, the whole command).
+
+A flag, seen by asking for it: `kChain 600` with `--deadline=1` prints
+`-- flag:` and the sequent, and ends with exit code 3 after 1.0 s. A
+text that is not a sequent (`p -> (q`): exit code 2, nothing on the
+standard output.
+
+Not checked: a printed file for a sequent larger than `boxChain 32`,
+`consis 32`, `kChain 12`, `binTree 4` was not elaborated. The fallback
+on the proved search was never taken by itself; its branch was run by
+the option `--proved` on the same 25 sequents with `--deadline=5`: 23
+agree with the recorded status, and 2 are flags at the deadline
+(`boxChain 32`, `consis 32`: the proved search is cut off there, Table
+1). One printed file of each verdict from it was elaborated (`axLob`,
+`notConverseK`).

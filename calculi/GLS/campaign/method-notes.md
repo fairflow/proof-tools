@@ -253,3 +253,112 @@ measuring run (the session ended under a running command at 09:57 and
 stood idle until 13:14, with no closing page); the skill's "Status",
 which now says what this run does not show; this campaign as a third
 worked instance.
+
+## 2026-11-26: `glsrun prove`, a sequent typed at a shell
+
+Written by the owner of `calculi/GLS`, at the directing session's
+request. The text built from: `reference/certify.md` §5, "A judgment
+typed at a shell", as it stood at commit `0e83910`; the instance read
+beside it: Brünnler's K (`BrunnlerK/Parse.lean`, the `prove` part of its
+`Main.lean`, `Corpus/prove_corpus.py`).
+
+27. **What the paragraph still does not say, and what GLS needed that
+    neither instance gave a model for.**
+
+    *The paragraph does not say:*
+
+    a. **That the program's own check of a certificate may be the slow
+       one.** The paragraph, and K's `answer`, suppose that what the
+       search returns is checked by the compiled certifier before it is
+       printed, and that this is cheap. In GLS it is not, twice, and
+       both times the kernel is the fast side (note 16 said so of the
+       producer; it holds of the check too):
+       - a tree of moves replayed on multisets builds sequents that
+         double at each nested GLR. Compiled, `treeCert.check` on
+         `□p → □³³p` does not end; the kernel checks that tree in under
+         a second;
+       - `Seq.refutedAt`, the check of `noValid` and `noDerivable`,
+         evaluates `□A` at a world by evaluating `A` at every world
+         below, keeping nothing. Compiled, `□³³⊥ → □³²⊥` on its chain of
+         33 worlds was not checked in 10 s: **the first run on the
+         families returned a flag for `consis 32`**, a sequent the
+         search over sets settles in a millisecond. The kernel checks
+         the same tree in 0.3 s.
+       What was done: the program prints only what it has checked, by
+       other means than the certifier's check where that is slow. For a
+       derivation, a replay under a cap (no side of a sequent longer
+       than 4 096 formulas), and beyond the cap the weaker fact alone
+       (b). For a tree of worlds, a second evaluation by a table
+       (`GLS/FastCheck.lean`), compared with `Seq.refutedAt` in the
+       tests on 1 024 sequents at 200 worlds. The kernel still checks
+       the printed certificate by the certifier.
+    b. **That one verdict may have more than one kind of answer.** "State
+       each [fact] from the one certificate" supposes each can be
+       stated. Here "derivable" is two kinds: with the derivation as
+       data (`treeCert`), and, beyond the cap of (a), the proposition
+       only (`setCert`, which checks the same tree of moves over sets).
+       So "one printed file of each kind of answer" is three files for
+       two verdicts, and the first line does not tell the two apart: a
+       comment in the file does.
+    c. **Which search answers, where the campaign has two.** GLS has a
+       proved search that is cut off at 28 nested boxes and a search
+       over sets that is not proved. The command runs the second,
+       checks its answer, and falls back on the first where the check
+       fails (not seen). The paragraph's "what a flag is" has no case
+       for this: with the fallback, a flag is still only the deadline,
+       or a refused certificate of the proved search.
+       A branch that is never taken is never run: the option `--proved`
+       asks the proved search for the answer, so that its branch could
+       be run on the corpus (23 of 25 agree; 2 flags at the deadline,
+       where that search is known to be cut off).
+    d. **That the corpus may not reach every kind of answer.** "Run on
+       every entry" found two kinds and no fault. The third kind and
+       the flag of (a) appeared only at members of the families
+       (`boxChain 32`, `consis 32`). `glsrun families` lists nine
+       members beside `glsrun corpus`, and the script takes both.
+    e. **Whether a judgment may be abbreviated.** A person types a
+       formula, not a sequent. Here a text with no arrow is one formula
+       `A`, read as `⇒ A`, and the first line shows the arrow; two
+       formulas with no arrow are refused.
+    f. **The deadline of the script that runs the command.** §5's
+       paragraph on measuring says a deadline ends the whole process
+       group. K's `prove_corpus.py`, which the paragraph points to, uses
+       `subprocess.run(timeout=…)`: that ends `lake` and leaves `lean`.
+       GLS's script starts each command in a session of its own and
+       ends the group (`os.killpg`).
+    g. **Which alteration.** "One with its certificate altered refused":
+       a tree of moves altered at random may still be a derivation. The
+       alterations here cannot pass: the last IdP made a move on a
+       variable the sequent does not have; a variable of the antecedent
+       side made true at the root of the countermodel. One for each
+       kind of answer. (A large certificate is printed with a move
+       broken over two lines, `GLS.Move.idP` and then `0`: a script that
+       alters text matches across white space. The first run reported
+       "not checked" for that file, and said so.)
+
+    *GLS needed, with no model in either instance:*
+
+    h. **Two sides, each a list.** K's sequent has one side; DILL's has
+       zones and one formula. Lean source writes a GLS sequent as
+       `[A, B] ⇒ [C]`, so `[]` is `□` before a formula and a side with
+       nothing in it before the arrow or the end, and a bracket that is
+       not `[]` opens a list, only at the start of a side. Guarded:
+       `[]p ⇒ q`, `[] ⇒ []p`, `[[]p] ⇒ [q]`, `[] ⇒ []`, and `[]`,
+       `[], p ⇒ q`, `[[], p] ⇒ q` refused.
+    i. **Connectives the library defines and the calculus does not
+       have.** `GLS/Connectives.lean` (added after the campaign) defines
+       `¬`, `⊤`, `◇`, `∧`, `∨` from `→` and `⊥`, with Lean notations for
+       the last two. The reader uses those definitions, and the tests
+       of binding have Lean terms on the right, so the reader's binding
+       is compared with that of Lean's notations. The printers write
+       `→`, `⊥`, `□` only: nothing folds a formula back into `∧`, and
+       the guide shows an example of what the first line then looks
+       like.
+    j. **A fact weaker than the one wanted**, (b), and **a check of the
+       program's own**, (a): a second evaluation that is not the
+       certifier's needs its own test against the certifier's.
+
+    *Asked of the directing session* (files that are not this owner's):
+    in the paragraph, (a) and (b) under "What is printed" and "What a
+    flag is"; (d) under "Run on the corpus"; (g) there too; (e) under
+    "The reader". (f): K's script, or a line in the paragraph.

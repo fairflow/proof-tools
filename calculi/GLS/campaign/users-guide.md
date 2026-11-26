@@ -99,3 +99,78 @@ in front of you (a limit of the library, recorded on the closing page).
 The first two check a certificate; the last has the kernel run the
 search. `glsrun` (`lake build glsrun`) writes such facts for the corpus:
 `GLS/Corpus/Facts.lean`. What each costs: `measurements.md`.
+
+## A sequent typed at a shell (`glsrun prove`)
+
+With no Lean file open, from `calculi/GLS/` after `lake build glsrun`:
+
+    .lake/build/bin/glsrun prove '[]([]p -> p) -> []p'
+    .lake/build/bin/glsrun prove --short '[](p -> q), []p => []q'
+    .lake/build/bin/glsrun prove '[]p -> p' > answer.lean && lake env lean answer.lean
+
+**The first line** is a comment: the verdict and the sequent as it was
+read, in the source's notation (`--ascii`: with the signs of a keyboard).
+
+    -- derivable: ⇒ □(□p → p) → □p
+    -- not derivable: ⇒ □p → p
+
+**After it, a Lean file** (`--short` leaves it out) that states the
+sequent as Lean source and the facts with their certificate, each under
+a name, and ends with the bound on axioms. Elaborating the file has the
+kernel check the certificate. There are three kinds:
+
+| verdict | the certificate | the facts |
+|---|---|---|
+| derivable | a tree of moves, checked on multisets | `proof : Fam sequent` (the derivation as data), `derivable : Derivable sequent`, `valid : Valid sequent` |
+| derivable | the same tree, checked over sets | `derivable`, `valid`. The derivation is not stated as data: on multisets a sequent of it has more than 4 096 formulas on a side (GLR doubles the boxed part of an antecedent), and the program does not print a fact it has not checked. For `□p → □ⁿp`: from `n = 12` |
+| not derivable | a finite tree of worlds, the sequent false at its root | `countermodel : Tree`, `notValid : ¬ Valid sequent`, `notDerivable : ¬ Derivable sequent` |
+
+**What is read.** A sequent is `Γ ⇒ Δ`; either side may be empty. A text
+with no arrow is one formula `A`, read as `⇒ A`.
+
+| | typed as |
+|---|---|
+| the arrow of the sequent | `⇒`, `=>`, `⊢`, `\|-` |
+| a variable | `p q r s`, then `p4`, `p5`, …; `Form.var n` |
+| `⊥` | `⊥`, `bot`, `_\|_` |
+| `A → B` | `→`, `⟶`, `⊃`, `->` |
+| `□A` | `□`, `[]` |
+| `⊤`, `¬A`, `◇A` | `top`; `~A`, `!A`; `<>A` |
+| `A ∧ B`, `A ∨ B` | `&`, `/\`, `⋏`; `\|`, `\/`, `⋎` |
+
+`→` groups to the right; `□`, `¬`, `◇` take the formula that follows
+them; `∧` binds tighter than `∨`, and `∨` tighter than `→`.
+
+**The last two rows are not connectives of GLS**, whose language is `⊥`,
+`→`, `□`. The reader replaces each by its definition
+(`GLS/Connectives.lean`), so the first line shows the formula in `→` and
+`⊥`, and not the text typed:
+
+    $ glsrun prove --short '<>top -> ~[]bot'
+    -- derivable: ⇒ (□((⊥ → ⊥) → ⊥) → ⊥) → □⊥ → ⊥
+
+**`[]` is two things.** Before a formula it is `□`. Before the arrow or
+the end it is a side with nothing in it, as Lean source writes a sequent
+(`[] ⇒ [□p ⟶ □□p]`, which is also read). A bracket that is not `[]`
+opens a list, and only at the start of a side.
+
+**A text that is not a sequent** is refused on the error stream, with
+nothing on the standard output: what was expected, the place counted
+from character 1, and a mark under it.
+
+**The search** is the one over sets, which is not proved; its answer is
+checked by the program before anything is printed, and an answer that
+did not pass would be replaced by that of the proved search (this has
+not been seen). `--proved` asks for the answer of the proved search
+itself, which is cut off beyond about 28 nested boxes. `--deadline=N`:
+the seconds allowed (10).
+
+**The exit code**: 0 derivable, 1 not derivable, 3 flag, 2 a text not
+read. Derivability in GLS is decided, so **a flag** is one of two
+things: no answer within the deadline; or a certificate of the proved
+search that the program's own check refused, which would be a defect and
+has not been seen. A flag prints no fact.
+
+`glsrun corpus` and `glsrun families` list the corpus and some members
+of the families as texts; `Corpus/prove_corpus.py` runs the command on
+each and elaborates each printed file.

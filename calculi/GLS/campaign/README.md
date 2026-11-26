@@ -92,4 +92,5 @@ Theory files are each within `[propext, Quot.sound]`
 * `GLS/Test.lean`, `GLS/SearchTest.lean`, `GLS/CutTest.lean`, `GLS/RunTest.lean`, `GLS/SetSearchTest.lean`, `GLS/ExploreTest.lean`: the tests, every message pinned. Code.
 * `GLS/Corpus/Basic.lean`: 16 entries and four families; `GLS/Corpus/Facts.lean`: the 16 facts, written by `glsrun facts`, checked by the kernel.
 * `Main.lean`: the driver `glsrun`. `Corpus/measure.py`, `Corpus/measure_set.py`: the measuring scripts.
+* `GLS/Parse.lean`: a sequent read from text, and written as Lean source and with the signs of a keyboard, for `glsrun prove '<sequent>'` (added 2026-11-26). Code. `GLS/ParseTest.lean`: its tests. `Corpus/prove_corpus.py`: the command run on the corpus and on members of the families, each printed file elaborated.
 * `Play/GLS.lean`: the exercises; `Play/GLSTutorial.lean`: the tutorial. In no library.
