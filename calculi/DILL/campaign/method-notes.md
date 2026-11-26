@@ -163,8 +163,8 @@ what was done there. Kept to what would change that text.
 
 ## Every record
 
-15. **A time typed ahead of the clock, four times in one campaign**
-    (note 3, and three more: an entry "16:06" at 16:05, "built 16:24"
+15. **A time typed ahead of the clock, five times in one campaign**
+    (note 3, and four more: "delivered 16:35" at 16:34 on the closing page itself, an entry "16:06" at 16:05, "built 16:24"
     at 16:23, a set of agents' end times computed from durations and
     first written as if read). Each was put right in the next call.
     The cause is the same each time: a document is composed in one
