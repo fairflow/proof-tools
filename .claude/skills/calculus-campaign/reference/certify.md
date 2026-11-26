@@ -354,7 +354,13 @@ the date. A search is measured compiled, by the driver, under a
 deadline, from the first run: `#eval` runs it in the interpreter, and a
 sizing loop by `#eval` did not end in five minutes on inputs the
 compiled driver settled in milliseconds. A long timing run goes in the
-background, its output to a file.
+background, its output to a file. Every such run has a cap on memory
+(`lake env lean -M <megabytes>`) as well as a deadline, and the deadline
+ends the whole process group: ending `lake` leaves the `lean` process
+under it running, with nothing to stop it. Two runs with a deadline and
+no cap were among the likely causes of a restart of the machine
+(DILL, 2026-11-26; the process-group fix was tested there with a shell
+command, not with Lean).
 
 - kernel time against the size of the certificate (Lean's profiler,
   `set_option profiler true`, reports the time of each declaration);
