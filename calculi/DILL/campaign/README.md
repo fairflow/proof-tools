@@ -46,7 +46,7 @@ Waiting on the reviewer: nothing.
 * [cost-log.md](cost-log.md): one row for each stage, the agents, the
   time lost, the words of the reviewer.
 * [method-notes.md](method-notes.md): where the skill was wrong, silent
-  or unclear (19 notes).
+  or unclear (20 notes).
 * [users-guide.md](users-guide.md): how a goal reads, the moves, the
   tactic's lines.
 * `brief-2-1.md`, `brief-3-1.md`, `brief-4-1.md`: the briefs to the

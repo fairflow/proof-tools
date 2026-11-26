@@ -214,3 +214,11 @@ what was done there. Kept to what would change that text.
     *Proposed*: let step 4 say that the order is a matter of what is
     risked, and that with agents the two theorems may run beside the
     rest at that risk.
+20. **The tutorial's links, and a rebase.** `reference/explore.md` §11
+    says: "commit the Lean first, then run `write`, then commit the
+    page". `write` links at `HEAD`; the push then rebased onto another
+    session's commits, and the commit the 112 links named was no longer
+    on the branch. *Done*: `write` run again after the push, at a commit
+    that is on `main`. *Proposed*: "commit the Lean and push it, then
+    run `write`, then commit the page": where several sessions push to
+    one branch, a link may name only a commit that is already there.

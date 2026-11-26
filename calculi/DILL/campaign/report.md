@@ -9,6 +9,10 @@ later commits of the same branch. To build:
 Links below are to GitHub at `5850b99`; B is
 `https://github.com/fairflow/proof-tools/blob/5850b99/calculi/DILL`.
 
+Delivered 2026-11-26 16:35 GMT: on `main` (this file), and as a private
+page for the reviewer, https://claude.ai/artifact/VNyYCXMHeVzVx1fCGvwopH
+(as of commit `47234be`).
+
 ## 1. What was adopted, proved, and runs
 
 Dual intuitionistic linear logic as a sequent calculus with two zones,
