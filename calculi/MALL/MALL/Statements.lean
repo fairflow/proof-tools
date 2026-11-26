@@ -189,6 +189,28 @@ def UniformInterpolationForFormulas : Prop :=
     (∃ E : Form, (∀ a ∈ E.letters, a ≠ p ∧ a ∈ A.letters) ∧ Derivable [Aᗮ, E] ∧
       ∀ B : Form, p ∉ B.letters → Derivable [Aᗮ, B] → Derivable [Eᗮ, B])
 
+/-- **Uniform interpolation, with the condition on signs** (Lyndon's):
+the interpolant of S24 can be taken with every literal of it a literal of
+`Γ`.  (`I` implies the par of `Γ`, so a letter is in `I` only with a sign
+it has in `Γ`.)  Entered 2026-11-26, before its proof. -/
+def UniformInterpolationLyndon : Prop :=
+  ∀ (p : Nat) (Γ : List Form), ∃ I : Form,
+    (∀ ℓ ∈ I.lits, ℓ ∈ litsL Γ) ∧
+    (∀ a ∈ I.letters, a ≠ p ∧ a ∈ lettersL Γ) ∧
+    Derivable (Iᗮ :: Γ) ∧
+    ∀ Δ : List Form, (∀ a ∈ lettersL Δ, a ≠ p) → Derivable (Γ ++ Δ) → Derivable (I :: Δ)
+
+/-- The same for a formula: every literal of `∀p A`, and every literal of
+`∃p A`, is a literal of `A`. -/
+def UniformInterpolationLyndonForFormulas : Prop :=
+  ∀ (p : Nat) (A : Form),
+    (∃ U : Form, (∀ ℓ ∈ U.lits, ℓ ∈ A.lits) ∧
+      (∀ a ∈ U.letters, a ≠ p ∧ a ∈ A.letters) ∧ Derivable [Uᗮ, A] ∧
+      ∀ B : Form, p ∉ B.letters → Derivable [Bᗮ, A] → Derivable [Bᗮ, U]) ∧
+    (∃ E : Form, (∀ ℓ ∈ E.lits, ℓ ∈ A.lits) ∧
+      (∀ a ∈ E.letters, a ≠ p ∧ a ∈ A.letters) ∧ Derivable [Aᗮ, E] ∧
+      ∀ B : Form, p ∉ B.letters → Derivable [Aᗮ, B] → Derivable [Eᗮ, B])
+
 end MALL
 
 #axioms_within_file [propext, Quot.sound]
