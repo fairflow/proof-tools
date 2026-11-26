@@ -5,3 +5,5 @@ import MALL.Source
 import MALL.Proof
 import MALL.Tactic
 import MALL.Test
+import MALL.Semantics
+import MALL.Statements
