@@ -4,15 +4,22 @@ sequent written with the signs of a keyboard.
 
     sequent  ::=  zone ; zone => formula   |   zone => formula
     zone     ::=  formula , … , formula    |   .   |   (nothing)
-    formula  ::=  p q r s  a4 a5 …  1  0  T
+               |  [ formula , … , formula ]   |   [ ]
+    formula  ::=  p q r s  a4 a5 …  Form.atom 4 …  1  0  T
                |  ! A  |  A * B  |  A & B  |  A + B  |  A -o B  |  ( A )
 
 `*` is ⊗, `-o` is ⊸, `+` is ⊕, `T` (or `top`) is ⊤, `=>` (or `|-`) is ⟹,
 `.` is the empty zone.  The signs of the source (`⊗ ⊸ ⊕ ⊤ ⟹ ·`, and `⨾`
-for `;`) are read as well, so what `showSeq` writes is read back.  With
-no `;` the zone given is the linear one and the unrestricted zone is
+for `;`) are read as well, so what `showSeq` writes is read back.  So is
+a sequent as Lean source (`seqSrc`, `Refute.srcSeq`): a zone may be a
+list in brackets, `[p, q]` or `[]`, and an atom may be `Form.atom 12`.
+With no `;` the zone given is the linear one and the unrestricted zone is
 empty.  The connectives bind as the notations of `DILL/Form.lean` do: `!`
 closest, then `*`, `&`, `+`, `-o`, each to the right.
+
+A text that is not a sequent is refused with a `Fault`: what was
+expected, and the place.  A `Fault` counts characters from 0; its report
+counts from 1, as a person does, and puts a mark under the place.
 
 Code, not theory: nothing here is trusted, and the file carries no bound
 on axioms.  A sequent misread is a wrong question, not a wrong answer:
@@ -26,7 +33,7 @@ namespace DILL.Parse
 inductive Tok where
   | id (s : String)
   | one | zero | top
-  | lp | rp | comma | semi | turn | dot
+  | lp | rp | lb | rb | comma | semi | turn | dot
   | tensor | wth | plus | lolli | bang
   deriving DecidableEq, Repr, Inhabited
 
@@ -34,13 +41,24 @@ inductive Tok where
 def Tok.show : Tok → String
   | .id s => s
   | .one => "1" | .zero => "0" | .top => "T"
-  | .lp => "(" | .rp => ")" | .comma => "," | .semi => ";" | .turn => "=>" | .dot => "."
+  | .lp => "(" | .rp => ")" | .lb => "[" | .rb => "]" | .comma => "," | .semi => ";" | .turn => "=>" | .dot => "."
   | .tensor => "*" | .wth => "&" | .plus => "+" | .lolli => "-o" | .bang => "!"
+
+/-- What is wrong with a text, and where: the number of the character,
+the first being 0; the number of characters of the text where it is the
+end that is at fault. -/
+structure Fault where
+  pos : Nat
+  msg : String
+  deriving Repr
+
+/-- A fault inside the reader: `none` is the end of the text. -/
+abbrev Err := Option Nat × String
 
 /-- The signs of a text, each with the number of the character at which
 it starts. -/
 partial def lex (cs : List Char) (i : Nat) (acc : List (Tok × Nat)) :
-    Except String (List (Tok × Nat)) :=
+    Except Err (List (Tok × Nat)) :=
   match cs with
   | [] => .ok acc.reverse
   | c :: rest =>
@@ -51,6 +69,8 @@ partial def lex (cs : List Char) (i : Nat) (acc : List (Tok × Nat)) :
       match c, rest with
       | '(', _ => one .lp
       | ')', _ => one .rp
+      | '[', _ => one .lb
+      | ']', _ => one .rb
       | ',', _ => one .comma
       | ';', _ => one .semi
       | '⨾', _ => one .semi
@@ -75,9 +95,18 @@ partial def lex (cs : List Char) (i : Nat) (acc : List (Tok × Nat)) :
       | _, _ =>
         if c.isAlpha then
           let w := cs.takeWhile fun d => d.isAlphanum
-          let t : Tok := if w == ['T'] || w == "top".toList then .top else .id (String.ofList w)
-          lex (cs.drop w.length) (i + w.length) ((t, i) :: acc)
-        else .error s!"character {i + 1}: '{c}' is not a sign of a sequent"
+          let after := cs.drop w.length
+          if w == "Form".toList && (after.take 5) == ".atom".toList then
+            -- an atom as Lean source: `Form.atom <n>`
+            let sp := (after.drop 5).takeWhile Char.isWhitespace
+            let ds := ((after.drop 5).drop sp.length).takeWhile Char.isDigit
+            let k := w.length + 5 + sp.length + ds.length
+            if ds.isEmpty then .error (some (i + w.length + 5 + sp.length), "a number expected after 'Form.atom'")
+            else lex (cs.drop k) (i + k) ((.id (String.ofList ('a' :: ds)), i) :: acc)
+          else
+            let t : Tok := if w == ['T'] || w == "top".toList then .top else .id (String.ofList w)
+            lex after (i + w.length) ((t, i) :: acc)
+        else .error (some i, s!"'{c}' is not a sign of a sequent")
 
 /-- The atom that a name is: `p q r s`, and `a<n>`. -/
 def atomOf (s : String) : Option Nat :=
@@ -96,20 +125,28 @@ def infixOf : Tok → Option (Nat × (Form → Form → Form))
   | .tensor => some (75, .tensor)
   | _ => none
 
-/-- Where a list of signs starts, for a message. -/
-def place : List (Tok × Nat) → String
-  | (t, i) :: _ => s!"character {i + 1}, at '{t.show}'"
-  | [] => "the end"
+/-- Where a list of signs starts: `none` at the end of the text. -/
+def here : List (Tok × Nat) → Option Nat
+  | (_, i) :: _ => some i
+  | [] => none
+
+/-- What is there, for a message. -/
+def found : List (Tok × Nat) → String
+  | (t, _) :: _ => s!", and '{t.show}' is there"
+  | [] => ", and the text has ended"
+
+/-- The fault "`what` expected", at the start of `ts`. -/
+def expected (what : String) (ts : List (Tok × Nat)) : Err := (here ts, what ++ " expected" ++ found ts)
 
 mutual
 
 /-- A formula with no infix connective outside parentheses. -/
-partial def prim (ts : List (Tok × Nat)) : Except String (Form × List (Tok × Nat)) :=
+partial def prim (ts : List (Tok × Nat)) : Except Err (Form × List (Tok × Nat)) :=
   match ts with
   | (.id s, i) :: ts =>
     match atomOf s with
     | some n => .ok (.atom n, ts)
-    | none => .error s!"character {i + 1}: '{s}' is not an atom (the atoms are p q r s, then a4, a5, …)"
+    | none => .error (some i, s!"'{s}' is not an atom (the atoms are p q r s, then a4, a5, …)")
   | (.one, _) :: ts => .ok (.one, ts)
   | (.zero, _) :: ts => .ok (.zero, ts)
   | (.top, _) :: ts => .ok (.top, ts)
@@ -120,13 +157,13 @@ partial def prim (ts : List (Tok × Nat)) : Except String (Form × List (Tok × 
     let (A, ts) ← form 0 ts
     match ts with
     | (.rp, _) :: ts => return (A, ts)
-    | _ => throw s!"{place ts}: ')' expected, for the '(' at character {i + 1}"
-  | _ => .error s!"{place ts}: a formula expected"
+    | _ => throw (here ts, s!"')' expected, for the '(' at character {i + 1}" ++ found ts)
+  | _ => .error (expected "a formula" ts)
 
 /-- `A`, then the infix connectives that bind at least as closely as
 `min`, each with what is to its right. -/
 partial def more (min : Nat) (A : Form) (ts : List (Tok × Nat)) :
-    Except String (Form × List (Tok × Nat)) :=
+    Except Err (Form × List (Tok × Nat)) :=
   match ts with
   | (t, _) :: ts' =>
     match infixOf t with
@@ -139,14 +176,14 @@ partial def more (min : Nat) (A : Form) (ts : List (Tok × Nat)) :
   | [] => .ok (A, [])
 
 /-- A formula whose outer connectives bind at least as closely as `min`. -/
-partial def form (min : Nat) (ts : List (Tok × Nat)) : Except String (Form × List (Tok × Nat)) := do
+partial def form (min : Nat) (ts : List (Tok × Nat)) : Except Err (Form × List (Tok × Nat)) := do
   let (A, ts) ← prim ts
   more min A ts
 
 end
 
 /-- Formulas with commas between them, one at least. -/
-partial def forms (ts : List (Tok × Nat)) : Except String (List Form × List (Tok × Nat)) := do
+partial def forms (ts : List (Tok × Nat)) : Except Err (List Form × List (Tok × Nat)) := do
   let (A, ts) ← form 0 ts
   match ts with
   | (.comma, _) :: ts =>
@@ -154,32 +191,53 @@ partial def forms (ts : List (Tok × Nat)) : Except String (List Form × List (T
     return (A :: Γ, ts)
   | _ => return ([A], ts)
 
-/-- A zone: `.`, or nothing before `;` or `=>`, or formulas. -/
-def zone (ts : List (Tok × Nat)) : Except String (List Form × List (Tok × Nat)) :=
+/-- A zone: `.`, or nothing before `;` or `=>`, or formulas, or a list in
+brackets as Lean source has it. -/
+def zone (ts : List (Tok × Nat)) : Except Err (List Form × List (Tok × Nat)) :=
   match ts with
   | (.dot, _) :: ts => .ok ([], ts)
+  | (.lb, _) :: (.rb, _) :: ts => .ok ([], ts)
+  | (.lb, i) :: ts => do
+    let (Γ, ts) ← forms ts
+    match ts with
+    | (.rb, _) :: ts => return (Γ, ts)
+    | _ => throw (here ts, s!"',' or ']' expected, for the '[' at character {i + 1}" ++ found ts)
   | (.semi, _) :: _ => .ok ([], ts)
   | (.turn, _) :: _ => .ok ([], ts)
   | _ => forms ts
 
-/-- **A sequent, read.**  The answer is the sequent, or what is wrong
-with the text and where. -/
-def seq (text : String) : Except String Seq := do
+/-- The reader, with its own faults. -/
+def seqE (text : String) : Except Err Seq := do
   let ts ← lex text.toList 0 []
   let (Γ, ts) ← zone ts
-  let goal (unr lin : List Form) (ts : List (Tok × Nat)) : Except String Seq := do
+  let goal (unr lin : List Form) (ts : List (Tok × Nat)) : Except Err Seq := do
     let (C, ts) ← form 0 ts
     match ts with
     | [] => return unr ⨾ lin ⟹ C
-    | _ => throw s!"{place ts}: the sequent has ended (one conclusion, and no comma in it)"
+    | _ => throw (here ts, "the sequent has ended (one conclusion, and no comma in it)" ++ found ts)
   match ts with
   | (.semi, _) :: ts =>
     let (Δ, ts) ← zone ts
     match ts with
     | (.turn, _) :: ts => goal Γ Δ ts
-    | _ => throw s!"{place ts}: '=>' expected"
+    | _ => throw (expected "'=>'" ts)
   | (.turn, _) :: ts => goal [] Γ ts
-  | _ => throw s!"{place ts}: ';' or '=>' expected"
+  | _ => throw (expected "';' or '=>'" ts)
+
+/-- **A sequent, read.**  The answer is the sequent, or what is wrong
+with the text and where. -/
+def seq (text : String) : Except Fault Seq :=
+  match seqE text with
+  | .ok j => .ok j
+  | .error (i, msg) => .error ⟨i.getD text.length, msg⟩
+
+/-- A fault as the command reports it: what is wrong and at which
+character, the first being 1; the text; and a mark under the place.  The
+mark is counted in characters: under a sign that a terminal draws wide
+(`𝟏`, `⟹`) it stands a little to the left. -/
+def Fault.report (f : Fault) (text : String) : String :=
+  let line := String.ofList (text.toList.map fun c => if c == '\n' || c == '\t' then ' ' else c)
+  s!"not a sequent, at character {f.pos + 1}: {f.msg}\n  {line}\n  {String.ofList (List.replicate f.pos ' ')}^"
 
 /-! ## Written with the signs of a keyboard -/
 

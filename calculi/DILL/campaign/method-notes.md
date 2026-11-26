@@ -238,3 +238,78 @@ what was done there. Kept to what would change that text.
     and one with a move altered was refused. *Done in the skill*:
     `reference/certify.md` §5 names the command as the third way to
     splice. Not done: the same command for K, GLS and MALL.
+22. **`dillrun prove` brought to the skill's paragraph** (2026-11-26,
+    22:16 GMT on; by the owner session, on the directing session's
+    task). The paragraph is "A judgment typed at a shell",
+    `reference/certify.md` §5, as of commit `0e83910`. *Done*: the
+    printed file has named declarations in `DILL.Answer` and ends with
+    the bound on axioms; both options for a large answer, with the
+    threshold measured; a text not read is reported with the text and a
+    mark; Lean reads the Lean source of all 56 entries (and six more) as
+    the sequent it was written from (`DILL/ParseTest.lean`, `leanReads`);
+    `dillrun corpus` and `Corpus/prove_corpus.py`; the figures in
+    `measurements.md`, "The command on the corpus". What the paragraph
+    does not say, for this calculus:
+    1. *A flag agrees with either status.* "A script that compares each
+       exit code with the recorded status" supposes a search that always
+       answers (K's). Here 4 of the 56 answers are flags. The script
+       fails only on an answer against the status, and names the flags;
+       a search that came to flag more would pass it. *Proposed*: say
+       that where the command can flag, the script names the flagged
+       entries and the measurements record the list; or let the corpus
+       record the verdict expected of the command, not only the status.
+    2. *Two searches, and only one had a bound.* "The budget where the
+       search has one, a deadline where it has none" reads as a choice.
+       DILL has both kinds in one command: the search for a derivation
+       has the budget and a cap on calls, the search for a saturated set
+       has neither, and on 24 equal atoms against 25 the command as note
+       21 left it did not end in 100 s. Found only because the sizing of
+       "a large answer" tried a family outside the corpus. *Done*:
+       `--deadline=<seconds>` (10) over the whole answer. *Proposed*:
+       "a deadline in every case; the budget as well where a search has
+       one", and "try a family that grows before saying the command ends
+       by itself".
+    3. *"A large answer" has no measure.* K's thresholds are K's. Here
+       the limit met first is the depth of recursion, between a tree
+       nested 101 deep and one nested 131 deep; no limit on heartbeats
+       was met. *Proposed*: "find where a printed file without the
+       options is refused, set the threshold well below, and record
+       both".
+    4. *Several facts, one kernel check.* "State each from the one
+       certificate" was first done with one `verdict` for each fact, and
+       the kernel then checked the set once for each: 41 s for a set of
+       200 sequents. *Done*: the check is a theorem of its own, passed
+       to each certifier's `verdict`: 20 s. It has to be stated through
+       the certifier (`noCFBySet.check sequent saturated = true := by
+       decide +kernel`). Stated of the checker's function
+       (`refutedBy saturated sequent = true`), which is the same Boolean
+       by definition, the kernel passed 8 GB on the same set and the
+       file was refused. The cause was not looked for. *Proposed*: say
+       "one kernel check, stated as `K.check s c = true`", and that a
+       second statement of the same check is to be measured, not
+       assumed equal.
+    5. *Which texts the reader reads back.* "The reader reads back what
+       each printer writes": K's script gives the command the Lean
+       source as a third text; DILL's reader did not read Lean source
+       (zones in brackets, `Form.atom 12`). *Done*: it does, and the
+       script gives all three. *Proposed*: name the three texts.
+    6. *Two printers of Lean source.* `seqSrc` and `Refute.srcSeq` differ
+       in the parentheses around the conclusion. The facts are stated of
+       `sequent`, printed by the first; the second prints the members of
+       a set, which is a certificate: a member misprinted can make the
+       check fail and cannot make a fact false. Both are tested all the
+       same. *Proposed*: one line saying that the test of meaning is of
+       the printer that writes the statement.
+    7. *A certificate past the kernel's reach.* For a set of 499
+       sequents the command answers `not derivable` in milliseconds and
+       prints a file whose kernel check did not end in 120 s
+       (`measurements-sat.md`). The paragraph is silent. *Done*: from 201
+       sequents the head of the file says so. Whether that answer should
+       be a flag is not decided here.
+    8. *Who alters the certificate.* "One with its certificate altered
+       refused" names no place for it. *Done*: the script does it, for
+       one tree and one set, and fails if Lean accepts either.
+    Also corrected on the way: `Refute.outcome` printed "1 sequents"
+    (a loose end of the closing page); a `--budget` that is not a
+    number, and an option that does not exist, are refused with exit
+    code 2 where the first panicked and the second was dropped.

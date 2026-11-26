@@ -182,30 +182,87 @@ program is `.lake/build/bin/dillrun`):
     dillrun prove '!p, !(p -o q) => !q'
     dillrun prove --short 'p => p * p'
 
-The text has the signs of a keyboard: `*` for ⊗, `-o` for ⊸, `+` for ⊕,
-`&`, `!`, `1`, `0`, `T` for ⊤, `=>` for ⟹, `.` for an empty zone, and
-`;` between the zones (with no `;` the zone given is the linear one).
-The atoms are `p q r s`, then `a4`, `a5`, … The signs of the source are
-read too. The connectives bind as in a Lean file: `!` closest, then `*`,
-`&`, `+`, `-o`, each to the right. Quote the text: `;`, `&`, `*`, `!`
-and the parentheses mean something to a shell. The grammar is at the
-head of `DILL/Parse.lean`.
+**The text.** It has the signs of a keyboard: `*` for ⊗, `-o` for ⊸, `+`
+for ⊕, `&`, `!`, `1`, `0`, `T` for ⊤, `=>` for ⟹, `.` for an empty zone,
+and `;` between the zones (with no `;` the zone given is the linear
+one). The atoms are `p q r s`, then `a4`, `a5`, … The signs of the
+source are read too, and so is a sequent as Lean source (`[p] ⨾ [p ⊸ q]
+⟹ q`, `Form.atom 12`). The connectives bind as in a Lean file: `!`
+closest, then `*`, `&`, `+`, `-o`, each to the right. Quote the text:
+`;`, `&`, `*`, `!` and the parentheses mean something to a shell. The
+grammar is at the head of `DILL/Parse.lean`.
 
-| the answer | exit code | what is printed after the first line |
+| the answer | exit code | what is printed |
 |---|---|---|
-| `derivable` | 0 | a Lean file with the derivation: `treeCert.verdict _ <tree>` |
-| `not derivable` | 1 | a Lean file with a saturated set: `noDerivableBySet.verdict _ <set>` |
-| `flag` | 3 | what the search did, and why there is no set |
-| the text is not a sequent | 2 | what is wrong and at which character (on the error stream) |
+| `derivable` | 0 | the first line, then a Lean file with the tree of moves |
+| `not derivable` | 1 | the first line, then a Lean file with a saturated set |
+| `flag` | 3 | the first line, then comment: what the search did and why there is no set, or that the deadline passed. No fact |
+| the text is not a sequent | 2 | nothing on the standard output. On the error stream: what was expected, the number of the character (the first is 1), the text, and a mark under the place |
 
-The program is not trusted, and neither is its first line. The Lean file
-is what the kernel checks: `dillrun prove '…' > Fact.lean`, then `lake
-env lean Fact.lean` from this folder, is silent where the answer holds.
-`--short` prints the first line only; `--ascii` writes the sequent in it
-with the signs of a keyboard (the Lean file keeps the notations of
-`DILL/Form.lean`); `--budget=<n>` is the number of copies allowed along
-a branch (4 where it is not given). The first line names the sequent
-that was read: look at it, since a text misread is another question.
+    $ dillrun prove 'p, => q'
+    dillrun prove: not a sequent, at character 4: a formula expected, and '=>' is there
+      p, => q
+         ^
+
+**The first line** is a comment: the verdict and the sequent that was
+read, in the source's notation. Look at it, since a text misread is
+another question. It shows the sequent and not the text typed: both
+zones are written (`· ;` where no `;` was typed), parentheses are put
+around every formula inside another, and `a0` to `a3` come back as
+`p q r s`.
+
+**The Lean file** is what the kernel checks; the program is not
+trusted, and neither is its first line. `dillrun prove '…' > Fact.lean`,
+then `lake env lean Fact.lean` from this folder, is silent where the
+answer holds. The file has, in the namespace `DILL.Answer`:
+
+| declaration | for `derivable` | for `not derivable` |
+|---|---|---|
+| `sequent : Seq` | the sequent, as Lean source | the same |
+| the certificate | inside `derivation`: a tree of moves | `saturated : List Seq` |
+| the facts | `derivation : Fam true sequent` (`treeCert`); `derivable : Derivable sequent`; `valid : Valid sequent`, by soundness | `checked`: the kernel's check of the set, once; from it `notCutFree : ¬ CFDerivable sequent` (`noCFBySet`); `notDerivable : ¬ Derivable sequent` (`noDerivableBySet`, by cut elimination); `notValid : ¬ Valid sequent`, by completeness |
+
+It ends with `#axioms_within_file [propext, Quot.sound]`, so the facts
+are within the bound of the theory files. Where the answer is large
+(a tree of more than 150 moves or nested more than 40 deep, a set of
+more than 60 sequents or of more than 1500 signs, a sequent of more
+than 150 signs) the file sets `maxRecDepth` and `maxHeartbeats` itself;
+below that it sets neither, and Lean's own limits are enough
+(`measurements.md` has where they stop).
+
+After the first line the file opens with a comment that says how many
+moves the derivation has and at what budget it was found, or how many
+sequents the set has. (Before 2026-11-26 22:16 GMT these were two
+comment lines of their own after the first; they are kept, inside that
+comment.)
+
+**The options.** `--short` prints the first line only. `--ascii` writes
+the sequent in it with the signs of a keyboard (the Lean file keeps the
+notations of `DILL/Form.lean`). `--budget=<n>` is the number of copies
+allowed along a branch in the search for a derivation (4 where it is
+not given); that search is also capped at 200000 calls for each budget.
+`--deadline=<seconds>` (10 where it is not given) is for the whole
+answer: the search for a saturated set has no budget, and on a sequent
+with many equal formulas (`p, …, p ⟹ p ⊗ … ⊗ p`, 24 of them) it does
+not end in a minute. Past the deadline the answer is `flag`, so the
+command ends by itself. Any other option, or a number that is not one,
+is refused with exit code 2.
+
+**A flag** says: no derivation found within the budget, and no
+saturated set made; or no answer within the deadline. It prints no
+fact. It is the answer wherever a formula would have to go into the
+unrestricted zone on the way to a set (`!` on the left of a sequent
+that has no derivation), or where the unrestricted zone of the sequent
+is not empty and the search finds nothing. A set that the compiled
+check refused would also be a flag, marked `DEFECT`; none has been
+seen.
+
+**On the corpus.** `dillrun corpus` lists the 56 entries as texts, and
+`python3 -I Corpus/prove_corpus.py --elaborate` gives each to the
+command in its three forms, compares the answers with the recorded
+status and with one another, elaborates every printed file, and checks
+that two altered certificates are refused (`measurements.md`, "The
+command on the corpus").
 
 ## Out to the mathematics
 

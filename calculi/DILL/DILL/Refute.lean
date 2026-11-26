@@ -214,7 +214,8 @@ def outcome (j : Seq) (ch : Choice := .first) : Outcome :=
     let (b, s) := search j.lin j.goal
     if b then
       if s.aside == 0 then .derivable
-      else .noSet s!"{s.aside} sequents with ! in the linear zone were set aside"
+      else .noSet (if s.aside == 1 then "1 sequent with ! in the linear zone was set aside"
+        else s!"{s.aside} sequents with ! in the linear zone were set aside")
     else
       let D := setOf s ch j
       if refutedBy D j then .refuted D else .defect D

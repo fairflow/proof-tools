@@ -112,6 +112,18 @@ which 3 439 are tests and generated pins (Test, TutorialTest,
 TutorialPins, RunTest, SatTest); about 8 100 lines of documents, the
 tutorial among them.
 
+## After the close
+
+| what | when (GMT, 2026-11-26) | by | words of the reviewer |
+|---|---|---|---|
+| `dillrun prove`, first form | to 21:18 (method note 21) | the directing session | a remark that a prover at the command line would be useful (as that session reports it) |
+| `dillrun prove` brought to the skill's paragraph: the printed file, the report of a text not read, Lean's reading back, `dillrun corpus`, the script, the deadline, the measurements | 22:16 to 22:34 | the owner session, no agents | none; the task came from the directing session |
+
+In the second row: three builds of the whole (116 jobs), three runs of
+the script with every file elaborated, and the sizing of "a large
+answer". One run was stopped by hand: the command on 24 equal atoms,
+before it had a deadline (about 100 s; the free memory of the machine stayed at 90%).
+
 ## What the operator did unaided, and what it did not
 
 The operator wrote the target, the plan, the formulas, the family, the

@@ -1212,7 +1212,7 @@ example : refutedBy [[p] ⨾ [] ⟹ q, [p] ⨾ [p] ⟹ q] ([p] ⨾ [] ⟹ q) = f
   | .noSet why => why
   | _ => "another answer"
 
-/-- info: "1 sequents with ! in the linear zone were set aside" -/
+/-- info: "1 sequent with ! in the linear zone was set aside" -/
 #guard_msgs in
 #eval match Refute.outcome ([] ⨾ [!p, q] ⟹ !(p ⊗ q)) with
   | .noSet why => why

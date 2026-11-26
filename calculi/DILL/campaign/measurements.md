@@ -361,6 +361,83 @@ Chaining puts in one branch two copies that a derivation of the figure
 can put in two. So "the least budget" in the corpus table is the
 chained search's; on the corpus the two modes agree.
 
+## The command on the corpus
+
+Added 2026-11-26, after the campaign closed, by the owner session
+(method note 22). `dillrun prove` on each of the 56 entries, by
+`python3 -I Corpus/prove_corpus.py --elaborate` (three runs, as the
+printed file changed, with the same counts; the last ended at 22:34 GMT,
+after the build of 116 jobs, and is the one below).
+Each entry is given three times: in the source's notation, as Lean
+source, with the signs of a keyboard.
+
+| | |
+|---|---|
+| `derivable` (exit code 0) | 39, each recorded derivable |
+| `not derivable` (1), with a saturated set | 13, each recorded not derivable |
+| `flag` (3) | 4: `loop`, `loopU`, `pump`, `bangPlusNo`, each recorded not derivable |
+| against the recorded status | 0 |
+| the three texts of an entry answered differently | 0 |
+| printed files elaborated (`lake env lean -M 8000`, the kernel checking each certificate) | 56 of 56; none needed the options that lift Lean's limits |
+| a text that is not a sequent (`p, => q`; `p -o`) | each refused: exit code 2, the mark under character 4 and 5, nothing on the standard output |
+| the deadline (`--deadline=1`, 24 equal atoms against 25) | `flag`, exit code 3, after 1.0 s |
+| altered: the tree of `copyInit` replaced by `.mk .init []` | refused by Lean (`could not synthesize default value for parameter 'h'`) |
+| altered: the set of `contract` without its first member | refused by Lean ("Tactic `decide` proved that the proposition … is false", at `checked`) |
+
+A flag agrees with either status, so the script fails only where an
+answer is against the status. The four flags are the corpus's sequents
+with no derivation and a formula under `!` to the left (or a formula
+already in the unrestricted zone): no saturated set exists for them
+(`measurements-sat.md`). A search that came to flag more would pass the
+script: the list above is the record to compare with.
+
+**Where Lean's own limits stop a printed file**, and so what "a large
+answer" is. Each file elaborated as printed and again with the two
+`set_option` lines taken out (`-M 8000`, a deadline of 150 s on the
+process group; single runs, 22:21 to 22:28 GMT, with another session's
+builds running).
+
+| the sequent | the certificate | as printed | without the options |
+|---|---|---|---|
+| `a4, a4 ⊸ a5, …, ⟹ a44` (a chain of 40) | a tree of 81 moves | 2.7 s | 2.7 s |
+| `!p ⟹ p ⊗ … ⊗ p`, 60 | 180 moves, nested 61 | 1.4 s | 1.3 s |
+| the same, 100 | 300 moves, nested 101 | 1.7 s | 1.8 s |
+| the same, 130 | 390 moves, nested 131 | not run | refused: "maximum recursion depth has been reached" |
+| the same, 200 | 600 moves, nested 201 | 4.0 s | refused, the same |
+| the same, 400 | 1200 moves, nested 401 | 13.1 s | refused, the same |
+| the same, 800 | 2400 moves, nested 801 | 61.9 s | refused, the same |
+| a chain of 4 with the wrong conclusion | a set of 76 sequents | 4.7 s | 4.8 s |
+| a chain of 5 with the wrong conclusion | a set of 200 sequents | 41.3 s | 40.3 s |
+
+So the limit that is met first is the depth of recursion, between a
+tree nested 101 deep and one nested 131 deep; the command writes both
+options from a nesting of 41, a tree of 151 moves, a set of 61 sequents
+or of 1500 signs, or a sequent of 151 signs, which leaves a margin of
+more than two. No limit on heartbeats was met at these sizes; the option is written
+all the same, as the skill asks. The 41 s for a set of 200 sequents was two
+kernel checks of the one set, one for each of the two facts. The file
+now states the check once (`checked`) and both facts from it: 20.0 s.
+How the check is stated matters to the kernel:
+
+| `checked`, for the set of 200 sequents | the file elaborated |
+|---|---|
+| no such theorem: a `verdict` for each fact | 41.3 s (39.3 s in a second run) |
+| `refutedBy saturated sequent = true := by decide +kernel` | refused after 83.5 s (81.3 s in a second run): "(kernel) excessive memory consumption detected", at the cap of 8000 MB |
+| `noCFBySet.check sequent saturated = true := by decide +kernel` | 20.0 s |
+
+The second and the third state the same Boolean (`noCFBySet.check j D`
+is `refutedBy D j` by definition). Why the kernel's run differs was not
+looked for. The printed file has the third.
+
+**The search for a set has no bound of its own.** On `p, …, p ⟹ p ⊗ …
+⊗ p` with `n` atoms against `n + 1` the command (first line only) took
+0.06 s at 12, 0.13 s at 14, 0.54 s at 16, 2.5 s at 18, 11.3 s at 20, and
+at 24 did not end in the 100 s it was given. The search for a derivation
+makes 41 calls on the sequent at 20 and 81 at 40, so the time is the
+search for a set (`Refute.search`); what in it grows was not looked
+for. Hence the deadline of the command (10 s where none is given).
+Not repaired: the search itself.
+
 ## What went wrong in the measuring
 
 * **The deadline of `Corpus/measure.py` killed `lake` and not Lean.**
