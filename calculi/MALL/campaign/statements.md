@@ -2,7 +2,7 @@
 
 Every statement the campaign cites, displayed as Lean, with its status.
 The goals were written as named statements in `MALL/Statements.lean`
-(commit `8264d5c`) before any of them was proved; S1 to S3 were entered
+(commit `c81bc59`) before any of them was proved; S1 to S3 were entered
 in Adopt. Nothing is removed: a refuted statement stays.
 
 Status is exactly one of **PROVED** (checked by the kernel, no `sorry`,

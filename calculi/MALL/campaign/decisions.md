@@ -388,6 +388,18 @@ the argument, and attributes it.
 * **Rests on it**: 14 facts of the corpus; S19.
 * **Cost to reverse**: little.
 
+## 2026-11-26 11:06 GMT. The closing: the remote's `main` had moved
+
+* **Found** before the push: the remote's `main` was at `b698279`
+  (one commit after `906e2fa`, by another campaign: `calculi/GLS`, ten
+  files, nothing outside that folder; the library and the skill's text
+  unchanged).
+* **Decided**: the campaign's commits were rebased onto it, so that
+  the push is a fast-forward. Their names changed; the names cited in
+  these documents are the new ones. The full build was run again after
+  the rebase.
+* **Cost to reverse**: none.
+
 ## Stops
 
 *Each time a turn ended to wait for the reviewer. None so far.*
