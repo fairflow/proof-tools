@@ -410,10 +410,13 @@ missing from earlier wordings (K 72 to 75, GLS 27, MALL 29, DILL 22).
 - *A certificate beyond the kernel.* A search can print in
   milliseconds a certificate that Lean does not check within the
   memory cap (MALL: a saturated set of 238 sequents, stopped at 8 GB).
-  Find the size at which that happens, with a family that grows, and
-  above it let the first line say what the answer rests on: the
-  compiled check, not the kernel. A verdict line that reads the same
-  for a checked and an uncheckable file claims more than was done.
+  Find the largest size checked on every family tried (it is not a
+  sharp bound: MALL's kernel checked 124 sequents on one family and
+  not 119 on another, so the bound is 102), and above it let the first
+  line say what the answer rests on, in words that claim no more than
+  was seen: "by the compiled check only (… ; the kernel has checked
+  sets of up to 102)". A verdict line that reads the same for a
+  checked and an unchecked file claims more than was done.
 - *The options.* `--short`: the first line only. `--ascii`: the
   judgment in that line with the signs of a keyboard. `--deadline=
   <seconds>` in every case, with a default, over the whole answer, so
