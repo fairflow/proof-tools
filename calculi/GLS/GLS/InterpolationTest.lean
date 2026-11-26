@@ -102,6 +102,29 @@ def battery (vs : List Nat) (d n seed : Nat) : List Form × Nat × Nat :=
 #guard_msgs in
 #eval battery [0, 1, 2] 3 40 977
 
+/-! ## The size of the interpolant, simplified -/
+
+/-- The largest interpolant over a battery, and the mean size. -/
+def sizes (f : Form → Form) (d n seed : Nat) : Nat × Nat :=
+  let xs := (List.range n).map fun i => (f (rnd [0, 1, 2] d (i * 7919 + seed)).1).size
+  (xs.foldl max 0, xs.sum / n)
+
+-- simplified (`uiExists`) and without the shortcut (`uiSeqRaw`, which has
+-- the depth bound), on the battery above
+/-- info: ((33, 4), 109, 10) -/
+#guard_msgs in
+#eval (sizes (uiExists 0) 3 40 977, sizes (fun A => uiSeqRaw 0 [A] []) 3 40 977)
+
+-- the formula with no `p` whose interpolant had 11 010 757 nodes before
+-- the simplification
+#guard (uiExists 0 (□□q ⟶ (q.neg ⟶ □r))).size == 10
+#guard equiv (uiExists 0 (□□q ⟶ (q.neg ⟶ □r))) (□□q ⟶ (q.neg ⟶ □r))
+
+-- the simplified and the raw interpolant are equivalent, as `holds_uiSeq_raw` says
+#guard (List.range 20).all fun i =>
+  let A := (rnd [0, 1, 2] 3 (i * 7919 + 977)).1
+  equiv (uiExists 0 A) (uiSeqRaw 0 [A] [])
+
 /-! ## The defined connectives under the box -/
 
 #guard proves ([] ⇒ [□(p ⋏ q) ⟶ (□p ⋏ □q)])
@@ -170,10 +193,10 @@ PROVED · axioms: Quot.sound, propext
 #guard_msgs in #statement GLS.uiSeq_free
 
 /--
-info: theorem GLS.uiSeq_mdepth (p : Nat) (Γ Δ : List Form) : (uiSeq p Γ Δ).mdepth ≤ 2 * (Γ ⇒ Δ).boxes.length
+info: theorem GLS.uiSeqRaw_mdepth (p : Nat) (Γ Δ : List Form) : (uiSeqRaw p Γ Δ).mdepth ≤ 2 * (Γ ⇒ Δ).boxes.length
 PROVED · axioms: Quot.sound, propext
 -/
-#guard_msgs in #statement GLS.uiSeq_mdepth
+#guard_msgs in #statement GLS.uiSeqRaw_mdepth
 
 /--
 info: theorem GLS.holds_bisim {p : Nat} (B : Form) (hB : Form.occ p B = false) {a b : Tree} :

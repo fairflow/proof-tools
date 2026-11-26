@@ -52,31 +52,223 @@ def lits (p : Nat) (Γ Δ : List Form) : List Form :=
   ((Γ.filterMap Form.var?).filter (· != p)).map Form.var ++
     ((Δ.filterMap Form.var?).filter (· != p)).map (fun q => (Form.var q).neg)
 
+/-! ## Formulas built with the units simplified -/
+
+/-- `A ∧ B`, with `⊥` and `⊤` simplified away. -/
+def mkAnd (A B : Form) : Form :=
+  if A = ⊥ then ⊥ else if B = ⊥ then ⊥ else if A = Form.top then B
+  else if B = Form.top then A else A ⋏ B
+
+/-- `A ∨ B`, with `⊥` and `⊤` simplified away. -/
+def mkOr (A B : Form) : Form :=
+  if A = Form.top then Form.top else if B = Form.top then Form.top else if A = ⊥ then B
+  else if B = ⊥ then A else A ⋎ B
+
+/-- `¬A`, with `¬⊥ = ⊤` and `¬⊤ = ⊥`. -/
+def mkNeg (A : Form) : Form := if A = ⊥ then Form.top else if A = Form.top then ⊥ else A.neg
+
+/-- `◇A`, with `◇⊥ = ⊥`. -/
+def mkDia (A : Form) : Form := if A = ⊥ then ⊥ else A.dia
+
+/-- `□A`, with `□⊤ = ⊤`. -/
+def mkBox (A : Form) : Form := if A = Form.top then Form.top else □A
+
+/-- The conjunction of a list, simplified. -/
+def mkConj : List Form → Form
+  | [] => Form.top
+  | A :: As => mkAnd A (mkConj As)
+
+/-- The disjunction of a list, simplified. -/
+def mkDisj : List Form → Form
+  | [] => ⊥
+  | A :: As => mkOr A (mkDisj As)
+
+/-- `A ∨ B`, with `B` computed only when `A` is not `⊤`. -/
+def orLazy (A : Form) (B : Unit → Form) : Form := if A = Form.top then Form.top else mkOr A (B ())
+
+/-- `A ∧ B`, with `B` computed only when `A` is not `⊥`. -/
+def andLazy (A : Form) (B : Unit → Form) : Form := if A = ⊥ then ⊥ else mkAnd A (B ())
+
+/-- The conjunction of a list of formulas to be computed, stopping at the
+first `⊥`. -/
+def conjLazy : List (Unit → Form) → Form
+  | [] => Form.top
+  | f :: fs => andLazy (f ()) (fun _ => conjLazy fs)
+
+/-- The sequent has no `p`. -/
+def pFree (p : Nat) (Γ Δ : List Form) : Bool := (Γ ++ Δ).all fun A => !A.occ p
+
+theorem holds_mkAnd (A B : Form) (t : Tree) :
+    (mkAnd A B).holds t = (A.holds t && B.holds t) := by
+  unfold mkAnd
+  split
+  · next h => subst h; rfl
+  · split
+    · next h => subst h; rw [holds_bot, Bool.and_false]
+    · split
+      · next h => subst h; rw [holds_top, Bool.true_and]
+      · split
+        · next h => subst h; rw [holds_top, Bool.and_true]
+        · exact holds_and A B t
+
+theorem holds_mkOr (A B : Form) (t : Tree) :
+    (mkOr A B).holds t = (A.holds t || B.holds t) := by
+  unfold mkOr
+  split
+  · next h => subst h; rw [holds_top]; rfl
+  · split
+    · next h => subst h; rw [holds_top, Bool.or_true]
+    · split
+      · next h => subst h; rfl
+      · split
+        · next h => subst h; rw [holds_bot, Bool.or_false]
+        · exact holds_or A B t
+
+theorem holds_mkNeg (A : Form) (t : Tree) : (mkNeg A).holds t = !A.holds t := by
+  unfold mkNeg
+  split
+  · next h => subst h; rfl
+  · split
+    · next h => subst h; rw [holds_top]; rfl
+    · exact holds_neg A t
+
+theorem holds_mkDia (A : Form) (t : Tree) :
+    (mkDia A).holds t = true ↔ ∃ u ∈ t.desc, A.holds u = true := by
+  unfold mkDia
+  split
+  · next h =>
+    subst h
+    exact ⟨(fun h => nomatch h), (fun ⟨_, _, h⟩ => nomatch h)⟩
+  · exact holds_dia A t
+
+theorem holds_mkBox (A : Form) (t : Tree) :
+    (mkBox A).holds t = t.desc.all (fun u => A.holds u) := by
+  unfold mkBox
+  split
+  · next h =>
+    subst h
+    rw [holds_top]
+    exact (List.all_eq_true.2 fun u _ => holds_top u).symm
+  · rfl
+
+theorem holds_mkConj (As : List Form) (t : Tree) :
+    (mkConj As).holds t = true ↔ ∀ A ∈ As, A.holds t = true := by
+  induction As with
+  | nil => exact ⟨(fun _ _ h => nomatch h), (fun _ => holds_top t)⟩
+  | cons A As ih =>
+    rw [mkConj, holds_mkAnd, Bool.and_eq_true, ih]
+    constructor
+    · rintro ⟨h1, h2⟩ B hB
+      rcases List.mem_cons.1 hB with rfl | hB
+      · exact h1
+      · exact h2 B hB
+    · intro h
+      exact ⟨h A (List.mem_cons_self ..), fun B hB => h B (List.mem_cons_of_mem _ hB)⟩
+
+theorem holds_mkDisj (As : List Form) (t : Tree) :
+    (mkDisj As).holds t = true ↔ ∃ A ∈ As, A.holds t = true := by
+  induction As with
+  | nil => exact ⟨(fun h => nomatch h), (fun ⟨_, h, _⟩ => nomatch h)⟩
+  | cons A As ih =>
+    rw [mkDisj, holds_mkOr, Bool.or_eq_true, ih]
+    constructor
+    · rintro (h | ⟨B, hB, h⟩)
+      · exact ⟨A, List.mem_cons_self .., h⟩
+      · exact ⟨B, List.mem_cons_of_mem _ hB, h⟩
+    · rintro ⟨B, hB, h⟩
+      rcases List.mem_cons.1 hB with rfl | hB
+      · exact .inl h
+      · exact .inr ⟨B, hB, h⟩
+
+theorem holds_orLazy (A : Form) (B : Unit → Form) (t : Tree) :
+    (orLazy A B).holds t = (A.holds t || (B ()).holds t) := by
+  unfold orLazy
+  split
+  · next h => subst h; rw [holds_top]; rfl
+  · exact holds_mkOr _ _ t
+
+theorem holds_andLazy (A : Form) (B : Unit → Form) (t : Tree) :
+    (andLazy A B).holds t = (A.holds t && (B ()).holds t) := by
+  unfold andLazy
+  split
+  · next h => subst h; rfl
+  · exact holds_mkAnd _ _ t
+
+theorem holds_conjLazy (fs : List (Unit → Form)) (t : Tree) :
+    (conjLazy fs).holds t = true ↔ ∀ f ∈ fs, (f ()).holds t = true := by
+  induction fs with
+  | nil => exact ⟨(fun _ _ h => nomatch h), (fun _ => holds_top t)⟩
+  | cons f fs ih =>
+    rw [conjLazy, holds_andLazy, Bool.and_eq_true, ih]
+    constructor
+    · rintro ⟨h1, h2⟩ g hg
+      rcases List.mem_cons.1 hg with rfl | hg
+      · exact h1
+      · exact h2 g hg
+    · intro h
+      exact ⟨h f (List.mem_cons_self ..), fun g hg => h g (List.mem_cons_of_mem _ hg)⟩
+
+theorem pFree_iff {p : Nat} {Γ Δ : List Form} :
+    pFree p Γ Δ = true ↔ ∀ A ∈ Γ ++ Δ, A.occ p = false := by
+  unfold pFree
+  rw [List.all_eq_true]
+  constructor
+  · intro h A hA
+    have := h A hA
+    cases hA' : A.occ p
+    · rfl
+    · rw [hA'] at this; cases this
+  · intro h A hA
+    rw [h A hA]; rfl
+
+/-- The shortcut's formula is true at a tree iff the tree refutes the sequent. -/
+theorem holds_shortcut (Γ Δ : List Form) (t : Tree) :
+    (mkAnd (mkConj Γ) (mkNeg (mkDisj Δ))).holds t = true ↔ (Γ ⇒ Δ).refutedAt t = true := by
+  rw [holds_mkAnd, holds_mkNeg, Bool.and_eq_true, holds_mkConj, refutedAt_iff]
+  constructor
+  · rintro ⟨h1, h2⟩
+    refine ⟨h1, fun B hB => ?_⟩
+    cases hB' : B.holds t with
+    | false => rfl
+    | true =>
+      have := (holds_mkDisj Δ t).2 ⟨B, hB, hB'⟩
+      rw [this] at h2; cases h2
+  · rintro ⟨h1, h2⟩
+    refine ⟨h1, ?_⟩
+    cases hd : (mkDisj Δ).holds t with
+    | false => rfl
+    | true =>
+      obtain ⟨B, hB, hBt⟩ := (holds_mkDisj Δ t).1 hd
+      rw [h2 B hB] at hBt; cases hBt
+
 /-- **The interpolant, with a number of steps allowed**, given `bx`, what
 the box part is for a list `H'`.  `H` is the list of formulas that hold,
 boxed and unboxed, at every world below. -/
-def itpIn (p : Nat) (bx : List Form → Form) : Nat → List Form → List Form → List Form → Form
+def itpIn (p : Nat) (sh : Bool) (bx : List Form → Form) :
+    Nat → List Form → List Form → List Form → Form
   | 0, _, _, _ => ⊥
   | n + 1, Γ, Δ, H =>
+    if sh && pFree p Γ Δ then mkAnd (mkConj Γ) (mkNeg (mkDisj Δ)) else
     match classify (Γ ⇒ Δ) with
     | .idP .. => ⊥
     | .botL _ => ⊥
     | .idB .. => ⊥
-    | .impR A B _ => itpIn p bx n (A :: Γ) (B :: Δ.erase (A ⟶ B)) H
+    | .impR A B _ => itpIn p sh bx n (A :: Γ) (B :: Δ.erase (A ⟶ B)) H
     | .impL A B _ =>
-      itpIn p bx n (Γ.erase (A ⟶ B)) (A :: Δ) H ⋎ itpIn p bx n (B :: Γ.erase (A ⟶ B)) Δ H
+      orLazy (itpIn p sh bx n (Γ.erase (A ⟶ B)) (A :: Δ) H)
+        (fun _ => itpIn p sh bx n (B :: Γ.erase (A ⟶ B)) Δ H)
     | .prime .. =>
-      conjL (lits p Γ Δ) ⋏
+      andLazy (andLazy (mkConj (lits p Γ Δ)) fun _ =>
         (if (Γ.filterMap Form.unbox?).all (fun B => H.contains B) then Form.top
-         else □(bx (H ++ Γ.filterMap Form.unbox?))) ⋏
-        conjL ((Δ.filterMap Form.unbox?).map fun C => (itpIn p bx n (xbox Γ ++ [□C]) [C] H).dia)
+         else mkBox (bx (H ++ Γ.filterMap Form.unbox?)))) fun _ =>
+        conjLazy ((Δ.filterMap Form.unbox?).map fun C _ => mkDia (itpIn p sh bx n (xbox Γ ++ [□C]) [C] H))
 
 /-- **The interpolant, with `k` box steps allowed**: the number of steps
 for each sequent is its measure relative to `U`, plus one. -/
-def itpK (p : Nat) (U : List Form) : Nat → List Form → List Form → List Form → Form
+def itpK (p : Nat) (sh : Bool) (U : List Form) : Nat → List Form → List Form → List Form → Form
   | 0, _, _, _ => ⊥
   | k + 1, Γ, Δ, H =>
-    itpIn p (fun H' => itpK p U k (xbox (H'.map Form.box)) [] H') (weight U (Γ ⇒ Δ) + 1) Γ Δ H
+    itpIn p sh (fun H' => itpK p sh U k (xbox (H'.map Form.box)) [] H') (weight U (Γ ⇒ Δ) + 1) Γ Δ H
 
 /-- A list without repetitions, with the same members. -/
 def nub : List Form → List Form
@@ -86,10 +278,19 @@ def nub : List Form → List Form
 /-- The boxed subformulas of a sequent, each once. -/
 def Seq.boxes (s : Seq) : List Form := nub s.boxSubs
 
-/-- **The uniform interpolant of a sequent** with respect to `p`: the
-classical `∃p (⋀Γ ∧ ¬⋁Δ)`. -/
-def uiSeq (p : Nat) (Γ Δ : List Form) : Form :=
-  itpK p (Γ ⇒ Δ).boxes ((Γ ⇒ Δ).boxes.length + 1) Γ Δ []
+/-- **The uniform interpolant of a sequent** with respect to `p`, the
+classical `∃p (⋀Γ ∧ ¬⋁Δ)`, with `sh` saying whether a sequent without `p`
+gives its own formula `⋀Γ ∧ ¬⋁Δ` (a shortcut that keeps formulas small, but
+for which the depth bound of `uiSeqRaw_mdepth` is not proved). -/
+def uiSeqWith (sh : Bool) (p : Nat) (Γ Δ : List Form) : Form :=
+  itpK p sh (Γ ⇒ Δ).boxes ((Γ ⇒ Δ).boxes.length + 1) Γ Δ []
+
+/-- **The uniform interpolant of a sequent**, simplified: the one the
+statements use. -/
+def uiSeq (p : Nat) (Γ Δ : List Form) : Form := uiSeqWith true p Γ Δ
+
+/-- The interpolant without the shortcut, whose modal depth is bounded. -/
+def uiSeqRaw (p : Nat) (Γ Δ : List Form) : Form := uiSeqWith false p Γ Δ
 
 /-- **`∃p.A`**, the uniform interpolant of `A ⇒`. -/
 def uiExists (p : Nat) (A : Form) : Form := uiSeq p [A] []
@@ -222,8 +423,76 @@ theorem occ_lits (p : Nat) (Γ Δ : List Form) : ∀ A ∈ lits p Γ Δ, A.occ p
     apply occ_neg
     simpa [Form.occ] using this
 
-theorem itpIn_free {p : Nat} {bx : List Form → Form} (hbx : ∀ H', (bx H').occ p = false) :
-    ∀ (n : Nat) (Γ Δ H : List Form), (itpIn p bx n Γ Δ H).occ p = false := by
+theorem occ_mkAnd {p : Nat} {A B : Form} (hA : A.occ p = false) (hB : B.occ p = false) :
+    (mkAnd A B).occ p = false := by
+  unfold mkAnd
+  split; · rfl
+  split; · rfl
+  split; · exact hB
+  split; · exact hA
+  exact occ_and hA hB
+
+theorem occ_mkOr {p : Nat} {A B : Form} (hA : A.occ p = false) (hB : B.occ p = false) :
+    (mkOr A B).occ p = false := by
+  unfold mkOr
+  split; · rfl
+  split; · rfl
+  split; · exact hB
+  split; · exact hA
+  exact occ_or hA hB
+
+theorem occ_mkNeg {p : Nat} {A : Form} (hA : A.occ p = false) : (mkNeg A).occ p = false := by
+  unfold mkNeg
+  split; · rfl
+  split; · rfl
+  exact occ_neg hA
+
+theorem occ_mkDia {p : Nat} {A : Form} (hA : A.occ p = false) : (mkDia A).occ p = false := by
+  unfold mkDia
+  split; · rfl
+  exact occ_dia hA
+
+theorem occ_mkBox {p : Nat} {A : Form} (hA : A.occ p = false) : (mkBox A).occ p = false := by
+  unfold mkBox
+  split; · rfl
+  exact hA
+
+theorem occ_mkConj {p : Nat} {As : List Form} (h : ∀ A ∈ As, A.occ p = false) :
+    (mkConj As).occ p = false := by
+  induction As with
+  | nil => rfl
+  | cons A As ih =>
+    exact occ_mkAnd (h A (List.mem_cons_self ..)) (ih fun B hB => h B (List.mem_cons_of_mem _ hB))
+
+theorem occ_mkDisj {p : Nat} {As : List Form} (h : ∀ A ∈ As, A.occ p = false) :
+    (mkDisj As).occ p = false := by
+  induction As with
+  | nil => rfl
+  | cons A As ih =>
+    exact occ_mkOr (h A (List.mem_cons_self ..)) (ih fun B hB => h B (List.mem_cons_of_mem _ hB))
+
+theorem occ_orLazy {p : Nat} {A : Form} {B : Unit → Form} (hA : A.occ p = false)
+    (hB : (B ()).occ p = false) : (orLazy A B).occ p = false := by
+  unfold orLazy
+  split; · rfl
+  exact occ_mkOr hA hB
+
+theorem occ_andLazy {p : Nat} {A : Form} {B : Unit → Form} (hA : A.occ p = false)
+    (hB : (B ()).occ p = false) : (andLazy A B).occ p = false := by
+  unfold andLazy
+  split; · rfl
+  exact occ_mkAnd hA hB
+
+theorem occ_conjLazy {p : Nat} {fs : List (Unit → Form)} (h : ∀ f ∈ fs, (f ()).occ p = false) :
+    (conjLazy fs).occ p = false := by
+  induction fs with
+  | nil => rfl
+  | cons f fs ih =>
+    exact occ_andLazy (h f (List.mem_cons_self ..)) (ih fun g hg => h g (List.mem_cons_of_mem _ hg))
+
+theorem itpIn_free {p : Nat} {sh : Bool} {bx : List Form → Form}
+    (hbx : ∀ H', (bx H').occ p = false) :
+    ∀ (n : Nat) (Γ Δ H : List Form), (itpIn p sh bx n Γ Δ H).occ p = false := by
   intro n
   induction n with
   | zero => intro _ _ _; rfl
@@ -231,29 +500,38 @@ theorem itpIn_free {p : Nat} {bx : List Form → Form} (hbx : ∀ H', (bx H').oc
     intro Γ Δ H
     simp only [itpIn]
     split
+    · next hs =>
+      have hf := pFree_iff.1 (Bool.and_eq_true_iff.1 hs).2
+      exact occ_mkAnd (occ_mkConj fun A hA => hf A (List.mem_append_left _ hA))
+        (occ_mkNeg (occ_mkDisj fun A hA => hf A (List.mem_append_right _ hA)))
+    split
     · rfl
     · rfl
     · rfl
     · exact ih _ _ _
-    · exact occ_or (ih _ _ _) (ih _ _ _)
-    · refine occ_and (occ_and (occ_conjL (occ_lits p Γ Δ)) ?_) (occ_conjL ?_)
+    · exact occ_orLazy (ih _ _ _) (ih _ _ _)
+    · refine occ_andLazy (occ_andLazy (occ_mkConj (occ_lits p Γ Δ)) ?_) (occ_conjLazy ?_)
       · split
         · rfl
-        · exact hbx _
-      · intro A hA
-        obtain ⟨C, _, rfl⟩ := List.mem_map.1 hA
-        exact occ_dia (ih _ _ _)
+        · exact occ_mkBox (hbx _)
+      · intro f hf
+        obtain ⟨C, _, rfl⟩ := List.mem_map.1 hf
+        exact occ_mkDia (ih _ _ _)
 
-theorem itpK_free (p : Nat) (U : List Form) :
-    ∀ (k : Nat) (Γ Δ H : List Form), (itpK p U k Γ Δ H).occ p = false := by
+theorem itpK_free (p : Nat) (sh : Bool) (U : List Form) :
+    ∀ (k : Nat) (Γ Δ H : List Form), (itpK p sh U k Γ Δ H).occ p = false := by
   intro k
   induction k with
   | zero => intro _ _ _; rfl
   | succ k ih => intro Γ Δ H; exact itpIn_free (fun H' => ih _ _ _) _ _ _ _
 
+theorem uiSeqWith_free (sh : Bool) (p : Nat) (Γ Δ : List Form) :
+    (uiSeqWith sh p Γ Δ).occ p = false :=
+  itpK_free p sh _ _ _ _ _
+
 /-- **The interpolant of a sequent does not contain `p`.** -/
 theorem uiSeq_free (p : Nat) (Γ Δ : List Form) : (uiSeq p Γ Δ).occ p = false :=
-  itpK_free p _ _ _ _ _
+  uiSeqWith_free true p Γ Δ
 
 /-! ## Invariants, and lemmas on trees -/
 
@@ -421,12 +699,12 @@ theorem good_append {H H' : List Form} {u : Tree} (h : Good H u) (h' : Good H' u
   · exact h B hB
   · exact h' B hB
 
-theorem itpIn_a {p : Nat} {U : List Form} {bx : List Form → Form} {H : List Form}
+theorem itpIn_a {p : Nat} {sh : Bool} {U : List Form} {bx : List Form → Form} {H : List Form}
     (hH : HOK U H)
     (hbx : ∀ H', HOK U H' → ub U (H'.map Form.box) < ub U (H.map Form.box) →
       ∀ u, Good H' u → Ctx0 H' u → (bx H').holds u = true) :
     ∀ (n : Nat) (Γ Δ : List Form), Closed U (Γ ⇒ Δ) → weight U (Γ ⇒ Δ) < n →
-      ∀ t, (Γ ⇒ Δ).refutedAt t = true → Ctx0 H t → (itpIn p bx n Γ Δ H).holds t = true := by
+      ∀ t, (Γ ⇒ Δ).refutedAt t = true → Ctx0 H t → (itpIn p sh bx n Γ Δ H).holds t = true := by
   intro n
   induction n with
   | zero => intro _ _ _ h; cases h
@@ -434,6 +712,8 @@ theorem itpIn_a {p : Nat} {U : List Form} {bx : List Form → Form} {H : List Fo
     intro Γ Δ hC hw t hr hctx
     have hr' := refutedAt_iff.1 hr
     simp only [itpIn]
+    split
+    · exact (holds_shortcut Γ Δ t).2 hr
     split
     · next q hΓ hΔ _ =>
       have h1 := hr'.1 _ hΓ; have h2 := hr'.2 _ hΔ
@@ -448,15 +728,15 @@ theorem itpIn_a {p : Nat} {U : List Form} {bx : List Form → Form} {H : List Fo
     · next A B h _ =>
       obtain ⟨hC1, hlt1⟩ := PSPrem.step (.impL₁ A B h rfl) hC
       obtain ⟨hC2, hlt2⟩ := PSPrem.step (.impL₂ A B h rfl) hC
-      rw [holds_or, Bool.or_eq_true]
+      rw [holds_orLazy, Bool.or_eq_true]
       rcases refuted_impL_inv h hr with h1 | h2
       · exact .inl (ih _ _ hC1 (by omega) t h1 hctx)
       · exact .inr (ih _ _ hC2 (by omega) t h2 hctx)
     · next nP nBot nB nR nL _ =>
-      rw [holds_and, holds_and, Bool.and_eq_true, Bool.and_eq_true]
+      rw [holds_andLazy, holds_andLazy, Bool.and_eq_true, Bool.and_eq_true]
       refine ⟨⟨?_, ?_⟩, ?_⟩
       · -- the literals
-        rw [holds_conjL]
+        rw [holds_mkConj]
         intro L hL
         unfold lits at hL
         rcases List.mem_append.1 hL with hL | hL
@@ -468,7 +748,7 @@ theorem itpIn_a {p : Nat} {U : List Form} {bx : List Form → Form} {H : List Fo
         split
         · exact holds_top t
         · next hn =>
-          rw [holds_box, List.all_eq_true]
+          rw [holds_mkBox, List.all_eq_true]
           intro u hu
           have hg := good_below hr
           refine hbx _ (hok_append hH hC) (ub_append_lt hC hn) u
@@ -476,7 +756,7 @@ theorem itpIn_a {p : Nat} {U : List Form} {bx : List Form → Form} {H : List Fo
           intro v hv
           exact good_append (hctx v (desc_trans' hu hv)) (hg v (desc_trans' hu hv))
       · -- the diamonds
-        rw [holds_conjL]
+        rw [holds_conjLazy]
         intro D hD
         obtain ⟨C, hCm, rfl⟩ := List.mem_map.1 hD
         have hCΔ := mem_unboxes.1 hCm
@@ -484,7 +764,7 @@ theorem itpIn_a {p : Nat} {U : List Form} {bx : List Form → Form} {H : List Fo
         have hbf : (□C).holds t = false := hr'.2 _ hCΔ
         obtain ⟨u, hu, hCu⟩ := exists_of_all_false hbf
         obtain ⟨w, hw, hCw, hbelow⟩ := last_failure C (u.size + 1) t u (Nat.lt_succ_self _) hu hCu
-        rw [holds_dia]
+        rw [holds_mkDia]
         refine ⟨w, hw, ih _ _ hC' (by omega) w ?_ (fun v hv => hctx v (desc_trans' hw hv))⟩
         rw [refutedAt_iff]
         refine ⟨fun A hA => ?_, fun A hA => ?_⟩
@@ -534,12 +814,12 @@ theorem mem_newVal_of_ne {p q : Nat} {Γ : List Form} {t : Tree} (hq : q ≠ p) 
       · cases h
   · intro h; exact .inl ⟨h, by simpa using hq⟩
 
-theorem itpIn_b {p : Nat} {U : List Form} {bx : List Form → Form} {H : List Form}
+theorem itpIn_b {p : Nat} {sh : Bool} {U : List Form} {bx : List Form → Form} {H : List Form}
     (hH : HOK U H)
     (hbx : ∀ H', HOK U H' → ub U (H'.map Form.box) < ub U (H.map Form.box) →
       ∀ u, (bx H').holds u = true → Ctx p H' u → ∃ u', Bisim p u u' ∧ Good H' u') :
     ∀ (n : Nat) (Γ Δ : List Form), Closed U (Γ ⇒ Δ) → weight U (Γ ⇒ Δ) < n →
-      ∀ t, (itpIn p bx n Γ Δ H).holds t = true → Ctx p H t →
+      ∀ t, (itpIn p sh bx n Γ Δ H).holds t = true → Ctx p H t →
         ∃ t', Bisim p t t' ∧ (Γ ⇒ Δ).refutedAt t' = true := by
   intro n
   induction n with
@@ -547,6 +827,8 @@ theorem itpIn_b {p : Nat} {U : List Form} {bx : List Form → Form} {H : List Fo
   | succ n ih =>
     intro Γ Δ hC hw t he hctx
     simp only [itpIn] at he
+    split at he
+    · exact ⟨t, Bisim.refl p t, (holds_shortcut Γ Δ t).1 he⟩
     split at he
     · cases he
     · cases he
@@ -558,16 +840,17 @@ theorem itpIn_b {p : Nat} {U : List Form} {bx : List Form → Form} {H : List Fo
     · next A B h _ =>
       obtain ⟨hC1, hlt1⟩ := PSPrem.step (.impL₁ A B h rfl) hC
       obtain ⟨hC2, hlt2⟩ := PSPrem.step (.impL₂ A B h rfl) hC
-      rw [holds_or, Bool.or_eq_true] at he
+      rw [holds_orLazy, Bool.or_eq_true] at he
       rcases he with he | he
       · obtain ⟨t', hb, hr⟩ := ih _ _ hC1 (by omega) t he hctx
         exact ⟨t', hb, refuted_impL₁ h hr⟩
       · obtain ⟨t', hb, hr⟩ := ih _ _ hC2 (by omega) t he hctx
         exact ⟨t', hb, refuted_impL₂ h hr⟩
     · next nP nBot nB nR nL _ =>
-      rw [holds_and, holds_and, Bool.and_eq_true, Bool.and_eq_true] at he
+      rw [holds_andLazy, holds_andLazy, Bool.and_eq_true, Bool.and_eq_true] at he
       obtain ⟨⟨hlits, hbox⟩, hdia⟩ := he
-      rw [holds_conjL] at hlits hdia
+      rw [holds_mkConj] at hlits
+      rw [holds_conjLazy] at hdia
       -- every proper descendant: bisimilar to a tree where the boxes of Γ hold
       have hD : ∀ u ∈ t.desc, ∃ u', Bisim p u u' ∧ Good (Γ.filterMap Form.unbox?) u' := by
         split at hbox
@@ -577,7 +860,7 @@ theorem itpIn_b {p : Nat} {U : List Form} {bx : List Form → Form} {H : List Fo
           refine ⟨u', hb, fun B hB => hg B ?_⟩
           exact List.contains_iff_mem.1 (List.all_eq_true.1 hall B hB)
         · next hn =>
-          rw [holds_box, List.all_eq_true] at hbox
+          rw [holds_mkBox, List.all_eq_true] at hbox
           have := ctx_build hbox (hbx _ (hok_append hH hC) (ub_append_lt hC hn))
           intro u hu
           obtain ⟨u', hb, hg⟩ := this u hu
@@ -589,7 +872,7 @@ theorem itpIn_b {p : Nat} {U : List Form} {bx : List Form → Form} {H : List Fo
         have hCΔ := mem_unboxes.1 hCm
         obtain ⟨hC', hlt⟩ := PSPrem.step (.glr C nP nB nBot hCΔ rfl) hC
         have := hdia _ (List.mem_map.2 ⟨C, hCm, rfl⟩)
-        obtain ⟨u, hu, hEu⟩ := (holds_dia _ _).1 this
+        obtain ⟨u, hu, hEu⟩ := (holds_mkDia _ _).1 this
         obtain ⟨w, hb, hr⟩ := ih _ _ hC' (by omega) u hEu
           (fun v hv => hctx v (desc_trans' hu hv))
         exact ⟨w, ⟨u, hu, hb⟩, hr⟩
@@ -679,9 +962,9 @@ theorem itpIn_b {p : Nat} {U : List Form} {bx : List Form → Form} {H : List Fo
 
 /-! ## The box steps, and the interpolant of a sequent -/
 
-theorem itpK_a {p : Nat} {U : List Form} : ∀ (k : Nat) (Γ Δ H : List Form), HOK U H →
+theorem itpK_a {p : Nat} {sh : Bool} {U : List Form} : ∀ (k : Nat) (Γ Δ H : List Form), HOK U H →
     ub U (H.map Form.box) < k → Closed U (Γ ⇒ Δ) →
-    ∀ t, (Γ ⇒ Δ).refutedAt t = true → Ctx0 H t → (itpK p U k Γ Δ H).holds t = true := by
+    ∀ t, (Γ ⇒ Δ).refutedAt t = true → Ctx0 H t → (itpK p sh U k Γ Δ H).holds t = true := by
   intro k
   induction k with
   | zero => intro _ _ _ _ h; cases h
@@ -690,9 +973,9 @@ theorem itpK_a {p : Nat} {U : List Form} : ∀ (k : Nat) (Γ Δ H : List Form), 
     refine itpIn_a hH (fun H' hH' hlt u hg hc => ?_) _ Γ Δ hC (Nat.lt_succ_self _) t hr hctx
     exact ih _ _ H' hH' (by omega) (closed_xbox hH') u (good_iff.2 hg) hc
 
-theorem itpK_b {p : Nat} {U : List Form} : ∀ (k : Nat) (Γ Δ H : List Form), HOK U H →
+theorem itpK_b {p : Nat} {sh : Bool} {U : List Form} : ∀ (k : Nat) (Γ Δ H : List Form), HOK U H →
     ub U (H.map Form.box) < k → Closed U (Γ ⇒ Δ) →
-    ∀ t, (itpK p U k Γ Δ H).holds t = true → Ctx p H t →
+    ∀ t, (itpK p sh U k Γ Δ H).holds t = true → Ctx p H t →
       ∃ t', Bisim p t t' ∧ (Γ ⇒ Δ).refutedAt t' = true := by
   intro k
   induction k with
@@ -723,26 +1006,48 @@ theorem closed_boxes (s : Seq) : Closed s.boxes s := fun A hA C hC =>
 theorem ub_nil_lt (U : List Form) : ub U ([] : List Form) < U.length + 1 :=
   Nat.lt_succ_of_le (List.countP_le_length)
 
+theorem uiSeqWith_of_refuted (sh : Bool) (p : Nat) {Γ Δ : List Form} {t : Tree}
+    (h : (Γ ⇒ Δ).refutedAt t = true) : (uiSeqWith sh p Γ Δ).holds t = true :=
+  itpK_a _ Γ Δ [] (fun _ h => nomatch h) (ub_nil_lt _) (closed_boxes _) t h (fun _ _ _ h => nomatch h)
+
+theorem bisim_of_uiSeqWith (sh : Bool) (p : Nat) {Γ Δ : List Form} {t : Tree}
+    (h : (uiSeqWith sh p Γ Δ).holds t = true) : ∃ t', Bisim p t t' ∧ (Γ ⇒ Δ).refutedAt t' = true :=
+  itpK_b _ Γ Δ [] (fun _ h => nomatch h) (ub_nil_lt _) (closed_boxes _) t h
+    (fun u _ => ⟨u, Bisim.refl p u, fun _ h => nomatch h⟩)
+
+theorem uiSeqWith_iff (sh : Bool) (p : Nat) (Γ Δ : List Form) (t : Tree) :
+    (uiSeqWith sh p Γ Δ).holds t = true ↔ ∃ t', Bisim p t t' ∧ (Γ ⇒ Δ).refutedAt t' = true := by
+  refine ⟨bisim_of_uiSeqWith sh p, fun ⟨t', hb, hr⟩ => ?_⟩
+  rw [holds_bisim _ (uiSeqWith_free sh p Γ Δ) hb]
+  exact uiSeqWith_of_refuted sh p hr
+
 /-- **(a)** A tree that refutes `Γ ⇒ Δ` satisfies its interpolant. -/
 theorem uiSeq_of_refuted (p : Nat) {Γ Δ : List Form} {t : Tree}
     (h : (Γ ⇒ Δ).refutedAt t = true) : (uiSeq p Γ Δ).holds t = true :=
-  itpK_a _ Γ Δ [] (fun _ h => nomatch h) (ub_nil_lt _) (closed_boxes _) t h (fun _ _ _ h => nomatch h)
+  uiSeqWith_of_refuted true p h
 
 /-- **(b)** A tree that satisfies the interpolant of `Γ ⇒ Δ` is bisimilar,
 ignoring `p`, to a tree that refutes `Γ ⇒ Δ`. -/
 theorem bisim_of_uiSeq (p : Nat) {Γ Δ : List Form} {t : Tree}
     (h : (uiSeq p Γ Δ).holds t = true) : ∃ t', Bisim p t t' ∧ (Γ ⇒ Δ).refutedAt t' = true :=
-  itpK_b _ Γ Δ [] (fun _ h => nomatch h) (ub_nil_lt _) (closed_boxes _) t h
-    (fun u _ => ⟨u, Bisim.refl p u, fun _ h => nomatch h⟩)
+  bisim_of_uiSeqWith true p h
 
 /-- **The interpolant is the bisimulation quantifier**: `∃p (⋀Γ ∧ ¬⋁Δ)` is
 true at a finite tree iff some tree bisimilar to it, ignoring `p`,
 refutes `Γ ⇒ Δ`. -/
 theorem uiSeq_iff (p : Nat) (Γ Δ : List Form) (t : Tree) :
-    (uiSeq p Γ Δ).holds t = true ↔ ∃ t', Bisim p t t' ∧ (Γ ⇒ Δ).refutedAt t' = true := by
-  refine ⟨bisim_of_uiSeq p, fun ⟨t', hb, hr⟩ => ?_⟩
-  rw [holds_bisim _ (uiSeq_free p Γ Δ) hb]
-  exact uiSeq_of_refuted p hr
+    (uiSeq p Γ Δ).holds t = true ↔ ∃ t', Bisim p t t' ∧ (Γ ⇒ Δ).refutedAt t' = true :=
+  uiSeqWith_iff true p Γ Δ t
+
+/-- The two interpolants are true at the same trees. -/
+theorem holds_uiSeq_raw (p : Nat) (Γ Δ : List Form) (t : Tree) :
+    (uiSeq p Γ Δ).holds t = (uiSeqRaw p Γ Δ).holds t := by
+  have e := (uiSeq_iff p Γ Δ t).trans (uiSeqWith_iff false p Γ Δ t).symm
+  cases h1 : (uiSeq p Γ Δ).holds t <;> cases h2 : (uiSeqRaw p Γ Δ).holds t
+  · rfl
+  · exact absurd (e.2 h2) (by rw [h1]; exact Bool.false_ne_true)
+  · exact absurd (e.1 h1) (by unfold uiSeqRaw at h2; rw [h2]; exact Bool.false_ne_true)
+  · rfl
 
 /-! ## The modal depth of the interpolant -/
 
@@ -777,17 +1082,73 @@ theorem mdepth_lits (p : Nat) (Γ Δ : List Form) : ∀ A ∈ lits p Γ Δ, A.md
   · obtain ⟨q, _, rfl⟩ := List.mem_map.1 hA; exact Nat.le_refl _
   · obtain ⟨q, _, rfl⟩ := List.mem_map.1 hA; exact Nat.le_refl _
 
+theorem mdepth_mkAnd_le (A B : Form) : (mkAnd A B).mdepth ≤ max A.mdepth B.mdepth := by
+  unfold mkAnd
+  split; · exact Nat.zero_le _
+  split; · exact Nat.zero_le _
+  split; · exact Nat.le_max_right _ _
+  split; · exact Nat.le_max_left _ _
+  exact Nat.le_of_eq (mdepth_and A B)
+
+theorem mdepth_mkOr_le (A B : Form) : (mkOr A B).mdepth ≤ max A.mdepth B.mdepth := by
+  unfold mkOr
+  split; · exact Nat.zero_le _
+  split; · exact Nat.zero_le _
+  split; · exact Nat.le_max_right _ _
+  split; · exact Nat.le_max_left _ _
+  exact Nat.le_of_eq (mdepth_or A B)
+
+theorem mdepth_mkDia_le (A : Form) : (mkDia A).mdepth ≤ A.mdepth + 1 := by
+  unfold mkDia
+  split; · exact Nat.zero_le _
+  exact Nat.le_of_eq (mdepth_dia A)
+
+theorem mdepth_mkBox_le (A : Form) : (mkBox A).mdepth ≤ A.mdepth + 1 := by
+  unfold mkBox
+  split; · exact Nat.zero_le _
+  exact Nat.le_refl _
+
+theorem mdepth_mkConj_le {As : List Form} {m : Nat} (h : ∀ A ∈ As, A.mdepth ≤ m) :
+    (mkConj As).mdepth ≤ m := by
+  induction As with
+  | nil => exact Nat.zero_le _
+  | cons A As ih =>
+    exact Nat.le_trans (mdepth_mkAnd_le _ _)
+      (Nat.max_le.2 ⟨h A (List.mem_cons_self ..), ih fun B hB => h B (List.mem_cons_of_mem _ hB)⟩)
+
+theorem mdepth_orLazy_le (A : Form) (B : Unit → Form) :
+    (orLazy A B).mdepth ≤ max A.mdepth (B ()).mdepth := by
+  unfold orLazy
+  split; · exact Nat.zero_le _
+  exact mdepth_mkOr_le _ _
+
+theorem mdepth_andLazy_le (A : Form) (B : Unit → Form) :
+    (andLazy A B).mdepth ≤ max A.mdepth (B ()).mdepth := by
+  unfold andLazy
+  split; · exact Nat.zero_le _
+  exact mdepth_mkAnd_le _ _
+
+theorem mdepth_conjLazy_le {fs : List (Unit → Form)} {m : Nat} (h : ∀ f ∈ fs, (f ()).mdepth ≤ m) :
+    (conjLazy fs).mdepth ≤ m := by
+  induction fs with
+  | nil => exact Nat.zero_le _
+  | cons f fs ih =>
+    exact Nat.le_trans (mdepth_andLazy_le _ _)
+      (Nat.max_le.2 ⟨h f (List.mem_cons_self ..), ih fun g hg => h g (List.mem_cons_of_mem _ hg)⟩)
+
 theorem itpIn_depth {p : Nat} {U : List Form} {bx : List Form → Form} {H : List Form}
     (hbx : ∀ H', HOK U H' → (bx H').mdepth ≤ ub U (xbox (H'.map Form.box)) + ub U (H'.map Form.box))
     (hH : HOK U H) :
     ∀ (n : Nat) (Γ Δ : List Form), Closed U (Γ ⇒ Δ) →
-      (itpIn p bx n Γ Δ H).mdepth ≤ ub U Γ + ub U (H.map Form.box) := by
+      (itpIn p false bx n Γ Δ H).mdepth ≤ ub U Γ + ub U (H.map Form.box) := by
   intro n
   induction n with
   | zero => intro _ _ _; exact Nat.zero_le _
   | succ n ih =>
     intro Γ Δ hC
     simp only [itpIn]
+    split
+    · next h => cases h
     split
     · exact Nat.zero_le _
     · exact Nat.zero_le _
@@ -806,12 +1167,11 @@ theorem itpIn_depth {p : Nat} {U : List Form} {bx : List Form → Form} {H : Lis
         ub_le (fun C _ hC => mem_erase_of_ne (by intro h; cases h) hC)
       have hle2 : ub U (B :: Γ.erase (A ⟶ B)) ≤ ub U Γ :=
         ub_le (fun C _ hC => List.mem_cons_of_mem _ (mem_erase_of_ne (by intro h; cases h) hC))
-      rw [mdepth_or]
-      exact Nat.max_le.2 ⟨by omega, by omega⟩
+      exact Nat.le_trans (mdepth_orLazy_le _ _) (Nat.max_le.2 ⟨Nat.le_trans h1 (by omega), Nat.le_trans h2 (by omega)⟩)
     · next nP nBot nB nR nL _ =>
-      rw [mdepth_and, mdepth_and]
-      refine Nat.max_le.2 ⟨Nat.max_le.2 ⟨?_, ?_⟩, ?_⟩
-      · exact Nat.le_trans (mdepth_conjL_le (mdepth_lits p Γ Δ)) (Nat.zero_le _)
+      refine Nat.le_trans (mdepth_andLazy_le _ _) (Nat.max_le.2
+        ⟨Nat.le_trans (mdepth_andLazy_le _ _) (Nat.max_le.2 ⟨?_, ?_⟩), ?_⟩)
+      · exact Nat.le_trans (mdepth_mkConj_le (mdepth_lits p Γ Δ)) (Nat.zero_le _)
       · split
         · exact Nat.zero_le _
         · next hn =>
@@ -820,9 +1180,9 @@ theorem itpIn_depth {p : Nat} {U : List Form} {bx : List Form → Form} {H : Lis
           have hle : ub U (xbox ((H ++ Γ.filterMap Form.unbox?).map Form.box)) ≤ ub U Γ := by
             refine ub_le (fun B _ hB => box_mem_xbox (mem_map_box.2 ?_))
             exact List.mem_append_right _ (mem_unboxes.2 hB)
-          show (bx _).mdepth + 1 ≤ _
+          refine Nat.le_trans (mdepth_mkBox_le _) ?_
           omega
-      · refine mdepth_conjL_le fun D hD => ?_
+      · refine mdepth_conjLazy_le fun D hD => ?_
         obtain ⟨C, hCm, rfl⟩ := List.mem_map.1 hD
         have hCΔ := mem_unboxes.1 hCm
         obtain ⟨hC', _⟩ := PSPrem.step (.glr C nP nB nBot hCΔ rfl) hC
@@ -831,11 +1191,11 @@ theorem itpIn_depth {p : Nat} {U : List Form} {bx : List Form → Form} {H : Lis
           ub_lt (fun B _ hB => List.mem_append_left _ (box_mem_xbox hB))
             (hC _ (.inr hCΔ) _ (boxSubs_self C)) (fun hΓ => nB ⟨C, hΓ, hCΔ⟩)
             (List.mem_append_right _ (List.mem_singleton.2 rfl))
-        rw [mdepth_dia]
+        refine Nat.le_trans (mdepth_mkDia_le _) ?_
         omega
 
 theorem itpK_depth {p : Nat} {U : List Form} : ∀ (k : Nat) (Γ Δ H : List Form), HOK U H →
-    Closed U (Γ ⇒ Δ) → (itpK p U k Γ Δ H).mdepth ≤ ub U Γ + ub U (H.map Form.box) := by
+    Closed U (Γ ⇒ Δ) → (itpK p false U k Γ Δ H).mdepth ≤ ub U Γ + ub U (H.map Form.box) := by
   intro k
   induction k with
   | zero => intro _ _ _ _ _; exact Nat.zero_le _
@@ -845,13 +1205,13 @@ theorem itpK_depth {p : Nat} {U : List Form} : ∀ (k : Nat) (Γ Δ H : List For
 
 /-- **The modal depth of the interpolant is at most twice the number of
 distinct boxed subformulas of the sequent.** -/
-theorem uiSeq_mdepth (p : Nat) (Γ Δ : List Form) :
-    (uiSeq p Γ Δ).mdepth ≤ 2 * (Γ ⇒ Δ).boxes.length := by
+theorem uiSeqRaw_mdepth (p : Nat) (Γ Δ : List Form) :
+    (uiSeqRaw p Γ Δ).mdepth ≤ 2 * (Γ ⇒ Δ).boxes.length := by
   have h := itpK_depth (p := p) ((Γ ⇒ Δ).boxes.length + 1) Γ Δ [] (fun _ h => nomatch h)
     (closed_boxes _)
   have h1 : ub (Γ ⇒ Δ).boxes Γ ≤ (Γ ⇒ Δ).boxes.length := List.countP_le_length
   have h2 : ub (Γ ⇒ Δ).boxes ([] : List Form) ≤ (Γ ⇒ Δ).boxes.length := List.countP_le_length
-  unfold uiSeq
+  unfold uiSeqRaw uiSeqWith
   simp only [List.map_nil] at h
   omega
 
@@ -977,6 +1337,17 @@ def uniformInterpolation : UniformInterpolation := fun p A =>
       have hA : A.holds t' = false := (refutedAt_iff.1 hr).2 A (List.mem_singleton.2 rfl)
       have hB' : B.holds t' = true := (holds_bisim B hB hb).symm.trans h.1
       exact not_refuted_of_fam d t' (refuted_one_one.2 ⟨hB', hA⟩) }
+
+/-- **The simplified interpolant is equivalent in GL to one of modal depth
+at most `2n`** (`uiSeqRaw_mdepth`): both are derivable from each other. -/
+def uiSeq_equiv_raw (p : Nat) (Γ Δ : List Form) :
+    Fam ([uiSeq p Γ Δ] ⇒ [uiSeqRaw p Γ Δ]) × Fam ([uiSeqRaw p Γ Δ] ⇒ [uiSeq p Γ Δ]) :=
+  (famOfNoRefutation _ fun t h => by
+      rw [refuted_one_one, holds_uiSeq_raw] at h
+      rw [h.1] at h; exact Bool.false_ne_true h.2.symm,
+   famOfNoRefutation _ fun t h => by
+      rw [refuted_one_one, ← holds_uiSeq_raw] at h
+      rw [h.1] at h; exact Bool.false_ne_true h.2.symm)
 
 end GLS
 
