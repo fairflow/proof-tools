@@ -181,3 +181,36 @@ what was done there. Kept to what would change that text.
     outside the repository (the round's shared notes folder served for
     hand-over notes and would serve for this), and the cold readers'
     reports are copied into the campaign folder when they come in.
+17. **A sum typed, not computed.** The closing page first said that
+    3 578 lines of the Lean are tests; `wc` says 3 439. It was caught
+    because the same command that filled the page printed the count.
+    The pitfall's order of work holds for sums too: compute, read,
+    paste.
+
+## Stage 4, and the whole
+
+18. **The tutorial page before Run was finished.** The agent for the
+    page was started while Run's files were being written, told to do
+    its section on what runs last; the restart cut it off with seven
+    sections done, and it was resumed for the eighth. Nothing was lost,
+    and the page was not the last thing on the path. *Proposed*: say in
+    stage 4, step 3, that the page may be begun when Prove is settled,
+    its section on Run last.
+19. **What this run shows of the skill as amended from MALL's notes.**
+    The third form of judgment (`reference/adopt.md` §3, "where the
+    logic has no weakening") carried over to two zones as written, one
+    form for each zone. The line "where derivability is not decidable,
+    level 3 is not a goal" (`reference/certify.md` §3) was right and
+    saved designing for it; what it does not say is that level 3 can
+    still be stated, and proved, of the decidable fragment
+    (`decidedBangFree`). "Build by target while agents write" (rule 5)
+    was needed from the first minute. The tutorial page as part of
+    stage 4 took one agent about half an hour of its own time. The
+    order "soundness, then completeness, before every other goal"
+    (stage 2, step 4) was not kept: all goals went out at once, and
+    nothing was lost by it, since no proof rested on a rule that the
+    two theorems could have faulted before the others were done; had
+    they faulted one, five agents' work would have been built again.
+    *Proposed*: let step 4 say that the order is a matter of what is
+    risked, and that with agents the two theorems may run beside the
+    rest at that risk.
