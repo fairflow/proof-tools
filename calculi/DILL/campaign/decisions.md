@@ -335,3 +335,36 @@ the folder point here.*
   them); an evaluation of unknown size runs under `lean -M 8000`, in
   the background, with a deadline. What the restart cost is in the cost
   log, "Time lost". Nothing committed was lost.
+
+## 2026-11-26 16:22 GMT. A word of the reviewer, relayed: builds need not go one at a time
+
+* **The words**: "predictably the rules are now too restrictive,
+  assuming a single build at a time. That's NOT needed. I thought the
+  gates you proposed were sensible. And of course things could always
+  blow up if a big search runs against a large built." (relayed by the
+  session that started this one; the skill has it from `d9716bd`).
+* **What it is**: a correction.
+* **What it changes**: the entry of 16:03 above is corrected by this
+  one. The look before a build stays. Builds and agents run side by
+  side while the machine has room; one is held back only when the look
+  shows load (free memory under 30%, swap in use beyond a gigabyte or
+  two, three or more builds running). An open-ended search is not
+  started beside a large build, and an evaluation of unknown size keeps
+  its cap (`lean -M 8000`). From 16:03 to 16:22 the operator had held
+  the engine file and the tutorial's agent behind the measuring agent:
+  nineteen minutes in which one agent worked where three could have.
+  At 16:22 the engine file was built and the tutorial's agent restarted
+  beside the measuring one.
+
+## 2026-11-26 16:19 GMT. A word of the reviewer: the measurements
+
+* **The words**: "report please: are you waiting on build permission or
+  something else slowing or stopping your progress?" and then "just
+  timing measurements?  why exactly are they needed please" (typed in
+  the session).
+* **What it is**: a question, twice; the second read as a correction.
+* **What it changes**: the answer given: the skill's Run stage asks for
+  the frontier, and a lower bound on it serves the closing page; taking
+  each growing family to its real limit does not, and that was what was
+  running, with the rest of the campaign held behind it. The measuring
+  agent was told at 16:19 to stop and write up from the figures it had.

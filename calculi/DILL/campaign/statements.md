@@ -300,8 +300,9 @@ unrestricted zone and no `!`, and for nothing more: with `!` no such
 statement can hold of sound checks with computable producers. Source:
 none. Entered 16:05, before the file was built. Not read back.
 **PROVED**: `dillEngine`, `noDerivableDec`, `decidedBangFree`,
-`DILL/Engine.lean` (built by the operator 16:24; the lints R2, R3 and R4
-of `lean-certify` pass on `noDerivableDec`, R1 on the producer).
+`DILL/Engine.lean` (built by the operator 16:23; the lints R2 and R3
+of `lean-certify` pass on `noDerivableDec`, and the file is within its
+bound on axioms).
 
 ### S17. Validity does not depend on the order of the hypotheses (ours)
 
