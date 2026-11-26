@@ -319,7 +319,13 @@ down (rules 8 and 9).
    recorded as PROVED. The lakefile's glob builds every file of the
    folder, an agent's half-written one included: until the agents have
    reported, build by target (`lake build <Calc>.Results`), and tell
-   each agent to do the same. Give an agent your design where you have
+   each agent to do the same. The machine is one: before a build, look
+   at what is running and at the free memory (the reviewer's global
+   instructions have the one line for it), and let one agent build at a
+   time. Three agents building at once, with another session's build
+   and an uncapped evaluation beside them, restarted the machine twice
+   in one day (2026-11-26): stagger the agents, say so in each brief,
+   and run any evaluation of unknown size under `lean -M <megabytes>`. Give an agent your design where you have
    one, and say that another is welcome: an agent has kept the design
    and bettered its central definition. End a session before the campaign is done only
    where the environment forces it: write the brief, and enter the end

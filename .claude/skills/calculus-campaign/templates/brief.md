@@ -32,7 +32,10 @@ target, not the whole library.>
 <Always: "Write your files to disk early and grow them: a session can
 end under a running command, and what is only in the conversation is
 then lost. Run a long build or timing in the background, with its
-output in a file.">.
+output in a file. Before any build, look at what is running and at the
+free memory, and do not build while another agent of this campaign is
+building: <who builds when>. An evaluation of unknown size runs under
+`lean -M <megabytes>`.">.
 
 ## Read, in this order
 
