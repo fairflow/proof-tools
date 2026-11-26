@@ -1,0 +1,252 @@
+# MALL: the decisions
+
+One entry for each choice the operator made, in order, and one for each
+word of the reviewer. Written when the choice is made, not afterwards.
+The closing page lists the entries by what they cost to reverse, the
+costliest first.
+
+The cost to reverse is one of:
+
+* **little**: a name, a letter, the place of a file;
+* **a stage**: the form of a goal, an encoding, which results are goals;
+* **the campaign**: the source, the system, what "holds" means, the
+  axiom policy.
+
+## 2026-11-26 09:46 GMT. The target
+
+*The first entry, and the one record of what it fixes: the other files of
+the folder point here.*
+
+* **The command's words**: "Propositional multiplicative-additive linear
+  logic, MALL, in Girard's one-sided sequent calculus with cut;
+  campaign folder calculi/MALL/". They reached the operator in a task
+  written by another session of the reviewer's (the session that
+  proposed the round: MALL, then dual intuitionistic linear logic, then
+  focusing or Benton's LNL), which gave the calculus in more words:
+  "Connectives ⊗, ⅋, 1, ⊥, &, ⊕, ⊤, 0; formulas in negation normal form
+  over atoms `p` and `p⊥`, negation a defined function. Rules: axiom
+  `⊢ A, A⊥`, cut, ⊗ (splits the context), ⅋, 1, ⊥, &, ⊕₁, ⊕₂, ⊤ (no
+  rule for 0). Primary source: J.-Y. Girard, 'Linear logic',
+  Theoretical Computer Science 50 (1987)." The same task lists seven
+  "points known in advance", each to be decided by the operator and
+  recorded; they are entered below where they arise. The skill was run
+  as a command (the Skill tool), with the words above as its argument.
+* **The paper and its version**: J.-Y. Girard, *Linear logic*,
+  Theoretical Computer Science 50 (1987) 1-102, North-Holland. The
+  journal article is the only version: there is no preprint or thesis
+  of it. Read as a scan of the journal pages (below). The system is in
+  Section 1, "The phase semantics", pp. 17-24: Definitions 1.1-1.3
+  (phase spaces, duals, facts), 1.7, 1.8, 1.11 (the connectives on
+  facts), the syntax on p. 21, Definition 1.14 (phase structures,
+  validity), Definition 1.15 (the sequent calculus, p. 22),
+  Proposition 1.16 (soundness), Theorem 1.17 (completeness).
+  Not taken, a line each:
+  - J.-Y. Girard, *Linear logic: its syntax and semantics* (in
+    *Advances in Linear Logic*, 1995): a later survey by the same
+    author, with the same rules; the command names the 1987 paper;
+  - Girard, Lafont and Taylor, *Proofs and Types* (1989), appendix B: a
+    summary;
+  - A. S. Troelstra, *Lectures on Linear Logic* (1992): a textbook, two
+    sided;
+  - Lincoln, Mitchell, Scedrov and Shankar (1992): another
+    presentation (one-sided, with literals in pairs, by the agent's
+    reading of its p. 243), read here for decidability and for cut
+    elimination on sequents, not for the rules.
+  Could not be got: none of those the campaign reads.
+* **The system**: the propositional fragment without exponentials of
+  the "linear sequent calculus" of Definition 1.15, as Girard states it
+  on p. 22, before the modalities are added (Definition 1.21) and
+  before the quantifiers. Girard gives this fragment no name of its
+  own ("the propositional framework of linear logic", p. 21); the
+  literature calls it MALL, and so does this campaign. Its rules:
+  logical axioms, cut, exchange, the additive rules (⊤, &, 1⊕, 2⊕; "no
+  rule for 0"), the multiplicative rules (1, ⊥, ⊗, ⅋). Left out: the
+  exponentials `!`, `?` and their four rules (Definition 1.21), the
+  quantifiers, the proof nets of Section 2 (PN1, PN2), the coherent
+  semantics.
+* **The results aimed at**: of the standing list, cut elimination and
+  the finite model property (the second as a stretch goal, by the
+  task's words: "attempt them only after the rest stands"); the
+  source's soundness (1.16) and completeness (1.17) for phase
+  semantics; and what the task mentions: exchange, with where it
+  lives; weakening and contraction REFUTED, each by a concrete pair of
+  sequents; decidability, by a decision procedure proved correct; a
+  search by lazy splitting as the untrusted producer. The Survey makes
+  the list exact (`plan.md`, Q2).
+* **The path**: adopted from the paper.
+* **The place and the name**: `calculi/MALL/` of `proof-tools`, a Lake
+  package of its own (`mall`, library `MALL`), core Lean only, the
+  toolchain of the library (`leanprover/lean4:v4.31.0`).
+* **The library**: this checkout of `fairflow/proof-tools`, a worktree
+  on the branch `claude/ecstatic-benz-bee260`, at commit `906e2fa`;
+  the remote's `main` is at `906e2fa` (`git ls-remote`, 2026-11-26
+  09:46): the same commit, nothing to update. It has
+  `ProofTools/Explore/Cert.lean` and `ProofTools/Explore/Session.lean`.
+  The build was seeded by an APFS clone of the main checkout's `.lake`
+  (the reviewer's standing rule for Lean worktrees).
+* **The source's files** (public; fetched without asking, by the
+  skill's "Downloading"; each in a folder of its own in the session's
+  scratchpad, nothing run from them; none is committed):
+  - `linear.pdf`, from `https://girard.perso.math.cnrs.fr/linear.pdf`
+    (the author's page), 5 240 273 bytes, 102 pages, a scan of the
+    journal issue with its cover (so the paper's page *n* is the
+    file's page *n* + 1), no text layer; sha256 begins
+    `7892034966d7b9bc`. Not LaTeX, so not compiled: the skeleton is
+    written by hand from the printed numbers. Read as page images: the
+    contents, pp. 1-7 (Parts I, II), pp. 17-26 (Section 1 to the
+    exponential rules), pp. 40-44 (the cut rule and cut elimination
+    for proof nets). Not read: Parts III-IV after p. 7, Sections 2
+    (but for pp. 40-44) to 6, Part V.
+  - the other works (Lafont 1997; Lincoln, Mitchell, Scedrov and
+    Shankar 1992; Okada 1999; Hodas and Miller 1994; Cervesato, Hodas
+    and Pfenning 2000) and the mechanisations (Yalla, cslib): fetched
+    by an agent of the operator; each file is entered in the next
+    entry, when its report is in.
+* **Pushing**: by the reviewer's standing instructions and the task's:
+  commits go to `main`, pushed only as
+  `git push origin HEAD:refs/heads/main` after `git branch -vv`; the
+  branch `claude/ecstatic-benz-bee260` is never pushed.
+* **Not touched**: every tracked file outside `calculi/MALL/` (rule 7
+  of the skill). Only the reviewer contacts the authors of the sources.
+* **Told to the reviewer**: 2026-11-26, in the session's output, when
+  this entry was committed: "MALL campaign begun. Source: Girard,
+  *Linear logic*, TCS 50 (1987), Section 1 (Definition 1.15, p. 22),
+  read from the author's scan. System: the propositional fragment
+  without exponentials, with cut and Girard's exchange rule. Aimed at:
+  soundness and completeness for phase semantics (1.16, 1.17), cut
+  elimination, exchange, weakening and contraction refuted,
+  decidability, a search by lazy splitting; the finite model property
+  as a stretch. Place: `calculi/MALL/`."
+* **Before this text was read**: nothing. After the skill's text and
+  its four reference parts were read, and before this entry was
+  written (it was written at 09:56 from notes), the session had: read
+  the source's pages listed above; started the agent that fetches the
+  other sources; and run three scratch screens of the encoding (stage
+  0, step 3), which the plan reports.
+
+## 2026-11-26 10:03 GMT. Stage 0: the other sources' files
+
+Fetched by an agent of the operator (public material; `SKILL.md`,
+"Downloading"), each into a folder of its own in the session's
+scratchpad; nothing run from them; none committed. The agent's report is
+[survey-report.md](survey-report.md).
+
+| file | from | size | what it is |
+|---|---|---|---|
+| `lafont/model.ps`, converted to `fmp.pdf` | `https://www.i2m.univ-amu.fr/perso/yves.lafont/pub/model.ps` (the author's page) | 99 405 bytes; the PDF 138 260 bytes, 6 pages | Lafont 1997, the author's version: 6 pages against the journal's 7, not compared with the published text. **Cited by this file's page numbers** |
+| `lmss/lmss.pdf` | `https://curien.galene.org/ECI2023/Lincoln%2B-decision-LL.pdf` | 5 200 610 bytes, 73 pages | LMSS 1992, a scan of the journal pages 239-311 with an OCR layer |
+| `lmss/lmss-sri-tr.pdf` | `https://www.csl.sri.com/papers/lmss90/lmss90.pdf` | 562 323 bytes, 89 pages | the SRI version (dated 13 Sept 1994); numbering not compared with the journal's; not cited |
+| `hodas-miller/hm.pdf` | `https://www.lix.polytechnique.fr/Labo/Dale.Miller/papers/ic94.pdf` | 272 565 bytes, 32 pages | Hodas and Miller 1994, an author's copy |
+| `chp/chp.pdf` | `https://www.cs.cmu.edu/~fp/papers/erm97.pdf` | 317 841 bytes, 26 pages | Cervesato, Hodas and Pfenning, the preprint of 29 Aug 1997 of the TCS 2000 paper |
+| `okada/kurims-1023-4.pdf` | (the agent's report) | 1 646 962 bytes, 19 pages | a different paper (Okada and Terui, RIMS Kokyuroku 1023); not used |
+| clones of Yalla (`a138437`), cslib (`907f934`), and single files of five other mechanisations | GitHub | | read, not run, not imported |
+
+**Not obtained**: M. Okada, TCS 227 (1999): ScienceDirect and CORE
+refused the download. Not needed: Lafont's Lemma 1 states and proves
+the argument, and attributes it.
+
+* **Cost to reverse**: little. Lafont's theorem numbers are those of
+  the author's version; if the journal's differ, the citations change.
+
+## 2026-11-26 10:03 GMT. Stage 0: sequents are lists read as multisets; exchange is in the rule format
+
+* **Decided**: a sequent is a `List Form`. Every rule of the family
+  concludes a variable `Ξ` under a hypothesis that `Ξ` is a permutation
+  of the rule's conclusion as the figure writes it
+  (`Ξ.Perm (A ⅋ B :: Γ)`); the ⊗ rule and cut write the split there
+  (`Ξ.Perm (A ⊗ B :: (Γ ++ Δ))`). Girard's rule EXCH has no constructor
+  in `Fam`: it is a theorem, with the height kept. A second family,
+  `Lit`, has the figure as it stands (a constructor EXCH, each rule at
+  the head), and is proved equivalent to `Fam`.
+* **Not taken**: the figure's form as the working family (every proof
+  by hand would be mostly exchanges, and each theorem would be stated
+  up to permutation anyway); membership with `erase` in the premises,
+  as in GLS (the split of ⊗ still needs a permutation, and exchange
+  then needs an induction); a Boolean mask for the split (a mask says
+  which, not what: unreadable in a move); a quotient type (no
+  `Lean.ToExpr`, no matching).
+* **Why**: the source itself names the form ("pedantically, in the
+  variant without exchange, adapted to multisets of formulas", p. 24),
+  and Lafont's calculus is that form. Screened in scratch on five rules
+  (`plan.md`, "Choices of encoding").
+* **Rests on it**: every file. The answer to the task's first two
+  points: the split is a permutation hypothesis on a variable
+  conclusion; exchange lives in the rule format, and is also a proved
+  lemma with heights.
+* **Cost to reverse**: a stage (Adopt, and every proof after it).
+* **For phase 2** (dual intuitionistic linear logic): this carries
+  over to the linear zone as it stands. The intuitionistic zone wants
+  the other form, membership, which builds weakening in, as in GLS.
+
+## 2026-11-26 10:03 GMT. Stage 0: two families, into `Type`; what holds is the family
+
+* **Decided**: `Fam` is Definition 1.15 with cut; `CF` is the same
+  without the cut rule. Both into `Type`. What holds, for the explorer
+  and the certifiers, is `Fam` (the skill's default); the proposition
+  is `Derivable Γ := Nonempty (Fam Γ)`.
+* **Not taken**: one family with a Boolean that allows cut (it puts a
+  parameter the source has not into the family the rule table is
+  checked against); a predicate "has no cut" on derivations of `Fam`
+  (every proof about cut-free derivations would carry it through every
+  case); validity as what holds (the moves' soundness would then say
+  nothing about the rules).
+* **Rests on it**: the rule table (rows for both), goals 2, 5, 7.
+* **Cost to reverse**: what holds, the campaign; two families against
+  one, a stage.
+
+## 2026-11-26 10:03 GMT. Stage 0: what "valid" means
+
+* **Decided**: `Valid Γ` is: for every phase structure `S` (Definition
+  1.14; its monoid a type in `Type`), the unit is in the
+  interpretation of the par of the formulas of `Γ`, and of ⊥ when `Γ`
+  is empty (the reading in the proof of 1.16). The interpretation of a
+  formula is U2 of the plan. Stated directly, over all phase
+  structures, sets of phases being predicates.
+* **Not taken**: a restriction to two-valued structures
+  (`reference/adopt.md` §5): the source's proofs of 1.16 and 1.17 use
+  no excluded middle that the operator can see, and the planned proofs
+  are constructive; if a proof turns out to need it, this entry is
+  reopened. Universe-polymorphic structures: soundness would be
+  stronger and completeness the same; not needed by any goal.
+* **Why, and the screen**: `plan.md`, "Screened": 21 sequents over the
+  cyclic groups of order at most 4.
+* **Rests on it**: goals 1, 2, 7, 11.
+* **Cost to reverse**: the campaign.
+
+## 2026-11-26 10:03 GMT. Stage 0: the axiom policy, and its first cost
+
+* **Decided**: every theory file within `[propext, Quot.sound]`.
+* **Its cost, found in scratch**: core Lean's instance that decides
+  `List.Perm`, and its lemmas `perm_cons_erase`, `Perm.erase`,
+  `cons_perm_iff_perm_erase`, use `Classical.choice` on v4.31.0. The
+  campaign writes its own (a file `Perm.lean`: permutations by
+  counting, after `calculi/GLS/GLS/Structural.lean`).
+* **Cost to reverse**: the campaign (to tighten); little (to loosen).
+
+## 2026-11-26 10:03 GMT. Stage 0: which results are goals
+
+* **Decided**: the eleven goals of `plan.md`, in its order. By rule:
+  soundness, completeness, cut elimination, the finite model property.
+  Decided by the operator: exchange with heights; identity expansion;
+  the inversions of ⅋, ⊥, &; decidability; weakening and contraction
+  REFUTED; the disjunction property for ⊕ (no source read for it); the
+  subformula property.
+* **Not goals**: PSPACE-completeness; proof nets and their
+  normalisation and confluence (standing entries 4 and 5: they hold of
+  the logic, for another system); the semantic equations as statements
+  about facts.
+* **The form of cut elimination**: a function `Fam Γ → CF Γ`, by
+  structural recursion on a bound of the size of the cut formula and
+  then on the derivations. The task expected "size of the cut formula,
+  then heights": since no rule duplicates a derivation, the two
+  derivations themselves serve, and no sum of heights is needed. The
+  semantic route (Lafont's Theorem 1) is a second proof, of the
+  proposition.
+* **Cost to reverse**: a stage.
+
+## Stops
+
+*Each time a turn ended to wait for the reviewer. None so far.*
+
+| date | what was asked, and why only the reviewer can answer it | what went on meanwhile | the answer, in the reviewer's words |
+|---|---|---|---|

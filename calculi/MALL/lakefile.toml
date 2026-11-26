@@ -1,0 +1,13 @@
+name = "mall"
+defaultTargets = ["MALL"]
+
+[leanOptions]
+autoImplicit = false
+
+[[require]]
+name = "proof-tools"
+path = "../.."
+
+[[lean_lib]]
+name = "MALL"
+globs = ["MALL", "MALL.+"]
