@@ -109,6 +109,9 @@ Code (no bound; nothing in it is trusted):
 * `MALL/Lazy.lean`: the search by lazy splitting.
 * `MALL/Refute.lean`: the producer of saturated sets; the structure of
   a set computed by tables.
+* `MALL/Parse.lean`: a sequent read from text, and written with the
+  signs of a keyboard, for `mallrun prove`; `Corpus/prove_corpus.py`
+  runs the command on the corpus.
 * `MALL/Explore.lean`: tactics of the calculus; `explain`.
 * `MALL/Screen.lean`: the phase semantics evaluated over small cyclic
   groups, as a screen.
@@ -118,5 +121,5 @@ Code (no bound; nothing in it is trusted):
 * Tests: `MALL/Test.lean`, `DecideTest.lean`, `CutTest.lean`,
   `RunTest.lean`, `ModelTest.lean`, `ExploreTest.lean`, `SatTest.lean`,
   `TutorialTest.lean`, `TutorialPins.lean` (generated), `CraigTest.lean`,
-  `UniformTest.lean`.
+  `UniformTest.lean`, `ParseTest.lean`.
 * In no library: `Play/MALL.lean` (exercises), `Play/MALLTutorial.lean`.

@@ -38,3 +38,5 @@ import MALL.CraigTest
 import MALL.Uniform
 import MALL.UniformTest
 import MALL.UniformLyndon
+import MALL.Parse
+import MALL.ParseTest

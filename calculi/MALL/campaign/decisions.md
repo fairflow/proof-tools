@@ -511,6 +511,29 @@ the argument, and attributes it.
   interpolants of a formula have their properties by name.
 * **Cost to reverse**: none: it adds a statement.
 
+## 2026-11-26 22:24 GMT. `mallrun prove`: a sequent typed at a shell
+
+* **Whose task**: the directing session's ("Calculus campaign manager"),
+  under the organisation of the round since 2026-11-26: one directing
+  session, one owner session for each calculus; this session owns
+  `calculi/MALL/**`, and the skill and the shared libraries are changed
+  by the directing session only.
+* **Decided**: (a) the signs of a keyboard: `*` ⊗, `|` (or `par`) ⅋,
+  `&`, `+` ⊕, `-o` ⊸, `^` after a formula and `~` before one for the
+  dual, `1`, `bot`, `top` (or `T`), `0`; the letters `p q r s`, `a4`, …;
+  (b) a two-sided text is taken and read one-sided, its left formulas
+  negated; (c) `⊥` is the unit where a formula is expected and the dual
+  after one; (d) two searches side by side, the first certificate wins;
+  the "no" side is a cyclic phase structure where one is found, and
+  otherwise a saturated set; (e) every printed file lifts Lean's two
+  limits; (f) a flag is the deadline (10 s if not given), or a defect.
+* **Not taken**: `@`, `#` or `%` for ⅋ (none is in use for it; `|` reads
+  as "or", which ⅋ is, and `|-` is cut off first as the turnstile); the
+  proved search as the only one (it is the slowest of the three);
+  refusing a two-sided text.
+* **Cost to reverse**: little; the signs, once people type them, a
+  little more.
+
 ## Stops
 
 *Each time a turn ended to wait for the reviewer. None so far.*

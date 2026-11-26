@@ -202,6 +202,73 @@ a note says where a choice made here would, or would not, carry over.
     derivability with cut makes each of them a cut against a derivation
     of two lines.
 
+## A sequent typed at a shell (a task from the directing session)
+
+29. **`mallrun prove`, built from the paragraph "A judgment typed at a
+    shell"** (`reference/certify.md` §5, as it stood at `0e83910`). The
+    paragraph was enough to build from. What it does not say, and what
+    MALL needed that neither instance gave a model for:
+
+    (a) *A sign the calculus prints that is two things.* The paragraph
+    speaks of a sign of the keyboard that is also a bracket. Here it is
+    the source's own `⊥`: the unit, and the dual after a letter (`p⊥`),
+    both written by the first printer. Settled by place: the unit where
+    a formula is expected, the dual after one; `bot` and `^` are one
+    thing each; each case guarded. *Proposed*: "a sign that is two
+    things", whoever prints it.
+
+    (b) *A calculus with one side.* Nothing says whether a two-sided
+    text is taken. It is: `A, B |- C` is read as `⊢ A⊥, B⊥, C`, and the
+    first line shows the one-sided sequent, which the guide says. The
+    converse case will come up for a two-sided calculus given a
+    one-sided text.
+
+    (c) *Two searches, neither good on the other's inputs.* The
+    paragraph says "the search". Here the fast search for a derivation
+    is exponential where there is none, and the producers of
+    refutations are exponential where there is one. They run as two
+    tasks, and the first certificate wins. A flag is then one of three
+    things, not two: the deadline; a certificate the compiled check
+    refused; or both searches ended and disagree. The last two were
+    never seen. *Proposed*: say "the searches", and name the third.
+
+    (d) *Several certificates on one side.* The "no" side has a cyclic
+    phase structure (small, found for 14 of the 15 non-theorems of the
+    corpus) and a saturated set (always exists, can be large). The
+    first line does not say which was used; the script counts them.
+    A set of 238 sequents is printed in 0.06 s, and the kernel's check
+    of it was stopped by the cap of 8 GB after 36 s: an answer can be
+    printed that the kernel does not check. *Proposed*: say what the
+    command does when its own certificate is beyond the kernel (here: a
+    comment in the file above 100 sequents, and the guide says so; the
+    verdict line is unchanged, which is the weak point).
+
+    (e) *"State each from the one certificate."* With the default
+    argument of `Certifier.verdict` each fact runs the kernel's check
+    again. Here the check is a named theorem (`checks`, `refutes`,
+    `refuted`), proved once and passed to each verdict. *Proposed*: say
+    so.
+
+    (f) *"At least for a large answer."* The two options are now in
+    every file. With a threshold on the size of the sequent and the
+    certificate, a file was printed that Lean refused ("maximum
+    recursion depth has been reached"): a sequent of nine formulas with
+    a letter numbered 92, whose phase structure lists 93 sets. The size
+    that matters was not one the threshold looked at. *Proposed*:
+    "always", and drop the threshold.
+
+    (g) *The script's deadline.* K's `prove_corpus.py` ends a run with
+    `subprocess.run(timeout=…)`, which ends `lake` and not the `lean`
+    under it. Here each run is a process group of its own and the group
+    is ended. *Proposed*: change the model, since the paragraph on
+    measuring asks for it.
+
+    (h) *A flag that is reproducible.* The paragraph asks that it be
+    said whether a flag was ever seen. One was, and can be made at
+    will: `chain 3` with the converse of half-distributivity on other
+    letters (seven formulas) is answered in 25 s by a set of
+    3 347 sequents, and flags at the default deadline of 10 s.
+
 ## For phase 2 (dual intuitionistic linear logic)
 
 * The linear zone: this campaign's form (a variable conclusion, a

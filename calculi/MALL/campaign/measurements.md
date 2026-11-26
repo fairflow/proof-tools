@@ -162,6 +162,42 @@ the whole set, so it is quadratic in the set. On these two families the
 cyclic structures are the certificate to use (130 formulas in about a
 second, above).
 
+## `mallrun prove`
+
+Added 2026-11-26. `Corpus/prove_corpus.py --elaborate`: each of the 38
+entries of the corpus given to the command three times (the source's
+notation, Lean source, the signs of a keyboard), and the printed file
+elaborated under `lake env lean -M 8000` with a deadline of 60 s that
+ends the process group.
+
+| | |
+|---|---|
+| by verdict | derivable 23, not derivable 15, flag 0 |
+| by certificate | a tree of moves 23, a cyclic phase structure 14, a saturated set 1 |
+| disagreeing with the recorded status, or the three texts answered differently | 0 |
+| printed files not elaborated | 0 of 38 |
+
+Beyond the corpus (the command under `--deadline=5` or 60; the file
+under the same cap, deadline 150 s):
+
+| the sequent | the answer | found in | the file elaborated |
+|---|---|---|---|
+| `chain 64`, 66 formulas | derivable, a tree | 0.03 s | 3.7 s |
+| `fan 32` | derivable, a tree | 0.03 s | 1.9 s |
+| `withTree 8` | derivable, a tree | 0.04 s | 1.5 s |
+| `chainBad 64` | not derivable, a cyclic structure | 0.04 s | 1.4 s |
+| `chainBad 10` and the converse of half-distributivity on other letters | not derivable, a cyclic structure | 0.03 s | 1.1 s |
+| `chain 1` and the same, 5 formulas | not derivable, a set of 238 | 0.06 s | **no**: stopped at 8 GB after 36 s |
+| `chain 2` and the same, 6 formulas | not derivable, a set of 947 | 0.91 s | not run |
+| `chain 3` and the same, 7 formulas | not derivable, a set of 3 347 | 24.8 s; **flag** at 5 s and at the default 10 s | not run |
+| `chain 10` and the same | flag at 5 s | | |
+
+So the answers the kernel checks are: every derivation tried; every
+cyclic structure tried; a saturated set to about a hundred sequents (86
+in 3.4 s, above; 238 not within 8 GB). A sequent with a derivable part
+that has many ⊗ and a part with no small cyclic countermodel is where
+the command prints a file that is not checked, or flags.
+
 ## What the measurements say
 
 * **The proved search is exponential on every family with ⊗.** It tries

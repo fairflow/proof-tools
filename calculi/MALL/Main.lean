@@ -15,6 +15,22 @@
                                        Lean file with the fact
     mallrun countermodel <name>        an entry of the corpus: its saturated
                                        set and the structure, described
+    mallrun prove '<sequent>'          a sequent typed at a shell: the verdict
+                                       and the sequent as it was read, then a
+                                       Lean file that states the fact with its
+                                       certificate.  `--short`: the first line
+                                       only.  `--ascii`: the sequent in it with
+                                       the signs of a keyboard.
+                                       `--deadline=N`: seconds, 10 if not
+                                       given.  Exit code 0 derivable, 1 not
+                                       derivable, 3 flag, 2 a text that is not
+                                       a sequent
+    mallrun corpus                     the corpus as texts: name, status, the
+                                       sequent in the source's notation, as
+                                       Lean source, and with the signs of a
+                                       keyboard
+    mallrun show <family> <n>          a member of a family, with the signs of
+                                       a keyboard
 
 `<producer>` is `lazy` (the search by lazy splitting) or `search` (the
 proved search).  Not trusted.  What it prints is checked by the kernel
@@ -23,6 +39,7 @@ when the file it wrote is elaborated.
 import MALL.Corpus.Basic
 import MALL.ModelRun
 import MALL.Refute
+import MALL.Parse
 
 open MALL MALL.Corpus ProofTools ProofTools.Explore
 
@@ -75,6 +92,200 @@ open MALL MALL.Corpus
 
 "
 
+/-! ## A sequent typed at a shell -/
+
+/-- What the searches found for a sequent. -/
+inductive Found where
+  /-- A tree of moves that `treeCert` accepts. -/
+  | tree (c : Cert S)
+  /-- A phase structure on a cyclic group in which the sequent does not
+  hold. -/
+  | model (z : ZModel)
+  /-- A saturated set of sequents of which the sequent is a member. -/
+  | set (D : List (List Form))
+  /-- A certificate that the compiled check refused: a defect of the
+  program. -/
+  | defect (why : String)
+
+/-- The "no" side: a small cyclic structure where the producer has one,
+and otherwise the saturated set of the memoised search; `none` where that
+search says the sequent is derivable.  Each certificate is checked here
+before it is handed on. -/
+def refuteSide (Γ : List Form) : Option Found :=
+  match refuteBy Γ with
+  | some z =>
+    if z.refutes Γ then some (.model z)
+    else some (.defect "the phase structure found does not refute the sequent")
+  | none =>
+    match refuteSet Γ with
+    | some D =>
+      if refutedBy D Γ then some (.set D)
+      else some (.defect "the set of sequents found did not pass the check of saturation")
+    | none => none
+
+/-- Lean's two limits, lifted in every file the command prints: nobody
+adds an option to a file made at a shell.  Seen without them: a phase
+structure for a sequent with a letter numbered 92 (a list of 93 sets) was
+refused with "maximum recursion depth has been reached", though the
+sequent had nine formulas; so the size of the sequent is no guide to
+whether they are needed. -/
+def liftLimits : String := "
+-- Lean's limits on the depth of recursion and on its own work are lifted
+-- for this file: its terms can be large.
+set_option maxRecDepth 1000000
+set_option maxHeartbeats 0
+"
+
+/-- The head of the file `mallrun prove` prints, after its first line:
+the imports, and a name for each of the letters `p q r s` that the
+sequent has. -/
+def proveHead (Γ : List Form) : String :=
+  let names := ((List.range 4).filter fun n => (lettersL Γ).contains n).map fun n =>
+    s!"abbrev {letterName n} : Form := .atom {n}\n"
+  "/-
+Written by `mallrun prove` (`Main.lean`) for a sequent typed at a shell.
+The program is not trusted.  The kernel checks the certificate below when
+this file is elaborated, in `calculi/MALL`: `lake env lean <file>`.
+-/
+import MALL.Run
+import MALL.ModelRun
+import MALL.SatRun
+
+namespace MALL.Answer
+
+open MALL
+
+" ++ String.join names ++ liftLimits ++ s!"
+/-- The sequent, as it was read. -/
+def sequent : List Form := {srcForms Γ}
+"
+
+def proveFoot : String :=
+  "\nend MALL.Answer\n\n#axioms_within_file [propext, Quot.sound]\n"
+
+/-- The answer for what was found: the exit code, the verdict, and the
+rest of the file. -/
+def answerOf (Γ : List Form) : Found → UInt32 × String × String
+  | .tree c =>
+    (0, "derivable", proveHead Γ ++ s!"
+/-- A tree of moves: each node a rule with its principal formula, and for
+⊗ the context of its first premise. -/
+def tree : ProofTools.Explore.Cert S :=
+  {showRepr c}
+
+/-- The kernel runs each move of the tree. -/
+theorem checks : treeCert.check sequent tree = true := by decide +kernel
+
+/-- A derivation of the sequent. -/
+def proof : Fam sequent := treeCert.verdict sequent tree checks
+
+theorem derivable : Derivable sequent := ⟨proof⟩
+
+/-- By soundness: the sequent holds in every phase structure. -/
+theorem valid : Valid sequent := soundness sequent derivable
+" ++ proveFoot)
+  | .model z =>
+    (1, "not derivable", proveHead Γ ++ s!"
+/-- A phase structure on the cyclic group ℤ/(k+1): the number `k`, the
+antiphases, and for each letter a set of phases whose closure is its
+fact. -/
+def countermodel : ZModel :=
+  {showFlat z}
+
+/-- The kernel computes the interpretation of the sequent in the
+structure: the unit is not in it. -/
+theorem refutes : countermodel.refutes sequent = true := by decide +kernel
+
+theorem notValid : ¬ Valid sequent := noValidBy.verdict sequent countermodel refutes
+
+/-- By soundness. -/
+theorem notDerivable : ¬ Derivable sequent := noDerivableBy.verdict sequent countermodel refutes
+" ++ proveFoot)
+  | .set D =>
+    let warn := if D.length > 100 then s!"
+-- The set below has {D.length} sequents.  The kernel's check of a set grows
+-- fast with its size: one of 86 was checked in 3.4 s, and the check of one
+-- of 238 was stopped at 8 GB of memory.  This file may not be checked.
+" else ""
+    (1, "not derivable", proveHead Γ ++ warn ++ s!"
+/-- A saturated set of sequents of which the sequent is a member: every
+rule that could conclude a member has a premise in the set. -/
+def refutation : List (List Form) :=
+  {showFlat D}
+
+/-- The kernel checks the membership and the saturation. -/
+theorem refuted : refutedBy refutation sequent = true := by decide +kernel
+
+theorem notDerivable : ¬ Derivable sequent := noDerivableBySet.verdict sequent refutation refuted
+
+theorem notValid : ¬ Valid sequent := noValidBySet.verdict sequent refutation refuted
+
+/-- The set presents a finite phase structure in which the sequent does
+not hold. -/
+theorem countermodel : ∃ S : PhaseStructure, S.Finite ∧ ¬ S.Sat sequent :=
+  countermodel_of_refutedBy refuted
+" ++ proveFoot)
+  | .defect why => (3, "flag", s!"-- {why}: a defect of `mallrun`\n")
+
+/-- `mallrun prove`: the arguments after the word.  The text is the
+arguments that are not options, joined by spaces.
+
+Two searches run side by side: the search by lazy splitting, for a
+derivation; and the "no" side.  The first that answers with a
+certificate gives the verdict.  A flag: neither answered within the
+deadline; or both ended and disagree, or a certificate did not pass the
+compiled check, which would be defects. -/
+partial def prove (args : List String) : IO UInt32 := do
+  let usage := "usage: mallrun prove [--short] [--ascii] [--deadline=N] '<sequent>'    \
+e.g.  mallrun prove 'p * q -o q * p'"
+  let short := args.contains "--short"
+  let ascii := args.contains "--ascii"
+  let mut secs := 10
+  for a in args do
+    if a.startsWith "--deadline=" then
+      match (a.drop 11).toString.toNat? with
+      | some n => secs := n
+      | none => IO.eprintln s!"mallrun prove: bad {a}\n{usage}"; return 2
+  let texts := args.filter fun a => !(a == "--short" || a == "--ascii" || a.startsWith "--deadline=")
+  if texts.isEmpty then
+    IO.eprintln usage
+    return 2
+  let text := " ".intercalate texts
+  match Parse.parseSeq text with
+  | .error f => IO.eprintln s!"mallrun prove: {f.report text}"; return 2
+  | .ok Γ =>
+    let shown := if ascii then asciiSeq Γ else showSeq Γ
+    let t₀ ← IO.monoMsNow
+    let yes := Task.spawn (prio := .dedicated) fun _ => proveLazy Γ
+    let no := Task.spawn (prio := .dedicated) fun _ => refuteSide Γ
+    let out ← IO.getStdout
+    let finish (found : Found) : IO UInt32 := do
+      let (code, verdict, rest) := answerOf Γ found
+      IO.println s!"-- {verdict}: {shown}"
+      unless short do IO.print rest
+      out.flush
+      -- the other search may still be running: leave without waiting for it
+      IO.Process.exit code.toUInt8
+    let rec wait : IO UInt32 := do
+      let yesDone ← IO.hasFinished yes
+      let noDone ← IO.hasFinished no
+      if yesDone then
+        if let some c := yes.get then return ← finish (.tree c)
+      if noDone then
+        if let some f := no.get then return ← finish f
+      if yesDone && noDone then
+        return ← finish (.defect "the search by lazy splitting found no derivation and the \
+memoised search says there is one")
+      if (← IO.monoMsNow) - t₀ ≥ secs * 1000 then
+        IO.println s!"-- flag: {shown}"
+        unless short do
+          IO.println s!"-- no answer within {secs} s; a longer deadline: --deadline=N, in seconds"
+        out.flush
+        IO.Process.exit 3
+      IO.sleep 5
+      wait
+    wait
+
 def produceBy (prod : String) (Γ : List Form) : Option (Cert S) :=
   if prod == "lazy" then proveLazy Γ else proveSearch Γ
 
@@ -86,6 +297,15 @@ def main (args : List String) : IO UInt32 := do
       IO.println (fact e.name e.src e.seq)
     IO.println "end MALL.Corpus.Facts\n\n#axioms_within_file [propext, Quot.sound]"
     return 0
+  | "prove" :: rest => prove rest
+  | ["corpus"] =>
+    for e in entries do
+      IO.println s!"{e.name}\t{if e.derivable then "derivable" else "not derivable"}\t{showSeq e.seq}\t{srcForms e.seq}\t{asciiSeq e.seq}"
+    return 0
+  | ["show", fam, n] =>
+    match family fam n.toNat! with
+    | none => IO.eprintln s!"no family {fam}"; return 2
+    | some (Γ, _) => IO.println (asciiSeq Γ); return 0
   | ["status"] =>
     for e in entries do
       let lz := proveLazy e.seq
@@ -160,5 +380,5 @@ def main (args : List String) : IO UInt32 := do
         | none => pure ()
       return 0
   | _ =>
-    IO.eprintln "usage: mallrun facts | status | run <producer> <family> <n> | cert <producer> <family> <n> | model <family> <n> | refute <family> <n> | countermodel <name>"
+    IO.eprintln "usage: mallrun facts | status | run <producer> <family> <n> | cert <producer> <family> <n> | model <family> <n> | refute <family> <n> | countermodel <name> | prove [options] '<sequent>' | corpus | show <family> <n>"
     return 2

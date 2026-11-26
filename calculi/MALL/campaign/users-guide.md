@@ -108,6 +108,57 @@ i`, `up`, `left`, `right`, `top`, `goal k`); a block `example : Walk d
 | `(craigInterpolation Γ Δ d).C` | the interpolant of `⊢ Γ, Δ` computed from a derivation without cut `d : CF (Γ ++ Δ)`; the fields `.left`, `.right` are the two derivations | yes: a function proved by its type |
 | `forallP p A`, `existsP p A`, `ui p Γ` | the uniform interpolants for the letter numbered `p`: the weakest formula without it that implies `A`, the strongest that `A` implies | yes: `ui_spec`. The kernel computes them (`by decide +kernel`) |
 
+## A sequent typed at a shell
+
+With no Lean file open:
+
+    (cd ~/Lean/Sources/proof-tools/calculi/MALL && lake build mallrun)
+    (cd ~/Lean/Sources/proof-tools/calculi/MALL && .lake/build/bin/mallrun prove 'p * q -o q * p')
+
+The first line of the answer is a comment: the verdict, `derivable`,
+`not derivable` or `flag`, and the sequent as it was read. After it comes
+a Lean file that states the fact with its certificate; saved in
+`calculi/MALL` and given to `lake env lean`, it is checked by the kernel.
+
+| you type | it is |
+|---|---|
+| `p q r s`, `a4`, `a5`, … | the letters (`a0` is `p`) |
+| `A^`, `A⊥`, `Aᗮ` after a formula; `~A` before one | the dual of `A` |
+| `1`, `bot`, `top` (or `T`), `0` | the units 1, ⊥, ⊤, 0 |
+| `A * B`, `A \| B` (or `A par B`), `A & B`, `A + B` | ⊗, ⅋, &, ⊕ |
+| `A -o B` | `A ⊸ B`, which is `A⊥ ⅋ B` |
+| `A, B` or `\|- A, B` | the sequent `⊢ A, B` |
+| `A, B \|- C, D` | two-sided: read as `⊢ A⊥, B⊥, C, D` |
+
+The signs the calculus prints (`⊗ ⅋ ⊕ ⊸ ⊤ ⊥ 𝟏 𝟎 ⊢`) and Lean's list
+`[A, B]` are read as well. ⊗ binds tighter than &, & than ⅋, ⅋ than ⊕,
+and ⊸ least; each groups to the right, as in Lean.
+
+Three things to know:
+
+* **The first line shows what was computed, not what was typed.** The
+  dual and ⊸ are functions: `~(p * q)` is shown as `p⊥ ⅋ q⊥`, and
+  `p * q -o q * p` as `(p⊥ ⅋ q⊥) ⅋ (q ⊗ p)`. A two-sided text is shown
+  one-sided, its left formulas negated.
+* **`⊥` is the unit where a formula is expected and the dual after
+  one**: `⊥ ⅋ p` has the unit, `p⊥` is the dual of `p`, `⊥⊥` is 1. On a
+  keyboard `bot` is the unit only and `^` the dual only.
+* **The "no" side** is a phase structure on a small cyclic group where
+  one is found, and otherwise a saturated set of sequents. Either gives
+  `¬ Derivable` and `¬ Valid`. A set can be large, and then the kernel
+  may not check the file: a set of 86 sequents was checked in 3.4 s, and
+  the check of one of 238 was stopped at 8 GB of memory. Above 100
+  sequents the file says so in a comment. The verdict in the first line
+  is the program's, which is not trusted; the fact is the file's.
+
+Options: `--short`, the first line only; `--ascii`, the sequent in it
+with the signs of a keyboard; `--deadline=N`, seconds, 10 if not given.
+The exit code is 0 for derivable, 1 for not derivable, 3 for a flag and
+2 for a text that is not a sequent, which is refused on the error stream
+with the place of the fault. The logic is decidable, so a flag is a
+search cut off at the deadline: a sequent with no derivation, many ⊗,
+and no small countermodel. `mallrun corpus` lists the corpus as texts.
+
 ## Out to the mathematics
 
 `famOfDer d : Fam Γ` is the derivation of the calculus as the source
