@@ -8,6 +8,8 @@ import DILL.Goals
 import DILL.ILL
 import DILL.Invert
 import DILL.Lazy
+import DILL.Parse
+import DILL.ParseTest
 import DILL.Perm
 import DILL.Proof
 import DILL.Refute

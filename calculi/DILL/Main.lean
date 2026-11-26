@@ -18,6 +18,17 @@
                                         the kernel runs the proved search of
                                         `DILL/Decide.lean`
 
+    dillrun prove [--ascii] [--short] [--budget=<n>] '<sequent>'
+                                        a sequent typed in (the syntax is in
+                                        `DILL/Parse.lean`: `. ; p, p -o q => q`):
+                                        `derivable` with its tree, `not
+                                        derivable` with a saturated set, or
+                                        `flag`.  What is printed is a Lean
+                                        file, for the kernel to check; with
+                                        `--short` the first line only.  The
+                                        exit code is 0, 1 or 3 for the three
+                                        answers, 2 for a text not read
+
     dillrun fuzz <count> <size> <seed> [<budget>]
                                         a test of the search itself: <count>
                                         sequents made at random, of at most
@@ -37,6 +48,8 @@ the search is for the "yes" side only.
 -/
 import DILL.Corpus.Basic
 import DILL.Decide
+import DILL.Refute
+import DILL.Parse
 
 open DILL DILL.Run DILL.Corpus ProofTools ProofTools.Explore
 
@@ -171,8 +184,70 @@ def genSeq (bd seed : Nat) : Seq × Nat :=
     (A :: acc.1, seed)) ([], seed)
   (unr ⨾ lin ⟹ goal, seed)
 
+/-! ## A sequent typed in -/
+
+/-- The fact that a tree gives, as a Lean file. -/
+def proveYes (j : Seq) (c : Cert S) : String :=
+  "import DILL.Corpus.Basic\nopen DILL DILL.Corpus ProofTools.Explore\n\n" ++
+  "set_option maxRecDepth 100000 in\n" ++
+  s!"example : Fam true ({seqSrc j}) :=\n  treeCert.verdict _ ({certSrc c})"
+
+/-- The fact that a saturated set gives, as a Lean file. -/
+def proveNo (j : Seq) (D : List Seq) : String :=
+  "import DILL.SatRun\nopen DILL\n" ++
+  "abbrev p : Form := .atom 0\nabbrev q : Form := .atom 1\n" ++
+  "abbrev r : Form := .atom 2\nabbrev s : Form := .atom 3\n\n" ++
+  "set_option maxRecDepth 100000 in\n" ++
+  s!"example : Derivable ({Refute.srcSeq j}) → False :=\n  noDerivableBySet.verdict _\n    [" ++
+  ",\n     ".intercalate (D.map Refute.srcSeq) ++ "]"
+
+/-- `dillrun prove`: the answer for a sequent typed in. -/
+def prove (args : List String) : IO UInt32 := do
+  let ascii := args.contains "--ascii"
+  let short := args.contains "--short"
+  let maxB := match args.find? (·.startsWith "--budget=") with
+    | some a => (a.drop 9).toNat!
+    | none => 4
+  let text := " ".intercalate (args.filter fun a => !a.startsWith "--")
+  if text.all Char.isWhitespace then
+    IO.eprintln "usage: dillrun prove [--ascii] [--short] [--budget=<n>] '<sequent>'    e.g.  dillrun prove '. ; p, p -o q => q'"
+    return 2
+  match Parse.seq text with
+  | .error e => IO.eprintln s!"not read: {e}"; return 2
+  | .ok j =>
+    let shown := if ascii then Parse.asciiSeq j else showSeq j
+    let f := find (cfgOf "focus" 200000) j maxB
+    match f.tree with
+    | some (b, c) =>
+      IO.println s!"-- derivable: {shown}"
+      if !short then
+        IO.println s!"-- A derivation of {certSize c} moves, found with {b} copies allowed along a branch."
+        IO.println "-- This text is a Lean file: the kernel checks the derivation when it is elaborated."
+        IO.println (proveYes j c)
+      return 0
+    | none =>
+      let searched := (cell f maxB).replace "flag: " ""
+      let flag (why : String) : IO UInt32 := do
+        IO.println s!"-- flag: {shown}"
+        if !short then
+          IO.println s!"-- The search for a derivation: {searched}."
+          IO.println s!"-- No certificate that there is none: {why}."
+        return 3
+      match Refute.outcome j with
+      | .refuted D =>
+        IO.println s!"-- not derivable: {shown}"
+        if !short then
+          IO.println s!"-- A saturated set of {D.length} sequents of which it is a member."
+          IO.println "-- This text is a Lean file: the kernel checks the set when it is elaborated."
+          IO.println (proveNo j D)
+        return 1
+      | .noSet why => flag why
+      | .derivable => flag "the search for a set met a derivation, of which it keeps no tree; a larger --budget may find it"
+      | .defect _ => flag "DEFECT: the set that was made does not check"
+
 def main (args : List String) : IO UInt32 := do
   match args with
+  | "prove" :: rest => prove rest
   | "status" :: rest =>
     let maxB := natArg rest 0 4
     let cap := natArg rest 1 200000
@@ -316,5 +391,5 @@ def main (args : List String) : IO UInt32 := do
         | none => pure ()
       return 0
   | _ =>
-    IO.eprintln "usage: dillrun status [<budget> [<cap>]] | facts [<budget> [<cap>]] | tree <name> [<budget>] | run <mode> <family> <n> <budget> | cert <mode> <family> <n> <budget> | fuzz <count> <size> <seed> [<budget>]"
+    IO.eprintln "usage: dillrun prove [--ascii] [--short] [--budget=<n>] '<sequent>' | status [<budget> [<cap>]] | facts [<budget> [<cap>]] | tree <name> [<budget>] | run <mode> <family> <n> <budget> | cert <mode> <family> <n> <budget> | fuzz <count> <size> <seed> [<budget>]"
     return 2

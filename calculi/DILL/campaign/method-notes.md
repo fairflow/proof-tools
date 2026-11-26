@@ -222,3 +222,19 @@ what was done there. Kept to what would change that text.
     that is on `main`. *Proposed*: "commit the Lean and push it, then
     run `write`, then commit the page": where several sessions push to
     one branch, a link may name only a commit that is already there.
+21. **A sequent typed at a shell** (2026-11-26 21:18 GMT, after the
+    campaign closed; by the session that started it, on the reviewer's
+    remark that a prover at the command line would be useful). The four
+    runners (`ksearch`, `glsrun`, `mallrun`, `dillrun`) answered only
+    for their own corpus and families: none read a judgment from text.
+    *Done*: `dillrun prove '<sequent>'` (`DILL/Parse.lean`, `Main.lean`;
+    the user's guide, "From the command line"). It prints `derivable`
+    with the tree, `not derivable` with a saturated set, or `flag`, as a
+    Lean file that the kernel checks, and exits 0, 1 or 3 (2 for a text
+    not read). The reader is tested by reading back all 56 entries of
+    the corpus from both printers (`DILL/ParseTest.lean`); the command,
+    run on the 56, gives 39 derivable, 13 not derivable with a set and 4
+    flags, none against the status; three printed files were elaborated,
+    and one with a move altered was refused. *Done in the skill*:
+    `reference/certify.md` §5 names the command as the third way to
+    splice. Not done: the same command for K, GLS and MALL.

@@ -172,6 +172,41 @@ Shankar 1992, Corollary 3.8), so there is no line of this table that
 always answers. Measured sizes and times are in `measurements.md` and
 `measurements-sat.md`.
 
+## From the command line
+
+`dillrun prove '<sequent>'` answers for a sequent typed at a shell, with
+no Lean file written first (build it with `lake build dillrun`; the
+program is `.lake/build/bin/dillrun`):
+
+    dillrun prove '. ; p, p -o q => q'
+    dillrun prove '!p, !(p -o q) => !q'
+    dillrun prove --short 'p => p * p'
+
+The text has the signs of a keyboard: `*` for ⊗, `-o` for ⊸, `+` for ⊕,
+`&`, `!`, `1`, `0`, `T` for ⊤, `=>` for ⟹, `.` for an empty zone, and
+`;` between the zones (with no `;` the zone given is the linear one).
+The atoms are `p q r s`, then `a4`, `a5`, … The signs of the source are
+read too. The connectives bind as in a Lean file: `!` closest, then `*`,
+`&`, `+`, `-o`, each to the right. Quote the text: `;`, `&`, `*`, `!`
+and the parentheses mean something to a shell. The grammar is at the
+head of `DILL/Parse.lean`.
+
+| the answer | exit code | what is printed after the first line |
+|---|---|---|
+| `derivable` | 0 | a Lean file with the derivation: `treeCert.verdict _ <tree>` |
+| `not derivable` | 1 | a Lean file with a saturated set: `noDerivableBySet.verdict _ <set>` |
+| `flag` | 3 | what the search did, and why there is no set |
+| the text is not a sequent | 2 | what is wrong and at which character (on the error stream) |
+
+The program is not trusted, and neither is its first line. The Lean file
+is what the kernel checks: `dillrun prove '…' > Fact.lean`, then `lake
+env lean Fact.lean` from this folder, is silent where the answer holds.
+`--short` prints the first line only; `--ascii` writes the sequent in it
+with the signs of a keyboard (the Lean file keeps the notations of
+`DILL/Form.lean`); `--budget=<n>` is the number of copies allowed along
+a branch (4 where it is not given). The first line names the sequent
+that was read: look at it, since a text misread is another question.
+
 ## Out to the mathematics
 
 `famOfDer d : Fam true j` is the derivation of the calculus as the

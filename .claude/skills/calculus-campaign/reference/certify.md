@@ -339,6 +339,17 @@ code; its certificate has to be written into a term.
   `theorem fact_i : Derivable j_i := … .verdict j_i c_i`. Commit the
   generated file beside the program that wrote it (step 5 of
   `lean-certify`). The library has no such generator.
+- For one judgment typed at a shell: a command of the same executable,
+  `<name>run prove '<judgment>'`, that reads the judgment from text and
+  prints the answer as a Lean file (the first line a comment with the
+  verdict and the judgment as it was read, then the fact with its
+  certificate), with the exit codes of `lean-certify`'s `Cli` (0 yes,
+  1 no, 3 flag, 2 a text not read). The reader takes the signs of a
+  keyboard as well as the source's (`-o` for ⊸), and is tested by
+  reading back what the printer writes for every entry of the corpus.
+  It costs a parser of some hundred lines and is what a person who has
+  no Lean file open can use. First built for DILL (`calculi/DILL/DILL/
+  Parse.lean`, `Main.lean`); the three calculi before it have none.
 
 **The corpus.** Judgments of known status, with the status and its source:
 the paper's examples, its non-theorems, a family that grows (to find where
