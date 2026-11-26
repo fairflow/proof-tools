@@ -125,3 +125,59 @@ what was done there. Kept to what would change that text.
     session's commits and the hash changed. *Proposed*: in "The campaign
     folder": cite a commit by hash only after it is on the shared
     branch.
+
+## Stage 3
+
+12. **Measurements with no budget.** Stage 3, step 3, says "give every
+    run a deadline of its own"; nothing says how far a growing family
+    is to be taken. The agent took a chain to 96 formulas, one capped
+    case at a time, with the rest of the campaign queued behind it; the
+    reviewer asked what was being waited for, and why. *Done*: stopped,
+    and written up with the largest size settled as a lower bound.
+    *Proposed*: in stage 3, step 3, and `reference/certify.md` §5: set a
+    budget for the measurements before they start (so many sizes of
+    each family, or so many minutes in all); the closing page needs the
+    order of the frontier, and a lower bound serves; nothing waits on a
+    measurement.
+13. **A saturated set's soundness needs no model.** `reference/certify.md`
+    §3 gives the record of a failed search its soundness through the
+    syntactical model of the completeness proof. Here it is an
+    induction on a derivation without cut (a member's last rule has a
+    premise in the set), with cut elimination to reach the calculus
+    with cut: 250 lines, no semantics. With it came, proved, what the
+    certificate cannot reach (no member with a formula in the
+    unrestricted zone or `!A` in the linear one). *Proposed*: say in §3
+    that the syntactic proof is the first to try, and that the model is
+    wanted only where the countermodel itself is.
+14. **Builds side by side.** The skill gained, during this run, first
+    "one agent builds at a time" (after the machine restarted under
+    three of this campaign's agents and another session's uncapped
+    evaluation) and then its correction, in the reviewer's words:
+    "predictably the rules are now too restrictive, assuming a single
+    build at a time. That's NOT needed." Under the first form the
+    operator serialised everything for nineteen minutes. What the run
+    shows of the rule as it now stands: the look before a build is
+    cheap and was always clear after the restart (about 90% of memory
+    free with two builds running); the danger was an evaluation of
+    unknown size, and the cap (`lean -M 8000`) is the part that binds.
+
+## Every record
+
+15. **A time typed ahead of the clock, four times in one campaign**
+    (note 3, and three more: an entry "16:06" at 16:05, "built 16:24"
+    at 16:23, a set of agents' end times computed from durations and
+    first written as if read). Each was put right in the next call.
+    The cause is the same each time: a document is composed in one
+    call, and the time inside it must exist before the call. *Proposed*:
+    pitfall 11 might say it mechanically: no document is written in the
+    same call as the `date` it quotes.
+16. **Fetched sources in a scratch folder do not survive a restart.**
+    The first act says to put what is fetched in "a folder of its own";
+    the session's scratchpad was used, as MALL's campaign did, and the
+    machine's restart cleared it: the papers, the page images, the two
+    cold readers' reports. Nothing proved was lost, and the records
+    hold what the reports found, but a later check against the page
+    means fetching again. *Proposed*: the folder is a durable one
+    outside the repository (the round's shared notes folder served for
+    hand-over notes and would serve for this), and the cold readers'
+    reports are copied into the campaign folder when they come in.
