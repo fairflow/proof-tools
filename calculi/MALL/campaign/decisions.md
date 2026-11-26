@@ -388,7 +388,7 @@ the argument, and attributes it.
 * **Rests on it**: 14 facts of the corpus; S19.
 * **Cost to reverse**: little.
 
-## 2026-11-26 11:06 GMT. The closing: the remote's `main` had moved
+## 2026-11-26 11:04 GMT. The closing: the remote's `main` had moved
 
 * **Found** before the push: the remote's `main` was at `b698279`
   (one commit after `906e2fa`, by another campaign: `calculi/GLS`, ten
