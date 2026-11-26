@@ -317,3 +317,21 @@ the folder point here.*
   for `· ; !(a ⊸ b) ⟹ b`, which the tests now have. The plan's row is
   corrected with this date.
 * **Cost to reverse**: little.
+
+## 2026-11-26 16:03 GMT. A word of the reviewer, relayed: one builder at a time
+
+* **The words**: "We need a high level CLAUDE.md and even SOUL.md
+  instruction to check for memory resources and existing builds before
+  proceeding on a build. Check # of lean/lake processes running. check
+  state of VS code. Nothing too heavyweight: just don't start a big
+  build on top of several others." (relayed by the session that started
+  this one, after the machine restarted at 15:51 GMT; the skill has it
+  from commit `8285c44`, which this checkout now includes).
+* **What it is**: a command.
+* **What it changes**: from 16:03, before a build, one look at the
+  running `lean` and `lake` processes and at the free memory; one agent
+  of the campaign builds at a time (G to finish its measurements, then
+  the tutorial's agent; the operator builds between them, not beside
+  them); an evaluation of unknown size runs under `lean -M 8000`, in
+  the background, with a deadline. What the restart cost is in the cost
+  log, "Time lost". Nothing committed was lost.

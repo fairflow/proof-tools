@@ -52,6 +52,20 @@ same millisecond as the interrupt. The reviewer declined nothing and
 resumed this session at about 15:12. The survey agent went on working
 through it.
 
+From 15:51 to 16:03 GMT, twelve minutes, and the three agents' work in
+flight. The machine restarted at 15:51 (the session that started this
+one reports it, with the cause: several Lean builds at once, three of
+them this campaign's agents G, H and the tutorial's, beside an
+evaluation of another repository's that had no cap on its memory). This
+session's last command before it was the push of 15:42; its first after
+it was at 16:03. The agents had their files on disk: G's and H's Lean
+built as it stood; H's measurements were written but for one
+placeholder; G's measurements and the tutorial's last files were not.
+The scratchpad was cleared: the fetched papers, the page images, the
+cold readers' two reports and the scratch screens are gone (what they
+showed is in the plan, the rule table and the statements). From 16:03
+one agent builds at a time (the reviewer's word of that hour, relayed).
+
 ## Words of the reviewer
 
 | # | date | stage | class | the reviewer's words, in brief | what it changed |
