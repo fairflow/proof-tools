@@ -23,7 +23,16 @@ skill's stage, with anything the plan adds.>
 <Where goals are handed to an agent: each statement by its name in the
 Lean file; the tests the result must pass; the files the agent will
 write, which the operator keeps out of its commits until the agent
-reports.>
+reports; the names already taken in the calculus's namespace, or a
+namespace of the agent's own (a second `def step` compiles until both
+files are imported); the operator's design, where there is one, with
+the line "another design is welcome"; and that the agent builds by
+target, not the whole library.>
+
+<Always: "Write your files to disk early and grow them: a session can
+end under a running command, and what is only in the conversation is
+then lost. Run a long build or timing in the background, with its
+output in a file.">.
 
 ## Read, in this order
 

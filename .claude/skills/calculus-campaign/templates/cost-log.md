@@ -26,6 +26,27 @@ Where the tokens and the cost come from: <the tool's usage report, read
 by the reviewer on <date>; the transcript; "not known to the operator,
 and not filled">.
 
+Where one session runs several stages, the rows are the stages: one row
+each, "went on in the session" in the fourth column, the times from the
+status board's entries, and the lines of Lean from the stage's commits
+(`git show --stat`).
+
+## Agents
+
+One row for each agent the operator started. The environment usually
+reports an agent's duration and tokens when it ends: enter them as
+given, and "not known" otherwise.
+
+| # | stage | task, in a few words | brief | began | ended | duration, as reported | tokens, as reported | result: what was kept, what was redone |
+|---|---|---|---|---|---|---|---|---|
+
+## Time lost
+
+Where the clock ran and no work was done (a hook of the application
+that did not answer, a process that ended under a running command, a
+session idle until someone wrote): from when to when, from the session's
+record, not from memory.
+
 ## Words of the reviewer
 
 Every message from the reviewer during the campaign, classed. An

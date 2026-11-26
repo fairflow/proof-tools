@@ -24,7 +24,7 @@ meanwhile>.
 | 1. Adopt | | worked derivations as terms: <n of m>; the second transcription: <run, n differences settled / not run, why>; S2: <PROVED / OPEN> | [rule-table.md](rule-table.md), `<the theory file>`, `<the exercises file>` |
 | 2. Prove | | statements screened and read back: <n of m>; goals PROVED: <n of m>; OPEN: <n>; REFUTED: <n> | [statements.md](statements.md) |
 | 3. Run | | negative tests: <n>; the frontier: <in a line> | `measurements.md`, `<files>` |
-| 4. Explore | | the tutorial: <every line elaborated and pinned / not yet> | `<files>` |
+| 4. Explore | | the tutorial: <every line elaborated and pinned / not yet>; the tutorial page: <n pins hold, by `tutorial_pins.py check` / not yet> | `<files>` |
 
 ## Files here
 

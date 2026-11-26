@@ -66,3 +66,13 @@ step of a part already says is not repeated here.
     value a test was to pin, were written from expectation, not from
     the clock and not from Lean. Both were wrong. A time comes from
     `date`; a pinned value from Lean's output: run it, then pin it.
+    Knowing this did not prevent it: one campaign typed three such
+    values after this entry was written, each wrong, each refused by
+    the build. So as an order of work: evaluate, read the output, paste
+    it. There is then no moment at which a value is typed. The same for
+    a time told to the reviewer: from the session's record, never "at
+    about".
+12. **A document written through the shell.** A heredoc with an unquoted
+    delimiter ran the words between backticks as commands. Write a
+    document with the file tool, or under a quoted delimiter
+    (`<<'EOF'`).

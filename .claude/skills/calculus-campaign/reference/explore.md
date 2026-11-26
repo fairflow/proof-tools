@@ -110,6 +110,11 @@ inductive Move where … deriving DecidableEq, Repr, Lean.ToExpr
 - **A move names a rule by its data**: one constructor for each rule, with
   what is needed to say which instance of the rule is meant, and no more.
   Nothing a move could compute from the judgment need be in it.
+- **A move's name is not a keyword of Lean.** The tactic reads a move
+  by its name, and a line `mallmove with p q` does not parse, though
+  `Move.with` and `.with A B` are accepted. Where the source's name for
+  a rule is a keyword (`with`, `at`, `in`, `from`, `then`), rename the
+  constructor (`wth`), and enter it as a divergence of representation.
 - `Lean.ToExpr` is needed for the tactics, which write judgments and moves
   as terms. These three `deriving` lines stay within
   `[propext, Quot.sound]` (compiled, under `#axioms_within_file`).
@@ -560,6 +565,20 @@ and the theorems explained). Its link to the Lean is part of its format
   of the pins; and that the prose describing how a proof goes is a
   reading, not checked. Versions of the page for different readers
   differ in their prose and keep the same pins.
+- **A REFUTED statement is a paraphrase pin, for now.** The script's
+  statuses are PROVED and OPEN, and `#statement` on `¬ P` prints the
+  unfolding of `Not`, not `P`. So display `P` in the usual notation,
+  pin it in paraphrase to the theorem that is its negation, and say
+  under the caption that the PROVED there is of the negation, with the
+  refuting instance. (A finding about the library, 2026-11-26: a
+  status REFUTED, and `#statement` printing what is negated, would
+  make it an exact pin.)
+- **Every campaign writes the page** (`SKILL.md`, stage 4, step 3):
+  graded exercises in parts, a file of them to type in
+  (`Play/<Calculus>Exercises.lean`, in no library), and a module of the
+  library with a solution of each and every output the page quotes
+  (`<Calc>/TutorialTest.lean`). Where there are two kinds of
+  certificate, say at each which one the reader is looking at.
 
 **The user's guide**, `users-guide.md` in the campaign folder: how a goal
 reads, the moves with their rules, the lines of the tactic, the messages.

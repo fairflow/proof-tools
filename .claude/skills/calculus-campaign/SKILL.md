@@ -207,7 +207,7 @@ before the first document is written. Compiled Lean to read beside the parts:
   calculus as an inductive family), and their tests.
 
 **The worked instances** are not needed to follow this skill. There are
-three outside the library's tests:
+four outside the library's tests:
 
 - **the subframe tableau** for propositional lax logic, in
   [lax-logic-in-lean](https://github.com/fairflow/lax-logic-in-lean)
@@ -226,7 +226,13 @@ three outside the library's tests:
   2021, could not be got). Its judgments are flat. Its folder
   `campaign/` has the record in the present form: the decisions, the
   closing page (`report.md`), and a brief by which three goals were
-  handed to an agent.
+  handed to an agent;
+- **MALL**, Girard's one-sided sequent calculus for multiplicative-additive
+  linear logic, in `calculi/MALL/` of `proof-tools`: the first calculus
+  here with no weakening and no contraction (`reference/adopt.md` §3),
+  with phase semantics, two kinds of certificate against a derivation
+  (`reference/certify.md` §3), and a tutorial page in the pinned format
+  (`reference/explore.md` §11).
 
 **Status.** The three parts have been used separately. The whole, from a
 paper to an explorer, has been run once: on Brünnler's system K, on
@@ -255,8 +261,28 @@ does not:
 - rule 1 was not kept to the letter: the rules were transcribed from
   the authors' formalisation before any prose could be read, and were
   compared with the prose afterwards;
-- this text was amended after that run, from its notes, and as it now
-  stands it has not been run.
+- this text was amended after that run, from its notes.
+
+It was run a second time as rewritten on 2026-11-26, on MALL, by an
+operator that another session started from a brief. What that run
+shows:
+
+- the five stages ran in 81 minutes (09:45 to 11:06 GMT), the closing
+  page delivered, with no word of the reviewer between the start and
+  the page: 12 goals PROVED, weakening and contraction REFUTED as the
+  source says, none OPEN. Five agents were started by the operator;
+- the second transcription and the reading back again found no fault;
+  the reading back found the instances that refute weakening and
+  contraction, unprompted;
+- three pinned values were typed from expectation, each wrong, each
+  refused by the build (`reference/pitfalls.md`, 11);
+- after the page, at the reviewer's word, a complete certificate
+  against a derivation and the tutorial page were added. In that
+  stretch about two hours were lost to the application (a hook that
+  did not answer, then the process ended under a running command):
+  the campaign's cost log has the times;
+- this text was amended after that run too, from its 25 notes, and as
+  it now stands it has not been run.
 
 Where this text leaves you without an instruction, decide, and write it
 down (rules 8 and 9).
@@ -290,7 +316,12 @@ down (rules 8 and 9).
    Name in it the files the agent will write; an agent of the campaign
    works in your tree, so leave those files out of your commits until
    it reports; and build and run its result yourself before anything is
-   recorded as PROVED. End a session before the campaign is done only
+   recorded as PROVED. The lakefile's glob builds every file of the
+   folder, an agent's half-written one included: until the agents have
+   reported, build by target (`lake build <Calc>.Results`), and tell
+   each agent to do the same. Give an agent your design where you have
+   one, and say that another is welcome: an agent has kept the design
+   and bettered its central definition. End a session before the campaign is done only
    where the environment forces it: write the brief, and enter the end
    in `decisions.md` as a stop, since someone must then open a session
    with `/calculus-campaign` and the brief's path.
@@ -303,7 +334,11 @@ down (rules 8 and 9).
    board (`README.md` of the campaign folder) is true at every commit.
    Write the page as soon as the goals are settled, before anything
    that is optional: a measurement still running is added to it
-   afterwards.
+   afterwards. The goals are those of Prove and the level the plan set
+   for Run. A certifier that the first measurements show to be the
+   missing half of Run at that level is not optional: build it, then
+   write the page. What goes beyond the plan's level is optional: the
+   page first, amended afterwards.
 7. **Do not change the libraries.** If an instance seems to need a change
    to `proof-tools`, do not make it, and do not stop: it is a finding
    about the library. Record it, work round it in the campaign's own
@@ -396,7 +431,7 @@ that is refuted on the way is kept as REFUTED, and replaced (rule 3).
 | 1 | **Adopt** | the rules as an inductive family; a first explorer instance | (a), (c) | `#rules` beside the source's figure; **a second transcription** by a cold reader; the source's own derivations, as terms of the family and run through the explorer | `rule-table.md`; the exercises file |
 | 2 | **Prove** | the plan's goals, the source's soundness theorem first | (a) | each definition and statement displayed, screened, and **read back** by a cold reader, before its proof; soundness and completeness before the other goals | `statements.md`; in each theory file its bound on axioms |
 | 3 | **Run** | search and countermodel procedures, each an untrusted producer whose output a checker certifies | (b), (c) | `Holds`, the certificate and each soundness statement displayed before they are proved; a negative test of each certifier | the procedures, the corpus, the project's settings for `lean-certify` |
-| 4 | **Explore** | the explorer in full | (c) | every line of the tutorial elaborated, what it shows pinned in the tests | the tutorial, a user's guide, the closing page |
+| 4 | **Explore** | the explorer in full | (c) | every line of the tutorial elaborated, what it shows pinned in the tests; the pins of the tutorial page hold | the tutorial, the tutorial page with its exercises, a user's guide, the closing page |
 
 After stage 1 the order is not fixed: a countermodel found in Run screens a
 statement of Prove; a derivation found by hand in the explorer is the
@@ -545,7 +580,10 @@ pitfalls.
      the family, with its constructors, and cited in the table. They
      go in a test module of their own that imports the theory file
      only: the tests of step 7 import the tactic, which does not exist
-     yet;
+     yet. Where the source draws none for the fragment, take
+     derivations of what it asserts: the simplest instances of its
+     theorems, the axioms of the logic, an equation of its semantics
+     read as a sequent (`reference/explore.md` §10), each cited by page;
    - by a second transcription (`reference/adopt.md` §7): made by a
      cold reader from the source alone, compared with yours row by
      row, the comparison entered in the table.
@@ -662,9 +700,11 @@ Read `reference/explore.md` §11.
 3. The tutorial (`Play/<Calculus>Tutorial.lean`) and the user's guide.
    Elaborate every line of the tutorial, and pin in the tests what each
    step shows: a comment that says what happens is a claim, and is
-   checked like one. A tutorial page in Markdown (`tutorial.md`) shows
-   no statement typed by hand: each is a pin, printed by Lean, its status
-   computed, the page and the library held together by the build
+   checked like one. Then the tutorial page in Markdown (`tutorial.md`,
+   beside `Play/`): every campaign writes one, with graded exercises, a
+   file of them to type in, and a solution of each in the library. It
+   shows no statement typed by hand: each is a pin, printed by Lean, its
+   status computed, the page and the library held together by the build
    (`reference/explore.md` §11, "A tutorial page").
 4. The closing page (`templates/report.md`): what the campaign adopted,
    proved and runs, what is OPEN, what to read, what was decided, and

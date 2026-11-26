@@ -36,7 +36,10 @@ the folder point here.*
   pushed, and the closing page is delivered by …>.
 * **Not touched**: <…>. Only the reviewer contacts the source's authors.
 * **Told to the reviewer**: <date and time, filled from the clock after
-  the message is sent; the message, in full>.
+  the message is sent; the message, in full. Where the session was
+  started by another session and the message is part of the turn that
+  makes this commit: "in the session's output, at this commit", and the
+  message>.
 * **Before this text was read**: <what the session had read and written;
   or "nothing">.
 

@@ -124,7 +124,7 @@ statement of it.
 |---|---|---|
 | soundness and completeness for a semantics | a structure of models with a forcing relation; soundness by induction on derivations; completeness by a model construction or through a second calculus | make the model construction return data (a `Type`), since it is then the search of the Run stage |
 | cut elimination, admissible structural rules | two families, with and without the rule, or one with a parameter (§3); a measure carried by the statement; induction on it | decide how the measure is carried before the family is typed (§3). Say which form is the goal: that the rule is admissible, or a procedure that removes it. Where rules act at a place inside a judgment, §6 has the form of the proofs. Where the goal is a function on derivations, its type does not say which function was defined: say it in the statement's entry. A cut obtained from soundness and completeness ignores the two given derivations; where the source's subject is the procedure, the source's induction is the goal, and the other is a second proof |
-| a property stated of models (the finite model property) | a construction of a model with the property | return the model as data: it is then a producer of countermodels for Run |
+| a property stated of models (the finite model property) | a construction of a model with the property | return the model as data: it is then a producer of countermodels for Run. Before a model is built for completeness, ask whether the finite model is the same construction with a parameter (another congruence, another set of refuted judgments), and build it once with the parameter |
 | a result about a term calculus (normalisation, confluence) | terms, typing, and reduction as a relation: a further transcription, with a rule table of its own, checked as the first is (§7) | how binding is represented is a choice of encoding for the plan |
 | a result read off derivations (the disjunction and existence properties) | a function on derivations, or on derivations of a special form | it may need another result first (cut-free derivations, a normal form): order the goals so. With the family into `Type` what is read off is data |
 | termination, decidability | a well-founded order on judgments, and a procedure | the bound that makes the proof easy is seldom runnable: prove with it, and search without it (Run) |
@@ -166,6 +166,19 @@ no rule (the form that has kept earlier developments free of casts); or a
 list with an exchange rule added. Either is a divergence of
 representation (§4): choose one in the plan, and record it.
 
+**Where the logic has no weakening** (linear and other substructural
+calculi) the membership form is wrong: it makes weakening admissible.
+The form there is a third: every constructor concludes a variable `Ξ`
+under a hypothesis `Ξ.Perm (…)`, the source's conclusion on the right of
+it (`h : Ξ ~ A ⊗ B :: (Γ ++ Δ)`). It builds in exchange and nothing
+else, and no index of a conclusion is computed. What it costs: Lean
+infers nothing from a variable conclusion, so the constructors take
+their formulas and contexts as explicit arguments; and S2 needs its
+induction generalised over a permutation of the sequent, since `step`'s
+premises are the rule's only up to one. A calculus with two zones takes
+a form for each: this one for the zone without weakening, membership
+for the other. `calculi/MALL/MALL/System.lean` is the worked case.
+
 **No computed index in a conclusion.** In a constructor's return type
 every index must be a variable or a constructor applied to variables,
 never a function applied to something. Lean's unifier cannot invert a
@@ -203,6 +216,14 @@ replacements in the "Notation" table of the rule table: `Ξ` for `Σ`,
 `Υ` for `Π`, and `Θ` and `Φ` where more letters are needed. The capital
 `Λ` is not reserved and stays. Use the same letters in the documents, so
 that a statement reads the same in the plan and in Lean.
+
+Some of the source's signs are core Lean's own: `⊕` (sum types), `×`,
+`∘`, `→`. A scoped notation for formulas with the same sign works in
+most places. It fails in a pattern (match by constructor), and it is
+read as core's wherever an operator of a precedence between the two
+follows: `A ⊕ B :: Γ` and `A ⊕ B ∈ Γ` are read as a sum of types, and
+the error names `Sum`. Keep the source's sign, write the parentheses,
+and say so in the user's guide.
 
 **The figure's letters stay; what the encoding adds takes new ones.** A
 constructor often needs a name for a thing the figure has no letter
@@ -456,8 +477,16 @@ with `#rules`, and screen it before anything rests on it.
   known sources are the `String` functions that R4 of `lean-certify`
   lists, `omega` given a conjunction to prove (split the goal first),
   and some library lemmas about lists (`List.mem_erase_of_ne` brought it
-  in, on Lean v4.31.0; a six-line induction replaced it). `by_cases` on
-  an equation in a type with decidable equality does not.
+  in, on Lean v4.31.0; a six-line induction replaced it; so do the
+  permutation lemmas `List.isPerm_iff`, and with it core's instance
+  deciding `List.Perm` and any `by decide` of a permutation,
+  `List.perm_cons_erase`, `List.Perm.erase` and
+  `List.cons_perm_iff_perm_erase`: `calculi/MALL/MALL/Perm.lean` has
+  replacements by counting, to copy until the library has them).
+  `by_cases` on an equation in a type with decidable equality does not.
+  `omega` takes a defined function applied (`(A ⊗ B)ᗮ`) and what it
+  unfolds to (`Aᗮ ⅋ Bᗮ`) for different atoms: put a `show` with the
+  unfolded term before it.
   On Mathlib also: `tauto` and `push_neg` are classical, and `simp` can
   be, through a library lemma. Everywhere: `choose` and `Nonempty.some`
   are choice, so a construction that must return a derivation returns
@@ -567,7 +596,9 @@ read the campaign folder and the Lean.
 - *Given*: the source, by file and page: the figure, and the prose
   around it that carries side conditions; the source's definitions of
   formulas and judgments; the name of the system. The pages
-  themselves, not text extracted from them (§1). Where there is a
+  themselves, not text extracted from them (§1): a cold reader must be
+  given files it can open, so for a scan with no text layer give page
+  images (`pdftoppm -r 150 -png`). Where there is a
   published formalisation, a second cold reader may be given its file
   of definitions, with the same task.
 - *Asked*: write out each primitive rule of that system, in the
@@ -617,7 +648,12 @@ Compare what comes back with the source's item. Where they agree, write
 "read back, agrees" in the statement's entry. Where they differ, the
 difference is in the Lean, or in the reading, or is a choice you made (a
 class of models restricted, §5): settle which, and write it in the
-entry.
+entry. Two of the reader's remarks are findings even where nothing
+differs. "This is trivially true": either the encoding intends it (say
+so beside the statement, and say what does have content) or the
+statement is not the source's. "This is false, here is the instance":
+where the source says the property fails, the instance is the
+refutation to record; where it does not, the statement is wrong.
 
 **After a repair**, the check is run again on what changed, by a new
 cold reader: the first has seen the faulty version.

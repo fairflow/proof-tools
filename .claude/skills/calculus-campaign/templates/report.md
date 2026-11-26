@@ -80,9 +80,10 @@ Stated, and not asked for.
 
 * **Only the reviewer may**: <contact the source's authors about …;
   publish; push to …; or "nothing arose">.
-* **To try, at any time**: the exercises (`Play/<Calculus>.lean`) and the
-  tutorial (`Play/<Calculus>Tutorial.lean`). Every exercise was run by
-  script in the tests; no person has typed them.
+* **To try, at any time**: the exercises (`Play/<Calculus>.lean`), the
+  tutorial (`Play/<Calculus>Tutorial.lean`), and the tutorial page
+  (`tutorial.md`, with `Play/<Calculus>Exercises.lean`). Every exercise
+  was run by script in the tests; no person has typed them.
 * **To fill, if the method is to be costed**: the columns of
   `cost-log.md` that the operator cannot know (requests, tokens, cost).
 * **Words of the reviewer during the campaign**: <n, and the stops among

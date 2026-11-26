@@ -179,6 +179,41 @@ assembled from several failed attempts; in others there is no such
 reading. The library assumes none of these: how a model is found is a
 producer.
 
+**A certificate against a derivation need not be a model that the
+kernel evaluates.** Three forms have served, and an instance may have
+more than one:
+
+- *A model, evaluated*: a finite structure given as data, its
+  interpretation computed by the check. The producer of structures is
+  seldom complete. Where the kernel is to compute over a finite carrier,
+  tabulate each set once, as a list of Booleans indexed by the carrier,
+  when it is made: an evaluator by closures did not end in 120 s on
+  four elements, and the tabulated one was linear in the families
+  measured.
+- *The record of a failed search*: a finite set of judgments, saturated
+  (the judgment is a member; no member is an axiom; every rule instance
+  concluding a member has a premise in the set). The check is
+  syntactic. Where completeness is proved by a syntactical model (the
+  model built from the judgments with no derivation), the same
+  construction with the set as parameter gives the theorem that a
+  saturated set presents a model refuting its members, and the theorem
+  that the set of all small judgments with no derivation is saturated
+  makes the certificate complete. The semantics is in the theorem, not
+  in the check. Its size is the search's: measure it.
+  `calculi/MALL/MALL/Saturated.lean` is the worked case.
+- *No certificate*: where a search is proved and the kernel can run it
+  (§4), a certifier whose certificate is `Unit` and whose check is the
+  decision procedure is a certifier against what holds. An instance
+  with a proved search and no written countermodel has an engine and
+  level 3 by it.
+
+**Where derivability is not decidable**, no sound certificate against a
+derivation is complete, and level 3 is not a goal: the plan sets level
+2, the producer answers `flag` at its budget, and completeness of
+refutation is stated, if at all, for a fragment whose search space is
+finite. Say which fragment in the plan, before the Run stage is
+designed.
+
 A calculus whose derivations are disproofs is a calculus, with its own
 proof system and its own campaign. No instance has used one as the no
 side of an engine.
@@ -265,6 +300,15 @@ compare the two on a small member: a second search that is slower than
 the first there has a fault in its code (one such was a helper that
 called itself twice on each element).
 
+The fast search serves the "yes" side only: its tree is checked, and
+the proof is had. For a judgment with no derivation the kernel must
+then run the proved search, which may be the slow one (it tries each
+formula as principal, and each division of a context). So where the
+proved search is slow, the "no" side wants a certificate of its own
+(§3): this is where a finite model property, or a saturated set, pays
+in Run. Find out with the first measurements, on a family that is not
+derivable, before the closing page (rule 6).
+
 ## 5. Statements, tests, measurements
 
 **Statements first (R10).** The library's two certifiers of derivations
@@ -306,7 +350,11 @@ script that runs the cases serves), with a case that is cut off
 reported as a flag.
 
 **Measure** (R8), and put the figures in `measurements.md`, with the machine and
-the date:
+the date. A search is measured compiled, by the driver, under a
+deadline, from the first run: `#eval` runs it in the interpreter, and a
+sizing loop by `#eval` did not end in five minutes on inputs the
+compiled driver settled in milliseconds. A long timing run goes in the
+background, its output to a file.
 
 - kernel time against the size of the certificate (Lean's profiler,
   `set_option profiler true`, reports the time of each declaration);
