@@ -343,50 +343,85 @@ code; its certificate has to be written into a term.
   `<name>run prove '<judgment>'`. It is what a person with no Lean file
   open can use; what it has to do is the next paragraph.
 
-**A judgment typed at a shell** (`prove`). Two instances: DILL
-(`calculi/DILL/DILL/Parse.lean`, `Main.lean`: a flat sequent, a search
-with a budget, a saturated set on the "no" side) and Brünnler's K
-(`calculi/BrunnlerK/BrunnlerK/Parse.lean`, `Main.lean`: a judgment that
-nests, a search that always answers, a countermodel on the "no" side).
-Read the one nearer your calculus. K's method notes 72 to 74 say what a
-first wording of this paragraph left out; each line below is one of
-them.
+**A judgment typed at a shell** (`prove`). Five instances, all of
+2026-11-26: Brünnler's K (a judgment that nests, a search that always
+answers, a countermodel on the "no" side), GLS (a formula or a
+two-sided sequent, two searches, a compiled check slower than the
+kernel's), MALL (one side, two searches run together, two certificates
+on the "no" side), DILL (two zones, a budget, flags that are real
+answers); each is `<Name>/Parse.lean` with the `prove` part of
+`Main.lean`, a test file, and `Corpus/prove_corpus.py`. Read the one
+nearest your calculus. The lines below are what the owners' notes found
+missing from earlier wordings (K 72 to 75, GLS 27, MALL 29, DILL 22).
 
 - *The reader.* It takes the signs of a keyboard as well as the signs
   the calculus prints (`-o` for ⊸, `[]` for □), and binds the
-  connectives as the notations of the Lean file do. Where a sign of the
-  keyboard is also a bracket of the judgment (`[]` in a nested
-  sequent), say how the two are told apart and guard each case. A text
-  that is not a judgment is refused on the error stream, with nothing
-  on the standard output: what was expected, and the place, counted
-  from character 1, with a mark under it.
+  connectives as the notations of the Lean file do (test it: the
+  reader and Lean agree on texts with no parentheses). Where a sign is
+  two things, whoever prints it (`[]` as □ and as an empty box; ⊥ as a
+  unit and as the dual after a letter), say how they are told apart and
+  guard each case. Say what an abbreviated or differently sided text
+  is read as, and show the result in the first line: one formula with
+  no turnstile; a two-sided text for a one-sided calculus. A text that
+  is not a judgment is refused on the error stream, with nothing on the
+  standard output: what was expected, and the place, counted from
+  character 1, with a mark under it. The refusal of a letter names the
+  letters the reader takes: the five readers do not yet agree on them
+  (K takes `a`, `b`; the others `p q r s` and a numbered family).
 - *The printers, and two tests.* The first line shows the judgment in
   the calculus's notation; the fact is stated of the judgment as Lean
   source. So there are at least two printers (three with `--ascii`),
   and two directions to test for every entry of the corpus: the reader
   reads back what each printer writes; and Lean itself reads the
-  Lean-source text as the judgment it was written from (K's
-  `leanReads`, `Test/Parse.lean`). The second is not implied by the
-  first. Where the reader computes (a negation that is a function, an
-  implication that is defined), the first line shows the result and
-  not the text typed: the user's guide says so, or it looks like a
-  misreading.
+  Lean-source text as the judgment it was written from (`leanReads` in
+  each test file). The second is not implied by the first. Where the
+  reader computes (a negation that is a function, an implication that
+  is defined), the first line shows the result and not the text typed:
+  the user's guide says so, or it looks like a misreading.
 - *What is printed.* The first line is a comment: the verdict
   (`derivable`, `not derivable`, `flag`) and the judgment as it was
   read. After it, a Lean file: the fact with its certificate through
   the campaign's certifiers, as declarations with names (an `example`
   cannot be audited), ending with the bound on axioms
-  (`#axioms_within_file [propext, Quot.sound]`). Where the calculus has
-  several facts for one answer (a derivation as data and the
-  proposition; not valid and not derivable), state each from the one
-  certificate. The file writes the options that lift Lean's limits
-  itself, both of them (below), at least for a large answer: nobody
-  adds an option to a file made at a shell.
+  (`#axioms_within_file [propext, Quot.sound]`). The file writes both
+  options that lift Lean's limits (below), in every file: a threshold
+  on the size of the answer looked at the wrong size once (MALL: nine
+  formulas, a letter numbered 92, refused without the options).
+- *One kernel check, several facts.* Where one certificate gives
+  several facts (a derivation as data and the proposition; not valid
+  and not derivable), the check is a theorem of its own, stated through
+  the certifier (`K.check s c = true := by decide +kernel`), and passed
+  to each `verdict`: the default argument of `verdict` runs the check
+  again for each fact (41 s against 20 s on one set, DILL). A second
+  statement of the same Boolean is to be measured, not assumed equal:
+  stated of the checker's function and not through the certifier, the
+  kernel passed 8 GB on the same set.
+- *More than one kind of answer for a verdict.* A side may have several
+  certificates (a cyclic phase structure or a saturated set; a
+  derivation as data or, beyond a cap, the proposition only). A comment
+  in the file says which was used, and "one printed file of each kind"
+  below counts kinds of certificate, not verdicts.
+- *The program's own check.* The program prints only what it has
+  checked. Usually that is the certifier's check, compiled. Where that
+  is the slow side (GLS: a replay on multisets, and an evaluation that
+  keeps nothing, each slower compiled than in the kernel), check by
+  other means, tested against the certifier's check, and let the
+  kernel check the printed certificate by the certifier.
+- *A certificate beyond the kernel.* A search can print in
+  milliseconds a certificate that Lean does not check within the
+  memory cap (MALL: a saturated set of 238 sequents, stopped at 8 GB).
+  Find the size at which that happens, with a family that grows, and
+  above it let the first line say what the answer rests on: the
+  compiled check, not the kernel. A verdict line that reads the same
+  for a checked and an uncheckable file claims more than was done.
 - *The options.* `--short`: the first line only. `--ascii`: the
-  judgment in that line with the signs of a keyboard. A bound on the
-  search: the budget where the search has one (`--budget=<n>`), a
-  deadline where it has none (`--deadline=<seconds>`, with a default,
-  so that the command ends by itself).
+  judgment in that line with the signs of a keyboard. `--deadline=
+  <seconds>` in every case, with a default, over the whole answer, so
+  that the command ends by itself; `--budget=<n>` as well where a
+  search has one. Try a family that grows before saying that the
+  command ends: a search with no bound was found only so (DILL). Where
+  the campaign has two searches, an option that asks the other one, so
+  that its branch can be run on the corpus.
 - *The exit codes*: 0 derivable, 1 not derivable, 3 flag, 2 a text not
   read. They are those of `Certify.Cli` (the end of
   `LeanCertify/Decider.lean`); its `main` needs a registry of tools
@@ -394,15 +429,25 @@ them.
 - *What a flag is.* Where derivability is not decided, or the search is
   bounded: nothing found within the bound and no certificate that
   there is nothing. Where the search always answers: a search cut off
-  at the deadline, or a certificate that the compiled check refused (a
-  defect; say whether it was ever seen). A flag prints no fact.
-- *Run on the corpus.* The tests above are inside the library. The
-  command itself is run on every entry: a command that lists the
-  corpus as texts (`<name>run corpus`) and a script that compares each
-  exit code with the recorded status and elaborates each printed file
-  (K's `Corpus/prove_corpus.py`). Report the counts by verdict, one
-  printed file of each kind elaborated, and one with its certificate
-  altered refused.
+  at the deadline. In both: a certificate that the program's check
+  refused, and, where two searches run, both ended and disagreeing
+  (defects; say whether each was ever seen, and give a flag that can be
+  made at will if there is one). A flag prints no fact.
+- *Run on the corpus, and beyond it.* The tests above are inside the
+  library. The command itself is run on every entry: a command that
+  lists the corpus as texts (`<name>run corpus`) and a script that
+  compares each exit code with the recorded status and elaborates each
+  printed file. The corpus may not reach every kind of answer: add
+  members of the families (`<name>run families`) until each kind, and a
+  flag, has been seen. Where the command can flag, a flag agrees with
+  either status, so the script names the flagged entries and the
+  measurements record the list. The script starts each command in a
+  process group of its own and ends the group at its deadline
+  (`os.killpg`; `subprocess.run(timeout=…)` ends `lake` and leaves
+  `lean`). Report the counts by verdict and by kind of certificate, one
+  printed file of each kind elaborated, and one of each kind altered
+  and refused, the alteration chosen so that it cannot pass (a tree of
+  moves altered at random may still be a derivation).
 
 **The corpus.** Judgments of known status, with the status and its source:
 the paper's examples, its non-theorems, a family that grows (to find where
