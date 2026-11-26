@@ -522,6 +522,45 @@ their own, never after a line of the tactic (§6). Elaborate every line
 of it, and pin in the tests what each step shows: a comment that says
 what happens is a claim, and is checked like one.
 
+**A tutorial page**, `tutorial.md` in the calculus's folder, where the
+campaign teaches the calculus in prose (GLS has one: graded exercises,
+and the theorems explained). Its link to the Lean is part of its format
+(added 2026-11-26):
+
+- **Every displayed statement is a pin.** Put `<!-- lean: N -->` above
+  the indented block, where `N` is the full name of the declaration, or
+  several names for one block. Do not type the block: run
+  `python3 -I scripts/tutorial_pins.py write tutorial.md` (from the
+  repository root's `scripts/`), which prints it from Lean with
+  `#statement` (`ProofTools/Audit/Statement.lean`): the signature, and,
+  when the statement is a name for a proposition, the name's definition
+  after `where`. The script writes a caption under it: the declaration
+  linked to its source lines, its status and its axioms.
+- **A statement in the usual notation** (`⊢ₙ Γ, A ⇒ Δ`) is a pin with
+  `paraphrase` at the end of the comment. Its wording is the author's;
+  its caption, written by the script, says "in paraphrase" and gives the
+  declarations and their status.
+- **PROVED and OPEN are computed, not typed.** The caption's status comes
+  from `collectAxioms`: OPEN when `sorryAx` is among the axioms. Prose
+  that repeats the word stands directly under the caption that backs it.
+- **A name in the prose that a reader may look up** is written
+  [`name`](lean:Namespace.name); `write` makes it a link to the source
+  lines, with the full name as the link's title, and the build checks
+  that it exists.
+- **The page's header**, `<!-- lean-pins: module <Calc>.TutorialPins;
+  import <Calc>; open <Calc> -->`, names the module `write` generates: one
+  `#guard_msgs` test per pin, expecting exactly what the page shows. It is
+  in the calculus's library, so `lake build` fails when the page and the
+  library differ. Before committing, run `tutorial_pins.py check
+  tutorial.md`, which fails if the page was edited and `write` not run.
+- **Links name a commit.** `write` links at `HEAD` and warns when a
+  linked source file differs from it: commit the Lean first, then run
+  `write`, then commit the page.
+- **Say on the page what is checked**: the statements, statuses and links
+  of the pins; and that the prose describing how a proof goes is a
+  reading, not checked. Versions of the page for different readers
+  differ in their prose and keep the same pins.
+
 **The user's guide**, `users-guide.md` in the campaign folder: how a goal
 reads, the moves with their rules, the lines of the tactic, the messages.
 The section "Lean tactics" of the library's guide is the model.

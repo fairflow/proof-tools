@@ -1,5 +1,7 @@
 # GLS: a tutorial, with graded exercises
 
+<!-- lean-pins: module GLS.TutorialPins; import GLS; open GLS -->
+
 GLS is a cut-free sequent calculus for the provability logic GL. This
 page teaches the calculus through thirty exercises, and explains what
 has been proved about it in Lean: its syntactic properties (identity,
@@ -17,10 +19,16 @@ Lean development is `calculi/GLS/` of
 **What is checked.** Every derivation, countermodel, height and message
 quoted on this page is pinned in
 [`GLS/TutorialTest.lean`](https://github.com/fairflow/proof-tools/blob/9a11e68/calculi/GLS/GLS/TutorialTest.lean),
-which the build compiles. Every theorem called PROVED is checked by
-Lean's kernel, with no `sorry`, within the axioms `propext` and
-`Quot.sound`. The prose that describes how a proof goes is a reading of
-the Lean files and is not itself checked.
+which the build compiles. Every displayed statement with a line *Lean:*
+under it is printed by Lean from the declaration it names, not typed;
+the status on that line, PROVED or OPEN, and the axioms are computed by
+Lean, and [`GLS/TutorialPins.lean`](https://github.com/fairflow/proof-tools/blob/main/calculi/GLS/GLS/TutorialPins.lean)
+fails the build if the page and the library ever differ. A line *Lean,
+in paraphrase:* marks a statement written in the usual notation: its
+declarations and their status are checked, its wording is not. Names
+linked into the source are checked to exist. The prose that describes
+how a proof goes is a reading of the Lean files and is not itself
+checked.
 
 ## 0. Before you start
 
@@ -267,9 +275,13 @@ it takes derivations and returns one. All are PROVED. The types are in
 
 ### 5.1 Identity
 
+<!-- lean: GLS.Fam.id paraphrase -->
+
     ⊢ Γ, A ⇒ A, Δ        for every formula A
 
-`Fam.id`, by recursion on `A` (the source's `Id_all_form`). The case
+*Lean, in paraphrase:* [`GLS.Fam.id`](https://github.com/fairflow/proof-tools/blob/dbcc34b/calculi/GLS/GLS/Identity.lean#L11-L23) · PROVED · axioms: `Quot.sound`, `propext`
+
+[`Fam.id`](https://github.com/fairflow/proof-tools/blob/dbcc34b/calculi/GLS/GLS/Identity.lean#L11-L23 "GLS.Fam.id"), by recursion on `A` (the source's `Id_all_form`). The case
 `□A` is GLR followed by the identity on `A`, which is on the left of the
 premise because `⊠` unboxes.
 
@@ -277,17 +289,23 @@ premise because `⊠` unboxes.
 
 | property | statement | Lean |
 |---|---|---|
-| exchange | if `⊢ₙ Γ ⇒ Δ`, and `Γ'`, `Δ'` are permutations of `Γ`, `Δ`, then `⊢ₙ Γ' ⇒ Δ'` | `exchange` |
-| weakening | if `⊢ₙ Γ ⇒ Δ` then `⊢ₙ Γ, A ⇒ Δ` and `⊢ₙ Γ ⇒ A, Δ` | `weakeningL`, `weakeningR` |
-| inversion of →R | if `⊢ₙ Γ ⇒ A → B, Δ` then `⊢ₙ Γ, A ⇒ B, Δ` | `inversionImpR` |
-| inversion of →L | if `⊢ₙ Γ, A → B ⇒ Δ` then `⊢ₙ Γ ⇒ A, Δ` and `⊢ₙ Γ, B ⇒ Δ` | `inversionImpL` |
-| contraction | if `⊢ₙ Γ, A, A ⇒ Δ` then `⊢ₙ Γ, A ⇒ Δ`; and the same on the right | `contractionL`, `contractionR` |
+| exchange | if `⊢ₙ Γ ⇒ Δ`, and `Γ'`, `Δ'` are permutations of `Γ`, `Δ`, then `⊢ₙ Γ' ⇒ Δ'` | [`exchange`](https://github.com/fairflow/proof-tools/blob/dbcc34b/calculi/GLS/GLS/Structural.lean#L158-L159 "GLS.exchange") |
+| weakening | if `⊢ₙ Γ ⇒ Δ` then `⊢ₙ Γ, A ⇒ Δ` and `⊢ₙ Γ ⇒ A, Δ` | [`weakeningL`](https://github.com/fairflow/proof-tools/blob/dbcc34b/calculi/GLS/GLS/Structural.lean#L161-L163 "GLS.weakeningL"), [`weakeningR`](https://github.com/fairflow/proof-tools/blob/dbcc34b/calculi/GLS/GLS/Structural.lean#L165-L167 "GLS.weakeningR") |
+| inversion of →R | if `⊢ₙ Γ ⇒ A → B, Δ` then `⊢ₙ Γ, A ⇒ B, Δ` | [`inversionImpR`](https://github.com/fairflow/proof-tools/blob/dbcc34b/calculi/GLS/GLS/Invert.lean#L135-L136 "GLS.inversionImpR") |
+| inversion of →L | if `⊢ₙ Γ, A → B ⇒ Δ` then `⊢ₙ Γ ⇒ A, Δ` and `⊢ₙ Γ, B ⇒ Δ` | [`inversionImpL`](https://github.com/fairflow/proof-tools/blob/dbcc34b/calculi/GLS/GLS/Invert.lean#L138-L139 "GLS.inversionImpL") |
+| contraction | if `⊢ₙ Γ, A, A ⇒ Δ` then `⊢ₙ Γ, A ⇒ Δ`; and the same on the right | [`contractionL`](https://github.com/fairflow/proof-tools/blob/dbcc34b/calculi/GLS/GLS/Contract.lean#L169-L171 "GLS.contractionL"), [`contractionR`](https://github.com/fairflow/proof-tools/blob/dbcc34b/calculi/GLS/GLS/Contract.lean#L173-L175 "GLS.contractionR") |
 
 Each returns the new derivation together with a proof that its height
 is at most the old one, for example
 
-    WeakeningL :  (A : Form) → (d : Fam (Γ0 ++ Γ1 ⇒ Δ)) →
-                    { d' : Fam (Γ0 ++ A :: Γ1 ⇒ Δ) // d'.height ≤ d.height }
+<!-- lean: GLS.weakeningL -->
+
+    def GLS.weakeningL : WeakeningL
+      where GLS.WeakeningL :=
+        (A : Form) →
+          {Γ0 Γ1 Δ : List Form} → (d : Fam (Γ0 ++ Γ1 ⇒ Δ)) → { d' : Fam (Γ0 ++ A :: Γ1 ⇒ Δ) // d'.height ≤ d.height }
+
+*Lean:* [`GLS.weakeningL`](https://github.com/fairflow/proof-tools/blob/dbcc34b/calculi/GLS/GLS/Structural.lean#L161-L163) · PROVED · axioms: `Quot.sound`, `propext`
 
 Exchange is a theorem here and not a convention because sequents are
 lists. Weakening is by recursion on the derivation; at GLR the premise
@@ -297,7 +315,11 @@ the height and uses both inversions. In the thesis these are Lemmas
 
 ### 5.3 Cut admissibility
 
+<!-- lean: GLS.cutBySource GLS.cutAdmissible paraphrase -->
+
     if  ⊢ Γ ⇒ A, Δ  and  ⊢ Γ, A ⇒ Δ   then  ⊢ Γ ⇒ Δ
+
+*Lean, in paraphrase:* [`GLS.cutBySource`](https://github.com/fairflow/proof-tools/blob/dbcc34b/calculi/GLS/GLS/Cut.lean#L191-L197) · PROVED · axioms: `Quot.sound`, `propext`; [`GLS.cutAdmissible`](https://github.com/fairflow/proof-tools/blob/dbcc34b/calculi/GLS/GLS/Completeness.lean#L65-L72) · PROVED · axioms: `Quot.sound`, `propext`
 
 This is the additive cut: both premises have the same context (thesis,
 Theorem 12.7.1). It is PROVED twice.
@@ -356,7 +378,17 @@ nothing to the two it was given.
 GLS + (cut) is the family `FamCut`: the five rules and the additive cut
 as a sixth.
 
-    cutElimination :  (s : Seq) → FamCut s → Fam s
+<!-- lean: GLS.cutElimination GLS.cutEliminationBySearch -->
+
+    def GLS.cutElimination : CutElimination
+      where GLS.CutElimination :=
+        (s : GLS.Seq) → FamCut s → Fam s
+
+    def GLS.cutEliminationBySearch : CutElimination
+      where GLS.CutElimination :=
+        (s : GLS.Seq) → FamCut s → Fam s
+
+*Lean:* [`GLS.cutElimination`](https://github.com/fairflow/proof-tools/blob/dbcc34b/calculi/GLS/GLS/CutRule.lean#L70-L72) · PROVED · axioms: `Quot.sound`, `propext`; [`GLS.cutEliminationBySearch`](https://github.com/fairflow/proof-tools/blob/dbcc34b/calculi/GLS/GLS/CutRule.lean#L74-L76) · PROVED · axioms: `Quot.sound`, `propext`
 
 PROVED, by recursion on the derivation, removing each cut with
 `cutBySource` (thesis, Theorem 12.7.2). `cutEliminationBySearch` does
@@ -370,8 +402,17 @@ would do. The source's remedy is a second calculus, **PSGLS**: the rules
 of GLS, a further axiom IdB (`Γ, □A ⇒ □A, Δ`), and GLR restricted to
 conclusions that are not an instance of IdP, IdB or ⊥L.
 
-    psEquivalent  :  (s : Seq) → (Fam s → PSFam s) × (PSFam s → Fam s)
-    psTermination :  WellFounded PSPrem
+<!-- lean: GLS.psEquivalent GLS.psTermination -->
+
+    def GLS.psEquivalent : PSEquivalent
+      where GLS.PSEquivalent :=
+        (s : GLS.Seq) → (Fam s → PSFam s) × (PSFam s → Fam s)
+
+    theorem GLS.psTermination : PSTermination
+      where GLS.PSTermination :=
+        WellFounded PSPrem
+
+*Lean:* [`GLS.psEquivalent`](https://github.com/fairflow/proof-tools/blob/dbcc34b/calculi/GLS/GLS/PS.lean#L43-L44) · PROVED · axioms: `Quot.sound`, `propext`; [`GLS.psTermination`](https://github.com/fairflow/proof-tools/blob/dbcc34b/calculi/GLS/GLS/Measure.lean#L271-L276) · PROVED · axioms: `Quot.sound`, `propext`
 
 Both PROVED. `PSPrem p c` says that `p` is a premise of an instance of a
 rule of PSGLS with conclusion `c`, so the second statement says that
@@ -428,7 +469,13 @@ in one number that falls at every step,
 
 ### 6.1 Soundness
 
-    soundness :  ∀ s, Fam s → Valid s
+<!-- lean: GLS.soundness -->
+
+    theorem GLS.soundness : Soundness
+      where GLS.Soundness :=
+        ∀ (s : GLS.Seq) (a : Fam s), Valid s
+
+*Lean:* [`GLS.soundness`](https://github.com/fairflow/proof-tools/blob/dbcc34b/calculi/GLS/GLS/Soundness.lean#L11-L68) · PROVED · axioms: `Quot.sound`, `propext`
 
 PROVED, by induction on the derivation
 ([`GLS/Soundness.lean`](https://github.com/fairflow/proof-tools/blob/9a11e68/calculi/GLS/GLS/Soundness.lean)).
@@ -443,14 +490,26 @@ derivation, gives `v ⊩ A`.
 
 ### 6.2 Completeness, as a function
 
-    proofOrRefutation :  (s : Seq) → Fam s ⊕ Refutation s
+<!-- lean: GLS.proofOrRefutation -->
+
+    def GLS.proofOrRefutation : ProofOrRefutation
+      where GLS.ProofOrRefutation :=
+        (s : GLS.Seq) → Fam s ⊕ Refutation s
+
+*Lean:* [`GLS.proofOrRefutation`](https://github.com/fairflow/proof-tools/blob/dbcc34b/calculi/GLS/GLS/Search.lean#L389-L394) · PROVED · axioms: `Quot.sound`, `propext`
 
 PROVED: for every sequent, a derivation or a finite tree at whose root
 it is false
 ([`GLS/Search.lean`](https://github.com/fairflow/proof-tools/blob/9a11e68/calculi/GLS/GLS/Search.lean)).
 From it and soundness:
 
-    completeness :  ∀ s, Valid s → Nonempty (Fam s)
+<!-- lean: GLS.completeness -->
+
+    theorem GLS.completeness : Completeness
+      where GLS.Completeness :=
+        ∀ (s : GLS.Seq), Valid s → Nonempty (Fam s)
+
+*Lean:* [`GLS.completeness`](https://github.com/fairflow/proof-tools/blob/dbcc34b/calculi/GLS/GLS/Completeness.lean#L12-L16) · PROVED · axioms: `Quot.sound`, `propext`
 
 The function is a proof search in the order of PSGLS.
 
@@ -466,7 +525,7 @@ The function is a proof search in the order of PSGLS.
   children.
 
 That the new root refutes the sequent is the truth lemma of the
-construction (`prime_refuted`). A boxed `□B` in `Γ` is true at the new
+construction ([`prime_refuted`](https://github.com/fairflow/proof-tools/blob/dbcc34b/calculi/GLS/GLS/Search.lean#L198-L249 "GLS.prime_refuted")). A boxed `□B` in `Γ` is true at the new
 root because every `t_A` makes `B` and `□B` true, which is what `⊠Γ` on
 the left of each premise provides. A boxed `□A` in `Δ` is false at the
 root because `A` is false at `t_A`. This is why the countermodel of the
@@ -478,9 +537,21 @@ steps is bounded in advance.
 
 ### 6.3 The finite model property and decidability
 
-    finiteModelProperty :  ∀ s, (∀ M, M.GL → M.TwoValued → M.Finite → ∀ w, M.satSeq w s) → Valid s
-    validDecidable      :  (s : Seq) → Decidable (Valid s)
-    derivableDecidable  :  (s : Seq) → Decidable (Nonempty (Fam s))
+<!-- lean: GLS.finiteModelProperty GLS.validDecidable GLS.derivableDecidable -->
+
+    theorem GLS.finiteModelProperty : FiniteModelProperty
+      where GLS.FiniteModelProperty :=
+        ∀ (s : GLS.Seq), (∀ (M : Model), M.GL → M.TwoValued → M.Finite → ∀ (w : M.W), M.satSeq w s) → Valid s
+
+    def GLS.validDecidable : ValidDecidable
+      where GLS.ValidDecidable :=
+        (s : GLS.Seq) → Decidable (Valid s)
+
+    def GLS.derivableDecidable : DerivableDecidable
+      where GLS.DerivableDecidable :=
+        (s : GLS.Seq) → Decidable (Nonempty (Fam s))
+
+*Lean:* [`GLS.finiteModelProperty`](https://github.com/fairflow/proof-tools/blob/dbcc34b/calculi/GLS/GLS/Completeness.lean#L30-L37) · PROVED · axioms: `Quot.sound`, `propext`; [`GLS.validDecidable`](https://github.com/fairflow/proof-tools/blob/dbcc34b/calculi/GLS/GLS/Completeness.lean#L18-L22) · PROVED · axioms: `Quot.sound`, `propext`; [`GLS.derivableDecidable`](https://github.com/fairflow/proof-tools/blob/dbcc34b/calculi/GLS/GLS/Completeness.lean#L24-L28) · PROVED · axioms: `Quot.sound`, `propext`
 
 All PROVED, each a few lines from `proofOrRefutation` and soundness. A
 refutation is a finite tree, and the part of the tree model below it is
@@ -513,7 +584,7 @@ with no axioms in its way, the kernel can run it:
 
 | claim | what stands behind it |
 |---|---|
-| the theorems of sections 5 and 6 | the kernel, with no `sorry`, within `propext` and `Quot.sound` |
+| the theorems of sections 5 and 6 | the kernel, with no `sorry`, within `propext` and `Quot.sound`; each statement and status is printed by Lean and pinned in `GLS/TutorialPins.lean` |
 | that `Fam` is the calculus of the source | a reading of 17 lines of Lean against the authors' Coq definition and the thesis's Figure 12.1, made twice by readers with no other context; no difference was found. The 2021 paper itself was not obtained |
 | that `Valid` is validity for GL | the definitions of section 4, 42 lines of Lean. The source's Coq files have no semantics; this one is the usual Kripke semantics of GL, chosen by the campaign, with the two-valued restriction explained there |
 | the solutions below | each is compiled by the build; where a height or a tree is quoted it is pinned by a test |

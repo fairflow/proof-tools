@@ -662,7 +662,10 @@ Read `reference/explore.md` §11.
 3. The tutorial (`Play/<Calculus>Tutorial.lean`) and the user's guide.
    Elaborate every line of the tutorial, and pin in the tests what each
    step shows: a comment that says what happens is a claim, and is
-   checked like one.
+   checked like one. A tutorial page in Markdown (`tutorial.md`) shows
+   no statement typed by hand: each is a pin, printed by Lean, its status
+   computed, the page and the library held together by the build
+   (`reference/explore.md` §11, "A tutorial page").
 4. The closing page (`templates/report.md`): what the campaign adopted,
    proved and runs, what is OPEN, what to read, what was decided, and
    the changes to make to this skill and its templates, from

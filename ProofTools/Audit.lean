@@ -13,14 +13,19 @@
 * `ProofTools.Audit.Rules`: an inductive family printed as inference figures
   (`#rules`), for checking a transcription against its source;
 * `ProofTools.Audit.Slime`: computed indices in the conclusions of an
-  inductive family's constructors (`#slime`).
+  inductive family's constructors (`#slime`);
+* `ProofTools.Audit.Statement`: a declaration's statement and its status,
+  PROVED or OPEN, printed for a page that cites it (`#statement`,
+  `#statement_status`, `#statement_location`), used by
+  `scripts/tutorial_pins.py`.
 
 Core Lean only.  `Axioms`, `Sweep`, `Rules` and `Slime` were carried in
 from lax-logic-in-lean (`Meta/`, commit 79d83611) on 2026-11-19; each header
-says so.  `FileBound` was written here.  Tests: `ProofToolsTest/`.
+says so.  `FileBound` and `Statement` were written here.  Tests: `ProofToolsTest/`.
 -/
 import ProofTools.Audit.Axioms
 import ProofTools.Audit.Sweep
 import ProofTools.Audit.FileBound
 import ProofTools.Audit.Rules
 import ProofTools.Audit.Slime
+import ProofTools.Audit.Statement
