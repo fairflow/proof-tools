@@ -299,7 +299,9 @@ and it refuses every sequent outside that fragment. The last statement
 unrestricted zone and no `!`, and for nothing more: with `!` no such
 statement can hold of sound checks with computable producers. Source:
 none. Entered 16:05, before the file was built. Not read back.
-**OPEN** at this commit: the file is written and not yet built (one builder at a time).
+**PROVED**: `dillEngine`, `noDerivableDec`, `decidedBangFree`,
+`DILL/Engine.lean` (built by the operator 16:24; the lints R2, R3 and R4
+of `lean-certify` pass on `noDerivableDec`, R1 on the producer).
 
 ### S17. Validity does not depend on the order of the hypotheses (ours)
 
@@ -374,4 +376,4 @@ and `cutEliminationProp` carries it to the calculus with cut.
 |---|---|---|---|
 | of the goals from the standing list (cut elimination: S8, S4b; the deduction theorems: S9; the disjunction property: S13) | 3 | 0 | 0 |
 | of the other goals (S3, S4, S5, S6, the inversions of S9, S11, S12, consistency, S14, S15; S7 and S10 expected refuted) | 10 | 2 (eight statements) | 0 |
-| of our own (S1, S2, S16, S17) | 4 (S1, S2, S16, S17) | 0 | 0 |
+| of our own (S1, S2, S16, S17, S18) | 5 (S1, S2, S16, S17, S18) | 0 | 0 |
