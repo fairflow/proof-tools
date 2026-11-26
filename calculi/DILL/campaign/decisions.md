@@ -139,3 +139,87 @@ the folder point here.*
   The place: `calculi/DILL/`. Nothing is asked."
 * **Before this text was read**: nothing of the calculus. The task named
   the skill as the first act, and it was.
+
+## 2026-11-26 15:05 GMT. Stage 0: what holds, and what "valid" means
+
+* **Decided**: what holds is the family with cut, `Fam true`. `Valid j`
+  is satisfaction of the formula of the sequent,
+  `(!G₁ ⊗ … ⊗ !Gₙ ⊗ D₁ ⊗ … ⊗ Dₘ ⊗ 1) ⊸ C`, at the unit of every
+  intuitionistic phase model of Kanovich, Okada and Terui (2006),
+  Definitions 2.2, 2.4, 2.6: a commutative monoid with a closure
+  operator (Cl1) to (Cl4), `!X := Cl (X ∩ I)` with `I` the strict
+  idempotents of `1`; the carrier a `Type`, sets as predicates.
+* **Not taken**: validity as what holds (the family is the default, and
+  the map out then gives derivations); a semantics from Troelstra's
+  book or Abrusci 1990 (not public); a chosen submonoid in place of `I`
+  (the source read has the strict idempotents); models restricted to
+  two-valued sets (not needed: the proofs planned are constructive);
+  no semantics at all (the fourth check of meaning then has nothing to
+  run against, since the paper's own soundness theorem is about natural
+  deduction, which is left out).
+* **Why**: the paper is proof theory only, and the skill asks for the
+  logic's usual semantics from a place that is cited. The formula of a
+  sequent is the operator's (the source satisfies formulas only): it is
+  Barber's reading `!Γ, Δ ⊢ C`. Screened in scratch with the model
+  `(ℕ, +, 0, identity)` of the source's Example 2.5: three sequents
+  that must fail do (`· ; a ⟹ 1`, `· ; · ⟹ 0`, `· ; · ⟹ a ⊕ (a ⊸ 0)`),
+  and `a ; · ⟹ a` is valid in every model (plan, "What valid means").
+* **Rests on it**: `DILL/Semantics.lean`, the statements of soundness
+  and completeness, and nothing else: no other goal mentions `Valid`.
+* **Cost to reverse**: the campaign, as the skill counts it; in fact
+  two theorems. A doubt: the semantics is "holds of the logic, proved
+  elsewhere", for a one-zone calculus with ⊥; nothing published is
+  known to the operator that states it for two zones.
+
+## 2026-11-26 15:05 GMT. Stage 0: the encoding
+
+* **Decided**: a sequent is a structure `Seq` (`unr`, `lin`, `goal`),
+  written `Γ ; Δ ⟹ C`. The linear zone in MALL's form: a rule that
+  takes from it concludes a variable `Ξ` under `Ξ ~ …`. The unrestricted
+  zone by membership: copy asks `A ∈ Γ`, !L adds at the head. One family
+  `Fam (c : Bool) : Seq → Type`, the two cuts asking `c = true`;
+  `CF := Fam false`. Moves name the principal formula, and ⊗R, ⊸L, cut
+  the part of the linear zone for the first premise. `!` and `⊕` keep
+  the source's signs and need parentheses where anything follows.
+* **Not taken**: two families (MALL's choice: every structural function
+  twice); three indices in place of a structure (the explorer wants one
+  type); a multiset or set type for `Γ` (core Lean has none); another
+  glyph for `!` (a sign that looks like `!` and is not would be a trap).
+* **Why**: the brief's "what carries over", checked in scratch: seven
+  constructors, `#rules`, `#slime` clean, exchange and monotonicity by
+  pattern matching, all within `[propext, Quot.sound]`.
+* **Rests on it**: every file.
+* **Cost to reverse**: a stage and every proof after it.
+
+## 2026-11-26 15:05 GMT. Stage 0: which results are goals, and the level of Run
+
+* **Decided**: the goals of the plan's section "Goals, non-goals,
+  order". By rule: both cuts admissible and cut elimination; the two
+  deduction theorems (the inversions of ⊸R and !L); the disjunction
+  property. Decided as goals: Theorem 2; exchange; the inversions of
+  Lemma 6; consistency; the subformula property; identity expansion;
+  soundness and completeness for the phase semantics; the translation
+  to and from one-zone ILL (the calculus of KOT's Figure 1, without ⊥);
+  decidability for empty `Γ` and no `!`. Expected REFUTED: linear
+  weakening and contraction; the inversions of ⊗R, ⊸L, &L₁, &L₂, ⊕R₁,
+  ⊕R₂. Run aims at level 2.
+* **Not taken**: Theorems 4 and 5 against natural deduction (another
+  system, of about 18 rules; the phase semantics and the one-zone
+  translation were preferred as the checks of meaning and as what the
+  round's later phases use); the finite model property for the fragment
+  without `!` (budget); undecidability; level 3.
+* **Why**: `SKILL.md`, "What a campaign proves"; the brief's list of
+  candidates, each accepted or rejected in the plan's Q2 with its
+  source.
+* **Rests on it**: `statements.md`, the briefs to agents.
+* **Cost to reverse**: a stage.
+
+## 2026-11-26 15:05 GMT. Stage 0: the axiom policy
+
+* **Decided**: every theory file and every certifier within
+  `[propext, Quot.sound]`.
+* **Not taken**: `Classical.choice` for the completeness file.
+* **Why**: MALL kept it, with a quotient for the canonical model; the
+  same construction is planned.
+* **Cost to reverse**: the campaign, to tighten later; little, to
+  loosen.
