@@ -96,6 +96,39 @@ def ssize : List Form → Nat
   | [] => 0
   | A :: Γ => A.size + ssize Γ
 
+/-! ## Letters and literals -/
+
+/-- The numbers of the letters of a formula, each occurrence. -/
+def Form.letters : Form → List Nat
+  | .atom a => [a]
+  | .natom a => [a]
+  | .tensor A B => A.letters ++ B.letters
+  | .par A B => A.letters ++ B.letters
+  | .wth A B => A.letters ++ B.letters
+  | .plus A B => A.letters ++ B.letters
+  | _ => []
+
+/-- The letters of a sequent. -/
+def lettersL (Γ : List Form) : List Nat := Γ.flatMap Form.letters
+
+/-- The literals of a formula: each occurrence of a letter `a` or of a
+negated letter `a⊥`, as a formula.  (Formulas are in negation normal form,
+so this is the occurrences of letters with their signs.) -/
+def Form.lits : Form → List Form
+  | .atom a => [.atom a]
+  | .natom a => [.natom a]
+  | .tensor A B => A.lits ++ B.lits
+  | .par A B => A.lits ++ B.lits
+  | .wth A B => A.lits ++ B.lits
+  | .plus A B => A.lits ++ B.lits
+  | _ => []
+
+/-- The literals of a sequent. -/
+def litsL (Γ : List Form) : List Form := Γ.flatMap Form.lits
+
+theorem Form.letters_neg (A : Form) : Aᗮ.letters = A.letters := by
+  induction A <;> simp_all [Form.neg, Form.letters]
+
 end MALL
 
 #axioms_within_file [propext, Quot.sound]

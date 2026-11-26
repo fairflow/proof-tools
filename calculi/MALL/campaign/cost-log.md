@@ -50,6 +50,8 @@ hour, work. One more agent,
 a6, wrote the tutorial: 376 105 tokens, 600 s of its own time after it
 was restarted.
 
+Interpolation, a command relayed at 15:04: began 15:06.
+
 ## What went wrong, and what it cost
 
 | what | found by | cost |

@@ -37,16 +37,6 @@ def noDerivableBy : Certify.Certifier (List Form) ZModel (fun Γ => Derivable Γ
 
 /-! ## The producer -/
 
-/-- The numbers of the letters of a formula. -/
-def Form.letters : Form → List Nat
-  | .atom a => [a]
-  | .natom a => [a]
-  | .tensor A B => A.letters ++ B.letters
-  | .par A B => A.letters ++ B.letters
-  | .wth A B => A.letters ++ B.letters
-  | .plus A B => A.letters ++ B.letters
-  | _ => []
-
 /-- The subset of `0, …, m−1` whose members are the bits of `b`. -/
 def bitsSet (m b : Nat) : List Bool := (List.range m).map fun i => b.testBit i
 

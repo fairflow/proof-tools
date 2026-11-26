@@ -136,6 +136,59 @@ structure is derivable. -/
 def FiniteModelProperty : Prop :=
   ∀ Γ : List Form, (∀ S : PhaseStructure, S.Finite → S.Sat Γ) → Derivable Γ
 
+/-! ## Interpolation
+
+Entered 2026-11-26, after the closing page, before their proofs. -/
+
+/-- **An interpolant** of a sequent `⊢ Γ, Δ` divided in two: a formula `C`
+with `⊢ C, Γ` and `⊢ C⊥, Δ` (read two-sided: `Γ⊥ ⊢ C` and `C ⊢ Δ`), every
+literal of which occurs in `Δ` and, negated, in `Γ`.  The condition on
+literals is Lyndon's: a letter occurs in `C` only with a sign with which
+it occurs in `Δ` and, reversed, in `Γ`. -/
+structure Interpolant (Γ Δ : List Form) where
+  /-- The interpolant. -/
+  C : Form
+  /-- `⊢ C, Γ`, without cut. -/
+  left : CF (C :: Γ)
+  /-- `⊢ C⊥, Δ`, without cut. -/
+  right : CF (Cᗮ :: Δ)
+  /-- Lyndon's condition. -/
+  lits : ∀ ℓ ∈ C.lits, ℓᗮ ∈ litsL Γ ∧ ℓ ∈ litsL Δ
+
+/-- **Craig interpolation, with Lyndon's condition, as a function**: an
+interpolant from a derivation without cut, for any division of its
+sequent. -/
+def CraigInterpolation : Type := (Γ Δ : List Form) → CF (Γ ++ Δ) → Interpolant Γ Δ
+
+/-- **Craig interpolation, for an implication**: if `A ⊸ B` is derivable
+(`⊢ A⊥, B`), there is `C` with `A ⊸ C` and `C ⊸ B` derivable whose letters
+occur in both `A` and `B`. -/
+def CraigForFormulas : Prop :=
+  ∀ A B : Form, Derivable [Aᗮ, B] →
+    ∃ C : Form, Derivable [Aᗮ, C] ∧ Derivable [Cᗮ, B] ∧
+      ∀ a ∈ C.letters, a ∈ A.letters ∧ a ∈ B.letters
+
+/-- **Uniform interpolation**, for a sequent `Γ` and a letter `p`: there
+is a formula `I` without `p`, with no letter that is not in `Γ`, such that
+`⊢ I⊥, Γ`, and `⊢ I, Δ` for every `Δ` without `p` with `⊢ Γ, Δ`.  (Read
+two-sided: `I` is the weakest formula without `p` that implies the par of
+`Γ`.  It depends on `Γ` and `p` only, not on `Δ`.) -/
+def UniformInterpolation : Prop :=
+  ∀ (p : Nat) (Γ : List Form), ∃ I : Form,
+    (∀ a ∈ I.letters, a ≠ p ∧ a ∈ lettersL Γ) ∧
+    Derivable (Iᗮ :: Γ) ∧
+    ∀ Δ : List Form, (∀ a ∈ lettersL Δ, a ≠ p) → Derivable (Γ ++ Δ) → Derivable (I :: Δ)
+
+/-- **The uniform interpolants of a formula**: `∀p A`, the weakest formula
+without `p` that implies `A`; and `∃p A`, the strongest formula without `p`
+that `A` implies. -/
+def UniformInterpolationForFormulas : Prop :=
+  ∀ (p : Nat) (A : Form),
+    (∃ U : Form, (∀ a ∈ U.letters, a ≠ p ∧ a ∈ A.letters) ∧ Derivable [Uᗮ, A] ∧
+      ∀ B : Form, p ∉ B.letters → Derivable [Bᗮ, A] → Derivable [Bᗮ, U]) ∧
+    (∃ E : Form, (∀ a ∈ E.letters, a ≠ p ∧ a ∈ A.letters) ∧ Derivable [Aᗮ, E] ∧
+      ∀ B : Form, p ∉ B.letters → Derivable [Aᗮ, B] → Derivable [Eᗮ, B])
+
 end MALL
 
 #axioms_within_file [propext, Quot.sound]

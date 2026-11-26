@@ -429,6 +429,42 @@ the argument, and attributes it.
   `describeCountermodel`.
 * **Cost to reverse**: little.
 
+## 2026-11-26 15:06 GMT. A command: Craig interpolation and uniform interpolation, as goals
+
+* **The reviewer's words**, relayed by the session that started this
+  one (15:04): to its question "Add Craig and uniform interpolation for
+  MALL as goals of the MALL development?": "Yes, for MALL"; then
+  "please delegate this to the existing agent MALL, phase 1 rather than
+  starting a new one".
+* **Decided, the statements** (`MALL/Statements.lean`, entered before
+  any proof; `statements.md`, S22 to S25):
+  (a) Craig interpolation as a function on derivations without cut, for
+  a sequent divided in two, `⊢ Γ, Δ`: a formula `C` with `⊢ C, Γ` and
+  `⊢ C⊥, Δ`. With Lyndon's condition, which in negation normal form is
+  a condition on literals and costs nothing more: every literal of `C`
+  occurs in `Δ` and, negated, in `Γ`. The condition on letters is a
+  corollary.
+  (b) Uniform interpolation for a sequent `Γ` and one letter `p`: a
+  formula `I` without `p`, its letters among those of `Γ`, with
+  `⊢ I⊥, Γ` and, for every `Δ` without `p` with `⊢ Γ, Δ`, `⊢ I, Δ`. As
+  a proposition about `Derivable`; the interpolant is to be a function
+  `ui p Γ`. For a formula: `∀p A` is `I` at `[A]`, and `∃p A` is the
+  negation of `I` at `[A⊥]`.
+* **The route decided for (b)**, before the sources were read: the
+  interpolant by recursion on the size of `Γ`, along the rules read
+  upwards (the search ends by itself, since no rule contracts), with a
+  disjunct for each rule instance on `Γ` and one for each proper
+  division of `Γ` (for a ⊗ of the other side); its two properties by
+  induction, the second on a derivation without cut. This is Pitts's
+  method as the sources are said to apply it to logics without
+  contraction; whether it is their construction is to be checked when
+  they are read.
+* **Not taken**: interpolants of a set of letters at once (iterate);
+  the properties of (b) as functions on derivations (the proof divides
+  permutations, which gives existence and not data, and nothing asks
+  for the data).
+* **Cost to reverse**: a statement, little.
+
 ## Stops
 
 *Each time a turn ended to wait for the reviewer. None so far.*
