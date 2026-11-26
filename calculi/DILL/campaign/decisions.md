@@ -223,3 +223,54 @@ the folder point here.*
   same construction is planned.
 * **Cost to reverse**: the campaign, to tighten later; little, to
   loosen.
+
+## 2026-11-26 15:13 GMT. A word of the reviewer
+
+* **The words**: "I declined no such thing." (typed in the session).
+* **What it is**: a correction, and by it a command to go on.
+* **What it changes**: at about 15:00 the environment refused the
+  operator's first write of `DILL/Form.lean` with a message that the
+  user had declined it and that the operator must stop and wait. The
+  operator stopped, reported, and asked how to proceed: a stop that the
+  skill does not list, taken on the environment's word. The reviewer had
+  declined nothing. The file was written again, unchanged, at 15:13 and
+  the campaign went on. Nothing built was affected. Time lost: about
+  thirteen minutes (the cost log has the times from the record).
+
+## 2026-11-26 15:14 GMT. Stage 1: the sign between the zones, and the moves of the right rules
+
+* **Decided**: a sequent is written `Γ ⨾ Δ ⟹ C` (U+2A3E), not
+  `Γ ; Δ ⟹ C`. The moves of the right rules name the conclusion's
+  formula (`tensorR A B Δ`, `lolliR A B`, `withR A B`, `plusR₁ A B`,
+  `plusR₂ A B`, `bangR A`).
+* **Not taken**: `;` (the plan's choice at 14:59, screened only in a
+  file with no tactic block: the first build of `DILL/Perm.lean` under
+  it failed, since Lean then read the `;` between two tactics as the
+  sign between the zones); a move `tensorR Δ` that reads `A ⊗ B` off the
+  sequent (the soundness of the moves would then need a case for each
+  other shape of conclusion, or a cast).
+* **Why**: the build; and S1 as a definition that computes.
+* **Rests on it**: every file that writes a sequent; the tests'
+  pinned displays. The printer of the explorer writes `Γ ; Δ ⟹ C`, as
+  the source does: it is text, and is not parsed.
+* **Cost to reverse**: little (a notation; the moves' arguments).
+
+## 2026-11-26 15:19 GMT. Stage 2: the goals handed to five agents, and the source of the translation
+
+* **Decided**: the goals of the plan go to five agents at once, by the
+  brief `brief-2-1.md`, each with the operator's design and its own
+  files and namespace: A, the cuts and the inversions; B, soundness and
+  completeness; C, the structural results; D, the decision without `!`;
+  E, the translation. A sixth writes the tests and the exercises. The
+  source of the translation is CCP Theorem 7, items 1 and 3 (p. 20),
+  which the survey found: it is stated of sequents, where Barber's
+  Theorem 3 is about terms in natural deduction. The plan's Q2 row is
+  read with that source.
+* **Not taken**: proving in the plan's order in one session (the goals
+  do not rest on one another, except on the cuts); Okada and Terui's
+  semantics (RIMS Kôkyûroku 1023, 1998: a chosen submonoid `K` of weak
+  idempotents, and validity stated for sequents), which the survey read
+  after the plan was fixed: it has more models, so its soundness says
+  more and its completeness less; KOT's, with the strict idempotents,
+  stays, and the difference is named on the closing page.
+* **Cost to reverse**: little.
