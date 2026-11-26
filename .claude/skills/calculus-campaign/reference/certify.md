@@ -365,9 +365,12 @@ missing from earlier wordings (K 72 to 75, GLS 27, MALL 29, DILL 22).
   no turnstile; a two-sided text for a one-sided calculus. A text that
   is not a judgment is refused on the error stream, with nothing on the
   standard output: what was expected, and the place, counted from
-  character 1, with a mark under it. The refusal of a letter names the
-  letters the reader takes: the five readers do not yet agree on them
-  (K takes `a`, `b`; the others `p q r s` and a numbered family).
+  character 1, with a mark under it. The letters: take `p q r s`,
+  `a b c d` and a numbered family (`p0`, `p1`, …), as K's reader does,
+  and let the refusal of a letter name them. GLS, MALL and DILL take
+  `p q r s` and a numbered family only, each with its own numbering; a
+  person who goes from one command to another meets the difference at
+  once.
 - *The printers, and two tests.* The first line shows the judgment in
   the calculus's notation; the fact is stated of the judgment as Lean
   source. So there are at least two printers (three with `--ascii`),
@@ -386,7 +389,13 @@ missing from earlier wordings (K 72 to 75, GLS 27, MALL 29, DILL 22).
   (`#axioms_within_file [propext, Quot.sound]`). The file writes both
   options that lift Lean's limits (below), in every file: a threshold
   on the size of the answer looked at the wrong size once (MALL: nine
-  formulas, a letter numbered 92, refused without the options).
+  formulas, a letter numbered 92, refused without the options). Do not
+  print a certificate by `Repr`: it indents each line by its depth in
+  the term, so the size of the text is the size of the term times its
+  depth (K: 86 MB for a tree of 2 335 moves, 82 MB of it spaces; the
+  command took 13.7 s to print what the search found in 19 ms). Write
+  a printer, a node to a line; what guards a printer of one's own is
+  that the files are elaborated. Count the spaces in a large file.
 - *One kernel check, several facts.* Where one certificate gives
   several facts (a derivation as data and the proposition; not valid
   and not derivable), the check is a theorem of its own, stated through
@@ -416,7 +425,12 @@ missing from earlier wordings (K 72 to 75, GLS 27, MALL 29, DILL 22).
   line say what the answer rests on, in words that claim no more than
   was seen: "by the compiled check only (… ; the kernel has checked
   sets of up to 102)". A verdict line that reads the same for a
-  checked and an unchecked file claims more than was done.
+  checked and an unchecked file claims more than was done. One measure
+  of size may not separate the files checked from the others (K: the
+  number of moves did not; the depth of the sequent had to be a second
+  measure, since a file of 1.9 MB was refused where a larger one was
+  checked). Between the largest seen checked and the smallest seen to
+  fail nothing is known: word that region as not checked.
 - *The options.* `--short`: the first line only. `--ascii`: the
   judgment in that line with the signs of a keyboard. `--deadline=
   <seconds>` in every case, with a default, over the whole answer, so
@@ -450,7 +464,11 @@ missing from earlier wordings (K 72 to 75, GLS 27, MALL 29, DILL 22).
   `lean`). Report the counts by verdict and by kind of certificate, one
   printed file of each kind elaborated, and one of each kind altered
   and refused, the alteration chosen so that it cannot pass (a tree of
-  moves altered at random may still be a derivation).
+  moves altered at random may still be a derivation). A text typed at a
+  shell has a largest size, the operating system's limit on a command
+  line (K met it at 2.6 MB, before any limit of Lean's on the "no"
+  side): a family may end there, and no command yet reads its text from
+  the standard input.
 
 **The corpus.** Judgments of known status, with the status and its source:
 the paper's examples, its non-theorems, a family that grows (to find where
