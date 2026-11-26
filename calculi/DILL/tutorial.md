@@ -115,7 +115,7 @@ The grades:
 
     A ⊗ B   "tensor"      A ⊸ B   "lolli"      A & B   "with"      A ⊕ B   "plus"      !A   "bang"
 
-In Lean, [`Form`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Form.lean#L15-L36 "DILL.Form") has nine constructors. The constants
+In Lean, [`Form`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Form.lean#L15-L36 "DILL.Form") has nine constructors. The constants
 are typed `𝟏 ⊤ 𝟎` and printed `1 ⊤ 0`. There is no negation, no `⊥` and
 no `?`: the fragment is the one in which a sequent has exactly one
 conclusion.
@@ -245,12 +245,12 @@ So exchange in both zones, and weakening and contraction of `Γ`, are
 functions on derivations and not constructors (section 4).
 
 In Lean the calculus is an inductive family
-[`Fam`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/System.lean#L35-L100 "DILL.Fam") `c : Seq → Type`, with one constructor for each
+[`Fam`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/System.lean#L35-L100 "DILL.Fam") `c : Seq → Type`, with one constructor for each
 rule. `Fam true` has the two cuts; `Fam false`, also written
-[`CF`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/System.lean#L102-L103 "DILL.CF"), is the figure as it stands. A term of `Fam c j` is
+[`CF`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/System.lean#L102-L103 "DILL.CF"), is the figure as it stands. A term of `Fam c j` is
 a derivation, as data: it can be measured, transformed and printed.
-[`Derivable`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/System.lean#L120-L121 "DILL.Derivable") `j` says that `Fam true j` has an
-element. A sequent is a [`Seq`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Form.lean#L82-L94 "DILL.Seq"): two lists and a formula.
+[`Derivable`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/System.lean#L120-L121 "DILL.Derivable") `j` says that `Fam true j` has an
+element. A sequent is a [`Seq`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Form.lean#L82-L94 "DILL.Seq"): two lists and a formula.
 
 ### A worked derivation: `· ; !p ⟹ !p ⊗ !p`
 
@@ -332,8 +332,8 @@ its first premise derives `p` from the valid `p`, its second has `q`.
 The height is 7.
 
 What `dillmove` builds is a derivation of the explorer's proof system
-[`S`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Proof.lean#L137-L141 "DILL.S"), whose moves are the twenty rules;
-[`famOfDer`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Proof.lean#L212-L214 "DILL.famOfDer") carries it to a derivation in
+[`S`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Proof.lean#L137-L141 "DILL.S"), whose moves are the twenty rules;
+[`famOfDer`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Proof.lean#L212-L214 "DILL.famOfDer") carries it to a derivation in
 `Fam true`, which is what the theorems are about.
 
 <!-- lean: DILL.step_sound DILL.famToDer -->
@@ -347,13 +347,13 @@ What `dillmove` builds is a derivation of the explorer's proof system
       where DILL.FamToDer :=
         ∀ (j : DILL.Seq) (a : Fam true j), Nonempty (ProofTools.Explore.Der S j)
 
-*Lean:* [`DILL.step_sound`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Proof.lean#L156-L210) · PROVED · axioms: `Quot.sound`, `propext`; [`DILL.famToDer`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Proof.lean#L348-L349) · PROVED · axioms: `Quot.sound`, `propext`
+*Lean:* [`DILL.step_sound`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Proof.lean#L156-L210) · PROVED · axioms: `Quot.sound`, `propext`; [`DILL.famToDer`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Proof.lean#L348-L349) · PROVED · axioms: `Quot.sound`, `propext`
 
 Both PROVED. The first says that each move that applies is a rule of
 the calculus, applied to derivations of its premises: a derivation
 built with the tactic is a derivation of the calculus. The second is
 the converse: every instance of every rule is a move that the function
-[`step`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Proof.lean#L132-L135 "DILL.step") allows, so nothing derivable is out of the
+[`step`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Proof.lean#L132-L135 "DILL.step") allows, so nothing derivable is out of the
 tactic's reach. The campaign's
 [user's guide](https://github.com/fairflow/proof-tools/blob/main/calculi/DILL/campaign/users-guide.md)
 has every line of the tactic and every message.
@@ -434,11 +434,11 @@ has each with its source.
         ∀ (c : Bool) (Γ Γ' Δ : List Form) (C : Form),
           Γ.Perm Γ' → ∀ (d : Fam c (Γ ⨾ Δ ⟹ C)), ∃ (d' : Fam c (Γ' ⨾ Δ ⟹ C)), d'.height = d.height
 
-*Lean:* [`DILL.exchangeKeepsHeight`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Results.lean#L32-L33) · PROVED · axioms: `propext`; [`DILL.exchangeUKeepsHeight`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Results.lean#L35-L37) · PROVED · axioms: `Quot.sound`, `propext`
+*Lean:* [`DILL.exchangeKeepsHeight`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Results.lean#L32-L33) · PROVED · axioms: `propext`; [`DILL.exchangeUKeepsHeight`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Results.lean#L35-L37) · PROVED · axioms: `Quot.sound`, `propext`
 
 Both PROVED. `Δ.Perm Δ'` says that `Δ'` is a permutation of `Δ`.
 Exchange in the linear zone is the function
-[`Fam.exch`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/System.lean#L155-L159 "DILL.Fam.exch"). A rule that takes its principal
+[`Fam.exch`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/System.lean#L155-L159 "DILL.Fam.exch"). A rule that takes its principal
 formula out of the linear zone carries a proof that the zone of its
 conclusion is a permutation of the zone the figure writes, and exchange
 changes that proof and nothing above it; a rule that passes the whole
@@ -459,10 +459,10 @@ the next function.
       where DILL.ContractionU :=
         (c : Bool) → (Γ Δ : List Form) → (A C : Form) → Fam c (A :: A :: Γ ⨾ Δ ⟹ C) → Fam c (A :: Γ ⨾ Δ ⟹ C)
 
-*Lean:* [`DILL.weakeningU`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Results.lean#L26-L27) · PROVED · axioms: none; [`DILL.contractionU`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Results.lean#L29-L30) · PROVED · axioms: none
+*Lean:* [`DILL.weakeningU`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Results.lean#L26-L27) · PROVED · axioms: none; [`DILL.contractionU`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Results.lean#L29-L30) · PROVED · axioms: none
 
 Both PROVED (CCP, Theorem 2). Both are instances of one function,
-[`Fam.mono`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/System.lean#L198-L204 "DILL.Fam.mono"): a derivation at the unrestricted zone
+[`Fam.mono`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/System.lean#L198-L204 "DILL.Fam.mono"): a derivation at the unrestricted zone
 `Γ` is a derivation at every `Γ′` that has the members of `Γ`. The
 function is by recursion on the derivation. Only copy looks at `Γ`, and
 it asks for membership, which `Γ′` still gives; at !L and at cut!, which
@@ -478,10 +478,10 @@ which have the same members.
     weakening:      for every Γ, Δ, A and C,   if Γ ; Δ ⟹ C  then  Γ ; Δ, A ⟹ C
     refuted by:     · ; · ⟹ 1  is derivable,   · ; p ⟹ 1  is not
 
-*Lean, in paraphrase:* [`DILL.not_weakeningL`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Goals.lean#L34-L36) · PROVED · axioms: `Quot.sound`, `propext`
+*Lean, in paraphrase:* [`DILL.not_weakeningL`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Goals.lean#L34-L36) · PROVED · axioms: `Quot.sound`, `propext`
 
 **REFUTED.** The statement is the proposition
-[`WeakeningL`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Statements.lean#L53-L56 "DILL.WeakeningL"); the theorem in the caption is its
+[`WeakeningL`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Statements.lean#L53-L56 "DILL.WeakeningL"); the theorem in the caption is its
 negation.
 
 <!-- lean: DILL.not_contractionL paraphrase -->
@@ -489,20 +489,20 @@ negation.
     contraction:    for every Γ, Δ, A and C,   if Γ ; Δ, A, A ⟹ C  then  Γ ; Δ, A ⟹ C
     refuted by:     · ; p, p ⟹ p ⊗ p  is derivable,   · ; p ⟹ p ⊗ p  is not
 
-*Lean, in paraphrase:* [`DILL.not_contractionL`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Goals.lean#L38-L40) · PROVED · axioms: `Quot.sound`, `propext`
+*Lean, in paraphrase:* [`DILL.not_contractionL`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Goals.lean#L38-L40) · PROVED · axioms: `Quot.sound`, `propext`
 
 **REFUTED.** The statement is
-[`ContractionL`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Statements.lean#L58-L61 "DILL.ContractionL"); the theorem in the caption is
+[`ContractionL`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Statements.lean#L58-L61 "DILL.ContractionL"); the theorem in the caption is
 its negation.
 
 The source forbids both rules (CCP, p. 2). These two theorems say more:
 neither is admissible. That `· ; p ⟹ 1` has no derivation without cut
 is a case analysis on the last rule
-([`not_cf_weak`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Results.lean#L307-L314 "DILL.not_cf_weak")): 1R asks an empty linear zone,
+([`not_cf_weak`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Results.lean#L307-L314 "DILL.not_cf_weak")): 1R asks an empty linear zone,
 and every other rule asks for a conclusion or a hypothesis that is not
 there. For `· ; p ⟹ p ⊗ p` the last rule can only be ⊗R, and one of its
 two premises is `· ; · ⟹ p`
-([`not_cf_contr`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Results.lean#L316-L334 "DILL.not_cf_contr")). Cut elimination (section
+([`not_cf_contr`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Results.lean#L316-L334 "DILL.not_cf_contr")). Cut elimination (section
 5.2) then carries each to the calculus with cut. Exercises B1 and B2 are
 the two pairs, and exercise C7 refutes both sequents in a phase model.
 
@@ -530,7 +530,7 @@ of times (CCP, Principle 7, items 2 and 1).
       where DILL.CutElimination :=
         (j : DILL.Seq) → Fam true j → CF j
 
-*Lean:* [`DILL.cutAdmissible`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Cut.lean#L354-L357) · PROVED · axioms: `Quot.sound`, `propext`; [`DILL.cutUAdmissible`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Cut.lean#L359-L362) · PROVED · axioms: `Quot.sound`, `propext`; [`DILL.cutElimination`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Cut.lean#L364-L389) · PROVED · axioms: `Quot.sound`, `propext`
+*Lean:* [`DILL.cutAdmissible`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Cut.lean#L354-L357) · PROVED · axioms: `Quot.sound`, `propext`; [`DILL.cutUAdmissible`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Cut.lean#L359-L362) · PROVED · axioms: `Quot.sound`, `propext`; [`DILL.cutElimination`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Cut.lean#L364-L389) · PROVED · axioms: `Quot.sound`, `propext`
 
 All three PROVED, as functions
 ([`DILL/Cut.lean`](https://github.com/fairflow/proof-tools/blob/main/calculi/DILL/DILL/Cut.lean);
@@ -548,16 +548,16 @@ induction on three things in lexicographic order:
 3. the derivations of the premises.
 
 In Lean each level is a structural recursion.
-[`cutN`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Cut.lean#L342-L350 "DILL.Cut.cutN") is by recursion on a bound of the size of
+[`cutN`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Cut.lean#L342-L350 "DILL.Cut.cutN") is by recursion on a bound of the size of
 `A`, and gives both cuts on `A` from both cuts on every smaller formula.
 
 **The linear cut**, on `Γ ; Δ ⟹ A` and `Γ ; Δ′, A ⟹ C`. The function
-[`pushR`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Cut.lean#L177-L292 "DILL.Cut.pushR") takes the cut up the right premise, the
+[`pushR`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Cut.lean#L177-L292 "DILL.Cut.pushR") takes the cut up the right premise, the
 one that has `A` as a hypothesis. Where the last rule there acts on
 another formula, `A` is in the linear zone of one premise (⊗R, ⊸L), or
 of both (&R, ⊕L), or of the one premise: the cut goes to the premises
 that have `A`, and the same rule is applied below. Where the last rule
-is a left rule on `A` itself, [`pushL`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Cut.lean#L98-L173 "DILL.Cut.pushL") takes over
+is a left rule on `A` itself, [`pushL`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Cut.lean#L98-L173 "DILL.Cut.pushL") takes over
 and takes the cut up the left premise, past its left rules and copies,
 to the right rule that introduced `A`. There the two rules meet, and
 the cut is replaced by cuts on the immediate subformulas, which are
@@ -581,7 +581,7 @@ at a smaller formula.
 **The cut on a valid hypothesis, and why it has an induction of its
 own.** In `Γ ; · ⟹ A` and `Γ, A ; Δ ⟹ C`, the second premise may copy
 `A` any number of times, in any of its branches, so one linear cut
-cannot replace the cut!. The function [`pushU`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Cut.lean#L296-L331 "DILL.Cut.pushU") is
+cannot replace the cut!. The function [`pushU`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Cut.lean#L296-L331 "DILL.Cut.pushU") is
 by recursion on the right premise, with the left premise fixed. Every
 rule is applied again on the results for its premises. At a copy of `A`
 the premise is `Γ, A ; Δ, A ⟹ C`: the recursion first removes the valid
@@ -596,14 +596,14 @@ premises (exercise C2).
 **Three zones.** Inside the recursion the two premises and the
 conclusion have unrestricted zones of their own, `Γ₁`, `Γ₂` and `Γ′`,
 with every member of `Γ₁` and of `Γ₂` a member of `Γ′`
-([`CutLAt`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Cut.lean#L44-L49 "DILL.Cut.CutLAt")). When a cut passes !L, which adds a
+([`CutLAt`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Cut.lean#L44-L49 "DILL.Cut.CutLAt")). When a cut passes !L, which adds a
 formula to the zone of one premise, the zone of the conclusion grows and
 the other premise is left as it is. With one shared `Γ` the other
 premise would have to be weakened first, and the recursion would no
 longer be on a part of what it was given.
 
 **It computes.** The kernel evaluates the function. For the derivation
-[`exBang`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Cut.lean#L414-L427 "DILL.Cut.exBang"), a cut on `!(p & p)` between
+[`exBang`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Cut.lean#L414-L427 "DILL.Cut.exBang"), a cut on `!(p & p)` between
 `· ; !p ⟹ !(p & p)` and `· ; !(p & p) ⟹ p ⊗ p`, in which the right
 premise copies `p & p` twice:
 
@@ -619,7 +619,7 @@ and the result has the rules `!L(⊗R(copy(init), copy(init)))`.
       where DILL.CutEliminationProp :=
         ∀ (j : DILL.Seq), Derivable j → Nonempty (CF j)
 
-*Lean:* [`DILL.cutEliminationProp`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Completeness.lean#L309-L311) · PROVED · axioms: `Quot.sound`, `propext`
+*Lean:* [`DILL.cutEliminationProp`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Completeness.lean#L309-L311) · PROVED · axioms: `Quot.sound`, `propext`
 
 PROVED, in one line: a derivable sequent is valid (soundness, 7.2), and
 a valid sequent has a derivation without cut (completeness, 7.3). This
@@ -659,7 +659,7 @@ fact from `CF` to the calculus with cut use it.
       where DILL.BangRInv :=
         (Γ : List Form) → (A : Form) → CF (Γ ⨾ [] ⟹ !A) → CF (Γ ⨾ [] ⟹ A)
 
-*Lean:* [`DILL.tensorLInv`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Invert.lean#L24-L26) · PROVED · axioms: `Quot.sound`, `propext`; [`DILL.oneLInv`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Invert.lean#L28-L30) · PROVED · axioms: `Quot.sound`, `propext`; [`DILL.lolliRInv`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Invert.lean#L33-L36) · PROVED · axioms: `Quot.sound`, `propext`; [`DILL.withRInv`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Invert.lean#L39-L45) · PROVED · axioms: `Quot.sound`, `propext`; [`DILL.plusLInv`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Invert.lean#L48-L52) · PROVED · axioms: `Quot.sound`, `propext`; [`DILL.bangLInv`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Invert.lean#L55-L59) · PROVED · axioms: `Quot.sound`, `propext`; [`DILL.bangRInv`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Invert.lean#L62-L66) · PROVED · axioms: `Quot.sound`, `propext`
+*Lean:* [`DILL.tensorLInv`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Invert.lean#L24-L26) · PROVED · axioms: `Quot.sound`, `propext`; [`DILL.oneLInv`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Invert.lean#L28-L30) · PROVED · axioms: `Quot.sound`, `propext`; [`DILL.lolliRInv`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Invert.lean#L33-L36) · PROVED · axioms: `Quot.sound`, `propext`; [`DILL.withRInv`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Invert.lean#L39-L45) · PROVED · axioms: `Quot.sound`, `propext`; [`DILL.plusLInv`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Invert.lean#L48-L52) · PROVED · axioms: `Quot.sound`, `propext`; [`DILL.bangLInv`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Invert.lean#L55-L59) · PROVED · axioms: `Quot.sound`, `propext`; [`DILL.bangRInv`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Invert.lean#L62-L66) · PROVED · axioms: `Quot.sound`, `propext`
 
 All seven PROVED (CCP, Lemma 6), each by one admissible cut against a
 small derivation, as the source proves them
@@ -687,7 +687,7 @@ zones `(!A) :: Δ` and `(A ⊕ B) :: Δ`.
       where DILL.DeductionUnrestricted :=
         ∀ (Γ Δ : List Form) (A C : Form), Derivable (A :: Γ ⨾ Δ ⟹ C) ↔ Derivable (Γ ⨾ !A :: Δ ⟹ C)
 
-*Lean:* [`DILL.deductionLinear`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Invert.lean#L68-L72) · PROVED · axioms: `Quot.sound`, `propext`; [`DILL.deductionUnrestricted`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Invert.lean#L74-L78) · PROVED · axioms: `Quot.sound`, `propext`
+*Lean:* [`DILL.deductionLinear`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Invert.lean#L68-L72) · PROVED · axioms: `Quot.sound`, `propext`; [`DILL.deductionUnrestricted`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Invert.lean#L74-L78) · PROVED · axioms: `Quot.sound`, `propext`
 
 Both PROVED. A linear hypothesis is discharged by ⊸, and a valid one by
 `!` on the left: in each, one direction is the rule (⊸R, !L) and the
@@ -709,7 +709,7 @@ both sides, as the source says (CCP, Lemma 6, and p. 18 for ⊸L).
     ⊸L invertible:   if Γ ; Δ, Δ′, A ⊸ B ⟹ C  then  Γ ; Δ ⟹ A  and  Γ ; Δ′, B ⟹ C
     refuted by:      · ; p ⊸ q ⟹ p ⊸ q  is derivable,   · ; · ⟹ p  is not
 
-*Lean, in paraphrase:* [`DILL.not_tensorRInv`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Goals.lean#L52-L57) · PROVED · axioms: `Quot.sound`, `propext`; [`DILL.not_lolliLInv`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Goals.lean#L59-L65) · PROVED · axioms: `Quot.sound`, `propext`
+*Lean, in paraphrase:* [`DILL.not_tensorRInv`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Goals.lean#L52-L57) · PROVED · axioms: `Quot.sound`, `propext`; [`DILL.not_lolliLInv`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Goals.lean#L59-L65) · PROVED · axioms: `Quot.sound`, `propext`
 
 <!-- lean: DILL.not_withL₁Inv DILL.not_withL₂Inv paraphrase -->
 
@@ -719,7 +719,7 @@ both sides, as the source says (CCP, Lemma 6, and p. 18 for ⊸L).
     &L₂ invertible:  if Γ ; Δ, A & B ⟹ C  then  Γ ; Δ, B ⟹ C
     refuted by:      · ; p & q ⟹ p & q  is derivable,   · ; q ⟹ p & q  is not
 
-*Lean, in paraphrase:* [`DILL.not_withL₁Inv`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Goals.lean#L67-L71) · PROVED · axioms: `Quot.sound`, `propext`; [`DILL.not_withL₂Inv`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Goals.lean#L73-L77) · PROVED · axioms: `Quot.sound`, `propext`
+*Lean, in paraphrase:* [`DILL.not_withL₁Inv`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Goals.lean#L67-L71) · PROVED · axioms: `Quot.sound`, `propext`; [`DILL.not_withL₂Inv`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Goals.lean#L73-L77) · PROVED · axioms: `Quot.sound`, `propext`
 
 <!-- lean: DILL.not_plusR₁Inv DILL.not_plusR₂Inv paraphrase -->
 
@@ -729,15 +729,15 @@ both sides, as the source says (CCP, Lemma 6, and p. 18 for ⊸L).
     ⊕R₂ invertible:  if Γ ; Δ ⟹ A ⊕ B  then  Γ ; Δ ⟹ B
     refuted by:      · ; p ⊕ q ⟹ p ⊕ q  is derivable,   · ; p ⊕ q ⟹ q  is not
 
-*Lean, in paraphrase:* [`DILL.not_plusR₁Inv`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Goals.lean#L79-L83) · PROVED · axioms: `Quot.sound`, `propext`; [`DILL.not_plusR₂Inv`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Goals.lean#L85-L89) · PROVED · axioms: `Quot.sound`, `propext`
+*Lean, in paraphrase:* [`DILL.not_plusR₁Inv`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Goals.lean#L79-L83) · PROVED · axioms: `Quot.sound`, `propext`; [`DILL.not_plusR₂Inv`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Goals.lean#L85-L89) · PROVED · axioms: `Quot.sound`, `propext`
 
 **All six REFUTED.** The statements are the propositions
-[`TensorRInv`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Statements.lean#L125-L128 "DILL.TensorRInv"),
-[`LolliLInv`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Statements.lean#L130-L134 "DILL.LolliLInv"),
-[`WithL₁Inv`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Statements.lean#L136-L139 "DILL.WithL₁Inv"),
-[`WithL₂Inv`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Statements.lean#L141-L144 "DILL.WithL₂Inv"),
-[`PlusR₁Inv`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Statements.lean#L146-L148 "DILL.PlusR₁Inv") and
-[`PlusR₂Inv`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Statements.lean#L150-L152 "DILL.PlusR₂Inv"); each theorem in a caption is the
+[`TensorRInv`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Statements.lean#L125-L128 "DILL.TensorRInv"),
+[`LolliLInv`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Statements.lean#L130-L134 "DILL.LolliLInv"),
+[`WithL₁Inv`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Statements.lean#L136-L139 "DILL.WithL₁Inv"),
+[`WithL₂Inv`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Statements.lean#L141-L144 "DILL.WithL₂Inv"),
+[`PlusR₁Inv`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Statements.lean#L146-L148 "DILL.PlusR₁Inv") and
+[`PlusR₂Inv`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Statements.lean#L150-L152 "DILL.PlusR₂Inv"); each theorem in a caption is the
 negation of one. Each fact about a particular sequent is decided by the
 kernel, which runs the search of section 8.2: the sequents have no `!`
 and an empty unrestricted zone. Cut elimination as a proposition carries
@@ -751,11 +751,11 @@ and an empty unrestricted zone. Cut elimination as a proposition carries
       where DILL.IdentityExpansion :=
         (j : DILL.Seq) → CF j → { d : CF j // Fam.Atomic d }
 
-*Lean:* [`DILL.identityExpansion`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Results.lean#L123-L124) · PROVED · axioms: `Quot.sound`, `propext`
+*Lean:* [`DILL.identityExpansion`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Results.lean#L123-L124) · PROVED · axioms: `Quot.sound`, `propext`
 
-PROVED. [`Fam.Atomic`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Statements.lean#L156-L177 "DILL.Fam.Atomic") `d` says that every
+PROVED. [`Fam.Atomic`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Statements.lean#L156-L177 "DILL.Fam.Atomic") `d` says that every
 instance of init in `d` is at a letter. The function replaces each init
-at `A` by the derivation [`idExp`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Results.lean#L43-L60 "DILL.Res.idExp") `A` of
+at `A` by the derivation [`idExp`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Results.lean#L43-L60 "DILL.Res.idExp") `A` of
 `Γ ; A ⟹ A`, which is by recursion on `A`: the left rule of the
 connective below its right rule, or the other way where the right rule
 is the invertible one. For `A ⊗ B` it is ⊗L, then ⊗R with `A` to the
@@ -776,11 +776,11 @@ does not relate it to the derivation given.
         ∀ (j : DILL.Seq) (d : CF j),
           Fam.All (fun (j' : DILL.Seq) => ∀ (C : Form), C ∈ j'.forms → ∃ (D : Form), D ∈ j.forms ∧ C.IsSub D) d
 
-*Lean:* [`DILL.subformulaProperty`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Results.lean#L240-L246) · PROVED · axioms: `Quot.sound`, `propext`
+*Lean:* [`DILL.subformulaProperty`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Results.lean#L240-L246) · PROVED · axioms: `Quot.sound`, `propext`
 
-PROVED. [`Fam.All`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Statements.lean#L201-L225 "DILL.Fam.All") `P d` says that `P` holds of
+PROVED. [`Fam.All`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Statements.lean#L201-L225 "DILL.Fam.All") `P d` says that `P` holds of
 every sequent of the derivation `d`; `j.forms` is the conclusion of `j`
-with both its zones; and [`C.IsSub D`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Statements.lean#L185-L196 "DILL.Form.IsSub") says that
+with both its zones; and [`C.IsSub D`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Statements.lean#L185-L196 "DILL.Form.IsSub") says that
 `C` is a subformula of `D`. The proof is by recursion on the derivation
 without cut: read upwards, every rule of the figure replaces a formula
 by its immediate subformulas, or copies one (copy), or moves one (!L).
@@ -799,15 +799,15 @@ which side, a subformula occurs.
       where DILL.DisjunctionProperty :=
         ∀ (A B : Form), Derivable ([] ⨾ [] ⟹ A ⊕ B) → Derivable ([] ⨾ [] ⟹ A) ∨ Derivable ([] ⨾ [] ⟹ B)
 
-*Lean:* [`DILL.consistency`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Goals.lean#L20-L21) · PROVED · axioms: `Quot.sound`, `propext`; [`DILL.disjunctionProperty`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Goals.lean#L23-L24) · PROVED · axioms: `Quot.sound`, `propext`
+*Lean:* [`DILL.consistency`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Goals.lean#L20-L21) · PROVED · axioms: `Quot.sound`, `propext`; [`DILL.disjunctionProperty`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Goals.lean#L23-L24) · PROVED · axioms: `Quot.sound`, `propext`
 
 Both PROVED (Pfenning's notes, 3.11 and 3.12, stated there for natural
 deduction). No rule of the figure concludes `· ; · ⟹ 0`: init and every
 left rule ask for a linear hypothesis, copy for a valid one, and `0` has
-no right rule ([`consistencyCF`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Results.lean#L268-L275 "DILL.consistencyCF")). A
+no right rule ([`consistencyCF`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Results.lean#L268-L275 "DILL.consistencyCF")). A
 derivation without cut of `· ; · ⟹ A ⊕ B` can end only with ⊕R₁ or
 ⊕R₂, for the same reasons
-([`disjunctionCF`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Results.lean#L277-L292 "DILL.disjunctionCF"), a function: it returns the
+([`disjunctionCF`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Results.lean#L277-L292 "DILL.disjunctionCF"), a function: it returns the
 derivation of `A` or that of `B`). Cut elimination supplies the
 derivation without cut. With a hypothesis in either zone the disjunction
 property fails (exercise C5).
@@ -815,7 +815,7 @@ property fails (exercise C5).
 ## 6. The one-zone calculus, and the translation
 
 One-zone intuitionistic linear logic is the family
-[`ILL`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/ILL.lean#L24-L81 "DILL.ILL"): KOT's Figure 1, without the constant `⊥`. Its
+[`ILL`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/ILL.lean#L24-L81 "DILL.ILL"): KOT's Figure 1, without the constant `⊥`. Its
 sequents `Θ ⊢ C` have one multiset of hypotheses. Its rules for ⊗, 1,
 ⊸, &, ⊤, ⊕ and 0 are those of section 2 with the zone `Γ` removed, and
 `!` has four rules:
@@ -841,7 +841,7 @@ hypothesis is a `!` formula.
       where DILL.ILLEquivalence :=
         ∀ (Γ Δ : List Form) (C : Form), Derivable (Γ ⨾ Δ ⟹ C) ↔ ILLDerivable (List.map Form.bang Γ ++ Δ) C
 
-*Lean:* [`DILL.toILL`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Translate.lean#L204-L205) · PROVED · axioms: `Quot.sound`, `propext`; [`DILL.ofILL`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Translate.lean#L207-L209) · PROVED · axioms: `Quot.sound`, `propext`; [`DILL.illEquivalence`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Translate.lean#L211-L213) · PROVED · axioms: `Quot.sound`, `propext`
+*Lean:* [`DILL.toILL`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Translate.lean#L204-L205) · PROVED · axioms: `Quot.sound`, `propext`; [`DILL.ofILL`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Translate.lean#L207-L209) · PROVED · axioms: `Quot.sound`, `propext`; [`DILL.illEquivalence`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Translate.lean#L211-L213) · PROVED · axioms: `Quot.sound`, `propext`
 
 All three PROVED (CCP, Theorem 7, items 3 and 1;
 [`DILL/Translate.lean`](https://github.com/fairflow/proof-tools/blob/main/calculi/DILL/DILL/Translate.lean)).
@@ -849,7 +849,7 @@ All three PROVED (CCP, Theorem 7, items 3 and 1;
 
     Γ ; Δ ⟹ C   is derivable exactly when   !Γ, Δ ⊢ C   is.
 
-**From two zones to one** ([`toILLAux`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Translate.lean#L79-L130 "DILL.Tr.toILLAux")), by
+**From two zones to one** ([`toILLAux`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Translate.lean#L79-L130 "DILL.Tr.toILLAux")), by
 recursion on the derivation, for the calculus with cut and for the
 calculus without: a derivation without cut is sent to one without Cut.
 
@@ -873,12 +873,12 @@ derelicts and contracts, and below ⊗r the two `!p` are contracted.
 
 **From one zone to two**, in two steps. First a one-zone derivation of
 `Θ ⊢ C` is read as a two-zone derivation of `· ; Θ ⟹ C`
-([`ofILL0`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Translate.lean#L167-L198 "DILL.Tr.ofILL0")): !D is read as !L with copy as the
+([`ofILL0`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Translate.lean#L167-L198 "DILL.Tr.ofILL0")): !D is read as !L with copy as the
 rule above it, and !W as !L alone; !C and !r use the inversion of !L,
 which moves a `!A` of the linear zone into the unrestricted zone. Then the formulas `!Γ` of the linear zone
 are moved into the unrestricted zone, again by the inversion of !L
-([`unbangAll`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Translate.lean#L141-L146 "DILL.Tr.unbangAll")). The inversion used here
-([`Tr.bangLInv`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Translate.lean#L134-L139 "DILL.Tr.bangLInv")) is a cut against
+([`unbangAll`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Translate.lean#L141-L146 "DILL.Tr.unbangAll")). The inversion used here
+([`Tr.bangLInv`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Translate.lean#L134-L139 "DILL.Tr.bangLInv")) is a cut against
 `Γ ; · ⟹ !A`, so this direction is stated for the calculi with cut.
 
 One sequent of the one-zone calculus is several sequents here:
@@ -894,7 +894,7 @@ are derivable, and nothing about the derivations.
 ### 7.1 Phase spaces and models
 
 An **intuitionistic phase space** (KOT, Definition 2.2;
-[`PhaseSpace`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Semantics.lean#L16-L45 "DILL.PhaseSpace")) is a commutative monoid
+[`PhaseSpace`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Semantics.lean#L16-L45 "DILL.PhaseSpace")) is a commutative monoid
 `(M, ·, ε)`, whose elements are the phases, with a closure operator `Cl`
 on sets of phases:
 
@@ -905,10 +905,10 @@ A set is closed if it is its own closure. Two sets are fixed by the
 space: `1 = Cl({ε})`, and `I`, the set of the idempotents of `1`, the
 `x ∈ 1` with `x·x = x`.
 
-A **phase model** ([`PhaseModel`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Semantics.lean#L68-L77 "DILL.PhaseModel"), KOT,
+A **phase model** ([`PhaseModel`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Semantics.lean#L68-L77 "DILL.PhaseModel"), KOT,
 Definition 2.6) is a phase space with a closed set for each letter. It
 gives every formula a closed set
-([`interp`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Semantics.lean#L83-L97 "DILL.PhaseModel.interp")):
+([`interp`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Semantics.lean#L83-L97 "DILL.PhaseModel.interp")):
 
     ⟦p⟧      the set of p                ⟦1⟧      = Cl({ε})
     ⟦A ⊗ B⟧  = Cl(⟦A⟧ · ⟦B⟧)             ⟦A ⊸ B⟧  = { z  :  x·z ∈ ⟦B⟧  for every x ∈ ⟦A⟧ }
@@ -920,11 +920,11 @@ A sequent `G₁, …, Gₙ ; D₁, …, Dₘ ⟹ C` is read as the formula
 
     (!G₁ ⊗ … ⊗ !Gₙ ⊗ D₁ ⊗ … ⊗ Dₘ ⊗ 1) ⊸ C
 
-([`Seq.form`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Semantics.lean#L106-L110 "DILL.Seq.form"); this reading of a two-zone sequent
+([`Seq.form`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Semantics.lean#L106-L110 "DILL.Seq.form"); this reading of a two-zone sequent
 is the campaign's, since KOT satisfy formulas only). It is **satisfied
 in the model** if `ε` is in the interpretation of that formula
-([`Sat`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Semantics.lean#L112-L115 "DILL.PhaseModel.Sat")), and **valid** if it is satisfied in
-every model ([`Valid`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Semantics.lean#L117-L118 "DILL.Valid")). In Lean a set of phases is a
+([`Sat`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Semantics.lean#L112-L115 "DILL.PhaseModel.Sat")), and **valid** if it is satisfied in
+every model ([`Valid`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Semantics.lean#L117-L118 "DILL.Valid")). In Lean a set of phases is a
 predicate, nothing asks that membership be decidable, and the theorems
 below are proved with no excluded middle.
 
@@ -949,20 +949,20 @@ sequents with `!`.
       where DILL.Soundness :=
         ∀ (j : DILL.Seq), Derivable j → Valid j
 
-*Lean:* [`DILL.soundness`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Soundness.lean#L335-L340) · PROVED · axioms: `Quot.sound`, `propext`
+*Lean:* [`DILL.soundness`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Soundness.lean#L335-L340) · PROVED · axioms: `Quot.sound`, `propext`
 
 PROVED (KOT, Theorem 2.9, one half, there for the one-zone calculus),
 for the calculus with both cuts, by induction on the derivation
 ([`DILL/Soundness.lean`](https://github.com/fairflow/proof-tools/blob/main/calculi/DILL/DILL/Soundness.lean)).
 The proof first takes the formula of a sequent apart
-([`sat_iff_holds`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Soundness.lean#L232-L234 "DILL.Sem.sat_iff_holds")): the sequent is
+([`sat_iff_holds`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Soundness.lean#L232-L234 "DILL.Sem.sat_iff_holds")): the sequent is
 satisfied exactly when
 
     g·m ∈ ⟦C⟧     for every  g = g₁·…·gₙ  with  gᵢ ∈ ⟦Gᵢ⟧ ∩ I     and every  m = d₁·…·dₘ  with  dⱼ ∈ ⟦Dⱼ⟧
 
-([`Holds`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Soundness.lean#L171-L175 "DILL.Sem.Holds")). The phase `g` of the unrestricted
+([`Holds`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Soundness.lean#L171-L175 "DILL.Sem.Holds")). The phase `g` of the unrestricted
 zone is then an idempotent of `1`, and the twenty cases
-([`holds_of_fam`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Soundness.lean#L238-L331 "DILL.Sem.holds_of_fam")) use that in three ways.
+([`holds_of_fam`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Soundness.lean#L238-L331 "DILL.Sem.holds_of_fam")) use that in three ways.
 
 * `g ∈ 1`, and `1 · Y ⊆ Y` for a closed `Y`: so `g` may be dropped, as
   at init, where `g·a ∈ ⟦A⟧` for `a ∈ ⟦A⟧`. This is weakening of `Γ`.
@@ -985,13 +985,13 @@ so `g ∈ ⟦A⟧ ∩ I ⊆ ⟦!A⟧`. At !L a phase of `⟦!A⟧` may be taken 
       where DILL.Completeness :=
         ∀ (j : DILL.Seq), Valid j → Nonempty (CF j)
 
-*Lean:* [`DILL.completeness`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Completeness.lean#L303-L307) · PROVED · axioms: `Quot.sound`, `propext`
+*Lean:* [`DILL.completeness`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Completeness.lean#L303-L307) · PROVED · axioms: `Quot.sound`, `propext`
 
 PROVED (KOT, Theorem 2.9 with Remark 2.11, there for the one-zone
 calculus;
 [`DILL/Completeness.lean`](https://github.com/fairflow/proof-tools/blob/main/calculi/DILL/DILL/Completeness.lean)).
 The proof builds one model, the **canonical model**
-([`synModel`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Completeness.lean#L143-L148 "DILL.Sem.synModel")), on the two-zone calculus
+([`synModel`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Completeness.lean#L143-L148 "DILL.Sem.synModel")), on the two-zone calculus
 itself. No source read by the campaign builds it from two zones: the
 construction follows KOT's for one zone.
 
@@ -1003,9 +1003,9 @@ construction follows KOT's for one zone.
 * **The closed sets.** For a sequent `Γ′ ; Δ′ ⟹ C`, let
   `⟦Γ′ ; Δ′ ⟹ C⟧` be the set of the phases `(Γ, Δ)` such that
   `Γ, Γ′ ; Δ, Δ′ ⟹ C` has a derivation without cut
-  ([`inF`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Completeness.lean#L74-L84 "DILL.Sem.inF")). The closure of a set `X` is the
+  ([`inF`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Completeness.lean#L74-L84 "DILL.Sem.inF")). The closure of a set `X` is the
   intersection of the sets of this family that contain `X`
-  ([`synCl`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Completeness.lean#L111-L113 "DILL.Sem.synCl")). The family is closed under
+  ([`synCl`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Completeness.lean#L111-L113 "DILL.Sem.synCl")). The family is closed under
   `X ↦ {y} ⊸ X`, which gives the fourth law of a closure (KOT, Theorem
   2.8).
 * **The letters.** `⟦p⟧ = ⟦· ; · ⟹ p⟧`: the contexts that derive `p`.
@@ -1013,10 +1013,10 @@ construction follows KOT's for one zone.
 **Why the idempotents are the unrestricted contexts.** `(Γ, Δ)·(Γ, Δ)`
 is `(Γ, (Δ, Δ))`, since a set joined to itself is itself. So a phase is
 idempotent exactly when `Δ, Δ` is a permutation of `Δ`, that is, when
-`Δ` is empty ([`lin_nil_of_idem`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Completeness.lean#L180-L190 "DILL.Sem.lin_nil_of_idem")). And
+`Δ` is empty ([`lin_nil_of_idem`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Completeness.lean#L180-L190 "DILL.Sem.lin_nil_of_idem")). And
 every `(Γ, ·)` is in `1`: a set of the family that has `ε` has `(Γ, ·)`,
 by weakening of the unrestricted zone
-([`idem_cls`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Completeness.lean#L158-L169 "DILL.Sem.idem_cls")). So `I` is the set of the phases
+([`idem_cls`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Completeness.lean#L158-L169 "DILL.Sem.idem_cls")). So `I` is the set of the phases
 `(Γ, ·)`. The two structural rules that the first zone has are what
 makes its phases the idempotents of `1`, and that is the set that
 interprets `!`.
@@ -1026,7 +1026,7 @@ interprets `!`.
     theorem DILL.Sem.okada (B : Form) :
       Sem.synModel.interp B (Sem.cls [] [B]) ∧ ∀ (p : Sem.synModel.M), Sem.synModel.interp B p → Sem.inF ([] ⨾ [] ⟹ B) p
 
-*Lean:* [`DILL.Sem.okada`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Completeness.lean#L192-L278) · PROVED · axioms: `Quot.sound`, `propext`
+*Lean:* [`DILL.Sem.okada`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Completeness.lean#L192-L278) · PROVED · axioms: `Quot.sound`, `propext`
 
 PROVED: the main lemma (KOT, Lemma 2.10, after Okada), by induction on
 the formula `B`. `cls [] [B]` is the phase `(·, B)`. The statement has
@@ -1042,12 +1042,12 @@ the product; a set `⟦Γ′ ; Δ′ ⟹ C⟧` that contains the product then ha
 second half, phases of `⟦A⟧` and `⟦B⟧` derive `A` and `B`, and ⊗R,
 after weakening both to the union of their first parts, derives `A ⊗ B`
 from their product. For `!B`: the phase `(B, ·)` is in `⟦B⟧` by copy
-([`interp_copy`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Completeness.lean#L171-L178 "DILL.Sem.interp_copy")) and is an idempotent of
+([`interp_copy`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Completeness.lean#L171-L178 "DILL.Sem.interp_copy")) and is an idempotent of
 `1`, and !L gives the first half; a phase of `⟦B⟧ ∩ I` is some `(Γ, ·)`
 that derives `B`, and !R, which asks exactly for an empty linear zone,
 gives the second.
 
-Completeness follows ([`cf_of_sat`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Completeness.lean#L292-L299 "DILL.Sem.cf_of_sat")). By the
+Completeness follows ([`cf_of_sat`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Completeness.lean#L292-L299 "DILL.Sem.cf_of_sat")). By the
 first half of the lemma, `(Γ, ·)` is a product of idempotent phases of
 the formulas of `Γ`, and `(·, Δ)` a product of phases of the formulas of
 `Δ`. If `Γ ; Δ ⟹ C` is valid it is satisfied in the canonical model, so
@@ -1063,7 +1063,7 @@ without cut.
     theorem DILL.valid_perm {Γ Γ' Δ Δ' : List Form} {C : Form} (eΓ : Γ.Perm Γ') (eΔ : Δ.Perm Δ') :
       Valid (Γ ⨾ Δ ⟹ C) ↔ Valid (Γ' ⨾ Δ' ⟹ C)
 
-*Lean:* [`DILL.Sem.valid_iff_derivable`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Completeness.lean#L313-L315) · PROVED · axioms: `Quot.sound`, `propext`; [`DILL.valid_perm`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Goals.lean#L93-L100) · PROVED · axioms: `Quot.sound`, `propext`
+*Lean:* [`DILL.Sem.valid_iff_derivable`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Completeness.lean#L313-L315) · PROVED · axioms: `Quot.sound`, `propext`; [`DILL.valid_perm`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Goals.lean#L93-L100) · PROVED · axioms: `Quot.sound`, `propext`
 
 Both PROVED. The first is soundness and completeness together. The
 second is there because the formula of a sequent is written through an
@@ -1137,7 +1137,7 @@ premise.
 
     def DILL.scriptCert : Certify.Certifier DILL.Seq (ProofTools.Explore.Script S) (Fam true)
 
-*Lean:* [`DILL.treeCert`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Run.lean#L36-L38) · PROVED · axioms: `Quot.sound`, `propext`; [`DILL.scriptCert`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Run.lean#L40-L42) · PROVED · axioms: `Quot.sound`, `propext`
+*Lean:* [`DILL.treeCert`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Run.lean#L36-L38) · PROVED · axioms: `Quot.sound`, `propext`; [`DILL.scriptCert`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Run.lean#L40-L42) · PROVED · axioms: `Quot.sound`, `propext`
 
 Both PROVED: a certifier is a check together with the proof that what
 it accepts is so, here that a tree (or a script, the same moves in the
@@ -1153,7 +1153,7 @@ tree of the first worked derivation, checked by the kernel:
 
 A tree with a wrong move, or one that stops early, is rejected.
 
-**The search.** [`Run.proveLazy`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Run.lean#L53-L59 "DILL.Run.proveLazy") `j n` is a
+**The search.** [`Run.proveLazy`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Run.lean#L53-L59 "DILL.Run.proveLazy") `j n` is a
 producer of trees
 ([`DILL/Lazy.lean`](https://github.com/fairflow/proof-tools/blob/main/calculi/DILL/DILL/Lazy.lean)):
 a search without cut that applies the rules that lose nothing first,
@@ -1194,7 +1194,7 @@ have its times.
     theorem DILL.Dec.search_complete (n : Nat) (Δ : List Form) (C : Form) :
       ssize Δ + C.size ≤ n → Dec.LBF (C :: Δ) → Nonempty (CF ([] ⨾ Δ ⟹ C)) → Option.isSome (Dec.search n Δ C) = true
 
-*Lean:* [`DILL.decideCF`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Decide.lean#L514-L518) · PROVED · axioms: `Quot.sound`, `propext`; [`DILL.bangFreeDecidable`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Goals.lean#L26-L30) · PROVED · axioms: `Quot.sound`, `propext`; [`DILL.Dec.search_complete`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Decide.lean#L476-L497) · PROVED · axioms: `Quot.sound`, `propext`
+*Lean:* [`DILL.decideCF`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Decide.lean#L514-L518) · PROVED · axioms: `Quot.sound`, `propext`; [`DILL.bangFreeDecidable`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Goals.lean#L26-L30) · PROVED · axioms: `Quot.sound`, `propext`; [`DILL.Dec.search_complete`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Decide.lean#L476-L497) · PROVED · axioms: `Quot.sound`, `propext`
 
 All PROVED
 ([`DILL/Decide.lean`](https://github.com/fairflow/proof-tools/blob/main/calculi/DILL/DILL/Decide.lean)).
@@ -1204,7 +1204,7 @@ does not apply, nor do !L and !R, and no other rule changes the
 unrestricted zone or brings in a `!`. Read upwards, every other rule
 removes a connective or a constant, so the size of the sequent bounds
 the height of a derivation without cut.
-[`search`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Decide.lean#L284-L297 "DILL.Dec.search") `n Δ C` tries init, then the right rule
+[`search`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Decide.lean#L284-L297 "DILL.Dec.search") `n Δ C` tries init, then the right rule
 of the conclusion, then each hypothesis in turn as the principal
 formula of its left rule; ⊗R and ⊸L try every division. It returns a
 derivation, so it is sound by its type, and `search_complete` says that
@@ -1224,7 +1224,7 @@ evaluates it:
     example : ¬ Nonempty (CF ([] ⨾ [p ⊸ (q ⊗ r)] ⟹ (p ⊸ q) ⊗ (p ⊸ r))) := by decide
 
 For `Derivable`, with the cuts, go through
-[`Sem.derivable_iff_cf`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Completeness.lean#L317-L318 "DILL.Sem.derivable_iff_cf"). On a sequent
+[`Sem.derivable_iff_cf`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Completeness.lean#L317-L318 "DILL.Sem.derivable_iff_cf"). On a sequent
 with `!`, or with a valid hypothesis, `decide` finds no instance and
 says `failed to synthesize Decidable …`. The search tries every
 division, so it is slow where ⊗R or ⊸L must divide a long zone.
@@ -1232,7 +1232,7 @@ division, so it is slow where ⊗R or ⊸L must divide a long zone.
 ### 8.3 A saturated set of sequents, against a derivation
 
 A finite set `D` of sequents is **saturated**
-([`saturated`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Saturated.lean#L161-L163 "DILL.Sat.saturated")) when
+([`saturated`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Saturated.lean#L161-L163 "DILL.Sat.saturated")) when
 
 * no member is the conclusion of a rule with no premise: none is an
   instance of init, of 1R, of ⊤R or of 0L;
@@ -1256,12 +1256,12 @@ needs is again a member.
 
     def DILL.noDerivableBySet : Certify.Certifier DILL.Seq (List DILL.Seq) fun (j : DILL.Seq) => Derivable j → False
 
-*Lean:* [`DILL.not_cf_of_refutedBy`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Saturated.lean#L409-L416) · PROVED · axioms: `Quot.sound`, `propext`; [`DILL.noCFBySet`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/SatRun.lean#L27-L30) · PROVED · axioms: `Quot.sound`, `propext`; [`DILL.noDerivableBySet`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/SatRun.lean#L32-L36) · PROVED · axioms: `Quot.sound`, `propext`
+*Lean:* [`DILL.not_cf_of_refutedBy`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Saturated.lean#L409-L416) · PROVED · axioms: `Quot.sound`, `propext`; [`DILL.noCFBySet`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/SatRun.lean#L27-L30) · PROVED · axioms: `Quot.sound`, `propext`; [`DILL.noDerivableBySet`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/SatRun.lean#L32-L36) · PROVED · axioms: `Quot.sound`, `propext`
 
 All PROVED
 ([`DILL/Saturated.lean`](https://github.com/fairflow/proof-tools/blob/main/calculi/DILL/DILL/Saturated.lean),
 [`DILL/SatRun.lean`](https://github.com/fairflow/proof-tools/blob/main/calculi/DILL/DILL/SatRun.lean)).
-[`refutedBy`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Saturated.lean#L167-L169 "DILL.refutedBy") `D j` is the check: `j` is a member
+[`refutedBy`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Saturated.lean#L167-L169 "DILL.refutedBy") `D j` is the check: `j` is a member
 of `D`, and `D` is saturated. This is the second certificate: a set of
 sequents, written as data, against a derivation.
 
@@ -1299,7 +1299,7 @@ instance of init is a member.
     theorem DILL.Sat.no_bang {D : List DILL.Seq} (hs : Sat.saturated D = true) {k : DILL.Seq} (hk : k ∈ D) (A : Form) :
       ¬!A ∈ k.lin
 
-*Lean:* [`DILL.Sat.unr_nil`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Saturated.lean#L382-L393) · PROVED · axioms: `Quot.sound`, `propext`; [`DILL.Sat.no_bang`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Saturated.lean#L395-L405) · PROVED · axioms: `Quot.sound`, `propext`
+*Lean:* [`DILL.Sat.unr_nil`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Saturated.lean#L382-L393) · PROVED · axioms: `Quot.sound`, `propext`; [`DILL.Sat.no_bang`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Saturated.lean#L395-L405) · PROVED · axioms: `Quot.sound`, `propext`
 
 Both PROVED. A member with a formula `A` in its unrestricted zone asks
 for the premise of copy, whose linear zone is longer by `A`, and that
@@ -1310,7 +1310,7 @@ is Lean's printing of `(!A) ∉ k.lin`). The certificate is for the
 sequents with an empty unrestricted zone whose failed search never
 meets a `!` on the left. A `!` on the right is no obstacle.
 
-The producer is [`refuteSet`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Refute.lean#L234-L241 "DILL.refuteSet"): a search that
+The producer is [`refuteSet`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Refute.lean#L234-L241 "DILL.refuteSet"): a search that
 remembers every sequent it settles, and returns those it answered "no"
 of. It is not trusted, and that it finds a set wherever there is one is
 not proved. For the sequent of B4 it returns eight sequents. The
@@ -1337,8 +1337,8 @@ a decision procedure. Here the search of 8.1 answers "yes" where it
 finds a derivation within its budget, the saturated sets of 8.3 answer
 "no" on part of the fragment where copy and !L are never met, and
 between them is a region where neither answers. The two are joined in
-one engine, [`dillEngine`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Engine.lean#L44-L47 "DILL.dillEngine"), whose producer
-([`produce`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Engine.lean#L33-L42 "DILL.produce")) answers `pass` with a script, `fail`
+one engine, [`dillEngine`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Engine.lean#L44-L47 "DILL.dillEngine"), whose producer
+([`produce`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Engine.lean#L33-L42 "DILL.produce")) answers `pass` with a script, `fail`
 with a saturated set, or `flag`:
 
     · ; !p ⟹ !p ⊗ !p              at budget 2:   pass
@@ -1357,12 +1357,12 @@ hand: the campaign has no producer of countermodels.
       (∃ (c : ProofTools.Explore.Cert S), treeCert.check ([] ⨾ Δ ⟹ C) c = true) ∨
         noDerivableDec.check ([] ⨾ Δ ⟹ C) () = true
 
-*Lean:* [`DILL.decidedBangFree`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Engine.lean#L77-L97) · PROVED · axioms: `Quot.sound`, `propext`
+*Lean:* [`DILL.decidedBangFree`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Engine.lean#L77-L97) · PROVED · axioms: `Quot.sound`, `propext`
 
 PROVED: where `!` does not occur and the unrestricted zone is empty,
 one side always answers. There the answer against a derivation is the
 decision of 8.2 run by the kernel
-([`noDerivableDec`](https://github.com/fairflow/proof-tools/blob/38d477c/calculi/DILL/DILL/Engine.lean#L69-L75 "DILL.noDerivableDec")), with no certificate
+([`noDerivableDec`](https://github.com/fairflow/proof-tools/blob/65cc6df/calculi/DILL/DILL/Engine.lean#L69-L75 "DILL.noDerivableDec")), with no certificate
 written.
 
 ### Exercises D: what runs
