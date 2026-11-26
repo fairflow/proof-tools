@@ -159,12 +159,19 @@ a note says where a choice made here would, or would not, carry over.
     sizing loop run by `#eval` did not end in five minutes on inputs the
     compiled driver settles in milliseconds. Measure with the compiled
     driver, under a deadline, from the start.
-25. **The session ended under a running command**, and stood idle for
-    two hours until the reviewer wrote; an agent started before that
-    had written nothing to disk. The skill's status section records the
-    same of the GLS run. The session that started this one ended at
-    the same time, so the cause was the application and not the
-    command. *Proposed*: a brief to an agent should ask
+25. **Where the time went after the reviewer's request** (from the
+    session's record, 11:39 to 14:00): five tool calls each waited about
+    ten minutes on a hook of the application that did not answer, and
+    then failed (11:43 to 12:35, about 45 minutes); then the session's
+    process ended under a running command at 12:38 and nothing ran
+    until the reviewer wrote at 13:58 (80 minutes). About a quarter of
+    an hour was work. An agent started before that had written nothing
+    to disk. The skill's status section records an idle session of the
+    GLS run too. The session that started this one also ended under a
+    running call, so the cause was the application and not the
+    command. The operator first told the reviewer "ended at about
+    11:50", from assumption; the times here are the record's.
+    *Proposed*: a brief to an agent should ask
     that its files be on disk early and grown, and long timing runs go
     in the background with their output in a file.
 

@@ -42,8 +42,11 @@ Where "before" is written, the time the agent reported was not taken
 from the clock; the bound is the commit that has its result.
 
 After the closing page, at the reviewer's word (the saturated sets and
-the tutorial): 11:20 to 14:11 by the clock, of which about two hours
-(11:50 to 14:00) the session's process was not running. One more agent,
+the tutorial): 11:39 to 14:11 by the clock. Of that, by the session's
+record: about 45 minutes (11:43 to 12:35) in five tool calls that each
+waited ten minutes on a hook that did not answer; 80 minutes (12:38 to
+13:58) with the session's process not running; the rest, about half an
+hour, work. One more agent,
 a6, wrote the tutorial: 376 105 tokens, 600 s of its own time after it
 was restarted.
 
