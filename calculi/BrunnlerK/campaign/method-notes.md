@@ -717,3 +717,115 @@ section "From the command line" of its user's guide, all at commit
     library function (it waits for a third calculus that prints its
     judgments as Lean source); DILL's printed file, which is its
     owner's.
+
+## After the campaign: `ksearch prove` brought to the skill's paragraph (2026-11-26)
+
+The paragraph "A judgment typed at a shell" of `reference/certify.md`
+§5 was read at `c8454ad`, after the notes of MALL, GLS and DILL had gone
+into it. The directing session asked for three alignments and for a
+reading of the two lines that are new since K's command was built. What
+became of note 75 is written under it by the directing session; it is
+kept where it is.
+
+76. **The three alignments.** (a) `Corpus/prove_corpus.py` started its
+    commands with `subprocess.run(timeout=…)`, which at the deadline
+    ends `lake` and leaves the `lean` under it. Each command now starts
+    in a process group of its own, and the group is ended
+    (`os.killpg`); the new script `Corpus/prove_families.py` does the
+    same. Seen to work: a file cut off at 240 s left no `lean` behind.
+    (b) The two options that lift Lean's limits are written in every
+    file; the threshold (more than 400 moves, or deeper than 40) is
+    gone. (c) The check is a theorem of its own, `checked`, stated
+    through the certifier and given to each `verdict`. Measured, as
+    asked, and it made no difference here: the file of `tree 14` (a
+    countermodel of 32 767 nodes, the "no" side's two facts) took
+    13.31 s with the check run twice and 13.13 s with it run once. For
+    K the kernel's check is a small part of the time; Lean reading the
+    term is the rest. The "derivable" side ran its check once before as
+    well (`derivable` is `⟨proof⟩`). The change was made all the same,
+    for what it gives apart from time: a certificate altered is now
+    refused at the theorem, in words that name the check (``Tactic
+    `decide` proved that the proposition noValid.check sequent
+    countermodel = true is false``), and not at a default argument
+    ("could not synthesize default value for parameter 'h'"). `checked`
+    is stated of `noValid.check` and given to `noDerivable.verdict` as
+    well: the two checks are one function, and Lean sees it by
+    unfolding, at no cost that the timing shows.
+
+77. **What the paragraph does not say: do not print a certificate by
+    `Repr`.** Found while measuring for (c). `Repr` indents each line
+    by the depth of its place in the term. The file for `boxAnd 64`
+    (2 335 moves) was 86 MB, of which 82 MB were spaces at the start of
+    a line; for `boxAnd 128`, `Repr` wrote 1.26 GB, and the command
+    took 13.7 s to print what the search had found in 19 ms, which at
+    the default deadline is a flag. The section says of `Repr` that
+    its output broken over lines "is not always Lean source"; it does
+    not say that its size is the size of the term times its depth.
+    `Main.lean` now has printers of its own for the two certificates
+    (`certSrc`, `treeSrc`: thirty lines, a node to a line, written onto
+    the end of one text): 2.6 MB for 86 MB, the command at 0.03 s, and
+    the file elaborated in 11.6 s for 17.9 s. A printer of one's own
+    can print something other than the term; what guards it is that
+    the file is elaborated, for the corpus and the families. For the
+    other owners: count the spaces in a large printed file.
+
+78. **"A certificate beyond the kernel": K did not meet it, and now
+    does.** The first report said that beyond `boxAnd 64` and `nest
+    256` "nothing is known". Now measured, under 8 GB and 240 s
+    (`measurements-2026-11-23.md`, "`ksearch prove` beyond the
+    corpus"): a tree of moves is checked at 2 335 moves and not at
+    5 039; a derivable sequent at depth 385 and not at 513 (stopped at
+    8 GB, with a file of 1.9 MB, smaller than one that was checked: a
+    move carries its formula, so depth costs by itself); a countermodel
+    at 131 071 nodes, the next member being too long for a command
+    line. The search prints all of these within a second or so. So the
+    first line now says `derivable, on the program's check (a
+    certificate larger than any Lean was seen to check)` above the
+    sizes seen checked (three numbers in `Main.lean`), and reads as
+    before below them. Two things the line of the paragraph leaves
+    open. One size does not do: the length of the certificate did not
+    separate the files checked from those not checked, and depth had to
+    be a second measure, on the "derivable" side only (a countermodel
+    4 097 deep is checked in 2.6 s). And between the largest seen
+    checked and the smallest seen to fail nothing is known; K words
+    that region as not checked, which errs towards claiming less.
+    Unlike the threshold of (b), a wrong guess here refuses nothing: it
+    changes a sentence.
+
+79. **"Run on the corpus, and beyond it", sentence by sentence.**
+    `ksearch corpus` and a script that compares each exit code with the
+    recorded status and elaborates each file: there since the first
+    build. A flag agrees with either status and the script names the
+    flagged entries: now so (none in the corpus). Process groups: note
+    76 (a). Counts by verdict and by kind of certificate: K has one
+    kind for each verdict, so they are one count: derivable 11, not
+    derivable 11, flag 0. One file of each kind elaborated, and one of
+    each altered and refused: done again with the files as they now
+    are. The alterations cannot pass: in the countermodel of `◇ā ∨ □□a`
+    the proposition `a` is made false at the child of the root, which
+    makes `◇ā` true at the root; in the tree of moves an axiom is put
+    on a proposition that its node does not have. A flag that can be
+    made at will: `--deadline=1` on `nest 1024`, whose search takes
+    19 s. The flags of a defect were never seen. Members of the
+    families until each kind has been seen: K has no `ksearch
+    families`; `ksearch show <family> <n>` gives a member, and
+    `Corpus/prove_families.py` takes the members on its command line,
+    with two families the corpus has not (`tree`, `chain`) written in
+    the script, since only the script needs them. Not added: `ksearch
+    families`, for that reason. One thing met there that the paragraph
+    does not have: **a text has a largest size**, the operating
+    system's limit on a command line (`tree 18`, 2.6 MB: "Argument list
+    too long"). On the "no" side K reaches that limit before Lean's.
+    The command does not read its text from the standard input; that
+    would lift the limit, and was not added.
+
+80. **Asked of the directing session.** In the paragraph: a line on
+    printing (note 77: not by `Repr`; a node to a line; the size
+    measured); under "A certificate beyond the kernel", that more than
+    one measure of size may be needed, and how the region between is
+    worded (note 78); under "Run on the corpus", that a text typed at a
+    shell has a largest size (note 79). A correction: the paragraph
+    says of the letters that "K takes `a`, `b`"; K takes `p q r s a b c
+    d` and `p0`, `p1`, …, and its refusal of a letter names them. For
+    the owners of GLS, MALL and DILL: whether their printed files are
+    mostly indentation.

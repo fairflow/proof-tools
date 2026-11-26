@@ -16,6 +16,9 @@
                                   seconds, 10 if not given.  Exit code 0
                                   derivable, 1 not derivable, 3 flag, 2 a
                                   text that is not a sequent
+                                  Above the sizes Lean was seen to check,
+                                  the first line says that the answer
+                                  rests on the program's check
     ksearch corpus                the corpus as texts: name, status, the
                                   sequent in the source's notation, as
                                   Lean source, and with the signs of a
@@ -64,9 +67,84 @@ open BrunnlerK BrunnlerK.Corpus
 
 /-! ## A sequent typed at a shell -/
 
-/-- The depth of a tree of moves. -/
-partial def certDepth : Cert S → Nat
-  | .node _ cs => 1 + (cs.map fun x => certDepth x.2).foldl max 0
+/-! The certificates as Lean source, written here and not by `Repr`.
+`Repr` indents each line by the depth of its place in the term: for a
+tree of 2 335 moves 82 of the 86 megabytes it wrote were indentation, and
+for one of 8 767 moves it wrote 1.26 gigabytes.  These printers write a
+node to a line, with the names as the file's `open BrunnlerK` resolves
+them, onto the end of a text (which is then extended in place). -/
+
+/-- A formula by its constructors. -/
+def formSrc (acc : String) : Form → String
+  | .atom n => acc ++ s!"(Form.atom {n})"
+  | .natom n => acc ++ s!"(Form.natom {n})"
+  | .or A B => formSrc (formSrc (acc ++ "(Form.or ") A ++ " ") B ++ ")"
+  | .and A B => formSrc (formSrc (acc ++ "(Form.and ") A ++ " ") B ++ ")"
+  | .dia A => formSrc (acc ++ "(Form.dia ") A ++ ")"
+  | .box A => formSrc (acc ++ "(Form.box ") A ++ ")"
+
+/-- A move by its constructor. -/
+def moveSrc (acc : String) : Move → String
+  | .ax a p => acc ++ s!"(Move.ax {a} {p})"
+  | .and a A B => formSrc (formSrc (acc ++ s!"(Move.and {a} ") A ++ " ") B ++ ")"
+  | .or a A B => formSrc (formSrc (acc ++ s!"(Move.or {a} ") A ++ " ") B ++ ")"
+  | .box a A => formSrc (acc ++ s!"(Move.box {a} ") A ++ ")"
+  | .dia a i A => formSrc (acc ++ s!"(Move.dia {a} {i} ") A ++ ")"
+
+/-- A tree of moves, a move to a line. -/
+partial def certSrc (acc : String) : Cert S → String
+  | .node m cs =>
+    let acc := moveSrc (acc ++ "\n (ProofTools.Zip.RTree.node ") m ++ " ["
+    let out := cs.foldl (init := (acc, true)) fun (acc, first) x =>
+      (certSrc (acc ++ (if first then "(()," else ", ((),")) x.2 ++ ")", false)
+    out.1 ++ "])"
+
+/-- A finite tree, a node to a line. -/
+partial def treeSrc (acc : String) : Tree → String
+  | .node v ks =>
+    let acc := acc ++ s!"\n (Tree.node {v} ["
+    let out := ks.foldl (init := (acc, true)) fun (acc, first) t =>
+      (treeSrc (if first then acc else acc ++ ", ") t, false)
+    out.1 ++ "])"
+
+/-- Lean's two limits, lifted in every file the command prints.  Without
+them a tree of 2 335 moves, and a sequent nested 256 deep, were not
+elaborated; with them both were.  In every file, and not only for a large
+answer: a threshold on the size of the answer has to guess which size
+Lean's limits are met at, and a guess that is wrong refuses a file that
+is right (so MALL found). -/
+def liftLimits : String := "
+-- Lean's limits on the depth of recursion and on its own work, lifted for
+-- this file: the terms below may be large or deep.
+set_option maxRecDepth 1000000
+set_option maxHeartbeats 0
+"
+
+/-- The head of the file `ksearch prove` prints, after its first line: the
+imports, and a name for each of the propositions `p q r s a b c d` that
+the sequent has. -/
+def proveHead (Γ : NSeq) : String :=
+  let names := ((List.range 8).filter fun n => Γ.props.contains n).map fun n =>
+    s!"abbrev {propName n} : Form := .atom {n}\n"
+  "/-
+Written by `ksearch prove` (`Main.lean`) for a sequent typed at a shell.
+The program is not trusted.  The kernel checks the certificate below when
+this file is elaborated, in `calculi/BrunnlerK`: `lake env lean <file>`.
+-/
+import BrunnlerK.Run
+import BrunnlerK.Tactic
+
+namespace BrunnlerK.Answer
+
+open BrunnlerK
+
+" ++ String.join names ++ liftLimits ++ s!"
+/-- The sequent, as it was read. -/
+def sequent : NSeq := {Γ.src}
+"
+
+def proveFoot : String :=
+  "\nend BrunnlerK.Answer\n\n#axioms_within_file [propext, Quot.sound]\n"
 
 /-- How deep the connectives of a formula are nested. -/
 def formDepth : Form → Nat
@@ -82,82 +160,74 @@ def seqDepth : NSeq → Nat
   | .leaf fs => (fs.map formDepth).foldl max 0
   | .cons Δ r => max (1 + seqDepth Δ) (seqDepth r)
 
-/-- The depth of a finite tree. -/
-partial def treeDepth : Tree → Nat
-  | .node _ ks => 1 + (ks.map treeDepth).foldl max 0
+/-! The largest answers Lean was seen to check, each file under a cap of
+8 GB on memory and within 240 s (`Corpus/prove_families.py`; the table is
+in `campaign/measurements-2026-11-23.md`, "`ksearch prove` beyond the
+corpus").  The search prints in under a second certificates that Lean did
+not check so: `boxAnd 96` (cut off at 240 s) and `nest 512` (stopped at
+8 GB).  Beyond these three sizes the first line says that the answer
+rests on the program's check; the file is printed all the same, and a
+machine with more memory or time may check it. -/
 
-/-- Lean's two limits, lifted for a file whose terms are large or deep.
-Without them a tree of 2 335 moves, and a sequent nested 256 deep, were
-not elaborated; with them both were, in 17 s and 13 s.  Written only
-where the sequent is nested more than 40 deep or the tree has more than
-400 moves or is more than 40 deep: below that Lean's own limits serve. -/
-def liftLimits (large : Bool) : String :=
-  if large then "
--- The terms below are large: Lean's limits on the depth of recursion and
--- on its own work are lifted for this file.
-set_option maxRecDepth 1000000
-set_option maxHeartbeats 0
-" else ""
+/-- The deepest sequent seen checked with its tree of moves: `nest 384`.
+(Depth is no measure on the other side: a move carries its formula, a
+countermodel does not, and `chain 4096` was checked in seconds.) -/
+def seenDepth : Nat := 385
+/-- The longest tree of moves seen checked, in characters: `boxAnd 64`. -/
+def seenMoves : Nat := 2600000
+/-- The longest countermodel seen checked, in characters: `tree 16`. -/
+def seenTree : Nat := 4500000
 
-/-- The head of the file `ksearch prove` prints, after its first line: the
-imports, and a name for each of the propositions `p q r s a b c d` that
-the sequent has. -/
-def proveHead (Γ : NSeq) (large : Bool) : String :=
-  let names := ((List.range 8).filter fun n => Γ.props.contains n).map fun n =>
-    s!"abbrev {propName n} : Form := .atom {n}\n"
-  "/-
-Written by `ksearch prove` (`Main.lean`) for a sequent typed at a shell.
-The program is not trusted.  The kernel checks the certificate below when
-this file is elaborated, in `calculi/BrunnlerK`: `lake env lean <file>`.
--/
-import BrunnlerK.Run
-import BrunnlerK.Tactic
-
-namespace BrunnlerK.Answer
-
-open BrunnlerK
-
-" ++ String.join names ++ liftLimits large ++ s!"
-/-- The sequent, as it was read. -/
-def sequent : NSeq := {Γ.src}
-"
-
-def proveFoot : String :=
-  "\nend BrunnlerK.Answer\n\n#axioms_within_file [propext, Quot.sound]\n"
+def unseen : String :=
+  ", on the program's check (a certificate larger than any Lean was seen to check)"
 
 /-- The answer for a sequent: the exit code, the verdict, and the rest of
 the file.  What the search returns is checked here before it is printed;
 a certificate that did not pass would be a defect of the search, and the
-answer is then `flag`. -/
+answer is then `flag`.
+
+In the file the check is a theorem of its own (`checked`), stated through
+the certifier and proved once by the kernel; each fact is `verdict` with
+that theorem.  Left to its default argument, `verdict` would run the
+check again for each fact. -/
 def answer (Γ : NSeq) : UInt32 × String × String :=
   match search Γ with
   | .inl d =>
     let c := d.toCert
     if treeCert.check Γ c then
-      let large := seqDepth Γ > 40 || certSize c > 400 || certDepth c > 40
-      (0, "derivable", proveHead Γ large ++ s!"
-/-- A proof in system K: the kernel checks the tree of moves. -/
-def proof : K sequent :=
-  treeCert.verdict _ ({showRepr c})
+      let text := certSrc "" c
+      let word := if seqDepth Γ > seenDepth || text.length > seenMoves then unseen else ""
+      (0, "derivable" ++ word, proveHead Γ ++ s!"
+/-- The certificate: a tree of moves, {certSize c} of them. -/
+def moves : ProofTools.Explore.Cert S :={text}
+
+/-- The kernel checks the tree of moves, once. -/
+theorem checked : treeCert.check sequent moves = true := by decide +kernel
+
+/-- A proof in system K, built from the tree of moves. -/
+def proof : K sequent := treeCert.verdict _ moves checked
 
 theorem derivable : Derivable sequent := ⟨proof⟩
 " ++ proveFoot)
     else (3, "flag", "-- the search's tree of moves did not pass the check: a defect of `ksearch`\n")
   | .inr r =>
     if noDerivable.check Γ r.tree then
-      (1, "not derivable", proveHead Γ (seqDepth Γ > 40 || treeDepth r.tree > 40) ++ s!"
-/-- A finite tree: at each node the propositions true there, by their
-numbers, and the node's children.  The sequent's formula is false at its
-root. -/
-def countermodel : Tree :=
-  {showRepr r.tree}
+      let text := treeSrc "" r.tree
+      let word := if text.length > seenTree then unseen else ""
+      (1, "not derivable" ++ word, proveHead Γ ++ s!"
+/-- The certificate: a finite tree of {nodes r.tree} nodes.  At each node
+the propositions true there, by their numbers, and the node's children.
+The sequent's formula is false at its root. -/
+def countermodel : Tree :={text}
 
 /-- The kernel computes that the sequent's formula is false at the root
-of the tree. -/
-theorem notValid : ¬ Valid sequent := noValid.verdict _ countermodel
+of the tree, once. -/
+theorem checked : noValid.check sequent countermodel = true := by decide +kernel
 
-/-- By soundness. -/
-theorem notDerivable : ¬ Derivable sequent := noDerivable.verdict _ countermodel
+theorem notValid : ¬ Valid sequent := noValid.verdict _ countermodel checked
+
+/-- By soundness; the check is the same one. -/
+theorem notDerivable : ¬ Derivable sequent := noDerivable.verdict _ countermodel checked
 " ++ proveFoot)
     else (3, "flag", "-- the search's tree did not pass the check against validity: a defect of `ksearch`\n")
 

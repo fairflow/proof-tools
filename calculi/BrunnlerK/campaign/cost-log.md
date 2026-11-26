@@ -60,6 +60,7 @@ the reading of the source was all in the first part.
 | 3 Run | 1 (the same session) | from 18:32 GMT to the report, 2026-11-23 18:44 GMT | about three minutes, most of it the measurements | not known | not known | the producers: decided by the operator; done | 0 / 0 / 0 |
 | 4 Explore | 1 (the same session) | from 18:43 GMT to the closing report, 2026-11-23 18:47 GMT | under a minute | not known | not known | the tutorial: put, not worked through | 0 / 0 / 0 |
 | after the campaign: `ksearch prove` | 1 (the owner session of this calculus, 2026-11-26) | from 21:20 GMT, when the session's worktree was made, to the report, 21:35 GMT | about two minutes: five builds, the corpus elaborated three times, two large files | not known | not known | no gate | 0 / 0 / 0 |
+| after the campaign: `ksearch prove` brought to the skill's paragraph | 1 (the same owner session, 2026-11-26) | from 22:48 GMT (the rebase at the start, by the reflog) to the report, 23:38 GMT | about twenty minutes: seven builds of `ksearch`, the corpus elaborated three times, four tables of family members with files cut off at 240 s and 300 s | not known | not known | no gate | 0 / 0 / 0 |
 
 ## Errors of transcription
 

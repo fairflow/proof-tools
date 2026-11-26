@@ -26,7 +26,8 @@ gate; the reviewer may lift every gate).
 After the campaign, by the owner session of this calculus: `ksearch prove
 '<sequent>'`, a sequent typed at a shell, 2026-11-26
 ([report-6](report-6-2026-11-26.md); the user's guide, "From the command
-line").
+line"), and the same day brought to the skill's paragraph on such a
+command (the last section of report-6; method notes 76 to 80).
 
 ## Files here
 
@@ -99,6 +100,7 @@ toolchain (v4.31.0); the package requires `proof-tools` by its path.
 | `BrunnlerK/Parse.lean` | a nested sequent read from text; a sequent as Lean source and with the signs of a keyboard | none: code |
 | `BrunnlerK/Test/Parse.lean` | the reader's tests: the corpus read back from each printer, and by Lean; binding; texts refused | none: tests |
 | `Corpus/prove_corpus.py` | `ksearch prove` on every entry of the corpus, each file elaborated | none: code |
+| `Corpus/prove_families.py` | `ksearch prove` on members of the families, each file elaborated and timed | none: code |
 | `BrunnlerK/Explore.lean` | a sequent as its tree; tactics of the calculus (`routine`, `auto`, `found`) | none: code |
 | `BrunnlerK/Test/Explore.lean` | tests | none: tests |
 | `Play/BrunnlerKTutorial.lean` | the tutorial; in no library (`lake env lean Play/BrunnlerKTutorial.lean`) | none |

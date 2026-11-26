@@ -159,8 +159,8 @@ Look at the first line: a text misread is another question.
 
 | the answer | exit code | what is printed after the first line |
 |---|---|---|
-| `derivable` | 0 | a Lean file: `def proof : K sequent := treeCert.verdict _ <tree of moves>`, and `theorem derivable : Derivable sequent` |
-| `not derivable` | 1 | a Lean file: `def countermodel : Tree`, a finite tree; `theorem notValid : ¬ Valid sequent := noValid.verdict _ countermodel`; `theorem notDerivable : ¬ Derivable sequent` |
+| `derivable` | 0 | a Lean file: `def moves`, the tree of moves; `theorem checked : treeCert.check sequent moves = true`; `def proof : K sequent := treeCert.verdict _ moves checked`; `theorem derivable : Derivable sequent` |
+| `not derivable` | 1 | a Lean file: `def countermodel : Tree`, a finite tree; `theorem checked : noValid.check sequent countermodel = true`; `theorem notValid : ¬ Valid sequent` and `theorem notDerivable : ¬ Derivable sequent`, each `verdict` with `checked` |
 | `flag` | 3 | one line: no answer within the deadline |
 | the text is not a sequent | 2 | nothing; on the error stream, what is wrong, the text, and a mark under the place (characters are counted from 1) |
 
@@ -175,16 +175,35 @@ search returned did not pass the check, a defect.)
 
 `--short` prints the first line only; `--ascii` writes the sequent in
 it with the signs of a keyboard; `--deadline=N` is the number of seconds
-the search may take (10 where it is not given). A large answer (a tree
-of more than 400 moves, or nesting deeper than 40) has Lean's limits on
-recursion and on its own work lifted in the file; with them the largest
-tried were elaborated: a tree of 2 335 moves in 17 s, a sequent nested
-256 deep in 13 s. Beyond that nothing is known.
+the answer may take (10 where it is not given).
+
+Every file lifts Lean's limits on recursion and on its own work
+(`maxRecDepth`, `maxHeartbeats`), and states its check once, as the
+theorem `checked`, which each fact is then given. **A large answer may be
+beyond what Lean checks**, though the search prints it in a second. With
+8 GB of memory and 240 s, the largest seen checked were a tree of 2 335
+moves (`boxAnd 64`, 12 s), a derivable sequent nested 385 deep
+(`nest 384`, 27 s) and a countermodel of 131 071 nodes (`tree 16`, 50 s);
+`boxAnd 96` (5 039 moves) was cut off at 240 s and `nest 512` stopped at
+8 GB. For an answer larger than those seen checked the first line says
+what it rests on:
+
+    -- derivable, on the program's check (a certificate larger than any Lean was seen to check): …
+
+The file is printed all the same, and the exit code is the same; the
+answer is then the program's, by the check it compiled, and not the
+kernel's until a machine with more memory or time has elaborated the
+file. The table: `campaign/measurements-2026-11-23.md`, "`ksearch prove`
+beyond the corpus".
 
 `ksearch corpus` prints the corpus as texts, and `ksearch show <family>
 <n>` a member of a family: `ksearch prove "$(ksearch show boxAnd 8)"`.
 `python3 Corpus/prove_corpus.py --elaborate` runs the command on every
-entry of the corpus and elaborates what it prints.
+entry of the corpus and elaborates what it prints;
+`python3 Corpus/prove_families.py <family>:<n> …` does the same for
+members of the families, with the times. The text is taken from the
+command line only: one longer than the operating system gives a command
+line (about a megabyte here) cannot be asked.
 
 ## The theorems
 
