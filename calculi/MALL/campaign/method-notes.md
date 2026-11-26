@@ -140,6 +140,32 @@ a note says where a choice made here would, or would not, carry over.
     finite phase structure), and that this is where a finite model
     property pays in Run.
 
+## After the closing page
+
+23. **A refutation that the kernel can check need not be a model that
+    the kernel evaluates.** The first certificate against a derivation
+    was a finite phase structure, with the interpretation computed in
+    the kernel; its producer could not be made complete. The second is
+    a saturated set of sequents (the record of a failed search), with a
+    theorem that such a set presents a finite phase structure refuting
+    its members. The check is syntactic and the semantics is in the
+    theorem. *Proposed*: a line in `reference/certify.md` §3: where a
+    calculus has a completeness proof by a syntactical model, the
+    certificate against a derivation is the set of antiphases' complement
+    that a failed search visits, and its soundness is the model's
+    lemma. This is likely to carry over to phase 2 for the fragment
+    without `!`.
+24. **`#eval` of a search in the interpreter is not a measurement.** A
+    sizing loop run by `#eval` did not end in five minutes on inputs the
+    compiled driver settles in milliseconds. Measure with the compiled
+    driver, under a deadline, from the start.
+25. **The session ended under a running command**, and stood idle for
+    two hours until the reviewer wrote; an agent started before that
+    had written nothing to disk. The skill's status section records the
+    same of the GLS run. *Proposed*: a brief to an agent should ask
+    that its files be on disk early and grown, and long timing runs go
+    in the background with their output in a file.
+
 ## For phase 2 (dual intuitionistic linear logic)
 
 * The linear zone: this campaign's form (a variable conclusion, a

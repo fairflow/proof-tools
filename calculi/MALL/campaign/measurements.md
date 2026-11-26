@@ -132,6 +132,36 @@ Loading the imports: 1.12 s, taken off the last column.  Deadline: 30 s each.
 runs of it by hand afterwards gave 0.46 s, 0.72 s and 6.91 s (less the
 imports). The variation is not explained; it is not in the certificate.
 
+## Refutations by a saturated set
+
+Added 2026-11-26, after the closing page. `mallrun refute <family> <n>`;
+compiled times for the producer and the check; the last column is the
+kernel checking the fact, less the imports (0.9 s), under a deadline of
+60 s.
+
+| family | n | formulas | sequents in the set | phases of the structure | producer | check, compiled | the kernel |
+|---|---|---|---|---|---|---|---|
+| chainBad | 2 | 4 | 22 | 45 | 0 ms | 0 ms | not run |
+| chainBad | 3 | 5 | 86 | 135 | 0 ms | 2 ms | 3.39 s |
+| chainBad | 4 | 6 | 305 | 405 | 2 ms | 65 ms | flag (> 60 s) |
+| chainBad | 5 | 7 | 1 015 | 1 215 | 18 ms | 1 566 ms | not run |
+| chainBad | 6 | 8 | flag (> 40 s, the three steps together) | | | | |
+| fanBad | 4 | 6 | 33 | 81 | 0 ms | 0 ms | not run |
+| fanBad | 6 | 8 | 129 | 321 | 0 ms | 1 ms | 1.57 s |
+| fanBad | 8 | 10 | 513 | 1 281 | 1 ms | 21 ms | not run |
+| fanBad | 10 | 12 | 2 049 | 5 121 | 4 ms | 396 ms | not run |
+
+For the corpus: all 15 entries with no derivation get a set that the
+check accepts; the largest is `halfDistribConv`, 17 sequents, 35 phases,
+the one entry for which no cyclic structure was found.
+
+The set grows by a factor of about 3.3 for each ⊗ of `chainBad`, and
+doubles for each two of `fanBad`: every part of the context is a premise
+of some division. The check tries each division of each member against
+the whole set, so it is quadratic in the set. On these two families the
+cyclic structures are the certificate to use (130 formulas in about a
+second, above).
+
 ## What the measurements say
 
 * **The proved search is exponential on every family with ⊗.** It tries
@@ -175,6 +205,13 @@ imports). The variation is not explained; it is not in the certificate.
   among the structures tried. None is in the corpus; `chainBad 10` with
   a formula such as `halfDistribConv` added to it would be one (not
   tried).
+* **Since the closing page**: a saturated set of sequents (S20, S21) is
+  a certificate for every sequent with no derivation, so nothing is left
+  without an answer in principle. `halfDistribConv` is settled by one (17
+  sequents). What is out of practical reach is unchanged in kind: a
+  sequent with no derivation, many formulas with ⊗, and no small cyclic
+  structure; there the set is too large for the kernel within a minute
+  from about 300 sequents.
 * The finite model property (S17) says a finite structure exists for
   every sequent with no derivation. It does not say a cyclic group, and
   the structure of its proof is too large to write down. So "a better

@@ -279,6 +279,54 @@ structure on ℤ/1, ℤ/2, ℤ/3 for two letters, 584 of them, is accepted
 against four derivable sequents). Not read back (it has no item of the source).
 **PROVED.**
 
+### S20. A saturated set of sequents is a certificate, and presents a finite countermodel
+
+    noDerivableBySet : Certify.Certifier (List Form) (List (List Form)) (fun Γ => Derivable Γ → False)
+    noValidBySet     : Certify.Certifier (List Form) (List (List Form)) (fun Γ => Valid Γ → False)
+
+    ∀ (D : List (List Form)) (Γ : List Form), refutedBy D Γ = true →
+      ∃ S : PhaseStructure, S.Finite ∧ ¬ S.Sat Γ
+
+`MALL/SatRun.lean`; `countermodel_of_refutedBy`, `MALL/Saturated.lean`.
+Source: none for the certificate; the structure is Lafont's finite model
+(p. 3 of the author's version) with the set `D` in place of "below `A`
+and not provable", and the argument is his Lemma 1 (Okada).
+`refutedBy D Γ` is `memP D Γ && saturated D`: `Γ` is a member of `D` up
+to the order of its formulas, and at every formula of every member the
+rule that introduces it has a premise in `D`: the premise of ⅋ and of ⊥;
+one of the two of &; both that of 1⊕ and that of 2⊕; for every way to
+divide the context of a ⊗, one of the two; and no member is `⊢ a, a⊥`,
+`⊢ 1`, or has ⊤. The structure `satModel D`: its phases are the parts of
+the members and one phase for every other sequent; its antiphases are
+the phases that are not members; the fact of a letter `a` is `{a}⊥`. The
+kernel checks the saturation and computes no interpretation. Entered
+when it was written (2026-11-26, after the closing page, at the
+reviewer's word). Screened: the structure is also computed by tables
+(`Table`, `MALL/Refute.lean`, not proved), and for each of the 15
+non-theorems of the corpus no member of its set holds in the computed
+structure and each of the 23 derivable entries does (`#guard`s of
+`MALL/SatTest.lean`); seven negative tests in the kernel, the same file.
+Not read back by a cold reader. **PROVED.**
+
+### S21. The certificate is complete: every sequent has a written certificate
+
+    ∀ Γ : List Form, ¬ Derivable Γ → refutedBy (fullRefutation Γ) Γ = true
+
+    ∀ Γ : List Form,
+      (∃ c, treeCert.check Γ c = true) ∨ (∃ D, noDerivableBySet.check Γ D = true)
+
+`refutation_complete`, `MALL/Saturated.lean`; `certified`,
+`MALL/SatRun.lean`. Source: none. `fullRefutation Γ` is the list of the
+small sequents of S17 that have no derivation without cut; it is
+saturated because the premises of a rule with a small conclusion are
+small, and a sequent all of whose premises under some rule have
+derivations has one. That set is for the proof: the producer
+(`refuteSet`, `MALL/Refute.lean`, code) returns the far smaller set of
+the sequents a failed search visits. This strengthens S18: there the
+"no" side was the decision procedure run by the kernel, with nothing
+written. An instance is run by the kernel (`full_one_one`,
+`MALL/SatTest.lean`). **PROVED.**
+
 ## Refuted
 
 | statement | the proof of the negation | where it is checked | what replaced the statement |
@@ -303,4 +351,4 @@ Nothing was set aside by the reviewer.
 |---|---|---|---|
 | of the goals from the standing list (cut elimination S6-S8; the finite model property S17) | 4 | 0 | 0 |
 | of the other goals (S4, S5, S9, S10, S13, S14, S15, S16; S11, S12 as refutations) | 8 | 2 | 0 |
-| of our own (S1, S2, S3, S18, S19) | 5 | 0 | 0 |
+| of our own (S1, S2, S3, S18, S19, S20, S21) | 7 | 0 | 0 |

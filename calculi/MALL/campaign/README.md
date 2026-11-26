@@ -85,12 +85,18 @@ Theory (each ends with `#axioms_within_file [propext, Quot.sound]`):
 * `MALL/Model.lean`: finite phase structures as data, and their check.
 * `MALL/Run.lean`, `MALL/ModelRun.lean`: the certifiers, the producers,
   level 3.
+* `MALL/Saturated.lean`, `MALL/SatRun.lean`: saturated sets of sequents
+  as certificates of non-derivability, the finite phase structure a set
+  presents, and the completeness of the certificate (added after the
+  closing page).
 
 Code (no bound; nothing in it is trusted):
 
 * `MALL/Tactic.lean`: the printers, the candidates, the tactic
   `mallmove`.
 * `MALL/Lazy.lean`: the search by lazy splitting.
+* `MALL/Refute.lean`: the producer of saturated sets; the structure of
+  a set computed by tables.
 * `MALL/Explore.lean`: tactics of the calculus; `explain`.
 * `MALL/Screen.lean`: the phase semantics evaluated over small cyclic
   groups, as a screen.
@@ -98,5 +104,5 @@ Code (no bound; nothing in it is trusted):
   `Main.lean` (`mallrun`), `Corpus/measure.py`,
   `Corpus/measure_model.py`.
 * Tests: `MALL/Test.lean`, `DecideTest.lean`, `CutTest.lean`,
-  `RunTest.lean`, `ModelTest.lean`, `ExploreTest.lean`.
+  `RunTest.lean`, `ModelTest.lean`, `ExploreTest.lean`, `SatTest.lean`.
 * In no library: `Play/MALL.lean` (exercises), `Play/MALLTutorial.lean`.

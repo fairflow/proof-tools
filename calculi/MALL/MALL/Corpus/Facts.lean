@@ -2,12 +2,14 @@
 The facts of the corpus.  Written by `mallrun facts` (`Main.lean`); do not
 edit.  The kernel checks each when this file is elaborated: for a
 derivation, the tree of moves that the search by lazy splitting found;
-against one, a finite phase structure that refutes the sequent, where the
-producer of `MALL/ModelRun.lean` has one, and otherwise the decision
-procedure itself, which the kernel runs.
+against one, a finite phase structure on a cyclic group that refutes the
+sequent, where the producer of `MALL/ModelRun.lean` has one, and otherwise
+a saturated set of sequents of which it is a member (`MALL/SatRun.lean`),
+from the producer of `MALL/Refute.lean`.
 -/
 import MALL.Corpus.Basic
 import MALL.ModelRun
+import MALL.SatRun
 
 namespace MALL.Corpus.Facts
 
@@ -312,7 +314,7 @@ theorem mix : ¬ Derivable [p ⅋ pᗮ, q ⅋ qᗮ] :=
   noDerivableBy.verdict _ ({ k := 1, bot := [false, true], val := [[true, false], [true, false]] })
 
 theorem halfDistribConv : ¬ Derivable [(pᗮ ⅋ qᗮ) ⊕ (pᗮ ⅋ rᗮ), p ⊗ (q & r)] :=
-  noDerivable.verdict _ ()
+  noDerivableBySet.verdict _ ([[MALL.Form.tensor (MALL.Form.atom 0) (MALL.Form.wth (MALL.Form.atom 1) (MALL.Form.atom 2)), MALL.Form.plus (MALL.Form.par (MALL.Form.natom 0) (MALL.Form.natom 1)) (MALL.Form.par (MALL.Form.natom 0) (MALL.Form.natom 2))], [MALL.Form.atom 0, MALL.Form.plus (MALL.Form.par (MALL.Form.natom 0) (MALL.Form.natom 1)) (MALL.Form.par (MALL.Form.natom 0) (MALL.Form.natom 2))], [MALL.Form.atom 0, MALL.Form.par (MALL.Form.natom 0) (MALL.Form.natom 2)], [MALL.Form.atom 0, MALL.Form.par (MALL.Form.natom 0) (MALL.Form.natom 1)], [MALL.Form.atom 0, MALL.Form.natom 0, MALL.Form.natom 2], [MALL.Form.natom 0, MALL.Form.natom 1, MALL.Form.tensor (MALL.Form.atom 0) (MALL.Form.wth (MALL.Form.atom 1) (MALL.Form.atom 2))], [MALL.Form.atom 0, MALL.Form.natom 2], [MALL.Form.atom 2, MALL.Form.natom 1], [MALL.Form.tensor (MALL.Form.atom 0) (MALL.Form.wth (MALL.Form.atom 1) (MALL.Form.atom 2)), MALL.Form.par (MALL.Form.natom 0) (MALL.Form.natom 2)], [MALL.Form.atom 0], [MALL.Form.atom 0, MALL.Form.natom 1], [MALL.Form.atom 0, MALL.Form.natom 0, MALL.Form.natom 1], [MALL.Form.tensor (MALL.Form.atom 0) (MALL.Form.wth (MALL.Form.atom 1) (MALL.Form.atom 2)), MALL.Form.par (MALL.Form.natom 0) (MALL.Form.natom 1)], [MALL.Form.natom 2, MALL.Form.wth (MALL.Form.atom 1) (MALL.Form.atom 2)], [MALL.Form.atom 1, MALL.Form.natom 2], [MALL.Form.natom 0, MALL.Form.natom 2, MALL.Form.tensor (MALL.Form.atom 0) (MALL.Form.wth (MALL.Form.atom 1) (MALL.Form.atom 2))], [MALL.Form.natom 1, MALL.Form.wth (MALL.Form.atom 1) (MALL.Form.atom 2)]])
 
 theorem withTensor : ¬ Derivable [pᗮ ⊕ qᗮ, p ⊗ q] :=
   noDerivableBy.verdict _ ({ k := 1, bot := [true, false], val := [[false, true], [false, true]] })

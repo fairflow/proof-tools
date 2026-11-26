@@ -26,3 +26,7 @@ import MALL.ExploreTest
 import MALL.Model
 import MALL.ModelRun
 import MALL.ModelTest
+import MALL.Saturated
+import MALL.SatRun
+import MALL.Refute
+import MALL.SatTest

@@ -9,6 +9,12 @@
                                        states the fact with its tree
     mallrun model <family> <n>         a finite phase structure that refutes
                                        the member, and a Lean file with the fact
+    mallrun refute <family> <n>        a saturated set of sequents of which
+                                       the member is one, the size of the
+                                       phase structure it presents, and a
+                                       Lean file with the fact
+    mallrun countermodel <name>        an entry of the corpus: its saturated
+                                       set and the structure, described
 
 `<producer>` is `lazy` (the search by lazy splitting) or `search` (the
 proved search).  Not trusted.  What it prints is checked by the kernel
@@ -16,6 +22,7 @@ when the file it wrote is elaborated.
 -/
 import MALL.Corpus.Basic
 import MALL.ModelRun
+import MALL.Refute
 
 open MALL MALL.Corpus ProofTools ProofTools.Explore
 
@@ -41,21 +48,26 @@ def fact (name src : String) (Γ : List Form) : String :=
     match refuteBy Γ with
     | some z => s!"theorem {name} : ¬ Derivable {src} :=\n  noDerivableBy.verdict _ ({showFlat z})\n"
     | none =>
-      if noDerivable.check Γ () then
-        s!"theorem {name} : ¬ Derivable {src} :=\n  noDerivable.verdict _ ()\n"
-      else s!"-- {name}: flag\n"
+      match refuteSet Γ with
+      | some D =>
+        if refutedBy D Γ then
+          s!"theorem {name} : ¬ Derivable {src} :=\n  noDerivableBySet.verdict _ ({showFlat D})\n"
+        else s!"-- {name}: flag\n"
+      | none => s!"-- {name}: flag\n"
 
 def header : String :=
 "/-
 The facts of the corpus.  Written by `mallrun facts` (`Main.lean`); do not
 edit.  The kernel checks each when this file is elaborated: for a
 derivation, the tree of moves that the search by lazy splitting found;
-against one, a finite phase structure that refutes the sequent, where the
-producer of `MALL/ModelRun.lean` has one, and otherwise the decision
-procedure itself, which the kernel runs.
+against one, a finite phase structure on a cyclic group that refutes the
+sequent, where the producer of `MALL/ModelRun.lean` has one, and otherwise
+a saturated set of sequents of which it is a member (`MALL/SatRun.lean`),
+from the producer of `MALL/Refute.lean`.
 -/
 import MALL.Corpus.Basic
 import MALL.ModelRun
+import MALL.SatRun
 
 namespace MALL.Corpus.Facts
 
@@ -101,6 +113,31 @@ def main (args : List String) : IO UInt32 := do
           s!"import MALL.Corpus.Basic\nimport MALL.ModelRun\nopen MALL MALL.Corpus\n\ntheorem fact : ¬ Derivable (Corpus.{fam} {n}) :=\n  noDerivableBy.verdict _ ({showFlat z})\n"
       | none => pure ()
       return 0
+  | ["refute", fam, n] =>
+    let n := n.toNat!
+    match family fam n with
+    | none => IO.eprintln s!"no family {fam}"; return 2
+    | some (Γ, _) =>
+      let t₀ ← IO.monoMsNow
+      let out := refuteSet Γ
+      IO.println s!"{fam} {n}: {match out with | some D => s!"a set of {D.length}" | none => "none"}"
+      let t₁ ← IO.monoMsNow
+      IO.println s!"producer ms: {t₁ - t₀}"
+      match out with
+      | some D =>
+        let ok := refutedBy D Γ
+        IO.println s!"check: {ok}"
+        let t₂ ← IO.monoMsNow
+        IO.println s!"check ms: {t₂ - t₁}"
+        IO.println s!"phases: {(Table.ofSet D).card}"
+        IO.FS.writeFile s!"Corpus/out/{fam}_{n}_set.lean"
+          s!"import MALL.Corpus.Basic\nimport MALL.SatRun\nopen MALL MALL.Corpus\n\nset_option maxRecDepth 100000 in\ntheorem fact : ¬ Derivable (Corpus.{fam} {n}) :=\n  noDerivableBySet.verdict _ ({showFlat D})\n"
+      | none => pure ()
+      return 0
+  | ["countermodel", name] =>
+    match entries.find? (·.name == name) with
+    | none => IO.eprintln s!"no entry {name}"; return 2
+    | some e => IO.println (describeCountermodel e.seq); return 0
   | [cmd, prod, fam, n] =>
     let n := n.toNat!
     match family fam n with
@@ -123,5 +160,5 @@ def main (args : List String) : IO UInt32 := do
         | none => pure ()
       return 0
   | _ =>
-    IO.eprintln "usage: mallrun facts | status | run <producer> <family> <n> | cert <producer> <family> <n> | model <family> <n>"
+    IO.eprintln "usage: mallrun facts | status | run <producer> <family> <n> | cert <producer> <family> <n> | model <family> <n> | refute <family> <n> | countermodel <name>"
     return 2

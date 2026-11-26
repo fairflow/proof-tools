@@ -102,6 +102,9 @@ i`, `up`, `left`, `right`, `top`, `goal k`); a block `example : Walk d
 | `treeCert.verdict Γ c` | a derivation `Fam Γ`, from a tree of moves `c` | yes: the kernel checks the tree |
 | `refuteBy Γ` | a phase structure on a small cyclic group that refutes `Γ`, where it finds one among those it tries | no: checked by the next line |
 | `noDerivableBy.verdict Γ z`, `noValidBy.verdict Γ z` | `¬ Derivable Γ`, `¬ Valid Γ`, from a structure `z = ⟨k, bot, val⟩` on ℤ/(k+1): the antiphases and a set for each letter, as lists of Booleans | yes: the kernel computes the interpretation |
+| `refuteSet Γ` | a saturated set of sequents of which `Γ` is a member, for every `Γ` with no derivation (it always ends; the set can be large where ⊗ divides a context many ways) | no: checked by the next line |
+| `noDerivableBySet.verdict Γ D`, `noValidBySet.verdict Γ D` | `¬ Derivable Γ`, `¬ Valid Γ`, from a set `D`: the kernel checks that `Γ` is in it and that every rule that could conclude a member has a premise in it | yes |
+| `describeCountermodel Γ` (with `#eval IO.println`) | the set, and the finite phase structure it presents: how many phases, and that the sequent, computed in it, does not hold | no: to be read |
 
 ## Out to the mathematics
 

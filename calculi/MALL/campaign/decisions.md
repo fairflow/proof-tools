@@ -400,6 +400,35 @@ the argument, and attributes it.
   the rebase.
 * **Cost to reverse**: none.
 
+## 2026-11-26 14:04 GMT. After the closing page: a complete certificate of non-derivability
+
+* **The reviewer's word**, in the session, after the closing page:
+  "Can you complete the counter model construction? Decidability +
+  completeness means there must be one, that's complete of course. Also
+  a tutorial modelled on the existing ones is needed." And later: "We
+  don't need maximum efficiency, just an algorithm that doesn't
+  terminate early with no result."
+* **Decided**: a second certificate against a derivation, a *saturated
+  set of sequents* (S20, S21; `MALL/Saturated.lean`, `MALL/SatRun.lean`,
+  `MALL/Refute.lean`, `MALL/SatTest.lean`). The kernel checks a Boolean
+  condition on the set; a theorem says that the set presents a finite
+  phase structure in which the sequent does not hold. The certificate
+  is proved complete, and its producer (a search that remembers what it
+  settled) returns a set for every sequent with no derivation.
+* **Not taken**: a finite monoid given by its tables, with the
+  interpretation computed by the kernel (the structure of a set of 17
+  sequents has 35 phases, and every dual is quadratic in that; and the
+  check would have to verify the laws of the monoid, or the monoid be
+  built so that they hold, which is what the saturated set does);
+  enlarging the enumeration of cyclic groups (complete for no bound
+  that is known here).
+* **Its limit**: the set is exponential where ⊗ divides a context in
+  many ways (`measurements.md`). The cyclic structures stay the first
+  certificate tried.
+* **`explain` is unchanged**; the new description of a countermodel is
+  `describeCountermodel`.
+* **Cost to reverse**: little.
+
 ## Stops
 
 *Each time a turn ended to wait for the reviewer. None so far.*
