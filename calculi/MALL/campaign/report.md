@@ -12,6 +12,9 @@ Links below are to GitHub at `10becc3`; B is
 published: section 7, a countermodel for every sequent with no
 derivation. The rest of the page is as it was written.
 
+**Amended again 2026-11-26 15:22 GMT**, by a command relayed from the reviewer: section
+8, Craig and uniform interpolation.
+
 ## 1. What was adopted, proved, and runs
 
 Propositional multiplicative-additive linear logic, in the one-sided
@@ -297,3 +300,79 @@ solutions are checked by the build (`MALL/TutorialTest.lean`); the
 exercises to type are `Play/MALLExercises.lean`. The prose on how each
 proof goes is a reading and is not checked. No person has typed the
 exercises.
+
+## 8. Interpolation
+
+By command ("Yes, for MALL"; `decisions.md`). Commit `fe73047`. Statements
+S22 to S25 of [statements.md](https://github.com/fairflow/proof-tools/blob/fe73047/calculi/MALL/campaign/statements.md), entered as
+named types before their proofs.
+
+    (Γ Δ : List Form) → CF (Γ ++ Δ) → Interpolant Γ Δ                  (craigInterpolation, MALL/Craig.lean)
+      where an Interpolant Γ Δ is C with CF (C :: Γ), CF (Cᗮ :: Δ) and
+      ∀ ℓ ∈ C.lits, ℓᗮ ∈ litsL Γ ∧ ℓ ∈ litsL Δ
+    PROVED: Craig interpolation with Lyndon's condition, as a function on derivations without cut
+
+    ∀ A B, Derivable [Aᗮ, B] → ∃ C, Derivable [Aᗮ, C] ∧ Derivable [Cᗮ, B] ∧
+      ∀ a ∈ C.letters, a ∈ A.letters ∧ a ∈ B.letters                   (craigForFormulas, MALL/Craig.lean)
+    PROVED: Craig interpolation for an implication
+
+    ∀ (p : Nat) (Γ : List Form), ∃ I : Form,
+      (∀ a ∈ I.letters, a ≠ p ∧ a ∈ lettersL Γ) ∧ Derivable (Iᗮ :: Γ) ∧
+      ∀ Δ, (∀ a ∈ lettersL Δ, a ≠ p) → Derivable (Γ ++ Δ) → Derivable (I :: Δ)
+                                                                       (uniformInterpolation, MALL/Uniform.lean)
+    PROVED: uniform interpolation; the interpolant is the function ui p Γ (ui_spec)
+
+    the same for a formula: ∀p A := forallP p A and ∃p A := existsP p A  (uniformInterpolationForFormulas)
+    PROVED
+
+All within `[propext, Quot.sound]`.
+
+**What to read** (about 50 lines with their comments): [Statements.lean, 139-190](https://github.com/fairflow/proof-tools/blob/fe73047/calculi/MALL/MALL/Statements.lean#L139-L190),
+the four statements; and `Form.lits`, `Form.letters`
+([Form.lean, 99-127](https://github.com/fairflow/proof-tools/blob/fe73047/calculi/MALL/MALL/Form.lean#L99-L127)). To know which
+interpolant: `uiBase`, `uiPick`, `uiStep`, `uiN`
+([Uniform.lean, 69-107](https://github.com/fairflow/proof-tools/blob/fe73047/calculi/MALL/MALL/Uniform.lean#L69-L107)).
+
+**Craig** is Maehara's method by structural recursion on the derivation,
+for every division of its sequent; the condition on signs costs nothing
+in negation normal form. Written by an agent from the operator's design
+and inspected by the operator. Sixteen interpolants are pinned by the
+kernel.
+
+**Uniform** interpolation is by Pitts's method: the interpolant is the ⊕
+of one formula for each way a derivation of `⊢ Γ, Δ` can end that
+concerns `Γ`, by recursion on a bound of the size, simplified as it is
+built; that it is the weakest is by induction on a derivation without
+cut. The kernel computes it:
+
+    ∀p (p ⅋ p⊥) = 1       ∀p (p⊥ ⅋ (p ⊗ q)) = q       ∃p (p ⊗ q) = ⊤ ⊗ q       ∃p (p & q) = q
+
+(the third is not `q`: there is no weakening).
+
+**The checks.** The statement of uniform interpolation was screened
+before its proof: 21 formulas, both properties, against the decision
+procedure over 264 test formulas, no failure. A cold reader given the
+definitions and the four statements unnamed identified each and found
+none false or trivial. It asked for one more statement, a condition on
+signs for the uniform interpolant (every literal of `ui p Γ` a literal
+of `Γ`): **OPEN**, not a goal, screened on 21 formulas where it holds.
+
+**The sources** were read by an agent after the proofs
+([interpolation-sources.md](https://github.com/fairflow/proof-tools/blob/fe73047/calculi/MALL/campaign/interpolation-sources.md)):
+uniform interpolation for this logic is Theorem 4.3 of Alizadeh,
+Derakhshan and Ono (2014), who call it InFLₑ and write no proof for this
+case, and is covered by Akbar Tabatabai and Jalali (arXiv:1808.06258),
+who call it CFLₑ; Lyndon's condition is in Roorda's thesis (1991). None
+of the four reports a mechanised proof; that is a statement about those
+four texts. The construction here was made before they were read and is
+of the same kind as the first paper's table.
+
+**Not done.** Roorda's fragment without interpolation, (⊸, ⅋), as a
+REFUTED statement: his paper (JSL 1994) was not obtained; the thesis has
+the counterexample but its proof was not read, and it is for a counting
+form of the condition. The interpolant of a sequent of several formulas
+is long: it is not simplified up to commutativity.
+
+**The tutorial** has a section 5.8 with the two statements pinned and
+three exercises (D6 to D8), their solutions checked by the build.
+

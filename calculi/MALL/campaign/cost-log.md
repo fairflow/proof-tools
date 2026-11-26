@@ -52,7 +52,7 @@ was restarted.
 
 Interpolation, a command relayed at 15:04: began 15:06.
 
-Interpolation ended 15:22 (pushed). Four agents: a7, Craig
+Interpolation ended 15:22 (the records written; pushed after). Three agents: a7, Craig
 interpolation in Lean (164 029 tokens, 478 s); a8, the four sources
 (320 787 tokens, 683 s); a9, the reading back (88 477 tokens, 182 s);
 the tutorial's section and its exercises were written by the operator.
