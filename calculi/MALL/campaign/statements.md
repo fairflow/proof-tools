@@ -327,6 +327,141 @@ the sequents a failed search visits. This strengthens S18: there the
 written. An instance is run by the kernel (`full_one_one`,
 `MALL/SatTest.lean`). **PROVED.**
 
+### S22. Craig interpolation, with Lyndon's condition, as a function
+
+    structure Interpolant (Γ Δ : List Form) where
+      C : Form
+      left : CF (C :: Γ)
+      right : CF (Cᗮ :: Δ)
+      lits : ∀ ℓ ∈ C.lits, ℓᗮ ∈ litsL Γ ∧ ℓ ∈ litsL Δ
+
+    (Γ Δ : List Form) → CF (Γ ++ Δ) → Interpolant Γ Δ
+
+`CraigInterpolation`, defined by `craigInterpolation`, `MALL/Craig.lean`.
+Entered as a named type before its proof (commit `e7628b3`), at the
+reviewer's word (`decisions.md`). Sources, read after the proof
+(`interpolation-sources.md`): D. Roorda, thesis (Amsterdam 1991),
+chapter V, §5: interpolation for every fragment with negation, MALL
+among them, with the condition "every proposition letter having a
+positive (negative) occurrence in I, also has positive (negative)
+occurrences in A and in B" (p. 63), by induction on a derivation without
+cut; A. Akbar Tabatabai and R. Jalali, arXiv:1808.06256, Definition 5.2
+and Theorem 5.7: for a sequent divided in two, with the condition on
+letters only. The form here: one-sided, for a division of the sequent
+into `Γ` and `Δ`; read two-sided, `Γ⊥ ⊢ C` and `C ⊢ Δ`. `C.lits` is the
+list of the literals of `C` (letters and negated letters, formulas being
+in negation normal form), so the fourth field is Lyndon's condition; the
+condition on letters follows (`Interpolant.letters`). The interpolant
+may use the four units. **Which function**: Maehara's, by structural
+recursion on the derivation (`CF.interp`), for every division: where the
+principal formula is in `Γ`, the rules ⊥, ⅋, ⊕ keep the premise's
+interpolant, & gives `C₁ ⊕ C₂`, ⊗ gives `C₁ ⅋ C₂` (the contexts divided
+by `split4`, `MALL/Split.lean`), ⊤ gives `𝟎`, an axiom gives `Aᗮ` or `⊥`;
+where it is in `Δ`, the dual (`Interpolant.flip`). The interpolant is not
+simplified, and two derivations of one sequent can give two interpolants
+(`hand₁`, `hand₂` of `MALL/CraigTest.lean`). Written by an agent from the
+operator's design; built and inspected by the operator. Tested: sixteen
+interpolants pinned by the kernel, the same file. **PROVED.**
+
+### S23. Craig interpolation, for an implication
+
+    ∀ A B : Form, Derivable [Aᗮ, B] →
+      ∃ C : Form, Derivable [Aᗮ, C] ∧ Derivable [Cᗮ, B] ∧
+        ∀ a ∈ C.letters, a ∈ A.letters ∧ a ∈ B.letters
+
+`CraigForFormulas`, proved by `craigForFormulas`, `MALL/Craig.lean`: cut
+elimination, then S22 at the division `([Aᗮ], [B])`. Source: Akbar
+Tabatabai and Jalali, Definition 5.1. **PROVED.**
+
+### S24. Uniform interpolation
+
+    ∀ (p : Nat) (Γ : List Form), ∃ I : Form,
+      (∀ a ∈ I.letters, a ≠ p ∧ a ∈ lettersL Γ) ∧
+      Derivable (Iᗮ :: Γ) ∧
+      ∀ Δ : List Form, (∀ a ∈ lettersL Δ, a ≠ p) → Derivable (Γ ++ Δ) → Derivable (I :: Δ)
+
+`UniformInterpolation`, proved by `uniformInterpolation`,
+`MALL/Uniform.lean`, with `I := ui p Γ` (`ui_spec`). Entered before its
+proof (commit `e7628b3`). Sources, read after the proof: M. Alizadeh,
+F. Derakhshan and H. Ono, Review of Symbolic Logic 7 (2014), Theorem 4.3,
+for the logic they call InFLₑ ("i.e., MALL"): a formula `A_p(Γ; Δ)` for a
+two-sided sequent, with the letters of `Γ, Δ` other than `p`,
+`⊢ Γ, A_p ⇒ Δ`, and `⊢ Π ⇒ A_p, Λ` whenever `⊢ Π, Γ ⇒ Δ, Λ` with `Π, Λ`
+without `p`; a table of 20 clauses and no written proof for this logic.
+A. Akbar Tabatabai and R. Jalali, arXiv:1808.06258, Definition 5.1 and
+Theorems 4.3 and 5.9, for a family of calculi that has the one they call
+CFLₑ. The statement here is the one-sided form of the first: `Γ` here is
+their `Γ ⇒ Δ` moved to one side, and `Δ` here their `Π ⇒ Λ`.
+**Which function**: `ui p Γ := uiN p (ssize Γ + 1) Γ`, by recursion on a
+bound of the size; `uiN p (n+1) Γ` is the ⊕, simplified, of the
+disjuncts of `uiStep`: `⊥` for the empty sequent; `A` for the one
+formula `A` without `p`; `𝟏` for `A, A⊥`; for each formula of `Γ` with
+the rest `r`: `⊤` for ⊤, the interpolant of the premise for ⊥ and ⅋ and
+for each side of ⊕, the & of the two for &, the ⊗ of the two for each
+division of `r` for ⊗; and for each division of `Γ` into two parts, the
+first formula in the first and the second not empty, the ⅋ of the two
+interpolants. This is Pitts's method, of the kind of the first source's
+table; it was made before the sources were read, and differs in having
+identity at every formula and in the simplification (`sTensor`, `sPar`,
+`sWith`, `sBig`: `𝟎` annihilates ⊗ and is dropped from ⊕, units are
+removed, a disjunct is taken once, `⊤ ⊗ ⊤` is `⊤`). The proofs:
+`uiN_below` by recursion on the bound; `uiN_letters` the same;
+`uiN_greatest` by induction on a derivation without cut of `⊢ Γ, Δ`, for
+every division and every bound above the size of `Γ`. Screened before
+the proof: for 21 formulas `A` and the letter `p`, `∀p A ⊢ A` and
+`A ⊢ ∃p A`, and for each of 264 formulas `B` without `p` with at most
+one connective, `B ⊢ A` gives `B ⊢ ∀p A` and `A ⊢ B` gives `∃p A ⊢ B`,
+by the decision procedure, with no failure; kept as `#guard`s of
+`MALL/UniformTest.lean`, where sixteen interpolants are pinned by the
+kernel. Its limit: for a sequent of several formulas the interpolant is
+long (it is not simplified up to commutativity), and its computation is
+exponential in the number of formulas. **PROVED.**
+
+### S25. The uniform interpolants of a formula
+
+    ∀ (p : Nat) (A : Form),
+      (∃ U : Form, (∀ a ∈ U.letters, a ≠ p ∧ a ∈ A.letters) ∧ Derivable [Uᗮ, A] ∧
+        ∀ B : Form, p ∉ B.letters → Derivable [Bᗮ, A] → Derivable [Bᗮ, U]) ∧
+      (∃ E : Form, (∀ a ∈ E.letters, a ≠ p ∧ a ∈ A.letters) ∧ Derivable [Aᗮ, E] ∧
+        ∀ B : Form, p ∉ B.letters → Derivable [Aᗮ, B] → Derivable [Eᗮ, B])
+
+`UniformInterpolationForFormulas`, proved by
+`uniformInterpolationForFormulas`, `MALL/Uniform.lean`, with
+`U := forallP p A = ui p [A]` and `E := existsP p A = (ui p [Aᗮ])ᗮ`.
+Source: Akbar Tabatabai and Jalali, Definition 4.1 (one letter, both
+interpolants); Alizadeh, Derakhshan and Ono state it for a set of letters
+and reduce to one (their Lemma 3.4). **PROVED.**
+
+### The reading back of S22 to S25
+
+Made on 2026-11-26 by a fresh agent given only an extract of 124 lines
+(the formulas, the two families, `Interpolant` as `Itp`, and the four
+statements as T1 to T4, comments removed), told to open nothing else and
+not told what the statements were meant to be. It named each correctly
+(Craig-Lyndon interpolation in Maehara's form; Craig for formulas;
+Pitts's `∀p` of a sequent; the two uniform interpolants of a formula),
+checked the polarity side of `Interpolant` on the four divisions of
+`⊢ p⊥, p` and found the constants forced (`Γ = [⊤, p]`, `Δ = [q]` needs
+`𝟎`), and found no statement false or trivial. Its remarks:
+
+* the formula `I` of S24 stands on the other side from the `C` of S22:
+  `I⊥`, not `I`, is the interpolant in the sense of `Interpolant`. So it
+  is; the doc comment of S24 says `I` is the weakest formula implying
+  the par of `Γ`;
+* S22 is about derivations without cut and S23 to S25 about
+  derivability with cut: the bridge is cut elimination and exchange (it
+  is; S23 says so);
+* S24 is an existence statement and discards the function: the function
+  is `ui`, and `ui_spec` has the three clauses for it;
+* **S24 has no condition on signs** though S22 has one. That every
+  literal of `ui p Γ` is a literal of `Γ` is the natural strengthening.
+  **OPEN**: not stated as a goal and not proved; screened on 21 formulas
+  (`MALL/UniformTest.lean`), where it holds;
+* the division of S22 is written `Γ ++ Δ`: the function is `CF.interp`,
+  which takes any `Ξ ~ Γ ++ Δ`;
+* the two ways of saying "without `p`" in S24 and S25 could be one; the
+  field `lits` could be named `lyndon`. Not changed.
+
 ## Refuted
 
 | statement | the proof of the negation | where it is checked | what replaced the statement |
@@ -343,6 +478,8 @@ written. An instance is run by the kernel (`full_one_one`,
 | deduction theorems; the existence property | do not apply: standing entries 3 and 7 |
 | the semantic equations 1.9, 1.12, 1.13 as statements about facts | their syntactic forms are the corpus (`MALL/Corpus/Basic.lean`) |
 
+| interpolation fails for the fragment (⊸, ⅋), the interpolant to stay in the fragment (Roorda, JSL 59, 1994) | the paper was not obtained. Roorda's thesis has the counterexample (p. 78) for his counting form of the condition, and its proof was not read; a refutation in the kernel would decide many candidate interpolants (tens of thousands, by the operator's rough count) on sequents beyond the practical reach of the proved search. Not attempted |
+
 Nothing was set aside by the reviewer.
 
 ## Summary
@@ -352,3 +489,4 @@ Nothing was set aside by the reviewer.
 | of the goals from the standing list (cut elimination S6-S8; the finite model property S17) | 4 | 0 | 0 |
 | of the other goals (S4, S5, S9, S10, S13, S14, S15, S16; S11, S12 as refutations) | 8 | 2 | 0 |
 | of our own (S1, S2, S3, S18, S19, S20, S21) | 7 | 0 | 0 |
+| added by command after the closing page (interpolation: S22 to S25) | 4 | 0 | 0 |

@@ -7,6 +7,8 @@ import MALL.Explore
 import MALL.ModelRun
 import MALL.Source
 import MALL.Refute
+import MALL.Craig
+import MALL.Uniform
 import ProofTools.Audit.Statement
 
 open MALL
@@ -154,6 +156,50 @@ PROVED · axioms: Quot.sound, propext
 #guard_msgs in #statement MALL.search_complete
 
 /--
+info: def MALL.craigInterpolation : CraigInterpolation
+  where MALL.CraigInterpolation :=
+    (Γ Δ : List Form) → CF (Γ ++ Δ) → Interpolant Γ Δ
+PROVED · axioms: Quot.sound, propext
+-/
+#guard_msgs in #statement MALL.craigInterpolation
+
+/--
+info: theorem MALL.craigForFormulas : CraigForFormulas
+  where MALL.CraigForFormulas :=
+    ∀ (A B : Form),
+      Derivable [Aᗮ, B] →
+        ∃ (C : Form), Derivable [Aᗮ, C] ∧ Derivable [Cᗮ, B] ∧ ∀ (a : Nat), a ∈ C.letters → a ∈ A.letters ∧ a ∈ B.letters
+PROVED · axioms: Quot.sound, propext
+-/
+#guard_msgs in #statement MALL.craigForFormulas
+
+/--
+info: theorem MALL.uniformInterpolation : UniformInterpolation
+  where MALL.UniformInterpolation :=
+    ∀ (p : Nat) (Γ : List Form),
+      ∃ (I : Form),
+        (∀ (a : Nat), a ∈ I.letters → a ≠ p ∧ a ∈ lettersL Γ) ∧
+          Derivable (Iᗮ :: Γ) ∧
+            ∀ (Δ : List Form), (∀ (a : Nat), a ∈ lettersL Δ → a ≠ p) → Derivable (Γ ++ Δ) → Derivable (I :: Δ)
+PROVED · axioms: Quot.sound, propext
+-/
+#guard_msgs in #statement MALL.uniformInterpolation
+
+/--
+info: theorem MALL.uniformInterpolationForFormulas : UniformInterpolationForFormulas
+  where MALL.UniformInterpolationForFormulas :=
+    ∀ (p : Nat) (A : Form),
+      (∃ (U : Form),
+          (∀ (a : Nat), a ∈ U.letters → a ≠ p ∧ a ∈ A.letters) ∧
+            Derivable [Uᗮ, A] ∧ ∀ (B : Form), ¬p ∈ B.letters → Derivable [Bᗮ, A] → Derivable [Bᗮ, U]) ∧
+        ∃ (E : Form),
+          (∀ (a : Nat), a ∈ E.letters → a ≠ p ∧ a ∈ A.letters) ∧
+            Derivable [Aᗮ, E] ∧ ∀ (B : Form), ¬p ∈ B.letters → Derivable [Aᗮ, B] → Derivable [Eᗮ, B]
+PROVED · axioms: Quot.sound, propext
+-/
+#guard_msgs in #statement MALL.uniformInterpolationForFormulas
+
+/--
 info: theorem MALL.soundness : Soundness
   where MALL.Soundness :=
     ∀ (Γ : List Form), Derivable Γ → Valid Γ
@@ -230,6 +276,19 @@ PROVED · axioms: Quot.sound, propext
 #guard_msgs (drop info) in #statement_location MALL.reduce
 #guard_msgs (drop info) in #statement_location MALL.disjunction_cf
 #guard_msgs (drop info) in #statement_location MALL.search
+#guard_msgs (drop info) in #statement_location MALL.Interpolant
+#guard_msgs (drop info) in #statement_location MALL.Interpolant.letters
+#guard_msgs (drop info) in #statement_location MALL.CF.interp
+#guard_msgs (drop info) in #statement_location MALL.split4
+#guard_msgs (drop info) in #statement_location MALL.Interpolant.flip
+#guard_msgs (drop info) in #statement_location MALL.ui
+#guard_msgs (drop info) in #statement_location MALL.ui_spec
+#guard_msgs (drop info) in #statement_location MALL.forallP
+#guard_msgs (drop info) in #statement_location MALL.existsP
+#guard_msgs (drop info) in #statement_location MALL.uiN
+#guard_msgs (drop info) in #statement_location MALL.uiStep
+#guard_msgs (drop info) in #statement_location MALL.uiN_below
+#guard_msgs (drop info) in #statement_location MALL.uiN_greatest
 #guard_msgs (drop info) in #statement_location MALL.PhaseStructure.sat_iff_holds
 #guard_msgs (drop info) in #statement_location MALL.PhaseStructure.holds_cons
 #guard_msgs (drop info) in #statement_location MALL.synCF

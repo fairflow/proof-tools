@@ -35,6 +35,8 @@ Grades: ★ a move or two; ★★ a short derivation, or a small countermodel;
 import MALL.Explore
 import MALL.ModelRun
 import MALL.Refute
+import MALL.Craig
+import MALL.Uniform
 
 open ProofTools ProofTools.Explore MALL
 
@@ -213,6 +215,19 @@ example : Derivable [𝟏 ⊕ p] → Derivable [𝟏] ∨ Derivable [p] := disju
 theorem no_disjunction_in_context :
     ¬ ∀ (A B : Form) (Γ : List Form),
       Derivable ((A ⊕ B) :: Γ) → Derivable (A :: Γ) ∨ Derivable (B :: Γ) :=
+  sorry
+
+-- D6 ★★  The interpolant of ⊢ (p & q)⊥, p ⊕ r, divided between its two formulas.
+def d6 : CF [(p & q)ᗮ, p ⊕ r] := (searchCF _).get (by decide +kernel)
+-- #eval (craigInterpolation [(p & q)ᗮ] [p ⊕ r] d6).C.show
+
+-- D7 ★★  Predict, then evaluate.
+-- #eval (existsP 0 (p ⊗ q)).show
+-- #eval (existsP 0 (p & q)).show
+-- #eval (forallP 0 (p ⅋ pᗮ)).show
+
+-- D8 ★★★  From `ui_spec`, without computing the interpolant.
+example : Derivable [forallP 0 ((p ⊗ q) ⅋ pᗮ), qᗮ] :=
   sorry
 
 /-! ## Part E: the semantics, in Lean -/

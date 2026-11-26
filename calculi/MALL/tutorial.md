@@ -1,11 +1,11 @@
 # MALL: a tutorial, with graded exercises
 
-<!-- lean-pins: module MALL.TutorialPins; import MALL.Explore MALL.ModelRun MALL.Source MALL.Refute; open MALL -->
+<!-- lean-pins: module MALL.TutorialPins; import MALL.Explore MALL.ModelRun MALL.Source MALL.Refute MALL.Craig MALL.Uniform; open MALL -->
 
 MALL is propositional multiplicative-additive linear logic: the linear
 logic of ⊗, ⅋, 1, ⊥ (the multiplicatives) and &, ⊕, ⊤, 0 (the
 additives), without the exponentials. This page teaches its one-sided
-sequent calculus through twenty-five exercises, and explains what has
+sequent calculus through twenty-eight exercises, and explains what has
 been proved about it in Lean: its syntactic properties (exchange, the
 failure of weakening and contraction, identity expansion, cut
 admissibility and cut elimination, the inversions, the subformula and
@@ -83,8 +83,8 @@ so that `A⊥⊥` is `A` itself. Linear implication is an abbreviation:
 
     A ⊸ B  :=  A⊥ ⅋ B
 
-In Lean, [`Form`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Form.lean#L16-L39 "MALL.Form") has ten constructors, and negation is
-the function [`Form.neg`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Form.lean#L50-L64 "MALL.Form.neg"), written `Aᗮ`: a postfix
+In Lean, [`Form`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Form.lean#L16-L39 "MALL.Form") has ten constructors, and negation is
+the function [`Form.neg`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Form.lean#L50-L64 "MALL.Form.neg"), written `Aᗮ`: a postfix
 `⊥` would be read as the constant. The constants are typed `𝟏 ⊥ ⊤ 𝟎`,
 and printed `1 ⊥ ⊤ 0`. This page writes `A⊥` in prose and in what Lean
 prints, and `Aᗮ` in what you type. There is no notation for `⊸` in the
@@ -147,9 +147,9 @@ Five things to notice.
   derivations and not a constructor (section 5.1).
 
 In Lean the calculus is an inductive family
-[`Fam`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/System.lean#L28-L57 "MALL.Fam") `: List Form → Type`, one constructor for each
+[`Fam`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/System.lean#L28-L57 "MALL.Fam") `: List Form → Type`, one constructor for each
 rule, and the calculus without the cut rule is a second family,
-[`CF`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/System.lean#L59-L83 "MALL.CF"), with nine. A term of `Fam Γ` is a derivation, as
+[`CF`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/System.lean#L59-L83 "MALL.CF"), with nine. A term of `Fam Γ` is a derivation, as
 data: it can be measured, transformed, and printed. `Derivable Γ` says
 that `Fam Γ` has an element.
 
@@ -220,7 +220,7 @@ says
       [apply] mallmove plus₂ (p ⊗ q) (p ⊗ r)
 
 What `mallmove` builds is a derivation of the explorer's proof system;
-[`famOfDer`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Proof.lean#L128-L130 "MALL.famOfDer") carries it to a derivation in `Fam`,
+[`famOfDer`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Proof.lean#L128-L130 "MALL.famOfDer") carries it to a derivation in `Fam`,
 which is what the theorems are about. The campaign's
 [user's guide](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/campaign/users-guide.md)
 has every line of the tactic and every message.
@@ -270,7 +270,7 @@ Girard's **phase semantics** interprets a formula as a set of elements
 of a commutative monoid. It is a semantics of provability: it says which
 sequents are derivable, and nothing about the derivations.
 
-A **phase space** (Definition 1.1, [`PhaseSpace`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Semantics.lean#L15-L34 "MALL.PhaseSpace"))
+A **phase space** (Definition 1.1, [`PhaseSpace`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Semantics.lean#L15-L34 "MALL.PhaseSpace"))
 is a commutative monoid `M`, whose elements are the phases, with a set
 of phases `⊥`, the antiphases. For a set of phases `G`:
 
@@ -281,9 +281,9 @@ of phases `⊥`, the antiphases. For a set of phases `G`:
 For every `G`, `G ⊂ G⊥⊥` and `G⊥⊥⊥ = G⊥`, so every dual is a fact
 (exercise E2), and `G⊥⊥` is the least fact that contains `G`.
 
-A **phase structure** (1.14, [`PhaseStructure`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Semantics.lean#L53-L59 "MALL.PhaseStructure"))
+A **phase structure** (1.14, [`PhaseStructure`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Semantics.lean#L53-L59 "MALL.PhaseStructure"))
 is a phase space with a fact for each letter. It gives every formula a
-fact ([`interp`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Semantics.lean#L65-L81 "MALL.PhaseStructure.interp")):
+fact ([`interp`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Semantics.lean#L65-L81 "MALL.PhaseStructure.interp")):
 
     ⟦p⟧      the fact of p              ⟦p⊥⟧     = ⟦p⟧⊥
     ⟦1⟧      = ⊥⊥                       ⟦⊥⟧      = ⊥
@@ -292,10 +292,10 @@ fact ([`interp`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MA
     ⟦A & B⟧  = ⟦A⟧ ∩ ⟦B⟧                ⟦A ⊕ B⟧  = (⟦A⟧ ∪ ⟦B⟧)⊥⊥
 
 A sequent `⊢ A₁, …, Aₙ` is read as the formula `A₁ ⅋ … ⅋ Aₙ`, and the
-empty sequent as `⊥` ([`parAll`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Semantics.lean#L85-L91 "MALL.parAll")). It **holds in the
+empty sequent as `⊥` ([`parAll`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Semantics.lean#L85-L91 "MALL.parAll")). It **holds in the
 structure** if the unit of the monoid is in the interpretation of that
-formula ([`Sat`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Semantics.lean#L93-L96 "MALL.PhaseStructure.Sat")), and it is **valid** if
-it holds in every phase structure ([`Valid`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Semantics.lean#L98-L100 "MALL.Valid")).
+formula ([`Sat`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Semantics.lean#L93-L96 "MALL.PhaseStructure.Sat")), and it is **valid** if
+it holds in every phase structure ([`Valid`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Semantics.lean#L98-L100 "MALL.Valid")).
 
 In Lean a set of phases is a predicate, and nothing asks that
 membership be decidable. Soundness and completeness (section 6) are
@@ -331,7 +331,7 @@ The same structure, written as data and checked by the kernel:
 
     example : ¬ Derivable [𝟏, 𝟏] := noDerivableBy.verdict _ ⟨1, [false, true], []⟩
 
-A [`ZModel`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Model.lean#L27-L36 "MALL.ZModel") `⟨k, bot, val⟩` is a phase structure on
+A [`ZModel`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Model.lean#L27-L36 "MALL.ZModel") `⟨k, bot, val⟩` is a phase structure on
 ℤ/(k+1): `bot` is the set of antiphases, as a list of Booleans, one for
 each phase, and `val` has a set for each letter in the order `p`, `q`,
 `r`, whose closure `G⊥⊥` is the letter's fact. The check computes the
@@ -343,10 +343,10 @@ interpretation by the clauses above and asks that 0 be not in it.
 
     def MALL.noDerivableBy : Certify.Certifier (List Form) ZModel fun (Γ : List Form) => Derivable Γ → False
 
-*Lean:* [`MALL.ZModel.not_valid_of_refutes`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Model.lean#L204-L211) · PROVED · axioms: `Quot.sound`, `propext`; [`MALL.noDerivableBy`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/ModelRun.lean#L28-L31) · PROVED · axioms: `Quot.sound`, `propext`
+*Lean:* [`MALL.ZModel.not_valid_of_refutes`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Model.lean#L204-L211) · PROVED · axioms: `Quot.sound`, `propext`; [`MALL.noDerivableBy`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/ModelRun.lean#L28-L31) · PROVED · axioms: `Quot.sound`, `propext`
 
 That the computed sets are the interpretation in a phase structure is
-[`interp_eq`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Model.lean#L163-L202 "MALL.ZModel.interp_eq"), and the step from "not
+[`interp_eq`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Model.lean#L163-L202 "MALL.ZModel.interp_eq"), and the step from "not
 valid" to "not derivable" is soundness. To ask the searches:
 
     #eval IO.println (explain [𝟏, 𝟏])
@@ -355,7 +355,7 @@ valid" to "not derivable" is soundness. To ask the searches:
       is not derivable (decided by the proved search)
       refuted in ℤ/2 with antiphases {1}, p = {0, 1}, q = {0, 1}
 
-and [`refuteBy`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/ModelRun.lean#L70-L76 "MALL.refuteBy") `Γ` returns a `ZModel` to paste
+and [`refuteBy`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/ModelRun.lean#L60-L66 "MALL.refuteBy") `Γ` returns a `ZModel` to paste
 into the line above. Both look among a few small cyclic groups. They do
 not find a structure for every sequent that has no derivation: for the
 converse of half-distributivity,
@@ -377,7 +377,7 @@ occurrences; the structure of exercise C3 is of this kind.
 ### The second certificate: a saturated set of sequents
 
 A finite set `D` of sequents is **saturated**
-([`saturated`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Saturated.lean#L72-L75 "MALL.saturated")) when
+([`saturated`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Saturated.lean#L72-L75 "MALL.saturated")) when
 
 * no member is the conclusion of a rule with no premise: none is
   `⊢ p, p⊥` at a letter, none is `⊢ 1`, and none has a `⊤`;
@@ -409,7 +409,7 @@ set.
       (∃ (c : ProofTools.Explore.Cert S), treeCert.check Γ c = true) ∨
         ∃ (D : List (List Form)), noDerivableBySet.check Γ D = true
 
-*Lean:* [`MALL.countermodel_of_refutedBy`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Saturated.lean#L272-L276) · PROVED · axioms: `Quot.sound`, `propext`; [`MALL.refutation_complete`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Saturated.lean#L365-L370) · PROVED · axioms: `Quot.sound`, `propext`; [`MALL.certified`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/SatRun.lean#L40-L48) · PROVED · axioms: `Quot.sound`, `propext`
+*Lean:* [`MALL.countermodel_of_refutedBy`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Saturated.lean#L272-L276) · PROVED · axioms: `Quot.sound`, `propext`; [`MALL.refutation_complete`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Saturated.lean#L365-L370) · PROVED · axioms: `Quot.sound`, `propext`; [`MALL.certified`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/SatRun.lean#L40-L48) · PROVED · axioms: `Quot.sound`, `propext`
 
 All PROVED
 ([`MALL/Saturated.lean`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Saturated.lean),
@@ -418,7 +418,7 @@ All PROVED
 saturated.
 
 The first statement is why the check is sound. A saturated set presents
-a finite phase structure ([`satModel`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Saturated.lean#L219-L224 "MALL.satModel")): its phases
+a finite phase structure ([`satModel`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Saturated.lean#L219-L224 "MALL.satModel")): its phases
 are the parts of the members of `D`, and one more phase for every other
 sequent; the product is juxtaposition; the antiphases are the phases
 that are not members of `D`. It is the construction of section 6.3 with
@@ -436,11 +436,11 @@ saturated set that checks, so each side has something written that the
 kernel checks.
 
 `fullRefutation` is for the proof. To get a set, ask the producer:
-[`refuteSet`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Refute.lean#L107-L112 "MALL.refuteSet") `Γ` returns the sequents that a
+[`refuteSet`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Refute.lean#L107-L112 "MALL.refuteSet") `Γ` returns the sequents that a
 failed search visits, a far smaller set, and it returns one whenever
 its own search for a derivation fails. The producer is code and is not
 trusted; the kernel checks what it returns.
-[`describeCountermodel`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Refute.lean#L208-L219 "MALL.describeCountermodel") prints the set
+[`describeCountermodel`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Refute.lean#L208-L219 "MALL.describeCountermodel") prints the set
 and the structure it presents:
 
     #eval IO.println (describeCountermodel [p ⊕ pᗮ])
@@ -506,17 +506,17 @@ has each with its source.
 
     theorem MALL.lit_iff_fam (Γ : List Form) : Nonempty (Lit Γ) ↔ Derivable Γ
 
-*Lean:* [`MALL.lit_iff_fam`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Source.lean#L80-L82) · PROVED · axioms: none
+*Lean:* [`MALL.lit_iff_fam`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Source.lean#L80-L82) · PROVED · axioms: none
 
-PROVED. [`Lit`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Source.lean#L16-L46 "MALL.Lit") is the source's figure letter for
+PROVED. [`Lit`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Source.lean#L16-L46 "MALL.Lit") is the source's figure letter for
 letter: sequents are sequences, every rule acts on the first formula,
 and exchange is a rule. `Fam` is the form the source calls "the variant
 without exchange, adapted to multisets of formulas" (p. 24): each rule
 concludes any permutation of its conclusion. The theorem says the two
 derive the same sequents. In `Fam`, exchange is the function
-[`Fam.exch`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/System.lean#L107-L120 "MALL.Fam.exch"), which changes the last rule's proof
+[`Fam.exch`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/System.lean#L107-L120 "MALL.Fam.exch"), which changes the last rule's proof
 of permutation and nothing else, so it keeps the height
-([`exchangeKeepsHeight`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Results.lean#L20-L22 "MALL.exchangeKeepsHeight")).
+([`exchangeKeepsHeight`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Results.lean#L20-L22 "MALL.exchangeKeepsHeight")).
 
 ### 5.2 Weakening and contraction: REFUTED
 
@@ -525,10 +525,10 @@ of permutation and nothing else, so it keeps the height
     weakening:      for every Γ and A,   if ⊢ Γ  then  ⊢ A, Γ
     refuted by:     ⊢ 1  is derivable,   ⊢ 1, 1  is not
 
-*Lean, in paraphrase:* [`MALL.not_weakening`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Results.lean#L115-L117) · PROVED · axioms: `Quot.sound`, `propext`; [`MALL.not_derivable_one_one`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Results.lean#L112-L113) · PROVED · axioms: `Quot.sound`, `propext`
+*Lean, in paraphrase:* [`MALL.not_weakening`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Results.lean#L115-L117) · PROVED · axioms: `Quot.sound`, `propext`; [`MALL.not_derivable_one_one`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Results.lean#L112-L113) · PROVED · axioms: `Quot.sound`, `propext`
 
 **REFUTED.** The statement is the proposition
-[`Weakening`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Statements.lean#L67-L68 "MALL.Weakening"); the theorem in the caption is its
+[`Weakening`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Statements.lean#L67-L68 "MALL.Weakening"); the theorem in the caption is its
 negation.
 
 <!-- lean: MALL.not_contraction MALL.derivable_plus_plus MALL.not_derivable_plus paraphrase -->
@@ -536,10 +536,10 @@ negation.
     contraction:    for every Γ and A,   if ⊢ A, A, Γ  then  ⊢ A, Γ
     refuted by:     ⊢ p ⊕ p⊥, p ⊕ p⊥  is derivable,   ⊢ p ⊕ p⊥  is not
 
-*Lean, in paraphrase:* [`MALL.not_contraction`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Results.lean#L126-L129) · PROVED · axioms: `Quot.sound`, `propext`; [`MALL.derivable_plus_plus`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Results.lean#L122-L124) · PROVED · axioms: `Quot.sound`, `propext`; [`MALL.not_derivable_plus`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Results.lean#L119-L120) · PROVED · axioms: `Quot.sound`, `propext`
+*Lean, in paraphrase:* [`MALL.not_contraction`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Results.lean#L126-L129) · PROVED · axioms: `Quot.sound`, `propext`; [`MALL.derivable_plus_plus`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Results.lean#L122-L124) · PROVED · axioms: `Quot.sound`, `propext`; [`MALL.not_derivable_plus`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Results.lean#L119-L120) · PROVED · axioms: `Quot.sound`, `propext`
 
 **REFUTED.** The statement is
-[`Contraction`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Statements.lean#L70-L71 "MALL.Contraction"); the first theorem in the
+[`Contraction`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Statements.lean#L70-L71 "MALL.Contraction"); the first theorem in the
 caption is its negation.
 
 The source forbids both rules (p. 22). These two theorems say more:
@@ -556,12 +556,12 @@ and exercise C3 refute the two sequents by a phase structure.
       where MALL.IdentityExpansion :=
         (Γ : List Form) → CF Γ → { d : CF Γ // d.Atomic }
 
-*Lean:* [`MALL.identityExpansion`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Results.lean#L91-L93) · PROVED · axioms: `Quot.sound`, `propext`
+*Lean:* [`MALL.identityExpansion`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Results.lean#L91-L93) · PROVED · axioms: `Quot.sound`, `propext`
 
-PROVED. [`d.Atomic`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Statements.lean#L48-L58 "MALL.CF.Atomic") says that every logical axiom
+PROVED. [`d.Atomic`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Statements.lean#L48-L58 "MALL.CF.Atomic") says that every logical axiom
 of `d` is `⊢ p, p⊥` at a letter. The source remarks that the axiom may
 be so restricted (p. 22). The function replaces each axiom `⊢ A, A⊥` by
-its derivation [`idExp`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Results.lean#L26-L49 "MALL.idExp") `A`, which is by recursion on
+its derivation [`idExp`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Results.lean#L26-L49 "MALL.idExp") `A`, which is by recursion on
 `A`: for `A ⊗ B` it is ⅋ on `A⊥ ⅋ B⊥`, then ⊗ with the split that sends
 `A⊥` to `A`, then the two derivations for `A` and `B`; for `A & B` it is
 &, then 1⊕ in one premise and 2⊕ in the other; for `1` it is ⊥ and then
@@ -579,7 +579,7 @@ its derivation [`idExp`](https://github.com/fairflow/proof-tools/blob/5e0d563/ca
       where MALL.CutElimination :=
         (Γ : List Form) → Fam Γ → CF Γ
 
-*Lean:* [`MALL.cutAdmissible`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Cut.lean#L262-L264) · PROVED · axioms: `Quot.sound`, `propext`; [`MALL.cutElimination`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Cut.lean#L266-L280) · PROVED · axioms: `Quot.sound`, `propext`
+*Lean:* [`MALL.cutAdmissible`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Cut.lean#L262-L264) · PROVED · axioms: `Quot.sound`, `propext`; [`MALL.cutElimination`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Cut.lean#L266-L280) · PROVED · axioms: `Quot.sound`, `propext`
 
 Both PROVED, as functions
 ([`MALL/Cut.lean`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Cut.lean)).
@@ -591,7 +591,7 @@ is applied to the two results.
 structural:
 
 * on a bound of the size of the cut formula `A`
-  ([`cutN`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Cut.lean#L256-L260 "MALL.cutN"));
+  ([`cutN`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Cut.lean#L256-L260 "MALL.cutN"));
 * then on the left derivation, of `⊢ A, Γ`;
 * then on the right derivation, of `⊢ A⊥, Δ`.
 
@@ -599,7 +599,7 @@ No sum of heights is needed, and no induction on a pair. The reason is
 that no rule of MALL uses a premise twice: without contraction, a cut
 that is moved above a rule meets each premise once.
 
-The function [`push`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Cut.lean#L87-L151 "MALL.push") takes a cut on a formula `C` up
+The function [`push`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Cut.lean#L87-L151 "MALL.push") takes a cut on a formula `C` up
 through a derivation of `⊢ C, Γ`, with `Δ` the context of the other
 side. Where the last rule introduces another formula, `C` is in the
 context of that rule: the cut goes to the premises that have `C` (both
@@ -607,7 +607,7 @@ for &, one for ⊗, none for ⊤), and the same rule is applied below, with
 `Δ` added to its context. Where the last rule introduces `C`, `push`
 hands over to its argument.
 
-On the left derivation that argument is [`reduce`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Cut.lean#L155-L248 "MALL.reduce"):
+On the left derivation that argument is [`reduce`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Cut.lean#L155-L248 "MALL.reduce"):
 the last rule on the left introduces `A`, and now the cut on `A⊥` is
 pushed up the right derivation in the same way. Where it arrives at the
 rule that introduces `A⊥`, the two rules are dual, and the cut is
@@ -630,7 +630,7 @@ the semantics:
       where MALL.CutEliminationProp :=
         ∀ (Γ : List Form), Derivable Γ → Nonempty (CF Γ)
 
-*Lean:* [`MALL.cutEliminationProp`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Completeness.lean#L242-L244) · PROVED · axioms: `Quot.sound`, `propext`
+*Lean:* [`MALL.cutEliminationProp`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Completeness.lean#L242-L244) · PROVED · axioms: `Quot.sound`, `propext`
 
 PROVED, in one line: a derivable sequent is valid (soundness, 6.1), and
 a valid sequent has a derivation without cut (completeness, 6.2). This
@@ -652,7 +652,7 @@ proof gives no way to compute the derivation from the one it is given.
       where MALL.WithInversion :=
         (A B : Form) → (Γ : List Form) → CF (A & B :: Γ) → CF (A :: Γ) × CF (B :: Γ)
 
-*Lean:* [`MALL.parInversion`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Cut.lean#L284-L288) · PROVED · axioms: `Quot.sound`, `propext`; [`MALL.botInversion`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Cut.lean#L290-L292) · PROVED · axioms: `Quot.sound`, `propext`; [`MALL.withInversion`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Cut.lean#L294-L300) · PROVED · axioms: `Quot.sound`, `propext`
+*Lean:* [`MALL.parInversion`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Cut.lean#L284-L288) · PROVED · axioms: `Quot.sound`, `propext`; [`MALL.botInversion`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Cut.lean#L290-L292) · PROVED · axioms: `Quot.sound`, `propext`; [`MALL.withInversion`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Cut.lean#L294-L300) · PROVED · axioms: `Quot.sound`, `propext`
 
 All PROVED, each by one cut (two for &) against a small derivation: for
 ⅋ against `⊢ A⊥ ⊗ B⊥, A, B`; for ⊥ against `⊢ 1`; for & against
@@ -677,7 +677,7 @@ is not.
       where MALL.DisjunctionProperty :=
         ∀ (A B : Form), Derivable [A ⊕ B] → Derivable [A] ∨ Derivable [B]
 
-*Lean:* [`MALL.subformulaProperty`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Results.lean#L226-L228) · PROVED · axioms: `propext`; [`MALL.disjunctionProperty`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Results.lean#L158-L161) · PROVED · axioms: `Quot.sound`, `propext`
+*Lean:* [`MALL.subformulaProperty`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Results.lean#L226-L228) · PROVED · axioms: `propext`; [`MALL.disjunctionProperty`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Results.lean#L158-L161) · PROVED · axioms: `Quot.sound`, `propext`
 
 Both PROVED. `d.All P` says that `P` holds of every sequent of the
 derivation `d`, and `C.IsSub D` that `C` is a subformula of `D`. The
@@ -687,7 +687,7 @@ Lincoln, Mitchell, Scedrov and Shankar it is Corollary A.4).
 
 The disjunction property is for a sequent of one formula: the last rule
 of a derivation without cut of `⊢ A ⊕ B` can only be 1⊕ or 2⊕
-([`disjunction_cf`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Results.lean#L133-L156 "MALL.disjunction_cf")), and cut elimination
+([`disjunction_cf`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Results.lean#L133-L156 "MALL.disjunction_cf")), and cut elimination
 supplies the derivation without cut. With a context it fails (exercise
 D5).
 
@@ -701,11 +701,11 @@ D5).
 
     theorem MALL.search_complete (n : Nat) (Γ : List Form) : ssize Γ ≤ n → Nonempty (CF Γ) → (search n Γ).isSome = true
 
-*Lean:* [`MALL.derivableDecidable`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Results.lean#L103-L105) · PROVED · axioms: `Quot.sound`, `propext`; [`MALL.search_complete`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Decide.lean#L370-L392) · PROVED · axioms: `Quot.sound`, `propext`
+*Lean:* [`MALL.derivableDecidable`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Results.lean#L103-L105) · PROVED · axioms: `Quot.sound`, `propext`; [`MALL.search_complete`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Decide.lean#L370-L392) · PROVED · axioms: `Quot.sound`, `propext`
 
 Both PROVED. Read upwards, every rule of `CF` removes a connective or a
 constant, so the size of a sequent bounds the height of its derivations
-without cut. [`search`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Decide.lean#L244-L255 "MALL.search") `n Γ` tries the logical
+without cut. [`search`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Decide.lean#L244-L255 "MALL.search") `n Γ` tries the logical
 axiom, then the rule 1, then each formula of `Γ` in turn as the
 principal formula of its rule: ⊤ succeeds; ⅋, ⊥ and & go to their
 premises; ⊕ tries one side and then the other; ⊗ tries every split of
@@ -725,6 +725,131 @@ the campaign's
 put the practical limit between 6 and 12 formulas. Beyond it there is a
 second search, by lazy splitting, which is not proved; a derivation it
 returns is checked by the kernel as a tree of moves.
+
+### 5.8 Interpolation
+
+<!-- lean: MALL.craigInterpolation MALL.craigForFormulas -->
+
+    def MALL.craigInterpolation : CraigInterpolation
+      where MALL.CraigInterpolation :=
+        (Γ Δ : List Form) → CF (Γ ++ Δ) → Interpolant Γ Δ
+
+    theorem MALL.craigForFormulas : CraigForFormulas
+      where MALL.CraigForFormulas :=
+        ∀ (A B : Form),
+          Derivable [Aᗮ, B] →
+            ∃ (C : Form), Derivable [Aᗮ, C] ∧ Derivable [Cᗮ, B] ∧ ∀ (a : Nat), a ∈ C.letters → a ∈ A.letters ∧ a ∈ B.letters
+
+*Lean:* [`MALL.craigInterpolation`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Craig.lean#L391-L395) · PROVED · axioms: `Quot.sound`, `propext`; [`MALL.craigForFormulas`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Craig.lean#L405-L414) · PROVED · axioms: `Quot.sound`, `propext`
+
+Both PROVED. An [`Interpolant`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Statements.lean#L143-L156 "MALL.Interpolant") of a sequent
+divided in two, `⊢ Γ, Δ`, is a formula `C` with derivations without cut
+of `⊢ C, Γ` and of `⊢ C⊥, Δ`, every literal of which occurs in `Δ` and,
+negated, in `Γ`. Read two-sided, `Γ⊥ ⊢ C` and `C ⊢ Δ`. The condition on
+literals is Lyndon's: formulas are in negation normal form, so a letter
+occurs in `C` only with a sign it has in `Δ` and, reversed, in `Γ`. That
+the letters of `C` are common to `Γ` and `Δ`
+([`Interpolant.letters`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Craig.lean#L397-L403 "MALL.Interpolant.letters")) follows, and
+`craigForFormulas` is the usual statement for an implication `A ⊸ B`.
+
+The function is Maehara's method, by recursion on the derivation
+([`CF.interp`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Craig.lean#L373-L389 "MALL.CF.interp")), for every division of its sequent.
+At each rule the principal formula is in `Γ` or in `Δ`. In `Γ`: the
+rules ⊥, ⅋ and ⊕ pass the interpolant of the premise on; & gives the ⊕
+of the two; ⊗ gives the ⅋ of the two, the context of each premise
+divided as `Γ` and `Δ` divide it ([`split4`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Split.lean#L29-L56 "MALL.split4")); ⊤ gives
+`0`; an axiom `⊢ A, A⊥` gives `A⊥` when the division separates its two
+formulas and `⊥` when it does not. In `Δ` the interpolant is the dual,
+got by reversing the division
+([`Interpolant.flip`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Craig.lean#L139-L148 "MALL.Interpolant.flip")). The interpolant is
+data: it is computed from the derivation, and two derivations of one
+sequent can give two interpolants.
+
+    (craigInterpolation [(p ⊗ (q ⊕ r))ᗮ] [(p ⊗ q) ⊕ (p ⊗ r)] d).C = (p ⊗ q) ⊕ (p ⊗ r)
+    (craigInterpolation [(p ⊗ q)ᗮ] [(p ⊗ ⊤) ⊕ r] d).C = p ⊗ ⊤
+
+where `d` is the derivation the proved search returns. In the second,
+`q` is in the first part only and `r` in the second only, and neither is
+in the interpolant.
+
+Sources: interpolation with this condition on signs is D. Roorda's
+(thesis, Amsterdam 1991, chapter V), by induction on a derivation
+without cut; A. Akbar Tabatabai and R. Jalali (arXiv:1808.06256) prove
+the form with the condition on letters, for a sequent divided in two,
+for a family of calculi that has MALL. What each states is in the
+campaign's
+[note on the sources](https://github.com/fairflow/proof-tools/blob/main/calculi/MALL/campaign/interpolation-sources.md),
+which was read after the proofs were written.
+
+<!-- lean: MALL.uniformInterpolation MALL.uniformInterpolationForFormulas -->
+
+    theorem MALL.uniformInterpolation : UniformInterpolation
+      where MALL.UniformInterpolation :=
+        ∀ (p : Nat) (Γ : List Form),
+          ∃ (I : Form),
+            (∀ (a : Nat), a ∈ I.letters → a ≠ p ∧ a ∈ lettersL Γ) ∧
+              Derivable (Iᗮ :: Γ) ∧
+                ∀ (Δ : List Form), (∀ (a : Nat), a ∈ lettersL Δ → a ≠ p) → Derivable (Γ ++ Δ) → Derivable (I :: Δ)
+
+    theorem MALL.uniformInterpolationForFormulas : UniformInterpolationForFormulas
+      where MALL.UniformInterpolationForFormulas :=
+        ∀ (p : Nat) (A : Form),
+          (∃ (U : Form),
+              (∀ (a : Nat), a ∈ U.letters → a ≠ p ∧ a ∈ A.letters) ∧
+                Derivable [Uᗮ, A] ∧ ∀ (B : Form), ¬p ∈ B.letters → Derivable [Bᗮ, A] → Derivable [Bᗮ, U]) ∧
+            ∃ (E : Form),
+              (∀ (a : Nat), a ∈ E.letters → a ≠ p ∧ a ∈ A.letters) ∧
+                Derivable [Aᗮ, E] ∧ ∀ (B : Form), ¬p ∈ B.letters → Derivable [Aᗮ, B] → Derivable [Eᗮ, B]
+
+*Lean:* [`MALL.uniformInterpolation`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Uniform.lean#L853-L853) · PROVED · axioms: `Quot.sound`, `propext`; [`MALL.uniformInterpolationForFormulas`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Uniform.lean#L855-L885) · PROVED · axioms: `Quot.sound`, `propext`
+
+Both PROVED. Uniform interpolation is stronger than Craig's: the
+interpolant depends on one side only. For a sequent `Γ` and a letter `p`,
+[`ui`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Uniform.lean#L106-L107 "MALL.ui") `p Γ` is a formula without `p` such that
+`⊢ (ui p Γ)⊥, Γ`, and `⊢ ui p Γ, Δ` for every `Δ` without `p` with
+`⊢ Γ, Δ` ([`ui_spec`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Uniform.lean#L840-L851 "MALL.ui_spec")). For a formula,
+[`forallP`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Uniform.lean#L109-L110 "MALL.forallP") `p A` is the weakest formula without `p`
+that implies `A`, and [`existsP`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Uniform.lean#L112-L113 "MALL.existsP") `p A` the strongest
+that `A` implies; one is the dual of the other at `A⊥`.
+
+The interpolant is computed along the rules read upwards (Pitts's
+method). No rule of MALL contracts, so every premise is smaller than its
+conclusion and the recursion is on a bound of the size
+([`uiN`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Uniform.lean#L101-L104 "MALL.uiN")). `ui p Γ` is the ⊕ of one formula for each way a
+derivation of `⊢ Γ, Δ` can end that concerns `Γ`
+([`uiStep`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Uniform.lean#L95-L99 "MALL.uiStep")): `⊥` if `Γ` is empty; `A` if `Γ` is the
+one formula `A` without `p`; `1` if `Γ` is `A, A⊥`; for a rule at a
+formula of `Γ`, `⊤` for ⊤, the interpolant of the premise for ⊥, ⅋ and
+each side of ⊕, the & of the two for &, and for ⊗ the ⊗ of the two for
+each division of the rest; and, for a ⊗ of `Δ` whose premises divide `Γ`,
+the ⅋ of the interpolants of the two parts. That `ui p Γ` implies `Γ` is
+by recursion on the bound ([`uiN_below`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Uniform.lean#L457-L511 "MALL.uiN_below")); that it
+is the weakest is by induction on a derivation without cut of `⊢ Γ, Δ`,
+for every division ([`uiN_greatest`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Uniform.lean#L608-L836 "MALL.uiN_greatest")). The
+formula is simplified as it is built: `0` is dropped from a ⊕ and
+annihilates a ⊗, the units are removed, a disjunct is taken once.
+
+    forallP 0 (p ⅋ pᗮ) = 𝟏                    existsP 0 (p ⊗ pᗮ) = ⊥
+    forallP 0 (pᗮ ⅋ (p ⊗ q)) = q              existsP 0 (p ⊗ (pᗮ ⅋ q)) = q
+    forallP 0 (p ⅋ p) = 𝟎                     existsP 0 (p ⊗ q) = ⊤ ⊗ q
+
+The kernel computes each. The last shows the logic: in classical logic
+`∃p (p ∧ q)` is `q`, but here `p ⊗ q ⊢ q` would be weakening, and the
+strongest consequence of `p ⊗ q` without `p` is `⊤ ⊗ q`. For sequents of
+several formulas the interpolant is long: it is not simplified up to the
+commutativity of ⅋.
+
+Sources: uniform interpolation for this logic is Theorem 4.3 of
+M. Alizadeh, F. Derakhshan and H. Ono, *Uniform interpolation in
+substructural logics* (Review of Symbolic Logic 7, 2014), who call the
+logic InFLₑ, and is covered by Theorem 4.3 of A. Akbar Tabatabai and
+R. Jalali (arXiv:1808.06258), who call it CFLₑ. Both use Pitts's method
+on two-sided calculi. The construction here was made and proved before
+those papers were read, and is of the same kind as the first paper's
+table of clauses, in one-sided form; that paper writes out no proof for
+this logic. Before the proof, the statement was screened: for 21
+formulas, both properties against the decision procedure over 264 test
+formulas ([`MALL/UniformTest.lean`](https://github.com/fairflow/proof-tools/blob/main/calculi/MALL/MALL/UniformTest.lean)).
 
 ### Exercises D: the theorems, used
 
@@ -747,6 +872,15 @@ returns is checked by the kernel as a tree of moves.
   Where is cut elimination used, and why is it needed?
 * **D5** ★★★ State the disjunction property for a sequent with a
   context, and refute it.
+* **D6** ★★ `⊢ (p & q)⊥, p ⊕ r` is derivable. Divided between its two
+  formulas, which letters may an interpolant have? Follow Maehara's
+  clauses along a derivation by hand, then evaluate
+  `craigInterpolation`.
+* **D7** ★★ Predict `existsP 0 (p ⊗ q)`, `existsP 0 (p & q)` and
+  `forallP 0 (p ⅋ pᗮ)`, then evaluate. Why is the first not `q`?
+* **D8** ★★★ `q ⊢ p ⊸ p ⊗ q` is derivable. Without computing the
+  interpolant, prove `Derivable [forallP 0 ((p ⊗ q) ⅋ pᗮ), qᗮ]` from
+  `ui_spec`.
 
 ## 6. The semantic properties
 
@@ -758,7 +892,7 @@ returns is checked by the kernel as a tree of moves.
       where MALL.Soundness :=
         ∀ (Γ : List Form), Derivable Γ → Valid Γ
 
-*Lean:* [`MALL.soundness`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Soundness.lean#L257-L258) · PROVED · axioms: `Quot.sound`, `propext`
+*Lean:* [`MALL.soundness`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Soundness.lean#L257-L258) · PROVED · axioms: `Quot.sound`, `propext`
 
 PROVED (Girard, Proposition 1.16), by induction on the derivation
 ([`MALL/Soundness.lean`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Soundness.lean)).
@@ -766,9 +900,9 @@ The proof first puts "holds in a structure" in a form that follows the
 rules. Call the *context* of `Γ` the product of the duals of the
 interpretations of its formulas. Then `⊢ Γ` holds exactly if every
 phase of its context is an antiphase
-([`sat_iff_holds`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Soundness.lean#L154-L160 "MALL.PhaseStructure.sat_iff_holds")), and
+([`sat_iff_holds`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Soundness.lean#L154-L160 "MALL.PhaseStructure.sat_iff_holds")), and
 `⊢ A, Γ` holds exactly if every phase of the context of `Γ` is in `⟦A⟧`
-([`holds_cons`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Soundness.lean#L189-L199 "MALL.PhaseStructure.holds_cons")). The ten cases
+([`holds_cons`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Soundness.lean#L189-L199 "MALL.PhaseStructure.holds_cons")). The ten cases
 are then short. For ⊗: a phase of the context of `Γ, Δ` is a product
 `g·d`; by induction `g ∈ ⟦A⟧` and `d ∈ ⟦B⟧`, so `g·d` is in
 `⟦A⟧·⟦B⟧`, which is inside its closure `⟦A ⊗ B⟧`. For cut: `g ∈ ⟦A⟧`
@@ -784,14 +918,14 @@ which is why & shares its context.
       where MALL.Completeness :=
         ∀ (Γ : List Form), Valid Γ → Nonempty (CF Γ)
 
-*Lean:* [`MALL.completeness`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Completeness.lean#L238-L240) · PROVED · axioms: `Quot.sound`, `propext`
+*Lean:* [`MALL.completeness`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Completeness.lean#L238-L240) · PROVED · axioms: `Quot.sound`, `propext`
 
 PROVED. Girard's Theorem 1.17 concludes a derivation with cut; this is
 the stronger form of Lafont's Theorem 1, and it gives cut elimination
 again (5.4).
 
 The proof builds one phase structure, the **syntactical model**
-([`synCF`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Completeness.lean#L219-L236 "MALL.synCF")). Its phases are the sequents, up to
+([`synCF`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Completeness.lean#L219-L236 "MALL.synCF")). Its phases are the sequents, up to
 permutation; the product is juxtaposition, and the unit is the empty
 sequent. Its antiphases are the sequents that have a derivation without
 cut. The fact of a letter `p` is `{p}⊥`: the contexts `Γ` with `⊢ p, Γ`
@@ -802,7 +936,7 @@ derivable without cut.
     Okada's lemma:    ⟦A⟧ ⊂ {A}⊥     for every formula A
     that is:          if Γ ∈ ⟦A⟧ then ⊢ A, Γ has a derivation without cut
 
-*Lean, in paraphrase:* [`MALL.RuleModel.okada`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Completeness.lean#L69-L97) · PROVED · axioms: none
+*Lean, in paraphrase:* [`MALL.RuleModel.okada`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Completeness.lean#L69-L97) · PROVED · axioms: none
 
 PROVED (Lafont, Lemma 1), by induction on the formula. Each case uses
 the rule of its connective and no cut. For `A ⊗ B`: by induction every
@@ -818,9 +952,9 @@ cut.
 
 In Lean the lemma is proved once, for any phase space with a phase for
 each formula whose antiphases are closed under the nine rules
-([`RuleModel`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Completeness.lean#L26-L52 "MALL.RuleModel")), and the model is built once, from
+([`RuleModel`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Completeness.lean#L26-L52 "MALL.RuleModel")), and the model is built once, from
 any congruence on sequents and any set of sequents closed under the
-rules ([`Syn`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Completeness.lean#L115-L148 "MALL.Syn")). The monoid is a quotient of lists.
+rules ([`Syn`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Completeness.lean#L115-L148 "MALL.Syn")). The monoid is a quotient of lists.
 
 ### 6.3 The finite model property
 
@@ -832,13 +966,13 @@ rules ([`Syn`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL
 
     theorem MALL.finite_countermodel (Γ : List Form) (h : ¬Derivable Γ) : ∃ (S : PhaseStructure), S.Finite ∧ ¬S.Sat Γ
 
-*Lean:* [`MALL.finiteModelProperty`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/FiniteModel.lean#L235-L238) · PROVED · axioms: `Quot.sound`, `propext`; [`MALL.finite_countermodel`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/FiniteModel.lean#L240-L246) · PROVED · axioms: `Quot.sound`, `propext`
+*Lean:* [`MALL.finiteModelProperty`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/FiniteModel.lean#L235-L238) · PROVED · axioms: `Quot.sound`, `propext`; [`MALL.finite_countermodel`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/FiniteModel.lean#L240-L246) · PROVED · axioms: `Quot.sound`, `propext`
 
 Both PROVED (Lafont, Theorem 2). The proof is the construction of 6.2
 again, for one sequent `Γ₀` at a time
-([`fmSyn`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/FiniteModel.lean#L139-L189 "MALL.fmSyn")). Call a sequent *small* if its formulas
+([`fmSyn`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/FiniteModel.lean#L139-L189 "MALL.fmSyn")). Call a sequent *small* if its formulas
 are subformulas of formulas of `Γ₀` and its size is at most that of `Γ₀`
-([`Small`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/FiniteModel.lean#L80-L82 "MALL.Small")); Lafont uses an order on sequents in its
+([`Small`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/FiniteModel.lean#L80-L82 "MALL.Small")); Lafont uses an order on sequents in its
 place, and the file says so. Three properties of "small" are used: the
 premises of a rule with a small conclusion are small; a part of a small
 sequent is small; there are finitely many small sequents up to
@@ -846,10 +980,10 @@ permutation. The model identifies two sequents if they are permutations
 of each other or neither is small, and its antiphases are the sequents
 that are derivable without cut or not small. It has one phase for each
 small sequent and one more for all the others, so it is finite
-([`finiteModel_finite`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/FiniteModel.lean#L215-L227 "MALL.finiteModel_finite")). Okada's lemma
+([`finiteModel_finite`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/FiniteModel.lean#L215-L227 "MALL.finiteModel_finite")). Okada's lemma
 holds in it, because it is an instance of `Syn`. If `Γ₀` holds in it
 then `Γ₀` is an antiphase, and `Γ₀` is small, so it has a derivation
-without cut ([`cf_of_sat_finiteModel`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/FiniteModel.lean#L229-L233 "MALL.cf_of_sat_finiteModel")).
+without cut ([`cf_of_sat_finiteModel`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/FiniteModel.lean#L229-L233 "MALL.cf_of_sat_finiteModel")).
 
 This model is not one to compute with: its phases are classes of
 sequents. What the kernel checks are the two certificates of section 4,
@@ -866,7 +1000,7 @@ enough to write down.
       where MALL.ValidDecidable :=
         (Γ : List Form) → Decidable (Valid Γ)
 
-*Lean:* [`MALL.valid_iff_derivable`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Completeness.lean#L246-L249) · PROVED · axioms: `Quot.sound`, `propext`; [`MALL.validDecidable`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Results.lean#L107-L108) · PROVED · axioms: `Quot.sound`, `propext`
+*Lean:* [`MALL.valid_iff_derivable`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Completeness.lean#L246-L249) · PROVED · axioms: `Quot.sound`, `propext`; [`MALL.validDecidable`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Results.lean#L107-L108) · PROVED · axioms: `Quot.sound`, `propext`
 
 Both PROVED: the first is soundness and completeness, and with 5.7 it
 gives the second. So validity over all phase structures, a statement
@@ -905,6 +1039,7 @@ equivalent to a proposition the kernel decides:
 | that weakening and contraction are REFUTED | the two negations are theorems (5.2); the facts about the four sequents are decided by the kernel running the proved search |
 | that `Fam` is the calculus of the source | a reading of 30 lines of Lean against Definition 1.15, made a second time by a reader with no other context, from page images; no difference was found. The figure as it stands, `Lit`, is proved to derive the same sequents (5.1) |
 | that `Valid` is validity in phase semantics | the definitions of section 4, about 75 lines of Lean, read back once by a reader given only the definitions and statements; and that soundness and completeness both hold for them |
+| the interpolants of 5.8 | Craig's is computed by a function on derivations and the kernel checks its three properties by its type; the uniform one is a function of the sequent, and its properties are theorems. Its statement was screened against the decision procedure before the proof. That the statements are the published ones rests on a reading of four sources by an agent, after the proofs |
 | the certificates of section 4 | for a cyclic structure, the kernel computes the interpretation in the structure given, and `interp_eq` and soundness do the rest; its producer is not trusted and not complete. For a saturated set, the kernel checks the saturation, and `countermodel_of_refutedBy` does the rest; a set exists for every sequent with no derivation (`refutation_complete`), and its producer is not trusted |
 | the solutions below | each is compiled by the build; where a height, a set of phases or a message is quoted it is pinned by a test |
 
@@ -1118,6 +1253,25 @@ a side, as in A6.
 The parentheses in `(A ⊕ B) :: Γ` are needed: before `::` Lean reads
 `⊕` as the sum of two types.
 
+**D6.** Only `p`: `q` is in the first part alone and `r` in the second
+alone. The derivation the search returns ends with 1⊕ on `p⊥ ⊕ q⊥`, in the
+first part, above 1⊕ on `p ⊕ r`, in the second part, above the axiom
+`⊢ p, p⊥`, which the division separates. The unary rules pass the
+interpolant on, and the axiom gives it:
+
+    (craigInterpolation [(p & q)ᗮ] [p ⊕ r] d).C = p
+
+**D7.** `⊤ ⊗ q`, `q` and `𝟏`. From `p ⊗ q` one cannot drop `p`: the
+strongest formula without `p` that it implies keeps the place of `p`, as
+`⊤`. From `p & q` one can choose `q`. And `p ⅋ p⊥` holds, so the weakest
+formula that implies it is the weakest that holds, `𝟏`.
+
+**D8.** The third part of `ui_spec`, at `Γ = [(p ⊗ q) ⅋ pᗮ]` and
+`Δ = [qᗮ]`: `Δ` has no `p`, and `⊢ (p ⊗ q) ⅋ p⊥, q⊥` is derivable.
+
+    example : Derivable [forallP 0 ((p ⊗ q) ⅋ pᗮ), qᗮ] :=
+      (ui_spec 0 [(p ⊗ q) ⅋ pᗮ]).2.2 [qᗮ] (by decide) (by decide +kernel)
+
 ### Part E
 
 **E1.** As in 6.4.
@@ -1134,8 +1288,8 @@ The parentheses in `(A ⊕ B) :: Γ` are needed: before `::` Lean reads
       ⟨fun h n hn => h n (sub_dual_dual P G n hn), sub_dual_dual P (P.dual G) m⟩
 
 Neither proof depends on any axiom. In the library they are
-[`le_dual_dual`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Soundness.lean#L25-L27 "MALL.PhaseSpace.le_dual_dual") and
-[`isFact_dual`](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/MALL/Soundness.lean#L36-L37 "MALL.PhaseSpace.isFact_dual").
+[`le_dual_dual`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Soundness.lean#L25-L27 "MALL.PhaseSpace.le_dual_dual") and
+[`isFact_dual`](https://github.com/fairflow/proof-tools/blob/0f8de61/calculi/MALL/MALL/Soundness.lean#L36-L37 "MALL.PhaseSpace.isFact_dual").
 
 **E3.** Completeness turns each hypothesis into a derivation without
 cut; `cutAdmissible` joins them; soundness returns to validity.

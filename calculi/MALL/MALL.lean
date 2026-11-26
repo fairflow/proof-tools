@@ -32,3 +32,8 @@ import MALL.Refute
 import MALL.SatTest
 import MALL.TutorialTest
 import MALL.TutorialPins
+import MALL.Split
+import MALL.Craig
+import MALL.CraigTest
+import MALL.Uniform
+import MALL.UniformTest

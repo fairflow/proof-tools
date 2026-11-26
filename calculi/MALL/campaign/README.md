@@ -47,6 +47,8 @@ as a private page (https://claude.ai/artifact/HXsUnPBBZSQdoc9Ku72b1E),
   pinned format (`scripts/tutorial_pins.py`): 16 pins. Its solutions are
   `MALL/TutorialTest.lean`; the exercises to type are
   `Play/MALLExercises.lean`. Added after the closing page.
+* [interpolation-sources.md](interpolation-sources.md): what four
+  sources state about interpolation for this logic, read by an agent.
 * [users-guide.md](users-guide.md): how a goal reads, the moves, the
   tactic's lines, the messages.
 * [cost-log.md](cost-log.md): the sessions and the agents.
@@ -89,6 +91,10 @@ Theory (each ends with `#axioms_within_file [propext, Quot.sound]`):
 * `MALL/Model.lean`: finite phase structures as data, and their check.
 * `MALL/Run.lean`, `MALL/ModelRun.lean`: the certifiers, the producers,
   level 3.
+* `MALL/Split.lean`, `MALL/Craig.lean`, `MALL/Uniform.lean`: Craig
+  interpolation with Lyndon's condition as a function on derivations;
+  uniform interpolation, the interpolant computed (added by command,
+  2026-11-26).
 * `MALL/Saturated.lean`, `MALL/SatRun.lean`: saturated sets of sequents
   as certificates of non-derivability, the finite phase structure a set
   presents, and the completeness of the certificate (added after the
@@ -109,5 +115,6 @@ Code (no bound; nothing in it is trusted):
   `Corpus/measure_model.py`.
 * Tests: `MALL/Test.lean`, `DecideTest.lean`, `CutTest.lean`,
   `RunTest.lean`, `ModelTest.lean`, `ExploreTest.lean`, `SatTest.lean`,
-  `TutorialTest.lean`, `TutorialPins.lean` (generated).
+  `TutorialTest.lean`, `TutorialPins.lean` (generated), `CraigTest.lean`,
+  `UniformTest.lean`.
 * In no library: `Play/MALL.lean` (exercises), `Play/MALLTutorial.lean`.

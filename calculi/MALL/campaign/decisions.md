@@ -465,6 +465,37 @@ the argument, and attributes it.
   for the data).
 * **Cost to reverse**: a statement, little.
 
+## 2026-11-26 15:21 GMT. Interpolation: the sources, read after the proofs; what was not attempted
+
+* **The sources** were fetched and read by an agent while the proofs
+  were being written; its report is
+  [interpolation-sources.md](interpolation-sources.md), with each file's
+  origin and size. Obtained: Alizadeh, Derakhshan and Ono 2014 (the
+  publisher's PDF on an author's page, 246 606 bytes); Akbar Tabatabai
+  and Jalali, arXiv:1808.06258 v2 and arXiv:1808.06256 v3; Roorda's
+  thesis of 1991 (his deposit, a scan, read from page images, in part).
+  **Not obtained**: Roorda, JSL 59 (1994): for purchase only.
+* **What they changed**: no statement. They gave the items the
+  statements are cited to, and one correction of names: MALL with its
+  four units is InFLₑ in the first paper and CFLₑ in the second, and in
+  the Craig paper CFLₑ is the logic with two units only.
+* **The statement of uniform interpolation was made, screened and
+  proved before any source was read**; it is the one-sided form of
+  Theorem 4.3 of the first paper. That paper writes no proof for MALL.
+* **Lyndon's condition** is in the statement of Craig interpolation
+  because in negation normal form it is a condition on literals and its
+  proof is no longer; Roorda states it, Akbar Tabatabai and Jalali do
+  not.
+* **Not attempted**: Roorda's fragment without interpolation as a
+  REFUTED statement (the task's third item, "only if you can obtain the
+  paper"): `statements.md`, "Not goals".
+* **The reading back** of S22 to S25 was made by a fresh agent from an
+  extract of 124 lines; no statement was found false, trivial or other
+  than meant. It changed no statement and added one screen; its remarks,
+  and one statement it suggested that is left OPEN (a condition on signs
+  for the uniform interpolant), are in `statements.md`.
+* **Cost to reverse**: little.
+
 ## Stops
 
 *Each time a turn ended to wait for the reviewer. None so far.*

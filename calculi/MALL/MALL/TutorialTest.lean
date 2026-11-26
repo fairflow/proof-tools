@@ -9,6 +9,8 @@ Code, not theory.
 import MALL.Explore
 import MALL.ModelRun
 import MALL.Refute
+import MALL.Craig
+import MALL.Uniform
 
 namespace MALL.TutorialTest
 
@@ -539,6 +541,33 @@ theorem no_disjunction_in_context :
     ¬ ∀ (A B : Form) (Γ : List Form),
       Derivable ((A ⊕ B) :: Γ) → Derivable (A :: Γ) ∨ Derivable (B :: Γ) := fun h =>
   (h p q [pᗮ & qᗮ] (by decide +kernel)).elim (by decide +kernel) (by decide +kernel)
+
+/-! ## Section 5.8 and D6 to D8: interpolation -/
+
+/-- The derivation without cut that the proved search returns. -/
+def cfOf (Γ : List Form) (h : (searchCF Γ).isSome = true := by decide +kernel) : CF Γ :=
+  (searchCF Γ).get h
+
+-- The two interpolants displayed in 5.8.
+example : (craigInterpolation [(p ⊗ (q ⊕ r))ᗮ] [(p ⊗ q) ⊕ (p ⊗ r)] (cfOf _)).C
+    = (p ⊗ q) ⊕ (p ⊗ r) := by decide +kernel
+example : (craigInterpolation [(p ⊗ q)ᗮ] [(p ⊗ ⊤) ⊕ r] (cfOf _)).C = p ⊗ ⊤ := by decide +kernel
+
+-- D6.
+example : (craigInterpolation [(p & q)ᗮ] [p ⊕ r] (cfOf _)).C = p := by decide +kernel
+
+-- The six uniform interpolants displayed in 5.8, and D7.
+example : forallP 0 (p ⅋ pᗮ) = 𝟏 := by decide +kernel
+example : existsP 0 (p ⊗ pᗮ) = ⊥ := by decide +kernel
+example : forallP 0 (pᗮ ⅋ (p ⊗ q)) = q := by decide +kernel
+example : existsP 0 (p ⊗ (pᗮ ⅋ q)) = q := by decide +kernel
+example : forallP 0 (p ⅋ p) = 𝟎 := by decide +kernel
+example : existsP 0 (p ⊗ q) = ⊤ ⊗ q := by decide +kernel
+example : existsP 0 (p & q) = q := by decide +kernel
+
+-- D8.
+example : Derivable [forallP 0 ((p ⊗ q) ⅋ pᗮ), qᗮ] :=
+  (ui_spec 0 [(p ⊗ q) ⅋ pᗮ]).2.2 [qᗮ] (by decide) (by decide +kernel)
 
 /-! ## Section 6 and Part E: the semantics, in Lean -/
 

@@ -84,6 +84,11 @@ instance (Γ : List Form) : Decidable (Derivable Γ) := decDerivable Γ
 
 #guard small.length == 264
 
+-- A screen of a statement that is NOT proved here: Lyndon's condition for
+-- the uniform interpolant, that every literal of `∀p A` is a literal of `A`
+-- (a cold reader's question).  It holds on these 21 formulas.
+#guard tests.all fun A => (forallP 0 A).lits.all fun ℓ => A.lits.contains ℓ
+
 /-! ## The theorems, used -/
 
 /-- From `q ⊢ p ⊸ p ⊗ q` to `q ⊢ ∀p (p ⊸ p ⊗ q)`, by the theorem. -/

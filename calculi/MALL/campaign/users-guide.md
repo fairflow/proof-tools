@@ -105,6 +105,8 @@ i`, `up`, `left`, `right`, `top`, `goal k`); a block `example : Walk d
 | `refuteSet Γ` | a saturated set of sequents of which `Γ` is a member, for every `Γ` with no derivation (it always ends; the set can be large where ⊗ divides a context many ways) | no: checked by the next line |
 | `noDerivableBySet.verdict Γ D`, `noValidBySet.verdict Γ D` | `¬ Derivable Γ`, `¬ Valid Γ`, from a set `D`: the kernel checks that `Γ` is in it and that every rule that could conclude a member has a premise in it | yes |
 | `describeCountermodel Γ` (with `#eval IO.println`) | the set, and the finite phase structure it presents: how many phases, and that the sequent, computed in it, does not hold | no: to be read |
+| `(craigInterpolation Γ Δ d).C` | the interpolant of `⊢ Γ, Δ` computed from a derivation without cut `d : CF (Γ ++ Δ)`; the fields `.left`, `.right` are the two derivations | yes: a function proved by its type |
+| `forallP p A`, `existsP p A`, `ui p Γ` | the uniform interpolants for the letter numbered `p`: the weakest formula without it that implies `A`, the strongest that `A` implies | yes: `ui_spec`. The kernel computes them (`by decide +kernel`) |
 
 ## Out to the mathematics
 

@@ -52,6 +52,13 @@ was restarted.
 
 Interpolation, a command relayed at 15:04: began 15:06.
 
+Interpolation ended 15:22 (pushed). Four agents: a7, Craig
+interpolation in Lean (164 029 tokens, 478 s); a8, the four sources
+(320 787 tokens, 683 s); a9, the reading back (88 477 tokens, 182 s);
+the tutorial's section and its exercises were written by the operator.
+Errors found by the build on the way: a `simp` and an `omega` that used
+`Classical.choice` (found by the file's bound, located by `#axiom_path`).
+
 ## What went wrong, and what it cost
 
 | what | found by | cost |

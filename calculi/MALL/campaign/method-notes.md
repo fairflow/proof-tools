@@ -175,6 +175,33 @@ a note says where a choice made here would, or would not, carry over.
     that its files be on disk early and grown, and long timing runs go
     in the background with their output in a file.
 
+## Interpolation (a command, after the closing page)
+
+26. **A statement proved before its sources were read, then compared.**
+    The uniform interpolant was defined, screened against the decision
+    procedure and proved before any paper was read; an agent read the
+    papers meanwhile. The comparison found the same kind of
+    construction (Alizadeh, Derakhshan and Ono's table), a clash of
+    names between papers (CFLₑ means two logics), and that the nearest
+    source writes no proof for this logic. Rule 1 ("read the source at
+    source") is about transcribing rules; for a *result*, the order
+    "state, screen, prove, then read" cost nothing here and the screen
+    did the work a source's statement would have. *Proposed*: say in
+    stage 2 that a goal with a decision procedure at hand is screened
+    against it before either the proof or the literature.
+27. **Tactics that reach for classical logic.** `simp at h` on an
+    equation of lengths, and `omega` at a goal that is not decidable
+    (it argues by contradiction), each brought `Classical.choice` into
+    a proof that needed none; `exfalso` first, and `simp only` with the
+    lemmas named, do not. `#axiom_path` named the entry at once.
+    *Proposed*: add both to the list of `reference/adopt.md` §6.
+28. **An interpolant as data wants simplifying as it is built**, as the
+    GLS session found. Here the simplifying connectives are defined by
+    duality from two (`sPar` from `sTensor`, `sWith` from the ⊕ of a
+    list), so only two pairs of lemmas are proved; and working in
+    derivability with cut makes each of them a cut against a derivation
+    of two lines.
+
 ## For phase 2 (dual intuitionistic linear logic)
 
 * The linear zone: this campaign's form (a variable conclusion, a
