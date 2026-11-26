@@ -4,6 +4,7 @@ structures, and negative tests, rejected in the kernel.
 -/
 import MALL.ModelRun
 import MALL.Corpus.Basic
+import MALL.Screen
 
 namespace MALL.ModelTest
 
@@ -55,6 +56,14 @@ theorem derivable_never_refuted :
   decide +kernel
 
 #guard ([1, 2, 3].flatMap fun m => allOn m 2).length == 584
+
+-- The check agrees with the evaluator of `MALL/Screen.lean`, which was
+-- written first and is not proved: on every structure of the screen on
+-- ℤ/1, ℤ/2, ℤ/3 (314 of them), for every sequent of the screen's two lists.
+#guard ([1, 2, 3].flatMap Screen.structs).length == 314
+#guard (Screen.derivable ++ Screen.notDerivable).all fun Γ =>
+  ([1, 2, 3].flatMap Screen.structs).all fun s =>
+    (ZModel.mk (s.n - 1) s.bot s.val).refutes Γ == !s.sat Γ
 
 #certify_axioms MALL.ModelTest.one_one
 #certify_axioms MALL.ModelTest.one_one_not_valid

@@ -98,8 +98,10 @@ i`, `up`, `left`, `right`, `top`, `goal k`); a block `example : Walk d
 | `routine n Γ` | a script of the steps that lose nothing (the axioms, ⅋, ⊥, &), at every goal they leave; what remains has only ⊗ and ⊕ to try | no: `apply_script` checks it |
 | `found Γ` | the script of the derivation the search by lazy splitting finds | no: checked |
 | `explain Γ` (with `#eval IO.println`) | the derivation drawn, or "not derivable", with a small phase structure that refutes the sequent where the enumeration has one | no: to be read |
-| `by decide +kernel` on `Derivable Γ`, `¬ Derivable Γ`, `Valid Γ`, `¬ Valid Γ` | a theorem | yes: the kernel runs the proved search. Practical to about eight formulas with ⊗ (`measurements.md`) |
+| `by decide +kernel` on `Derivable Γ`, `¬ Derivable Γ`, `Valid Γ`, `¬ Valid Γ` | a theorem | yes: the kernel runs the proved search. Practical to between 6 and 12 formulas where ⊗ must split (`measurements.md`) |
 | `treeCert.verdict Γ c` | a derivation `Fam Γ`, from a tree of moves `c` | yes: the kernel checks the tree |
+| `refuteBy Γ` | a phase structure on a small cyclic group that refutes `Γ`, where it finds one among those it tries | no: checked by the next line |
+| `noDerivableBy.verdict Γ z`, `noValidBy.verdict Γ z` | `¬ Derivable Γ`, `¬ Valid Γ`, from a structure `z = ⟨k, bot, val⟩` on ℤ/(k+1): the antiphases and a set for each letter, as lists of Booleans | yes: the kernel computes the interpretation |
 
 ## Out to the mathematics
 

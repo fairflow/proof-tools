@@ -255,6 +255,30 @@ and whose certificate carries nothing:
 
 **PROVED.**
 
+### S19. A finite phase structure that refutes a sequent is a certificate
+
+    noValidBy     : Certify.Certifier (List Form) ZModel (fun Γ => Valid Γ → False)
+    noDerivableBy : Certify.Certifier (List Form) ZModel (fun Γ => Derivable Γ → False)
+
+    ∀ (z : ZModel) (Γ : List Form), z.refutes Γ = true → ¬ Valid Γ
+
+`MALL/ModelRun.lean`; `ZModel.not_valid_of_refutes`, `MALL/Model.lean`.
+Source: none (Definitions 1.1 to 1.14 on a cyclic group). `Holds` is
+`fun Γ => Valid Γ → False`. The certificate `ZModel` is a number `k`
+and two lists: the antiphases of ℤ/(k+1), and a set of phases for each
+letter, whose closure is the letter's fact. `z.refutes Γ` computes the
+interpretation of the par of `Γ` by the clauses of Definition 1.14 and
+asks that 0 be not in it; `ZModel.interp_eq` proves the computed sets
+are the interpretation in the phase structure `z.str`. Entered when it
+was written (10:56), after the plan's other certifiers; screened
+against the Boolean evaluator of `MALL/Screen.lean`, which was written
+first and is not proved: the two agree on each of that screen's 314
+structures on ℤ/1, ℤ/2, ℤ/3 for each of its 21 sequents (a `#guard` of
+`MALL/ModelTest.lean`); and by its negative tests (the same file: no
+structure on ℤ/1, ℤ/2, ℤ/3 for two letters, 584 of them, is accepted
+against four derivable sequents). Not read back (it has no item of the source).
+**PROVED.**
+
 ## Refuted
 
 | statement | the proof of the negation | where it is checked | what replaced the statement |
@@ -279,4 +303,4 @@ Nothing was set aside by the reviewer.
 |---|---|---|---|
 | of the goals from the standing list (cut elimination S6-S8; the finite model property S17) | 4 | 0 | 0 |
 | of the other goals (S4, S5, S9, S10, S13, S14, S15, S16; S11, S12 as refutations) | 8 | 2 | 0 |
-| of our own (S1, S2, S3, S18) | 4 | 0 | 0 |
+| of our own (S1, S2, S3, S18, S19) | 5 | 0 | 0 |

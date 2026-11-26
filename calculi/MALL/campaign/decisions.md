@@ -362,6 +362,32 @@ the argument, and attributes it.
   (`reference/certify.md` §4).
 * **Cost to reverse**: little.
 
+## 2026-11-26 10:56 GMT. Stage 3: finite phase structures as certificates, built after all
+
+* **Decided**: the certifier that the entry of 10:40 left out is built
+  (`MALL/Model.lean`, `MALL/ModelRun.lean`, `MALL/ModelTest.lean`),
+  because the first measurements showed what it buys: on `chainBad`
+  neither search answers at 12 formulas within 20 s. A certificate is
+  a phase structure on a cyclic group ℤ/(k+1), as data: the antiphases
+  and a set for each letter, as lists of Booleans. The letter's fact
+  is the closure of its set, so that every certificate is a phase
+  structure and the check has no side condition. The check computes
+  the interpretation; `ZModel.interp_eq` proves that it is the
+  interpretation in the structure.
+* **Not taken**: a multiplication table for an arbitrary finite
+  commutative monoid (the check would have to verify the laws; no
+  sequent of the corpus needs more than a cyclic group of order 3);
+  the structure of the finite model property's proof as a certificate
+  (its phases are all small sequents: far too many to write).
+* **The producer** (`refuteBy`) is small on purpose, and not complete:
+  `measurements.md`, "The frontier".
+* **It was built before the closing page was written**, while the
+  measuring run occupied the machine: rule 6 of the skill puts the page
+  first. It delayed the page by about a quarter of an hour (10:43 to
+  10:56).
+* **Rests on it**: 14 facts of the corpus; S19.
+* **Cost to reverse**: little.
+
 ## Stops
 
 *Each time a turn ended to wait for the reviewer. None so far.*
