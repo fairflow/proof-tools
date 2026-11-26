@@ -13,6 +13,9 @@ it started ([cost-log.md](cost-log.md)). The method: the skill
 
 Waiting on the reviewer: nothing. The campaign is closed:
 [report.md](report.md).
+The page was pushed to `main` (`ddd34e6`) and published to the reviewer
+as a private page (https://claude.ai/artifact/HXsUnPBBZSQdoc9Ku72b1E),
+2026-11-26 11:06 GMT.
 
 ## Status
 

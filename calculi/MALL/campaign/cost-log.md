@@ -17,7 +17,7 @@ after it (rule 5).
 | 1 | Adopt | 10:04 | 10:18 (`e605abf`) | none | 1 734 | 1 834 |
 | 1 | Prove | 10:18 | 10:32 (`ea0d357`) | none | 4 173 | 1 834 (`statements.md` was first committed at 10:56, in `1604735`; the statements themselves, as Lean, at 10:22, in `c81bc59`) |
 | 1 | Run, Explore | 10:32 | 11:00 (the last build; `1604735` at 10:56) | none | 6 051 | 2 373 |
-| 1 | the closing documents, the push, the page | 11:00 | the time at the head of `report.md` | none | the same | see `report.md` |
+| 1 | the closing documents, the push, the page | 11:00 | 11:06 (pushed and published) | none | the same | see `report.md` |
 
 Waiting on builds: not measured stage by stage. The library built in
 3 s from a cloned `.lake`; a full build of the campaign from nothing is
