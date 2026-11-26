@@ -53,9 +53,15 @@ Put every compound formula that is a move's argument in parentheses:
 
 Click an offered line to write it in place of yours.  A line that offers
 makes no move.  A line that nothing completes is an error, and so is a
-query where no move applies.  The first line offered is not the one to
-prefer: the rules that lose nothing (⊸R, &R, ⊗L, 1L, ⊕L, !L) are safe to
-make at once, and ⊗R, ⊸L, ⊕R, &L, !R and copy are choices.
+query where no move applies.
+
+The lines are offered in an order.  First the rules that lose nothing,
+which are safe to make at once: init, 1R, ⊤R, 0L, 1L, then ⊸R, &R, then
+⊗L, ⊕L, !L.  After them the choices: ⊕R₁, ⊕R₂, !R, the divisions of ⊗R,
+then &L₁, &L₂, the divisions of ⊸L, and last copy.  Nothing in the list
+marks where the choices begin: where no safe rule applies, the first line
+is the first choice, and it may be the wrong one (the first division
+offered gives the first premise nothing).
 
 **The rules** (each is a constructor of `Fam` in `DILL/System.lean`, with
 its place in the source; keep the source's Figure 2 beside this file).
@@ -196,8 +202,8 @@ example : Att S true ([] ⨾ [p] ⟹ p ⊗ p) := by
 
 !L moves `p` to the unrestricted zone.  From there it is copied when it is
 wanted: once in the first, never in the second, twice in the third.  In
-the third the query offers ⊗R first: make !L before it, or `!p` goes to
-one premise only. -/
+the third the query offers !L first and then two divisions of ⊗R: make
+!L before ⊗R, or `!p` goes to one premise only. -/
 
 example : Att S true ([] ⨾ [!p] ⟹ p) := by
   dillmove
@@ -216,8 +222,7 @@ example : Att S true ([] ⨾ [!p] ⟹ (!p) ⊗ (!p)) := by
 !R asks for an empty linear zone.  In the first, !L empties it.  In the
 second nothing can: no move applies to it as it stands, so the file has no
 query there.  Type `dillmove bangR p` yourself: "the move does not apply
-to goal 0: !R: the conclusion is not this formula, or the linear zone is
-not empty". -/
+to goal 0: !R: the linear zone is not empty". -/
 
 example : Att S true ([] ⨾ [!p] ⟹ !(!p)) := by
   dillmove

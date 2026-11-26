@@ -292,3 +292,28 @@ the folder point here.*
   cannot run is half of what the family into `Type` is for).
 * **Rests on it**: `DILL/System.lean`; nothing else changed.
 * **Cost to reverse**: little.
+
+## 2026-11-26 15:41 GMT. Stage 4, begun early: three repairs of the instance, from the tests' report
+
+* **Decided**, from what the agent that wrote the tests reported
+  (stage 4, step 1: "what your own runs showed to be missing or
+  awkward"): (1) `candidates` offers the rules that lose nothing first
+  (CCP Lemma 6: ⊸R, &R, ⊗L, ⊕L, !L, after the rules with nothing to
+  name), then the choices, then copy: before, the first line offered at
+  `· ; !p ⟹ !p ⊗ !p` was a division for ⊗R that leads nowhere; (2) a
+  suggested line writes `[!p]`, not `[(!p)]`; (3) the four refusals of
+  `step` that joined two reasons with "or" (⊗R, 1R, ⊸L, !R) say which
+  of the two failed.
+* **What it changes**: `DILL/Tactic.lean` (code) and the texts of four
+  messages in `DILL/Proof.lean` (the field `why` of `Move.rule`; no
+  side condition, no premise, no theorem changed; S1 and S2 built
+  unchanged). The pinned tests of `DILL/Test.lean` that show offered
+  moves and those messages are pinned again by the same agent.
+* **Also found there, and not a fault of the instance**: the plan's
+  prediction for `· ; !a ⊸ b ⟹ a ⊸ b` was wrong (the plan, "Known
+  non-theorems", last row: "copy is always offered"). `!a` is only to
+  be proved there, nothing reaches the unrestricted zone, and the
+  attempt ends at queries where no move applies. The prediction holds
+  for `· ; !(a ⊸ b) ⟹ b`, which the tests now have. The plan's row is
+  corrected with this date.
+* **Cost to reverse**: little.

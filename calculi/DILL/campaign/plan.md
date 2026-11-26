@@ -336,7 +336,7 @@ requires nothing outside its folder).
 | `· ; a ⊸ (b ⊗ c) ⟹ (a ⊸ b) ⊗ (a ⊸ c)` | Pfenning p. 60 | attempts that stay open; decided by the kernel |
 | `· ; a ⟹ !a` | !R needs an empty linear zone | !R refused |
 | `· ; a ⊕ b ⟹ a`, `· ; a ⟹ a & b` | the additives | an open premise |
-| `· ; !a ⊸ b ⟹ a ⊸ b` and the like with `!` on the left | | copy is always offered: the attempt stays open; the search answers `flag` |
+| `· ; !(a ⊸ b) ⟹ b` and the like, where `!L` puts a formula into the unrestricted zone | | copy is then always offered: the attempt stays open; the search answers `flag`. (Corrected 2026-11-26 15:41: the row had `· ; !a ⊸ b ⟹ a ⊸ b`, where `!a` is only to be proved, no copy is ever offered, and the attempt ends at queries where no move applies: the tests showed it.) |
 
 ## Results that exist in Lean already, used and not re-proved
 

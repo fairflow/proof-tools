@@ -87,18 +87,21 @@ def Move.rule (j : Seq) : Move → Rule
       "⊗L: the formula is not in the linear zone"⟩
   | .tensorR A B Δ => ⟨decide (j.goal = A ⊗ B) && permB j.lin (Δ ++ sub j.lin Δ),
       [j.unr ⨾ Δ ⟹ A, j.unr ⨾ sub j.lin Δ ⟹ B],
-      "⊗R: the conclusion is not this tensor, or the zone named for the first premise \
-       is not part of the linear zone"⟩
+      if decide (j.goal = A ⊗ B) then
+        "⊗R: the zone named for the first premise is not part of the linear zone"
+      else "⊗R: the conclusion is not this tensor"⟩
   | .oneL => ⟨decide (𝟏 ∈ j.lin), [j.unr ⨾ j.lin.erase 𝟏 ⟹ j.goal],
       "1L: 1 is not in the linear zone"⟩
   | .oneR => ⟨decide (j.goal = 𝟏) && decide (j.lin = []), [],
-      "1R: the conclusion is not 1, or the linear zone is not empty"⟩
+      if decide (j.goal = 𝟏) then "1R: the linear zone is not empty"
+      else "1R: the conclusion is not 1"⟩
   | .lolliL A B Δ =>
       ⟨decide (A ⊸ B ∈ j.lin) &&
           permB (j.lin.erase (A ⊸ B)) (Δ ++ sub (j.lin.erase (A ⊸ B)) Δ),
         [j.unr ⨾ Δ ⟹ A, j.unr ⨾ B :: sub (j.lin.erase (A ⊸ B)) Δ ⟹ j.goal],
-        "⊸L: the formula is not in the linear zone, or the zone named for the first premise \
-         is not part of the rest"⟩
+        if decide (A ⊸ B ∈ j.lin) then
+          "⊸L: the zone named for the first premise is not part of the rest of the linear zone"
+        else "⊸L: the formula is not in the linear zone"⟩
   | .lolliR A B => ⟨decide (j.goal = A ⊸ B), [j.unr ⨾ A :: j.lin ⟹ B],
       "⊸R: the conclusion is not this implication"⟩
   | .withL₁ A B => ⟨decide (A & B ∈ j.lin), [j.unr ⨾ A :: j.lin.erase (A & B) ⟹ j.goal],
@@ -119,7 +122,8 @@ def Move.rule (j : Seq) : Move → Rule
   | .bangL A => ⟨decide ((!A) ∈ j.lin), [A :: j.unr ⨾ j.lin.erase (!A) ⟹ j.goal],
       "!L: the formula is not in the linear zone"⟩
   | .bangR A => ⟨decide (j.goal = !A) && decide (j.lin = []), [j.unr ⨾ [] ⟹ A],
-      "!R: the conclusion is not this formula, or the linear zone is not empty"⟩
+      if decide (j.goal = !A) then "!R: the linear zone is not empty"
+      else "!R: the conclusion is not this formula"⟩
   | .cut A Δ => ⟨permB j.lin (Δ ++ sub j.lin Δ),
       [j.unr ⨾ Δ ⟹ A, j.unr ⨾ A :: sub j.lin Δ ⟹ j.goal],
       "cut: the zone named for the first premise is not part of the linear zone"⟩

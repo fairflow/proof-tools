@@ -93,7 +93,7 @@ def Form.srcIn : Form → Bool → String
       if inner then "(" ++ s ++ ")" else s
   | .plus A B, inner => let s := A.srcIn true ++ " ⊕ " ++ B.srcIn true
       if inner then "(" ++ s ++ ")" else s
-  | .bang A, _ => "(!" ++ A.srcIn true ++ ")"
+  | .bang A, inner => if inner then "(!" ++ A.srcIn true ++ ")" else "!" ++ A.srcIn true
 
 /-- A formula as an argument of a move, in Lean source. -/
 def Form.src (A : Form) : String := A.srcIn true
@@ -131,29 +131,35 @@ def sublists : List Form → List (List Form)
   | [] => [[]]
   | A :: Γ => let r := sublists Γ; r ++ r.map (A :: ·)
 
-/-- **The moves to try at a sequent**: the rules with nothing to name; a
-copy of each valid hypothesis; the right rule of the conclusion's
-connective; and for each formula of the linear zone the left rules of its
-connective.  ⊗R and ⊸L are proposed once for each part of the linear zone
-(2ⁿ of them, less the repetitions).  No cut is proposed: its formula is
-not in the sequent.  More than can apply; those that do not are dropped
-by the library. -/
+/-- **The moves to try at a sequent**, the rules that lose nothing first
+(CCP Lemma 6): the rules with nothing to name; ⊸R and &R; ⊗L, ⊕L and !L
+at each formula of the linear zone; then the choices: ⊕R₁, ⊕R₂, !R, and
+⊗R once for each part of the linear zone; &L₁, &L₂, and ⊸L once for each
+part of the rest; last, a copy of each valid hypothesis.  (2ⁿ divisions,
+less the repetitions.)  No cut is proposed: its formula is not in the
+sequent.  More than can apply; those that do not are dropped by the
+library. -/
 def candidates (j : Seq) : List Move :=
   [Move.init, Move.oneR, Move.topR, Move.zeroL, Move.oneL] ++
   (match j.goal with
-    | .tensor A B => (sublists j.lin).eraseDups.map fun Δ => Move.tensorR A B Δ
     | .lolli A B => [Move.lolliR A B]
     | .wth A B => [Move.withR A B]
-    | .plus A B => [Move.plusR₁ A B, Move.plusR₂ A B]
-    | .bang A => [Move.bangR A]
     | _ => []) ++
   (j.lin.eraseDups.flatMap fun C =>
     match C with
     | .tensor A B => [Move.tensorL A B]
-    | .lolli A B => (sublists (j.lin.erase C)).eraseDups.map fun Δ => Move.lolliL A B Δ
-    | .wth A B => [Move.withL₁ A B, Move.withL₂ A B]
     | .plus A B => [Move.plusL A B]
     | .bang A => [Move.bangL A]
+    | _ => []) ++
+  (match j.goal with
+    | .plus A B => [Move.plusR₁ A B, Move.plusR₂ A B]
+    | .bang A => [Move.bangR A]
+    | .tensor A B => (sublists j.lin).eraseDups.map fun Δ => Move.tensorR A B Δ
+    | _ => []) ++
+  (j.lin.eraseDups.flatMap fun C =>
+    match C with
+    | .wth A B => [Move.withL₁ A B, Move.withL₂ A B]
+    | .lolli A B => (sublists (j.lin.erase C)).eraseDups.map fun Δ => Move.lolliL A B Δ
     | _ => []) ++
   (j.unr.eraseDups.map fun A => Move.copy A)
 

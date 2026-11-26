@@ -252,9 +252,7 @@ example : Att S true ([] ⨾ [] ⟹ 𝟎) := by
   dillmove
 
 -- `· ; p ⟹ 1`: no linear weakening.  Predicted: 1R refused
-/--
-error: the move does not apply to goal 0: 1R: the conclusion is not 1, or the linear zone is not empty
--/
+/-- error: the move does not apply to goal 0: 1R: the linear zone is not empty -/
 #guard_msgs in
 example : Att S true ([] ⨾ [p] ⟹ 𝟏) := by
   dillmove oneR
@@ -316,7 +314,7 @@ example : Att S true ([] ⨾ [p] ⟹ p ⊗ p) := by
 
 -- the division that would use `p` twice is refused
 /--
-error: the move does not apply to goal 0: ⊗R: the conclusion is not this tensor, or the zone named for the first premise is not part of the linear zone
+error: the move does not apply to goal 0: ⊗R: the zone named for the first premise is not part of the linear zone
 -/
 #guard_msgs in
 example : Att S true ([] ⨾ [p] ⟹ p ⊗ p) := by
@@ -380,9 +378,7 @@ example : Att S true ([] ⨾ [p ⊸ (q ⊗ r)] ⟹ (p ⊸ q) ⊗ (p ⊸ r)) := b
   dillmove
 
 -- `· ; p ⟹ !p`: !R needs an empty linear zone.  Predicted: !R refused
-/--
-error: the move does not apply to goal 0: !R: the conclusion is not this formula, or the linear zone is not empty
--/
+/-- error: the move does not apply to goal 0: !R: the linear zone is not empty -/
 #guard_msgs in
 example : Att S true ([] ⨾ [p] ⟹ !p) := by
   dillmove bangR p
@@ -461,7 +457,7 @@ info:   · ; !p ⊸ q ⟹ p ⊸ q   by ⊸R p ⊸ q
       ? · ; q ⟹ q
   at 0.0: open goal 0; 2 open in all
 ---
-error: the move does not apply to goal 0: !R: the conclusion is not this formula, or the linear zone is not empty
+error: the move does not apply to goal 0: !R: the linear zone is not empty
 -/
 #guard_msgs in
 example : Att S true ([] ⨾ [(!p) ⊸ q] ⟹ p ⊸ q) := by
@@ -564,8 +560,48 @@ example : offered 12 ([] ⨾ [p] ⟹ p ⊗ p) = false := by decide +kernel
 
 /-! ## 4. The other refusals of `step`, each seen once
 
-Section 3 has those of init, 1R and !R, and one of ⊗R.  cut! is never
-refused. -/
+⊗R, 1R, ⊸L and !R each ask two things, and each says which one failed.
+Section 3 has the refusal of init, and one of the two of each of ⊗R, 1R
+and !R (the zone).  Here are the others.  cut! is never refused. -/
+
+-- 1R at an empty linear zone, the conclusion not `1`
+/-- error: the move does not apply to goal 0: 1R: the conclusion is not 1 -/
+#guard_msgs in
+example : Att S true ([] ⨾ [] ⟹ p) := by
+  dillmove oneR
+
+-- !R at an empty linear zone, the conclusion not `!p`
+/-- error: the move does not apply to goal 0: !R: the conclusion is not this formula -/
+#guard_msgs in
+example : Att S true ([p] ⨾ [] ⟹ p) := by
+  dillmove bangR p
+
+-- ⊸L where the implication is not in the linear zone
+/-- error: the move does not apply to goal 0: ⊸L: the formula is not in the linear zone -/
+#guard_msgs in
+example : Att S true ([] ⨾ [p] ⟹ q) := by
+  dillmove lolliL p q []
+
+-- where both conditions fail, the conclusion is named
+/-- error: the move does not apply to goal 0: !R: the conclusion is not this formula -/
+#guard_msgs in
+example : Att S true ([] ⨾ [p] ⟹ q) := by
+  dillmove bangR p
+
+/-- error: the move does not apply to goal 0: 1R: the conclusion is not 1 -/
+#guard_msgs in
+example : Att S true ([] ⨾ [p] ⟹ q) := by
+  dillmove oneR
+
+/-- error: the move does not apply to goal 0: ⊗R: the conclusion is not this tensor -/
+#guard_msgs in
+example : Att S true ([] ⨾ [p] ⟹ q) := by
+  dillmove tensorR p q [r]
+
+/-- error: the move does not apply to goal 0: ⊸L: the formula is not in the linear zone -/
+#guard_msgs in
+example : Att S true ([] ⨾ [p] ⟹ q) := by
+  dillmove lolliL p q [r]
 
 /-- error: the move does not apply to goal 0: copy: the formula is not in the unrestricted zone -/
 #guard_msgs in
@@ -577,9 +613,7 @@ example : Att S true ([] ⨾ [p] ⟹ q) := by
 example : Att S true ([] ⨾ [p] ⟹ q) := by
   dillmove tensorL p q
 
-/--
-error: the move does not apply to goal 0: ⊗R: the conclusion is not this tensor, or the zone named for the first premise is not part of the linear zone
--/
+/-- error: the move does not apply to goal 0: ⊗R: the conclusion is not this tensor -/
 #guard_msgs in
 example : Att S true ([] ⨾ [p] ⟹ q) := by
   dillmove tensorR p q []
@@ -590,7 +624,7 @@ example : Att S true ([] ⨾ [p] ⟹ q) := by
   dillmove oneL
 
 /--
-error: the move does not apply to goal 0: ⊸L: the formula is not in the linear zone, or the zone named for the first premise is not part of the rest
+error: the move does not apply to goal 0: ⊸L: the zone named for the first premise is not part of the rest of the linear zone
 -/
 #guard_msgs in
 example : Att S true ([] ⨾ [p, p ⊸ q] ⟹ q) := by
@@ -664,9 +698,9 @@ attempt as `where` draws it; and last the goal after the ⊗L, as
 
 /--
 info: dillmove: at goal 0, 3 moves apply; no move is made. Try these:
+  [apply] dillmove tensorL p q
   [apply] dillmove tensorR q p []
   [apply] dillmove tensorR q p [p ⊗ q]
-  [apply] dillmove tensorL p q
 ---
 info: Try this:
   [apply] dillmove tensorL p q
@@ -1059,9 +1093,9 @@ def uncurry : Der S ([] ⨾ [p ⊸ (q ⊸ r)] ⟹ (p ⊗ q) ⊸ r) := by
 -- 5: `· ; p ⊗ (q ⊕ r) ⟹ (p ⊗ q) ⊕ (p ⊗ r)`
 /--
 info: dillmove: at goal 0, 3 moves apply; no move is made. Try these:
+  [apply] dillmove tensorL p (q ⊕ r)
   [apply] dillmove plusR₁ (p ⊗ q) (p ⊗ r)
   [apply] dillmove plusR₂ (p ⊗ q) (p ⊗ r)
-  [apply] dillmove tensorL p (q ⊕ r)
 -/
 #guard_msgs in
 example : Att S true ([] ⨾ [p ⊗ (q ⊕ r)] ⟹ (p ⊗ q) ⊕ (p ⊗ r)) := by
@@ -1138,9 +1172,9 @@ example : Att S true ([] ⨾ [!p] ⟹ 𝟏) := by
 
 /--
 info: dillmove: at goal 0, 3 moves apply; no move is made. Try these:
-  [apply] dillmove tensorR (!p) (!p) []
-  [apply] dillmove tensorR (!p) (!p) [(!p)]
   [apply] dillmove bangL p
+  [apply] dillmove tensorR (!p) (!p) []
+  [apply] dillmove tensorR (!p) (!p) [!p]
 -/
 #guard_msgs in
 example : Att S true ([] ⨾ [!p] ⟹ (!p) ⊗ (!p)) := by
@@ -1166,9 +1200,7 @@ example : Att S true ([] ⨾ [!p] ⟹ !(!p)) := by
   all_goals leave_open
 
 -- !R first is refused: the linear zone is not empty
-/--
-error: the move does not apply to goal 0: !R: the conclusion is not this formula, or the linear zone is not empty
--/
+/-- error: the move does not apply to goal 0: !R: the linear zone is not empty -/
 #guard_msgs in
 example : Att S true ([] ⨾ [!p] ⟹ !(!p)) := by
   dillmove bangR (!p)
@@ -1178,15 +1210,14 @@ example : Att S true ([] ⨾ [!p] ⟹ !(!p)) := by
 -- second !R is refused (line 3 of the script, counted from 0)
 #guard (run S ([] ⨾ [!p] ⟹ !(!p))
     [⟨0, .bangL p⟩, ⟨0, .bangR (!p)⟩, ⟨0, .copy p⟩, ⟨0, .bangR p⟩]).2
-  == some (3, "the move does not apply to goal 0: !R: the conclusion is not this formula, \
-               or the linear zone is not empty")
+  == some (3, "the move does not apply to goal 0: !R: the linear zone is not empty")
 
 -- 10: `· ; !(p & q) ⟹ !p ⊗ !q` and `· ; !p ⊗ !q ⟹ !(p & q)`
 /--
 info: dillmove: at goal 0, 3 moves apply; no move is made. Try these:
-  [apply] dillmove tensorR (!p) (!q) []
-  [apply] dillmove tensorR (!p) (!q) [(!(p & q))]
   [apply] dillmove bangL (p & q)
+  [apply] dillmove tensorR (!p) (!q) []
+  [apply] dillmove tensorR (!p) (!q) [!(p & q)]
 -/
 #guard_msgs in
 example : Att S true ([] ⨾ [!(p & q)] ⟹ (!p) ⊗ (!q)) := by
