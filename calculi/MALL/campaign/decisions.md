@@ -244,6 +244,124 @@ the argument, and attributes it.
   proposition.
 * **Cost to reverse**: a stage.
 
+## 2026-11-26 10:13 GMT. Stage 1: what a constructor and a move carry
+
+* **Decided**: (a) every constructor of `Fam` and `CF` takes its
+  principal formulas and its contexts as explicit arguments
+  (`.par A B Γ h d`); (b) a move names its principal formula
+  (`par A B`), and the two rules that split, ⊗ and cut, also name the
+  context of the first premise as a list (`tensor A B [Γ]`), the rest
+  going to the second; (c) the rule **1** has the same form as the
+  others (`Ξ ~ [𝟏]`), though `Fam [𝟏]` would do; (d) the connective
+  "with" is `wth` in every name (D6 of the rule table); (e) the
+  source's `⊕` is kept as the notation, with parentheses where core
+  Lean's `⊕` for sum types would take over.
+* **Not taken**: (a) implicit arguments (Lean cannot infer them from a
+  variable conclusion: tried in scratch); (b) both contexts in a ⊗
+  move (the second is computed), a Boolean mask (unreadable), a split
+  by position (the sequent has no order); (c) `one : Fam [𝟏]`
+  (exchange would then need a cast in one case); (e) another glyph
+  for ⊕ (the page would no longer read as the source does).
+* **Rests on it**: the proof system, the tests, the exercises, every
+  certificate.
+* **Cost to reverse**: (a), (c) a stage; the rest little.
+
+## 2026-11-26 10:13 GMT. Stage 1: the derivations of the first check
+
+* **Decided**: since the source draws no derivation of the fragment,
+  ten derivations of what it asserts stand in (`MALL/Source.lean`;
+  listed in `rule-table.md`, "The checks").
+* **Cost to reverse**: little.
+
+## 2026-11-26 10:21 GMT. Stage 2: two goals handed to agents
+
+* **Decided** (rule 5 of the skill): cut elimination as a function
+  (`MALL/Cut.lean`, `MALL/CutTest.lean`) and the decision procedure
+  (`MALL/Decide.lean`, `MALL/DecideTest.lean`) were each written by a
+  fresh agent of the operator, from a brief given in the session: the
+  statements as the named types of `MALL/Statements.lean`, the files
+  to write and no others, the axiom bound, the tests the result must
+  pass. The briefs are not kept as files; their terms are these. The
+  operator kept the files out of its commits until each agent
+  reported, then built them itself, read the definitions, and checked
+  that no `sorry`, `partial`, well-founded recursion or
+  `native_decide` is in them. One change was made to an agent's file:
+  its function `step` was renamed `searchStep`, since the proof
+  system's `step` has that name.
+* **The route of the cut**: the operator's brief proposed a structure
+  of handlers with equations; the agent replaced it by an inductive
+  family `Prin C Γ` ("a last rule that introduces `C` in the context
+  `Γ`"), on which a dependent match discards the impossible pairs. The
+  measure is as the plan decided.
+* **Cost to reverse**: a stage.
+
+## 2026-11-26 10:25 GMT. Stage 2: completeness is stated without cut; the finite model by a simpler bound
+
+* **Decided**: (a) `Completeness` concludes a derivation without cut
+  (Lafont's Theorem 1), which is stronger than the source's 1.17 and
+  gives cut elimination as a proposition; (b) Okada's lemma is proved
+  once, for any phase space with a phase for each formula whose
+  antiphases are closed under the rules, and the syntactical model is
+  built once, for any congruence on sequents; (c) in the finite model,
+  Lafont's order `⊑` ("the least preorder such that …") is replaced by
+  *small*: the formulas are subformulas of formulas of the sequent,
+  and the size is at most its size.
+* **Not taken**: (a) Girard's own proof, S(A) = Pr(A), which uses cut
+  and gives less; (c) Lafont's `⊑` as an inductive relation: it would
+  need its finiteness proved, where *small* is decidable and its
+  finiteness is a list of lists.
+* **Why (c) is the same theorem**: the argument uses three properties
+  of "below" (the premises of a rule with a conclusion below are
+  below; a part of a sequent below is below; finitely many are below),
+  and *small* has them (`Small.sub₁`, `Small.par`, `Small.left`,
+  `finiteModel_finite`). The model is larger than Lafont's.
+* **Cost to reverse**: (c) little; (a), (b) a stage.
+
+## 2026-11-26 10:27 GMT. Stage 2: the reading back, and what it changed
+
+* **Run** by a fresh agent on an extract of 230 lines; its report is
+  entered statement by statement in `statements.md`.
+* **Changed**: `sat_perm` and `valid_perm` were added, since the
+  reader noted that validity is written through an order-dependent
+  formula. Nothing else.
+* **Kept as it is, with the reader's remark recorded**: S9 (exchange
+  keeps the height) is trivial by the encoding; the goals that are
+  data have types that do not say which function; `Decidable` is
+  inhabited classically for any proposition.
+
+## 2026-11-26 10:40 GMT. Stage 3: the producers and the certificates
+
+* **Decided**: (a) two producers of trees of moves: the proved search
+  with every split tried, and a search by lazy splitting that is not
+  proved (`MALL/Lazy.lean`: input and output contexts, a flag for ⊤,
+  the tree built last as a function of what a ⊤ takes back). What
+  either returns is checked before it is handed on; (b) the
+  certificate of record for a derivation is the tree of moves, whose
+  ⊗ and cut moves name the split; (c) against derivability there is
+  no certificate: `noDerivable` has the decision procedure for its
+  check, so the kernel runs the proved search; (d) the lazy search
+  first looks for the logical axiom at any formula, then the rule of
+  the chosen formula, then each formula of the context as the
+  principal one.
+* **Not built, and it was in the plan** (Q3, (iii)): a certifier of
+  finite phase structures against a sequent (a table for the monoid,
+  lists for the antiphases and the facts, a Boolean check proved
+  sound). The finite model property is PROVED (S17), so such a
+  structure exists for every sequent that is not derivable; but
+  nothing here writes one down and checks it in the kernel.
+  `MALL/Screen.lean` has an evaluator over small cyclic groups that is
+  not proved. **Why not**: it is not needed for a verdict (the
+  decision is proved), and the closing page comes first (rule 6). **What
+  it would buy** is in `measurements.md`, "the frontier": a negative
+  answer for a sequent too large for the kernel to run the search on.
+* **Not repaired**: the proved search tries each formula as principal
+  and each split, with no order among the rules, and is exponential on
+  the families (`measurements.md`). A repair that keeps the statement
+  would need its completeness proved again; it is left as it is, and
+  the lazy search is the fast producer beside it
+  (`reference/certify.md` §4).
+* **Cost to reverse**: little.
+
 ## Stops
 
 *Each time a turn ended to wait for the reviewer. None so far.*

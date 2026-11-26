@@ -2,9 +2,12 @@
 The facts of the corpus.  Written by `mallrun facts` (`Main.lean`); do not
 edit.  The kernel checks each when this file is elaborated: for a
 derivation, the tree of moves that the search by lazy splitting found;
-against one, the decision procedure itself, which the kernel runs.
+against one, a finite phase structure that refutes the sequent, where the
+producer of `MALL/ModelRun.lean` has one, and otherwise the decision
+procedure itself, which the kernel runs.
 -/
 import MALL.Corpus.Basic
+import MALL.ModelRun
 
 namespace MALL.Corpus.Facts
 
@@ -273,49 +276,49 @@ def topSlack : Fam [p ⊗ ⊤, pᗮ, q, r] :=
    ((), ProofTools.Zip.RTree.node (MALL.Move.top) [])])
 
 theorem weakening : ¬ Derivable [𝟏, 𝟏] :=
-  noDerivable.verdict _ ()
+  noDerivableBy.verdict _ ({ k := 1, bot := [false, true], val := [[false, false]] })
 
 theorem weakening' : ¬ Derivable [𝟏, p, pᗮ] :=
-  noDerivable.verdict _ ()
+  noDerivableBy.verdict _ ({ k := 1, bot := [false, true], val := [[true, false]] })
 
 theorem affine : ¬ Derivable [pᗮ ⅋ 𝟏] :=
-  noDerivable.verdict _ ()
+  noDerivableBy.verdict _ ({ k := 1, bot := [true, false], val := [[false, true]] })
 
 theorem contraction : ¬ Derivable [p ⊕ pᗮ] :=
-  noDerivable.verdict _ ()
+  noDerivableBy.verdict _ ({ k := 1, bot := [true, false], val := [[false, true]] })
 
 theorem p5tensor : ¬ Derivable [pᗮ ⅋ (p ⊗ p)] :=
-  noDerivable.verdict _ ()
+  noDerivableBy.verdict _ ({ k := 1, bot := [true, false], val := [[false, true]] })
 
 theorem empty : ¬ Derivable [] :=
-  noDerivable.verdict _ ()
+  noDerivableBy.verdict _ ({ k := 0, bot := [false], val := [[false]] })
 
 theorem zero : ¬ Derivable [𝟎] :=
-  noDerivable.verdict _ ()
+  noDerivableBy.verdict _ ({ k := 0, bot := [false], val := [[false]] })
 
 theorem zeroCtx : ¬ Derivable [𝟎, p] :=
-  noDerivable.verdict _ ()
+  noDerivableBy.verdict _ ({ k := 0, bot := [false], val := [[false]] })
 
 theorem bot : ¬ Derivable [⊥] :=
-  noDerivable.verdict _ ()
+  noDerivableBy.verdict _ ({ k := 0, bot := [false], val := [[false]] })
 
 theorem letter : ¬ Derivable [p] :=
-  noDerivable.verdict _ ()
+  noDerivableBy.verdict _ ({ k := 0, bot := [false], val := [[false]] })
 
 theorem tensorDual : ¬ Derivable [p ⊗ pᗮ] :=
-  noDerivable.verdict _ ()
+  noDerivableBy.verdict _ ({ k := 0, bot := [false], val := [[false]] })
 
 theorem mix : ¬ Derivable [p ⅋ pᗮ, q ⅋ qᗮ] :=
-  noDerivable.verdict _ ()
+  noDerivableBy.verdict _ ({ k := 1, bot := [false, true], val := [[true, false], [true, false]] })
 
 theorem halfDistribConv : ¬ Derivable [(pᗮ ⅋ qᗮ) ⊕ (pᗮ ⅋ rᗮ), p ⊗ (q & r)] :=
   noDerivable.verdict _ ()
 
 theorem withTensor : ¬ Derivable [pᗮ ⊕ qᗮ, p ⊗ q] :=
-  noDerivable.verdict _ ()
+  noDerivableBy.verdict _ ({ k := 1, bot := [true, false], val := [[false, true], [false, true]] })
 
 theorem tensorWith : ¬ Derivable [pᗮ ⅋ qᗮ, p & q] :=
-  noDerivable.verdict _ ()
+  noDerivableBy.verdict _ ({ k := 1, bot := [true, false], val := [[false, true], [true, false]] })
 
 end MALL.Corpus.Facts
 

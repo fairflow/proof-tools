@@ -71,3 +71,87 @@ a note says where a choice made here would, or would not, carry over.
    "filled from the clock after the message is sent" when the message
    is part of the same turn as the commit that records it; the
    template might say "in the session's output, at the commit".
+
+## Stage 2
+
+8. **An agent's files and the default build.** Rule 5 says to leave an
+   agent's files out of the commits until it reports. With the
+   lakefile's glob (`MALL.+`) the default target also *builds* every
+   file of the folder, so a plain `lake build` by the operator compiled
+   an agent's half-written test file and failed. *Done*: built by
+   target (`lake build MALL.Results`) until the agents reported, and
+   told each agent to do the same. *Proposed*: say so in rule 5.
+9. **An agent's names.** An agent wrote `def step` in the namespace
+   `MALL`, where the proof system's `step` already is; its file did not
+   import the other, so it compiled, and the clash showed only when
+   both were imported. *Proposed*: `templates/brief.md` should ask for
+   the names already taken in the namespace, or for a namespace of the
+   agent's own.
+10. **What a brief with a design in it bought.** The cut-elimination
+    brief gave the operator's design (push the cut up one derivation,
+    with handlers for the rules that introduce the formula; structural
+    recursion on a bound of the size, then on the derivations). The
+    agent kept the design and replaced the handlers by an inductive
+    family indexed by the cut formula, which was better. So: give the
+    design, and say that another is welcome. Both agents finished with
+    nothing open (8.6 and 4.1 minutes by the environment's count).
+11. **One abstraction served completeness and the finite model.** The
+    skill's table of kinds (`reference/adopt.md` §2) lists the finite
+    model property as "a construction of a model". Here it was the
+    completeness construction over again with another congruence and
+    another set of antiphases. *Proposed*: a line there: before a model
+    is built for completeness, ask whether the finite model is the same
+    construction with a parameter, and build it with the parameter.
+12. **The reading back found no fault, and was still worth its three
+    minutes.** It found, unprompted, the instances that refute
+    weakening and contraction; it called the exchange statement
+    trivial, which is what the encoding intends and is now said beside
+    the statement; and its remark that validity is written through an
+    order-dependent formula led to `valid_perm`. *Proposed*: the skill
+    might say that a reader's "this is trivially true" and "this is
+    false, here is the instance" are findings to enter, not noise.
+13. **`perm_count` and a negation that is not unfolded.** `omega`
+    takes `(A ⊗ B)ᗮ` and `Aᗮ ⅋ Bᗮ` for different atoms. A `show` with
+    the unfolded list before the tactic settles it. A note for phase 2,
+    where the same tactic will be used.
+
+## Stage 3
+
+14. **Against what holds, with no certificate.** `reference/certify.md`
+    §4 describes the direct decision (`by decide +kernel`), and §3 the
+    engine, which wants a certifier against what holds. The two meet in
+    a certifier whose certificate is `Unit` and whose check is the
+    decision procedure (`noDerivable` here). *Proposed*: say so in §3,
+    so that a campaign with a proved search and no notion of written
+    countermodel still has an engine and level 3.
+15. **A pinned value written from expectation, again.** The screen's
+    countermodel for `⊢ 1, 1` was pinned as the operator expected it
+    and was wrong in its second component; the build refused it.
+    Pitfall 11 says this already. It held.
+16. **The proved search is the slow one.** Here the proved decision
+    procedure is exponential in practice (it tries each formula as
+    principal and each split), and the fast search is the one that is
+    not proved. For a derivable sequent that costs nothing, since the
+    fast search's tree is checked. For a sequent that is not derivable
+    there is then no fast certified answer: the kernel must run the
+    slow search. The skill's "a fast search that is not proved, beside
+    the proved one" (§4) covers the first half only. *Proposed*: say
+    that the "no" side then wants a certificate of its own (here: a
+    finite phase structure), and that this is where a finite model
+    property pays in Run.
+
+## For phase 2 (dual intuitionistic linear logic)
+
+* The linear zone: this campaign's form (a variable conclusion, a
+  permutation hypothesis, explicit arguments), with `MALL/Perm.lean`
+  as it stands. The intuitionistic zone: membership, as in GLS.
+* A rule then has a hypothesis for each zone.
+* Cut: the measure used here (the cut formula, then the two
+  derivations, all structural) covers a cut on a linear formula. A cut
+  on a formula of the intuitionistic zone uses its premise many times:
+  it wants a substitution function of its own, by recursion on the
+  derivation that uses the hypothesis (the cut agent's note).
+* The decision procedure does not carry over as it is: with `!` the
+  search has no bound of this kind.
+* The lazy search carries over, and is closer to its sources there:
+  Hodas and Miller's system is two-sided and intuitionistic.

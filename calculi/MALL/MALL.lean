@@ -20,3 +20,9 @@ import MALL.Screen
 import MALL.Run
 import MALL.Corpus.Basic
 import MALL.Corpus.Facts
+import MALL.RunTest
+import MALL.Explore
+import MALL.ExploreTest
+import MALL.Model
+import MALL.ModelRun
+import MALL.ModelTest

@@ -7,12 +7,15 @@
                                        verdict, the size of the tree, the time
     mallrun cert <producer> <family> <n>  the same, and a Lean file that
                                        states the fact with its tree
+    mallrun model <family> <n>         a finite phase structure that refutes
+                                       the member, and a Lean file with the fact
 
 `<producer>` is `lazy` (the search by lazy splitting) or `search` (the
 proved search).  Not trusted.  What it prints is checked by the kernel
 when the file it wrote is elaborated.
 -/
 import MALL.Corpus.Basic
+import MALL.ModelRun
 
 open MALL MALL.Corpus ProofTools ProofTools.Explore
 
@@ -26,23 +29,33 @@ partial def certDepth : Cert S → Nat
 
 def showRepr {α : Type} [Repr α] (x : α) : String := (repr x).pretty 100
 
+/-- On one line: a structure instance printed over several lines by `Repr`
+is not always read back by Lean. -/
+def showFlat {α : Type} [Repr α] (x : α) : String := (repr x).pretty 1000000000
+
 /-- The fact for an entry, as a Lean declaration. -/
 def fact (name src : String) (Γ : List Form) : String :=
   match proveLazy Γ with
   | some c => s!"def {name} : Fam {src} :=\n  treeCert.verdict _ ({showRepr c})\n"
   | none =>
-    if noDerivable.check Γ () then
-      s!"theorem {name} : ¬ Derivable {src} :=\n  noDerivable.verdict _ ()\n"
-    else s!"-- {name}: flag\n"
+    match refuteBy Γ with
+    | some z => s!"theorem {name} : ¬ Derivable {src} :=\n  noDerivableBy.verdict _ ({showFlat z})\n"
+    | none =>
+      if noDerivable.check Γ () then
+        s!"theorem {name} : ¬ Derivable {src} :=\n  noDerivable.verdict _ ()\n"
+      else s!"-- {name}: flag\n"
 
 def header : String :=
 "/-
 The facts of the corpus.  Written by `mallrun facts` (`Main.lean`); do not
 edit.  The kernel checks each when this file is elaborated: for a
 derivation, the tree of moves that the search by lazy splitting found;
-against one, the decision procedure itself, which the kernel runs.
+against one, a finite phase structure that refutes the sequent, where the
+producer of `MALL/ModelRun.lean` has one, and otherwise the decision
+procedure itself, which the kernel runs.
 -/
 import MALL.Corpus.Basic
+import MALL.ModelRun
 
 namespace MALL.Corpus.Facts
 
@@ -72,6 +85,22 @@ def main (args : List String) : IO UInt32 := do
       let agrees := (lz.isSome == e.derivable) && (sr.isSome == e.derivable) && (dec == e.derivable)
       IO.println s!"{e.name}\t{if e.derivable then "derivable" else "not derivable"}\tlazy: {show1 lz}\tsearch: {show1 sr}\tdecided: {dec}\t{if agrees then "agrees" else "DISAGREES"}"
     return 0
+  | ["model", fam, n] =>
+    let n := n.toNat!
+    match family fam n with
+    | none => IO.eprintln s!"no family {fam}"; return 2
+    | some (Γ, _) =>
+      let t₀ ← IO.monoMsNow
+      let out := refuteBy Γ
+      IO.println s!"{fam} {n}: {match out with | some z => s!"refuted in ℤ/{z.k + 1}" | none => "none"}"
+      let t₁ ← IO.monoMsNow
+      IO.println s!"producer ms: {t₁ - t₀}"
+      match out with
+      | some z =>
+        IO.FS.writeFile s!"Corpus/out/{fam}_{n}_model.lean"
+          s!"import MALL.Corpus.Basic\nimport MALL.ModelRun\nopen MALL MALL.Corpus\n\ntheorem fact : ¬ Derivable (Corpus.{fam} {n}) :=\n  noDerivableBy.verdict _ ({showFlat z})\n"
+      | none => pure ()
+      return 0
   | [cmd, prod, fam, n] =>
     let n := n.toNat!
     match family fam n with
@@ -94,5 +123,5 @@ def main (args : List String) : IO UInt32 := do
         | none => pure ()
       return 0
   | _ =>
-    IO.eprintln "usage: mallrun facts | status | run <producer> <family> <n> | cert <producer> <family> <n>"
+    IO.eprintln "usage: mallrun facts | status | run <producer> <family> <n> | cert <producer> <family> <n> | model <family> <n>"
     return 2
