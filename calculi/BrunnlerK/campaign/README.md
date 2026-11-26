@@ -23,6 +23,11 @@ gate; the reviewer may lift every gate).
 | 3. Run | done, 2026-11-23, in the same session: the certifiers, the compiled producer `ksearch`, level 3 proved, a corpus of 22 sequents with every fact checked, negative tests, measurements and the frontier | the producers: decided by the operator; the report: [report-4](report-4-2026-11-23.md) | `BrunnlerK/Run.lean`, `BrunnlerK/Corpus/`, [measurements-2026-11-23.md](measurements-2026-11-23.md) |
 | 4. Explore | done but for its gate, 2026-11-23, in the same session: a sequent as its tree, tactics of the calculus, the search as a tactic, the tutorial, the user's guide, the closing report | the tutorial: put 2026-11-23, to be worked through by the reviewer; not done | `Play/BrunnlerKTutorial.lean`, [users-guide.md](users-guide.md), [report-5-2026-11-23.md](report-5-2026-11-23.md) |
 
+After the campaign, by the owner session of this calculus: `ksearch prove
+'<sequent>'`, a sequent typed at a shell, 2026-11-26
+([report-6](report-6-2026-11-26.md); the user's guide, "From the command
+line").
+
 ## Files here
 
 * [gates.md](gates.md): the reviewer's word at each gate; first, the
@@ -46,6 +51,8 @@ gate; the reviewer may lift every gate).
   of Run, as `Corpus/measure.py` wrote them, and the frontier.
 * [report-5-2026-11-23.md](report-5-2026-11-23.md): the closing report,
   with the retrospective.
+* [report-6-2026-11-26.md](report-6-2026-11-26.md): after the campaign,
+  the command `ksearch prove`: what was built and what was checked.
 * [users-guide.md](users-guide.md): the user's guide.
 * [brief-1-1.md](brief-1-1.md), [brief-1-2.md](brief-1-2.md): the briefs
   for Adopt, to the rule table's gate and after it.
@@ -87,8 +94,11 @@ toolchain (v4.31.0); the package requires `proof-tools` by its path.
 | `BrunnlerK/Run.lean` | the certifiers; a proof as a tree of moves; the producers; the engine; level 3 (S4) | `[propext, Quot.sound]` |
 | `BrunnlerK/Corpus/Basic.lean` | the corpus: 22 sequents with their status and its source; four families | none: data |
 | `BrunnlerK/Corpus/Facts.lean` | the corpus's facts, each with its certificate; written by `ksearch facts` | `[propext, Quot.sound]` |
-| `Main.lean`, `Corpus/measure.py` | the executable `ksearch` (`lake build ksearch`); the script of the measurements | none: code |
+| `Main.lean`, `Corpus/measure.py` | the executable `ksearch` (`lake build ksearch`), with `ksearch prove '<sequent>'`; the script of the measurements | none: code |
 | `BrunnlerK/Test/Run.lean` | negative tests of the certifiers | none: tests |
+| `BrunnlerK/Parse.lean` | a nested sequent read from text; a sequent as Lean source and with the signs of a keyboard | none: code |
+| `BrunnlerK/Test/Parse.lean` | the reader's tests: the corpus read back from each printer, and by Lean; binding; texts refused | none: tests |
+| `Corpus/prove_corpus.py` | `ksearch prove` on every entry of the corpus, each file elaborated | none: code |
 | `BrunnlerK/Explore.lean` | a sequent as its tree; tactics of the calculus (`routine`, `auto`, `found`) | none: code |
 | `BrunnlerK/Test/Explore.lean` | tests | none: tests |
 | `Play/BrunnlerKTutorial.lean` | the tutorial; in no library (`lake env lean Play/BrunnlerKTutorial.lean`) | none |

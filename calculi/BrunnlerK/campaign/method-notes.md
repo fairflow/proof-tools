@@ -550,3 +550,161 @@ these are beyond that count, and are in a commit of their own.
     the text only: the worked derivations go in a test module that
     imports the theory file alone, and the compiled template has no
     such module.
+
+## After the campaign: a sequent typed at a shell (2026-11-26)
+
+By the owner session of this calculus, which did not run the campaign.
+The task: `ksearch prove '<sequent>'`, built first from the one bullet of
+the skill that asks for it (`reference/certify.md` §5, the third way of
+delivering a fact: "For one judgment typed at a shell: …") and only then
+compared with the one instance there was, DILL's (`calculi/DILL/DILL/
+Parse.lean`, `prove` in its `Main.lean`, `DILL/ParseTest.lean`, the
+section "From the command line" of its user's guide, all at commit
+`3f435db`).
+
+71. **What was built from the bullet alone, and what was changed after
+    the comparison.** From the bullet: the reader (`BrunnlerK/Parse.lean`),
+    the command, the tests (`BrunnlerK/Test/Parse.lean`), `ksearch corpus`
+    and `ksearch show`, the script `Corpus/prove_corpus.py`. The bullet
+    was enough to build a command that works; it did not settle the
+    twelve things of note 72. After the comparison four things were
+    changed to DILL's, so that the calculi are used alike: the option
+    for the first line is `--short` (it was `--verdict`); `--ascii` and
+    a printer with the signs of a keyboard were added (`NSeq.ascii`:
+    the bar over a proposition is a combining character, which a
+    terminal may draw over the wrong letter); the text is the arguments
+    joined by spaces (it was one argument, anything else an error);
+    the report of a fault counts characters from 1 (it counted from 0).
+    Where the two instances still differ, and K's way is kept: note 74.
+
+72. **What was needed and the bullet does not say.**
+
+    a. *What the fact is, where a calculus has several.* "The fact with
+       its certificate": K has `K Γ` (a proof, data), `Derivable Γ`,
+       `¬ Valid Γ` and `¬ Derivable Γ`. Printed here: on the yes side
+       `def proof : K sequent` and `theorem derivable`; on the no side
+       both theorems, from one tree.
+    b. *That the file must pin its axioms.* "The kernel checks" is said
+       in this project only with the axioms bound. The file ends with
+       `#axioms_within_file [propext, Quot.sound]`, which needs
+       declarations with names: an `example` cannot be audited.
+    c. *That the judgment has to be written as Lean source, and that
+       this is a second printer to test.* The first line shows the
+       sequent as the calculus prints it; the fact is stated of
+       `seq[…]` as a printer of Lean source writes it. They are the
+       same sequent only if Lean reads that text as the sequent it was
+       written from. K had no such printer for a whole sequent
+       (`NSeq.src` is new) and the file has to declare the names the
+       printer uses for propositions. Tested: Lean's own parser and
+       elaborator are given the text of every entry, and the value is
+       compared (`Test/Parse.lean`, `leanReads`). The bullet's test,
+       reading back what the printer writes, is the other direction and
+       does not cover this.
+    d. *Which printer.* "What the printer writes": K has three (the
+       source's notation, Lean source, the signs of a keyboard). All
+       three are read back for every entry.
+    e. *What a flag is where the search always answers.* Exit code 3 is
+       named; K's search is total and one side always has a certificate
+       (`decided`). The flags here: the search cut off at a deadline,
+       and a certificate that did not pass the compiled check (a
+       defect, never seen).
+    f. *That the command must end by itself.* A person at a shell has
+       no deadline imposed from outside. `--deadline=N`, 10 s where not
+       given: the search runs as a task and the command leaves with 3.
+       The bullet's source for exit codes, `Certify.Cli`, has such an
+       option; the bullet does not carry it over.
+    g. *Where `Cli` is.* "The exit codes of `lean-certify`'s `Cli`":
+       there is no file of that name; it is the namespace `Certify.Cli`
+       at the end of `LeanCertify/Decider.lean`, and its `main` cannot
+       be used without a registry of tools, which no campaign has. Only
+       the four numbers are taken.
+    h. *What "not read" reports.* "2 a text not read": here the place,
+       what was expected, the text and a mark under the place, on the
+       error stream, with nothing on the standard output. From which
+       number characters are counted is not said: this reader counted
+       from 0 and DILL's from 1. DILL prints no mark.
+    i. *What "as it was read" is where the reader computes.* K's
+       negation and `⊃` are functions, so `[](a -> b)` is read as
+       `□(ā ∨ b)` and printed so. The guide has to say it, or the first
+       line looks like a misreading.
+    j. *The limits of a term apply to this file, and the file must lift
+       them itself.* §5 has the paragraph (further down, for the
+       driver); for a file made at a shell nobody adds the option
+       afterwards. And one option was not enough: with
+       `maxRecDepth` raised, the two members the campaign recorded as
+       not elaborated (`boxAnd 64`, 2 335 moves; `nest 256`) stopped at
+       Lean's limit on heartbeats instead; with `maxHeartbeats 0` as
+       well they were elaborated, in 17 s and 13 s. So the frontier of
+       `measurements-2026-11-23.md` for "a fact with its certificate"
+       is a frontier of the default options, not of the route. The
+       sequent itself, as a term, met the limit before the certificate
+       did (`nest 256`).
+    k. *How the command is run on the corpus.* The bullet tests the
+       reader on the corpus, inside the library. To run the command
+       itself on every entry the corpus is needed as texts at a shell:
+       `ksearch corpus`, and a script that compares exit codes with the
+       recorded status and elaborates each file.
+    l. *The option for the first line, and its name.* Not in the
+       bullet; DILL has `--short`.
+
+73. **What K needed and DILL's instance gave no model for.**
+
+    a. *A judgment that nests.* DILL's sequent is flat: two zones and a
+       formula. A nested sequent is read by a reader that calls itself
+       at each bracket; a bracket not closed is reported with the place
+       where it was opened; formulas and boxes may be mixed and are
+       kept as `seq[…]` keeps them (formulas in their order, boxes in
+       theirs), which is not the order typed.
+    b. *A sign of the keyboard that is also a bracket of the
+       structure.* `[]` is `□` on every keyboard and is the empty box
+       of this calculus. Settled by looking one sign further: before a
+       formula it is `□`, before a comma, a closing bracket or the end
+       it is the empty box. Guards: `[]a`, `[[]a]`, `[], a`,
+       `[[], a]`, `[][a]` (refused: an empty box and a box with no
+       comma).
+    c. *Connectives that are functions, and a sign that follows its
+       formula.* Negation is computed while reading; the printer's
+       negated proposition is the letter followed by U+0304, a sign
+       read after the name. `∅` for the empty sequent has no sign of a
+       keyboard: the printer of keyboard signs writes `seq[]`.
+    d. *The no side.* The campaign built a certificate of
+       non-derivability and it is used: a finite tree, a countermodel
+       (`BrunnlerK.Tree`), checked by `noValid` against validity and by
+       `noDerivable` against derivability (soundness carries one to
+       the other). DILL's is a saturated set of sequents, which says
+       only that there is no derivation; K's says more, and the file
+       states both.
+    e. *No budget.* DILL's search has a number of copies, and `flag`
+       is a real third answer of its procedures. K has none: the search
+       is proved to end, and the only bound is time.
+    f. *A proof that is data.* `K Γ` is a type; the file gives the
+       proof as a `def` and the proposition as a theorem. DILL prints
+       one `example`.
+    g. *One side only.* No turnstile: `a |- b` is refused, at the `-`.
+
+74. **Where the two instances differ and K's was kept.** K's file has
+    named declarations and ends with the bound on axioms; DILL's prints
+    an `example` and no bound (note 72 b). K writes the options that
+    lift Lean's limits only for a large answer, and both of them; DILL
+    writes `maxRecDepth 100000` for every answer and not `maxHeartbeats`
+    (note 72 j). K prints nothing but the file after the first line;
+    DILL prints two more lines of comment (the size of the derivation,
+    the budget). K marks the place of a fault under the text; DILL
+    names the character only. None of these was settled by the bullet,
+    and a person who uses both will meet each.
+
+75. **Asked of the directing session** (files that are not this
+    owner's). In `reference/certify.md` §5, the bullet: say that the
+    file names its declarations and ends with the bound on axioms; say
+    that the judgment is written as Lean source by a printer that is
+    tested through Lean itself; name the options `--short` and
+    `--ascii`, and a deadline where the search has no budget; say what
+    a flag is for a search that always answers; fix from which number
+    characters are counted; say that the file lifts Lean's limits
+    itself, with both options; say where `Certify.Cli` is. In the same
+    section, the paragraph on the limits of a term: `maxRecDepth` alone
+    moved the limit to the heartbeats here; both are needed. For DILL's
+    owner: its printed file has no bound on axioms. Not asked: a
+    library function for the read-back test through Lean
+    (`leanReads`, fifteen lines of `Test/Parse.lean`) would serve every
+    calculus that prints its judgments as Lean source.

@@ -26,6 +26,7 @@ import BrunnlerK.Corpus.Basic
 import BrunnlerK.Corpus.Facts
 import BrunnlerK.Explore
 import BrunnlerK.Tactic
+import BrunnlerK.Parse
 import BrunnlerK.Test.Sequent
 import BrunnlerK.Test.System
 import BrunnlerK.Test.Proof
@@ -35,3 +36,4 @@ import BrunnlerK.Test.Search
 import BrunnlerK.Test.Structural
 import BrunnlerK.Test.Run
 import BrunnlerK.Test.Explore
+import BrunnlerK.Test.Parse

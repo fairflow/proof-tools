@@ -59,6 +59,7 @@ the reading of the source was all in the first part.
 | 2 Prove | 1 (the session of stages 0 and 1, continued) | from 17:30 GMT to the last report, 2026-11-23 18:33 GMT; 17 min of it at the statements' gate | under three minutes | not known | not known | the statements, first sending: signed as put; second sending: decided by the operator; done | 4 / 2 / 0, and one question |
 | 3 Run | 1 (the same session) | from 18:32 GMT to the report, 2026-11-23 18:44 GMT | about three minutes, most of it the measurements | not known | not known | the producers: decided by the operator; done | 0 / 0 / 0 |
 | 4 Explore | 1 (the same session) | from 18:43 GMT to the closing report, 2026-11-23 18:47 GMT | under a minute | not known | not known | the tutorial: put, not worked through | 0 / 0 / 0 |
+| after the campaign: `ksearch prove` | 1 (the owner session of this calculus, 2026-11-26) | from 21:20 GMT, when the session's worktree was made, to the report, 21:35 GMT | about two minutes: five builds, the corpus elaborated three times, two large files | not known | not known | no gate | 0 / 0 / 0 |
 
 ## Errors of transcription
 

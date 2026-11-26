@@ -122,6 +122,70 @@ sequent is written out again. A finite tree is
 `ksearch` (`lake build ksearch`) is the search compiled; `ksearch facts`
 writes such facts for the corpus.
 
+## From the command line
+
+`ksearch prove '<sequent>'` answers for a sequent typed at a shell, with
+no Lean file written first (`lake build ksearch`; the program is
+`.lake/build/bin/ksearch`):
+
+    ksearch prove '[](a -> b) -> ([]a -> []b)'
+    ksearch prove '<>(~a & ~b), []a, <>b'
+    ksearch prove --short '<>~a, [a, []], []'
+
+| | the signs of a keyboard | also read |
+|---|---|---|
+| a proposition | `p q r s a b c d`, then `p8`, `p9`, … | `p0` … `p7`, `Form.atom n` |
+| `Ā` | `~A`, `!A` | `¬A`, `∼A`; `p̄` as it is printed; `Form.natom n` |
+| `A ∧ B`, `A ∨ B` | `A & B`, `A \| B`; `/\`, `\/` | `∧ ⋏`, `∨ ⋎` |
+| `A ⊃ B` | `A -> B` | `⊃`, `→` |
+| `◇A`, `□A` | `<>A`, `[]A` | `◇ ⋄`, `□` |
+| a sequent | members separated by commas | `seq[ … ]` around the whole |
+| a box | `[ … ]`; the empty box `[]` | `[∅]` |
+| the empty sequent | nothing, or `seq[]` | `∅` |
+
+`&` binds tighter than `|`, and `|` tighter than `->`; `&` and `|` group
+to the left, `->` to the right; `~`, `<>`, `[]` take the formula that
+follows them: as in a Lean file. **`[]` is two things**: before a formula
+it is `□`, before a comma, a closing bracket or the end it is the empty
+box. So `[]a` is `□a`, `[[]a]` is the box `[□a]`, and `[], a` is the
+sequent `a, [∅]`. Formulas and boxes may be mixed; the formulas keep
+their order and the boxes theirs, as in `seq[…]`. Quote the text: most
+of these signs mean something to a shell.
+
+Negation and `->` are functions, as in a Lean file: the sequent read is
+in negation normal form, and that is what the first line shows.
+`[](a -> b) -> ([]a -> []b)` is answered `-- derivable: ◇(a ∧ b̄) ∨ (◇ā ∨ □b)`.
+Look at the first line: a text misread is another question.
+
+| the answer | exit code | what is printed after the first line |
+|---|---|---|
+| `derivable` | 0 | a Lean file: `def proof : K sequent := treeCert.verdict _ <tree of moves>`, and `theorem derivable : Derivable sequent` |
+| `not derivable` | 1 | a Lean file: `def countermodel : Tree`, a finite tree; `theorem notValid : ¬ Valid sequent := noValid.verdict _ countermodel`; `theorem notDerivable : ¬ Derivable sequent` |
+| `flag` | 3 | one line: no answer within the deadline |
+| the text is not a sequent | 2 | nothing; on the error stream, what is wrong, the text, and a mark under the place (characters are counted from 1) |
+
+The program is not trusted, and neither is its first line. The Lean file
+is what the kernel checks: `ksearch prove '…' > Fact.lean`, then `lake
+env lean Fact.lean` from `calculi/BrunnlerK/`, is silent where the answer
+holds. The file ends with the bound `[propext, Quot.sound]` on its
+axioms. Every sequent is derivable or has a finite countermodel
+(`decided`), and the search finds which: a `flag` is a search cut off,
+not a third answer of the logic. (It would also be printed if what the
+search returned did not pass the check, a defect.)
+
+`--short` prints the first line only; `--ascii` writes the sequent in
+it with the signs of a keyboard; `--deadline=N` is the number of seconds
+the search may take (10 where it is not given). A large answer (a tree
+of more than 400 moves, or nesting deeper than 40) has Lean's limits on
+recursion and on its own work lifted in the file; with them the largest
+tried were elaborated: a tree of 2 335 moves in 17 s, a sequent nested
+256 deep in 13 s. Beyond that nothing is known.
+
+`ksearch corpus` prints the corpus as texts, and `ksearch show <family>
+<n>` a member of a family: `ksearch prove "$(ksearch show boxAnd 8)"`.
+`python3 Corpus/prove_corpus.py --elaborate` runs the command on every
+entry of the corpus and elaborates what it prints.
+
 ## The theorems
 
 For `K` (proofs in system K) and `Kcut` (with `cut`); all within
@@ -142,6 +206,8 @@ For `K` (proofs in system K) and `Kcut` (with `cut`); all within
 
 ## What is not there
 
+* `ksearch prove` gives the proof the search finds, and the countermodel
+  as a term. It does not draw either, and takes no proof from the user.
 * A goal is shown in brackets; as a tree only by `Γ.tree`, on request.
 * No tactic applies a tactic of the calculus, or the search, to the goal
   in front of it: the sequent is written out again.
