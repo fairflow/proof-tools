@@ -33,9 +33,10 @@ target, not the whole library.>
 end under a running command, and what is only in the conversation is
 then lost. Run a long build or timing in the background, with its
 output in a file. Before any build, look at what is running and at the
-free memory, and do not build while another agent of this campaign is
-building: <who builds when>. An evaluation of unknown size runs under
-`lean -M <megabytes>`.">.
+free memory (the one line and its gates are in the reviewer's global
+instructions): builds may run side by side while the machine has room,
+and a build is held back when it does not. An evaluation of unknown
+size runs under `lean -M <megabytes>`, and not beside a large build.">.
 
 ## Read, in this order
 
