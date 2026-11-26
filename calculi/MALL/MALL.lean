@@ -30,3 +30,5 @@ import MALL.Saturated
 import MALL.SatRun
 import MALL.Refute
 import MALL.SatTest
+import MALL.TutorialTest
+import MALL.TutorialPins

@@ -43,6 +43,10 @@ as a private page (https://claude.ai/artifact/HXsUnPBBZSQdoc9Ku72b1E),
   OPEN, with what the reading back said of it.
 * [measurements.md](measurements.md): what runs, its verdicts and its
   timings; the frontier.
+* `../tutorial.md`: the tutorial, with 25 graded exercises, in the
+  pinned format (`scripts/tutorial_pins.py`): 16 pins. Its solutions are
+  `MALL/TutorialTest.lean`; the exercises to type are
+  `Play/MALLExercises.lean`. Added after the closing page.
 * [users-guide.md](users-guide.md): how a goal reads, the moves, the
   tactic's lines, the messages.
 * [cost-log.md](cost-log.md): the sessions and the agents.
@@ -104,5 +108,6 @@ Code (no bound; nothing in it is trusted):
   `Main.lean` (`mallrun`), `Corpus/measure.py`,
   `Corpus/measure_model.py`.
 * Tests: `MALL/Test.lean`, `DecideTest.lean`, `CutTest.lean`,
-  `RunTest.lean`, `ModelTest.lean`, `ExploreTest.lean`, `SatTest.lean`.
+  `RunTest.lean`, `ModelTest.lean`, `ExploreTest.lean`, `SatTest.lean`,
+  `TutorialTest.lean`, `TutorialPins.lean` (generated).
 * In no library: `Play/MALL.lean` (exercises), `Play/MALLTutorial.lean`.

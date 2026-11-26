@@ -41,6 +41,12 @@ brief; the figures are what the environment said when each ended):
 Where "before" is written, the time the agent reported was not taken
 from the clock; the bound is the commit that has its result.
 
+After the closing page, at the reviewer's word (the saturated sets and
+the tutorial): 11:20 to 14:11 by the clock, of which about two hours
+(11:50 to 14:00) the session's process was not running. One more agent,
+a6, wrote the tutorial: 376 105 tokens, 600 s of its own time after it
+was restarted.
+
 ## What went wrong, and what it cost
 
 | what | found by | cost |

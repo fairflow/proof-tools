@@ -162,7 +162,9 @@ a note says where a choice made here would, or would not, carry over.
 25. **The session ended under a running command**, and stood idle for
     two hours until the reviewer wrote; an agent started before that
     had written nothing to disk. The skill's status section records the
-    same of the GLS run. *Proposed*: a brief to an agent should ask
+    same of the GLS run. The session that started this one ended at
+    the same time, so the cause was the application and not the
+    command. *Proposed*: a brief to an agent should ask
     that its files be on disk early and grown, and long timing runs go
     in the background with their output in a file.
 
@@ -181,6 +183,18 @@ a note says where a choice made here would, or would not, carry over.
   search has no bound of this kind.
 * The lazy search carries over, and is closer to its sources there:
   Hodas and Miller's system is two-sided and intuitionistic.
+* The Run stage there should not aim at level 3 (agreed with the
+  session that starts phase 2, 2026-11-26). With `!` derivability is
+  undecidable (LMSS 1992; not read by the operator for this point), so
+  no sound certificate of non-derivability is complete. On the "no"
+  side: a saturated set (note 23) where the search space of the goal is
+  finite, in particular the fragment without `!`; a structure from an
+  incomplete producer where one is cheap; a flag otherwise.
+  Completeness of refutation is then a statement about the fragment
+  without `!` only. No finitely presented saturated set is known to the
+  operator for any part of the fragment with `!`: under copying the
+  linear zone grows without bound, and a covering argument would be
+  needed. A candidate to look at, not a plan.
 
 ## Stage 4, and the whole
 

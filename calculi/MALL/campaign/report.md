@@ -254,7 +254,7 @@ Both within `[propext, Quot.sound]`. Statements S20 and S21 of
 [statements.md](https://github.com/fairflow/proof-tools/blob/e2ba9e5/calculi/MALL/campaign/statements.md).
 
 **What to read** (two definitions, 22 lines):
-[Saturated.lean, 59-76](https://github.com/fairflow/proof-tools/blob/e2ba9e5/calculi/MALL/MALL/Saturated.lean#L59-L76): `satAt` and
+[Saturated.lean, 58-75](https://github.com/fairflow/proof-tools/blob/e2ba9e5/calculi/MALL/MALL/Saturated.lean#L58-L75): `satAt` and
 `saturated`. A set `D` is saturated when no member is `⊢ a, a⊥`, `⊢ 1` or
 has ⊤, and at each formula of each member the rule that introduces it has
 a premise in `D`: the premise of ⅋ and of ⊥; one of the two of &; both
@@ -286,5 +286,14 @@ On those families the cyclic structures remain the certificate to use.
 So the frontier of section 1 is now a limit of size and not of method.
 
 Not read back by a cold reader. Seven negative tests in the kernel
-(`MALL/SatTest.lean`). A tutorial page in the pinned format of the GLS
-one is being written and is not in this commit.
+(`MALL/SatTest.lean`).
+
+**The tutorial** (2026-11-26 14:11 GMT): `calculi/MALL/tutorial.md`, in the pinned
+format of the GLS one: 25 graded exercises in five parts, 16 pinned
+statements, both certificates of non-derivability explained. Written by
+an agent of the operator; the operator ran the pin check and the build
+and read the section on the certificates, not the whole page. Its
+solutions are checked by the build (`MALL/TutorialTest.lean`); the
+exercises to type are `Play/MALLExercises.lean`. The prose on how each
+proof goes is a reading and is not checked. No person has typed the
+exercises.
