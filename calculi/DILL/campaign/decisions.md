@@ -368,3 +368,23 @@ the folder point here.*
   each growing family to its real limit does not, and that was what was
   running, with the rest of the campaign held behind it. The measuring
   agent was told at 16:19 to stop and write up from the figures it had.
+
+## 2026-11-26 16:27 GMT. Stage 3: the producers, and what is not repaired
+
+* **Decided** (recorded late: R10 asks for it before a producer is
+  written, and the brief of 15:28 stood in its place). For a
+  derivation, one producer, `Lazy.prove`, in two modes: the left rules
+  chained on one formula down to its head atom (the default, the
+  agent's addition), or as the figure has them (the brief's design).
+  Against a derivation, `refuteSet`. Neither is trusted; each answer is
+  checked before it is handed on. Who relies on the answers: the
+  refutations of Prove (through the proved decision, not through these),
+  the tutorial's exercises, and a reader who wants a sequent settled.
+* **Not repaired**, and named as the limit: `step`'s check of a division
+  of the linear zone (`permB j.lin (Δ ++ sub j.lin Δ)`) is quadratic in
+  the zone, and is where the kernel's time goes on a large tree (8 s at
+  a chain of 64 formulas, against 1.3 ms compiled). A check in one pass
+  would change `Move.rule` in `DILL/Proof.lean`, with S1 and S2 to be
+  proved again: a repair within stage 3, step 4, in kind, but not made:
+  the page first (rule 6), and no measurement was to wait on it.
+* **Cost to reverse**: little.

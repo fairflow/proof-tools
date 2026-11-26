@@ -63,8 +63,20 @@ built as it stood; H's measurements were written but for one
 placeholder; G's measurements and the tutorial's last files were not.
 The scratchpad was cleared: the fetched papers, the page images, the
 cold readers' two reports and the scratch screens are gone (what they
-showed is in the plan, the rule table and the statements). From 16:03
-one agent builds at a time (the reviewer's word of that hour, relayed).
+showed is in the plan, the rule table and the statements). From 16:03 to 16:22 the operator let one agent build at a time (the
+reviewer's word of that hour, relayed, and corrected at 16:22): nineteen
+minutes in which the engine file and the tutorial waited behind timing
+runs.
+
+What probably caused the restart, from the measuring agent's own account
+(`measurements.md`, "What went wrong in the measuring"): its first runs,
+at 15:44 and 15:50, had no cap on memory, and the deadline of its script
+ended `lake` and not the Lean process under it, so two kernel checks of
+a large tree and one run of the proved search went on with nothing to
+stop them; run again after the restart under a cap, the first of these
+passes 8 GB. So this campaign was a cause, beside the other session's
+evaluation that the first account named. The script now ends the whole
+process group (tested with a shell command, not with Lean).
 
 ## Words of the reviewer
 
