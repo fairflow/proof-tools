@@ -708,3 +708,12 @@ section "From the command line" of its user's guide, all at commit
     library function for the read-back test through Lean
     (`leanReads`, fifteen lines of `Test/Parse.lean`) would serve every
     calculus that prints its judgments as Lean source.
+
+    *What became of note 75* (the directing session, 2026-11-26):
+    done in `reference/certify.md` §5. The bullet is now a pointer, and
+    a paragraph "A judgment typed at a shell" carries each point of
+    notes 72 and 73 as a line; the paragraph on the limits of a term
+    has the finding on `maxHeartbeats`. Not done: `leanReads` as a
+    library function (it waits for a third calculus that prints its
+    judgments as Lean source); DILL's printed file, which is its
+    owner's.
