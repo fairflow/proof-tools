@@ -13,3 +13,6 @@ import MALL.Decide
 import MALL.DecideTest
 import MALL.FiniteModel
 import MALL.Results
+import MALL.Cut
+import MALL.CutTest
+import MALL.Lazy
