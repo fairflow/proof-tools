@@ -274,3 +274,21 @@ the folder point here.*
   more and its completeness less; KOT's, with the strict idempotents,
   stays, and the difference is named on the closing page.
 * **Cost to reverse**: little.
+
+## 2026-11-26 15:33 GMT. Stage 2: a repair of `Fam.exch` and `Fam.mono`, with no statement changed
+
+* **Decided**: the two functions are defined through `Fam.exchAux` and
+  `Fam.monoAux`, stated over a variable sequent `j` (with `j.unr`,
+  `j.lin`, `j.goal` in their types), and keep their names and types.
+* **Why**: agents C and A each found that Lean had compiled them by
+  well-founded recursion, without a word (`#print` shows `._unary` and
+  `@[irreducible]`), because their argument has the index `Γ ⨾ Ξ ⟹ C`
+  and not a variable. They ran compiled and did not reduce in the
+  kernel, so nothing built with them (cut elimination above all) could
+  be evaluated by `decide`. After the repair every file built unchanged
+  (44 jobs), and the kernel evaluates the height of three derivations
+  after cut elimination.
+* **Not taken**: leaving it (a function on derivations that the kernel
+  cannot run is half of what the family into `Type` is for).
+* **Rests on it**: `DILL/System.lean`; nothing else changed.
+* **Cost to reverse**: little.

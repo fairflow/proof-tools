@@ -39,12 +39,18 @@ AGENT-ROWS
 
 ## Time lost
 
-From about 15:00 to 15:13 GMT (the times of the session's record: the
-plan's commit at 14:59, the next command at 15:13): the environment
-refused a write with the message that the user had declined it and that
-the operator must stop and wait; the operator stopped and asked. The
-reviewer had declined nothing. About thirteen minutes, in which the
-survey agent went on working.
+From 15:00:36 to about 15:12 GMT, about twelve minutes. The operator's
+first write of `DILL/Form.lean` came back as declined by the user, with
+the instruction to stop and wait; the operator stopped and asked. The
+session that started this one read the application's log and this
+session's record afterwards and reports (15:33, a message between
+sessions): the reviewer had interrupted that session at 15:00:33 and
+15:00:35 about something else; at 15:00:36 the application stopped the
+family of sessions and interrupted this one; the write had been waiting
+39.9 s for its permission and was recorded as "user rejected" at the
+same millisecond as the interrupt. The reviewer declined nothing and
+resumed this session at about 15:12. The survey agent went on working
+through it.
 
 ## Words of the reviewer
 

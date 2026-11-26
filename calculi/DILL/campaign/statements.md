@@ -271,7 +271,7 @@ rule of `CF` that concludes a member has a premise in `D`
 form is MALL's second certificate, with the soundness proved from the
 rules alone. Fixed 15:28, before its proof. Screened: by the negative
 tests of `DILL/SatTest.lean`. Not read back (a certifier's statement).
-STATUS-S16
+**OPEN** at this commit: its proof is with agent H.
 
 ### S17. Validity does not depend on the order of the hypotheses (ours)
 
@@ -346,4 +346,4 @@ and `cutEliminationProp` carries it to the calculus with cut.
 |---|---|---|---|
 | of the goals from the standing list (cut elimination: S8, S4b; the deduction theorems: S9; the disjunction property: S13) | 3 | 0 | 0 |
 | of the other goals (S3, S4, S5, S6, the inversions of S9, S11, S12, consistency, S14, S15; S7 and S10 expected refuted) | 10 | 2 (eight statements) | 0 |
-| of our own (S1, S2, S16, S17) | SUMMARY-OWN |
+| of our own (S1, S2, S16, S17) | 3 (S1, S2, S17) | 0 | 1 (S16) |
