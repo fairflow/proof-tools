@@ -5,27 +5,56 @@ give is written "not known".
 
 ## Sessions
 
-One session runs the stages; the rows are the stages.
+One session runs the stages; the rows are the stages. The stages overlap
+(the proofs were handed out while the explorer was written), so the
+times are of the commits that begin and end each.
 
 | # | stage | operator | started cold, or handed on, or went on | began | ended | waiting on builds | waiting at a stop | requests | output tokens | input read again | cost | Lean lines added / removed | document lines |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1 | Survey | Claude Fable 5.2, effort as the session was started | started from a brief written by another session; cold as to the calculus | 2026-11-26 14:47 GMT | | | none | not known | not known | not known | not known | | |
+| 1 | Survey | Claude Fable 5.2 | started from a brief written by another session; cold as to the calculus | 2026-11-26 14:47 GMT | 14:59 (the plan committed) | a few seconds (two scratch files) | none (see "Time lost") | not known | not known | not known | not known | 0 | SURVEY-DOC |
+| 2 | Adopt | the same | went on in the session | 15:13 | ADOPT-END | ADOPT-BUILD | none | not known | not known | not known | not known | ADOPT-LEAN | ADOPT-DOC |
+| 3 | Prove | the same, with agents A to E | went on in the session | 15:20 (the brief) | PROVE-END | PROVE-BUILD | none | not known | not known | not known | not known | PROVE-LEAN | PROVE-DOC |
+| 4 | Run | the same, with agents G and H | went on in the session | 15:29 (the brief) | RUN-END | | none | not known | not known | not known | not known | RUN-LEAN | RUN-DOC |
+| 5 | Explore | the same, with an agent | went on in the session | EXPLORE-BEGIN | EXPLORE-END | | none | not known | not known | not known | not known | EXPLORE-LEAN | EXPLORE-DOC |
 
 Where the tokens and the cost come from: not known to the operator, and
-not filled.
+not filled. The agents' figures are as the environment reported them.
 
 ## Agents
 
+"Began" is the clock at the launch (read by `date` in the call before or
+after it); "ended" is that time plus the duration the environment
+reported, so it is computed, not read.
+
 | # | stage | task, in a few words | brief | began | ended | duration, as reported | tokens, as reported | result: what was kept, what was redone |
 |---|---|---|---|---|---|---|---|---|
-| 1 | Survey | the literature: a phase semantics for intuitionistic linear logic, the finite model property, undecidability, existing formalisations, places for the further results | given in the session; its report is `survey-report.md` | 14:49 | | | | |
+| 1 | Survey | the literature: a phase semantics, the finite model property, undecidability, formalisations, places for the further results | in the session; its report is `survey-report.md` | 14:49 | 15:09 | 19.5 min | 327 794 | kept whole; the operator read the semantics again from the page |
+| 2 | Adopt | the second transcription, from four page images | in the session (the text is in the rule table's account) | 15:15 | 15:19 | 3.3 min | 106 261 | kept: no difference from the family |
+| 3 | Prove | E: the translation to and from one-zone ILL | `brief-2-1.md`, E | 15:20 | 15:24 | 3.3 min | 119 603 | kept whole |
+| 4 | Prove | D: the decision without `!` | `brief-2-1.md`, D | 15:20 | 15:25 | 4.7 min | 134 707 | kept whole |
+| 5 | Prove | C: the structural results, identity expansion, subformulas | `brief-2-1.md`, C | 15:20 | 15:27 | 6.0 min | 147 994 | kept whole; it found that `Fam.exch` and `Fam.mono` were compiled by well-founded recursion |
+| 6 | Prove | the reading back, from an extract of 491 lines | in the session | 15:21 | 15:28 | 6.3 min | 120 026 | kept: its eight instances are the refutations |
+| 7 | Prove | B: soundness and completeness | `brief-2-1.md`, B | 15:20 | 15:28 | 7.7 min | 165 340 | kept whole |
+AGENT-ROWS
 
 ## Time lost
 
-None so far.
+From about 15:00 to 15:13 GMT (the times of the session's record: the
+plan's commit at 14:59, the next command at 15:13): the environment
+refused a write with the message that the user had declined it and that
+the operator must stop and wait; the operator stopped and asked. The
+reviewer had declined nothing. About thirteen minutes, in which the
+survey agent went on working.
 
 ## Words of the reviewer
 
 | # | date | stage | class | the reviewer's words, in brief | what it changed |
 |---|---|---|---|---|---|
 | 1 | 2026-11-26 | before the Survey | command | "Yes, start DILL" (relayed in the brief of the session that started this one) | the campaign |
+| 2 | 2026-11-26 15:13 | Adopt | correction | "I declined no such thing." | the operator went on; nothing built was affected |
+
+## Errors of transcription
+
+The list is in `rule-table.md`: none. By what could have found one:
+`#rules` or `#slime` 0; a worked derivation 0; the second transcription
+0; soundness or completeness 0; a person 0; later use 0.
