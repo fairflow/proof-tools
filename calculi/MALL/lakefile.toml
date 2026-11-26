@@ -11,3 +11,7 @@ path = "../.."
 [[lean_lib]]
 name = "MALL"
 globs = ["MALL", "MALL.+"]
+
+[[lean_exe]]
+name = "mallrun"
+root = "Main"
