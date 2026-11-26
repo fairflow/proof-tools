@@ -8,6 +8,10 @@ Written 2026-11-26 11:05 GMT. Commit `10becc3` and this page's own, on `main` of
 Links below are to GitHub at `10becc3`; B is
 `https://github.com/fairflow/proof-tools/blob/10becc3/calculi/MALL`.
 
+**Amended 2026-11-26 14:04 GMT**, at the reviewer's word after this page was first
+published: section 7, a countermodel for every sequent with no
+derivation. The rest of the page is as it was written.
+
 ## 1. What was adopted, proved, and runs
 
 Propositional multiplicative-additive linear logic, in the one-sided
@@ -227,3 +231,60 @@ covers a cut on a linear formula, and a cut on the intuitionistic zone
 wants a substitution function of its own; the decision procedure does
 not carry over with `!`; the lazy search does. The end of
 `method-notes.md` has each.
+
+## 7. After the closing page: a countermodel for every sequent with no derivation
+
+Asked by the reviewer: "Can you complete the counter model construction?
+Decidability + completeness means there must be one." Commit `e2ba9e5`.
+
+The producer of cyclic structures (section 1, "Runs") settled 14 of the
+15 non-theorems of the corpus and could not be complete. There is now a
+second certificate, which is:
+
+    ∀ (D : List (List Form)) (Γ : List Form), refutedBy D Γ = true →
+      ∃ S : PhaseStructure, S.Finite ∧ ¬ S.Sat Γ                      (countermodel_of_refutedBy, MALL/Saturated.lean)
+    PROVED: a saturated set of sequents presents a finite countermodel
+
+    ∀ Γ, ¬ Derivable Γ → refutedBy (fullRefutation Γ) Γ = true         (refutation_complete, MALL/Saturated.lean)
+    ∀ Γ, (∃ c, treeCert.check Γ c = true) ∨ (∃ D, noDerivableBySet.check Γ D = true)
+                                                                       (certified, MALL/SatRun.lean)
+    PROVED: the certificate is complete; every sequent has a written certificate, checked by the kernel
+
+Both within `[propext, Quot.sound]`. Statements S20 and S21 of
+[statements.md](https://github.com/fairflow/proof-tools/blob/e2ba9e5/calculi/MALL/campaign/statements.md).
+
+**What to read** (two definitions, 22 lines):
+[Saturated.lean, 59-76](https://github.com/fairflow/proof-tools/blob/e2ba9e5/calculi/MALL/MALL/Saturated.lean#L59-L76): `satAt` and
+`saturated`. A set `D` is saturated when no member is `⊢ a, a⊥`, `⊢ 1` or
+has ⊤, and at each formula of each member the rule that introduces it has
+a premise in `D`: the premise of ⅋ and of ⊥; one of the two of &; both
+that of 1⊕ and that of 2⊕; for every way to divide the context of a ⊗,
+one of the two. `refutedBy D Γ` adds that `Γ` is a member.
+
+**The countermodel** that a set presents (`satModel`): phases are the
+parts of the members, with one more phase for all other sequents;
+antiphases are the phases that are not members; the fact of a letter `a`
+is `{a}⊥`. That no member holds in it is Okada's lemma, already proved
+for completeness. The kernel checks the saturation and computes no
+interpretation. As a check of meaning the structure is also computed by
+tables in compiled code (not proved): for each of the 15 non-theorems,
+no member of its set holds in the computed structure and all 23
+derivable entries of the corpus do.
+
+**The producer** (`refuteSet`, `MALL/Refute.lean`, not trusted): a search
+that remembers every sequent it settles; where it says no, the sequents
+it said no of are a saturated set. It ends on every input and never
+returns nothing for a sequent with no derivation: the search space of
+one sequent is finite. `halfDistribConv`, the entry the cyclic producer
+missed, gets a set of 17 sequents (a structure of 35 phases).
+
+**Its limit**, measured ([measurements.md](https://github.com/fairflow/proof-tools/blob/e2ba9e5/calculi/MALL/campaign/measurements.md)):
+the set is exponential where ⊗ divides a context many ways (1 015
+sequents at 7 formulas on `chainBad`), and the kernel's check, quadratic
+in the set, passes a minute from about 300 sequents (86 sequents: 3.4 s).
+On those families the cyclic structures remain the certificate to use.
+So the frontier of section 1 is now a limit of size and not of method.
+
+Not read back by a cold reader. Seven negative tests in the kernel
+(`MALL/SatTest.lean`). A tutorial page in the pinned format of the GLS
+one is being written and is not in this commit.
