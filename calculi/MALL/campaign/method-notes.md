@@ -249,3 +249,45 @@ a note says where a choice made here would, or would not, carry over.
     figures that exist are the agents'. *Proposed*: let the template
     have a row per stage, a table for agents, and take the lines of
     Lean from the commits (`git show`), which is what was done here.
+
+## What became of these notes
+
+Entered 2026-11-26 14:15 GMT by the session that started this campaign, not by its
+operator. The changes to the skill are commit `94df876`, made with no
+word of the reviewer asking for them, under his standing word of
+2026-11-23 ("Stop telling me to read and approve everything. Act
+independently."). To reverse: revert that commit.
+
+| note | the change | where |
+|---|---|---|
+| 1 | a third form for judgments as data, for a logic with no weakening: a variable conclusion under a permutation hypothesis, and what it costs | `reference/adopt.md` §3 |
+| 2, 13 | the permutation lemmas that bring in `Classical.choice`; `omega` and a defined function not unfolded | `reference/adopt.md` §6 |
+| 3 | page images for a cold reader, by `pdftoppm` | `reference/adopt.md` §7 |
+| 4 | where the source draws no derivation of the fragment | `SKILL.md`, stage 1, step 4 |
+| 5 | a move's name is not a keyword of Lean | `reference/explore.md` §2 |
+| 6 | the source's signs that core Lean uses (`⊕ × ∘ →`) | `reference/adopt.md` §3 |
+| 7 | "told to the reviewer" in a session that another session started | `templates/decisions.md` |
+| 8, 10 | build by target while agents write; give the design and say another is welcome | `SKILL.md`, rule 5; `templates/brief.md` |
+| 9, 25 | the names taken in the namespace; files on disk early; long runs in the background | `templates/brief.md` |
+| 11 | the finite model as the completeness construction with a parameter | `reference/adopt.md` §2 |
+| 12 | a reader's "trivially true" and "false, here is the instance" are findings | `reference/adopt.md` §7 |
+| 14, 19, 23 | three forms of certificate against a derivation: a model evaluated (tabulated), the record of a failed search, none (`Unit`) | `reference/certify.md` §3 |
+| 16 | the fast search serves the "yes" side only; the "no" side then wants a certificate of its own | `reference/certify.md` §4 |
+| 17 | rule 6: what the plan's level of Run needs is not optional; what goes beyond it comes after the page | `SKILL.md`, rule 6 |
+| 15, 18 | pitfall 11 as an order of work: evaluate, read, paste | `reference/pitfalls.md`, 11 |
+| 20 | every campaign writes the tutorial page, with exercises and their solutions in the library | `SKILL.md`, stage 4, step 3; `reference/explore.md` §11; the report and status-board templates |
+| 21 | a document written through the shell | `reference/pitfalls.md`, 12 |
+| 22, 25 | the cost log: rows by stage, a table of agents, time lost | `templates/cost-log.md` |
+| 24 | a search is measured compiled, never by `#eval` | `reference/certify.md` §5 |
+
+Added, and in no note: where derivability is not decidable, level 3 is
+not a goal (`reference/certify.md` §3; from "For phase 2" above); a
+REFUTED statement on a tutorial page is a paraphrase pin for now
+(`reference/explore.md` §11; from the tutorial's finding about
+`#statement`); this campaign as a fourth worked instance, and what its
+run shows (`SKILL.md`, "Status").
+
+Not made: the library changes that notes 2 and 20 name (the permutation
+lemmas into `proof-tools`; a status REFUTED and `#statement` on a
+negation in `scripts/tutorial_pins.py`). They are findings about the
+library, for whoever next changes it.
