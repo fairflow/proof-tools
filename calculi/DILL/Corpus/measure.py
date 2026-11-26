@@ -16,8 +16,9 @@ For each member of a family, in growing size:
   * where the unrestricted zone is empty and `!` does not occur, the
     kernel running the proved search of `DILL/Decide.lean` on the sequent
     (`by decide +kernel`), with no certificate.
-Every run is under a deadline; a run cut off is a flag, and the column
-stops there (rules R5, R7 of lean-certify).  Every size is listed below:
+Every run is under a deadline, and every run of Lean under a cap on
+memory (`-M 8000`); one run at a time.  A run cut off is a flag, and the
+column stops there (rules R5, R7 of lean-certify).  Every size is listed below:
 nothing is generated without a bound.
 
 Run from `calculi/DILL/`:
@@ -27,19 +28,20 @@ Run from `calculi/DILL/`:
 The driver is `.lake/build/bin/dillrun` (after `lake build dillrun`), or
 the path in the environment variable DILLRUN.
 """
-import subprocess, time, os, platform, datetime
+import subprocess, time, os, platform, datetime, signal
 
 EXE = os.environ.get("DILLRUN", ".lake/build/bin/dillrun")
 OUT = "Corpus/out/run"
 PRODUCER_DEADLINE = 20.0
 KERNEL_DEADLINE = 60.0
-SIZES = [2, 4, 8, 16, 32, 64, 96, 128, 256, 512, 1024, 2048, 4096]
+# no tree of more than a few thousand moves is made: the sizes stop at 1024
+SIZES = [2, 4, 8, 16, 32, 64, 96, 128, 256, 512, 1024]
 FAMILIES = {
     "chain": SIZES,
     "chainU": SIZES,
     "fan": SIZES,
-    "chainBad": [2, 4, 6, 8, 10, 12, 14, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096],
-    "chainUBad": [2, 3, 4, 5, 6, 7, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096],
+    "chainBad": [2, 4, 6, 8, 10, 12, 14, 16, 32, 64, 128, 256, 512, 1024],
+    "chainUBad": [2, 3, 4, 5, 6, 7, 8, 16, 32, 64, 128, 256, 512, 1024],
 }
 # the families that the proved search of `DILL/Decide.lean` covers
 DECIDED = {"chain", "fan", "chainBad"}
@@ -52,18 +54,30 @@ NFORMS = {"chain": lambda n: n + 2, "chainU": lambda n: n + 2, "fan": lambda n: 
 
 
 def timed(cmd, deadline):
-    """The time, the return code and the output; on a cut, what was printed."""
+    """The time, the return code and the output; on a cut, what was printed.
+
+    The command runs in a process group of its own, and at the deadline the
+    whole group is killed: `lake env lean` starts Lean as a child, and a
+    kill of `lake` alone leaves that Lean running, with nothing to stop it.
+    """
     t0 = time.monotonic()
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True,
+                         start_new_session=True)
     try:
-        r = subprocess.run(cmd, capture_output=True, text=True, timeout=deadline)
-        return time.monotonic() - t0, r.returncode, r.stdout + r.stderr
-    except subprocess.TimeoutExpired as e:
-        out = e.stdout or b""
-        return None, None, out.decode() if isinstance(out, bytes) else out
+        out, _ = p.communicate(timeout=deadline)
+        return time.monotonic() - t0, p.returncode, out
+    except subprocess.TimeoutExpired:
+        try:
+            os.killpg(p.pid, signal.SIGKILL)
+        except ProcessLookupError:
+            pass
+        out, _ = p.communicate()
+        return None, None, out or ""
 
 
 def lean(path, deadline):
-    return timed(["lake", "env", "lean", path], deadline)
+    # a cap on memory (MB) on every run of Lean, as well as the deadline
+    return timed(["lake", "env", "lean", "-M", "8000", path], deadline)
 
 
 def check(path, base):
@@ -79,6 +93,7 @@ def check(path, base):
         why = ("maximum recursion depth" if "maximum recursion" in outc
                else "deterministic timeout" if "timeout" in outc
                else "stack overflow" if "tack overflow" in outc
+               else "the cap on memory" if "memory" in outc
                else (outc.strip().splitlines() or [f"exit {rcc}"])[0][-80:])
         return f"flag: not elaborated ({why})", False
     return f"{max(tc - base, 0):.2f} s", True
