@@ -90,6 +90,11 @@ inductive SlimedControl : List Nat → Prop where
 inductive Move where
   | ‹rule› (‹what says which instance of the rule is meant›)
   deriving DecidableEq, Repr, Lean.ToExpr
+-- `Repr` is for the editor, and may be derived in the code file instead
+-- (`deriving instance Repr for Move`, in `Tactic.lean`).  Where the formulas
+-- come from a library whose `Repr` is written with `String` functions, the
+-- instance derived here breaks this file's bound on axioms.  (This comment
+-- was added after the listing was compiled.)
 
 /-- What a move asks of a judgment, what it leaves, and what to say when
 it does not apply. -/

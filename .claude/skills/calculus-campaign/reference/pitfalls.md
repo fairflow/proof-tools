@@ -71,7 +71,14 @@ step of a part already says is not repeated here.
     the build. So as an order of work: evaluate, read the output, paste
     it. There is then no moment at which a value is typed. The same for
     a time told to the reviewer: from the session's record, never "at
-    about".
+    about". Mechanically: no document is written in the same call as
+    the `date` it quotes. Run `date` first, in a call of its own, and
+    paste (DILL: five times ahead of the clock in one campaign, each
+    in a document composed in the call that read the clock). The same
+    order holds for a sum (a count of lines is computed, read and
+    pasted), and for a certificate: one in a test or in a module of
+    solutions comes from the producer, pasted from the runner or
+    written by a script that calls it.
 12. **A document written through the shell.** A heredoc with an unquoted
     delimiter ran the words between backticks as commands. Write a
     document with the file tool, or under a quoted delimiter

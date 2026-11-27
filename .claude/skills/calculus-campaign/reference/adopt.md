@@ -123,7 +123,7 @@ statement of it.
 | kind | shape | watch for |
 |---|---|---|
 | soundness and completeness for a semantics | a structure of models with a forcing relation; soundness by induction on derivations; completeness by a model construction or through a second calculus | make the model construction return data (a `Type`), since it is then the search of the Run stage |
-| cut elimination, admissible structural rules | two families, with and without the rule, or one with a parameter (§3); a measure carried by the statement; induction on it | decide how the measure is carried before the family is typed (§3). Say which form is the goal: that the rule is admissible, or a procedure that removes it. Where rules act at a place inside a judgment, §6 has the form of the proofs. Where the goal is a function on derivations, its type does not say which function was defined: say it in the statement's entry. A cut obtained from soundness and completeness ignores the two given derivations; where the source's subject is the procedure, the source's induction is the goal, and the other is a second proof |
+| cut elimination, admissible structural rules | two families, with and without the rule, or one with a parameter (§3); a measure carried by the statement; induction on it | decide how the measure is carried before the family is typed (§3). Say which form is the goal: that the rule is admissible, or a procedure that removes it. Where rules act at a place inside a judgment, §6 has the form of the proofs. Where the goal is a function on derivations, its type does not say which function was defined: say it in the statement's entry. A cut obtained from soundness and completeness ignores the two given derivations; where the source's subject is the procedure, the source's induction is the goal, and the other is a second proof. That second proof is also the cheap way to unblock every goal that needs only the proposition (consistency, the disjunction property, decidability): DILL had it before the syntactic proof, and joined those goals from it at once |
 | a property stated of models (the finite model property) | a construction of a model with the property | return the model as data: it is then a producer of countermodels for Run. Before a model is built for completeness, ask whether the finite model is the same construction with a parameter (another congruence, another set of refuted judgments), and build it once with the parameter |
 | a result about a term calculus (normalisation, confluence) | terms, typing, and reduction as a relation: a further transcription, with a rule table of its own, checked as the first is (§7) | how binding is represented is a choice of encoding for the plan |
 | a result read off derivations (the disjunction and existence properties) | a function on derivations, or on derivations of a special form | it may need another result first (cut-free derivations, a normal form): order the goals so. With the family into `Type` what is read off is data |
@@ -224,6 +224,13 @@ read as core's wherever an operator of a precedence between the two
 follows: `A ⊕ B :: Γ` and `A ⊕ B ∈ Γ` are read as a sum of types, and
 the error names `Sum`. Keep the source's sign, write the parentheses,
 and say so in the user's guide.
+
+Two signs cannot be signs of a judgment as they stand. `;` separates
+tactics: with `Γ ; Δ ⟹ C` as a notation, the term before a `;` between
+two tactics is read as the start of a sequent (DILL took `⨾`). `!` is
+Boolean negation and takes all that follows it: `!A ⊗ B` is refused, and
+`(!A) ⊗ B` is read. A file of definitions and terms shows neither:
+screen a notation in a file that has a tactic block and a `do` block.
 
 **The figure's letters stay; what the encoding adds takes new ones.** A
 constructor often needs a name for a thing the figure has no letter
@@ -390,6 +397,13 @@ from the function into a proof or a refutation) is a statement of its
 own, beside it. Compiled: `calculi/BrunnlerK/BrunnlerK/Semantics.lean`
 of `proof-tools`.
 
+Classically, a type of functions says no more than that it is
+inhabited (a cold reader's remark on `Decidable`: "inhabited with no
+proof search at all"). What such a statement asserts beyond its
+proposition is that the definition is within a bound that excludes
+`Classical.choice`, and that it computes. Say so in its entry, and
+test that the kernel runs it: `decide` on a small instance (§6).
+
 **A statement about every structure may say more than the source
 means.** In Lean, truth in a model is a proposition, and a valuation
 may take any proposition as its value. "Valid in every model" can then
@@ -484,6 +498,9 @@ with `#rules`, and screen it before anything rests on it.
   `List.cons_perm_iff_perm_erase`: `calculi/MALL/MALL/Perm.lean` has
   replacements by counting, to copy until the library has them).
   `by_cases` on an equation in a type with decidable equality does not.
+  `simp at h` on an equation of lengths, and `omega` at a goal that is
+  not decidable (it argues by contradiction), each brought it in;
+  `exfalso` first, and `simp only` with the lemmas named, do not (MALL).
   `omega` takes a defined function applied (`(A ⊗ B)ᗮ`) and what it
   unfolds to (`Aᗮ ⅋ Bᗮ`) for different atoms: put a `show` with the
   unfolded term before it.
@@ -502,6 +519,14 @@ with `#rules`, and screen it before anything rests on it.
   constructors, with the recursive calls on the premises, it compiles,
   and reduces in the kernel. A theorem about derivations is a
   proposition, is not compiled, and may use `induction`.
+  State such a function over a variable judgment
+  (`{j : Seq} → Fam j → …`, with `j`'s fields in its type). Where the
+  family's index in the argument is not a variable (a judgment that is
+  a structure, written out: `Fam (Γ ⨾ Ξ ⟹ C)`), the match is compiled
+  by well-founded recursion, silently: it runs under `#eval` and does
+  not reduce in the kernel. Check with `#print` that it has a `brecOn`
+  and no `._unary`; a `decide` on a small derivation that fails is the
+  sign (DILL).
 - **Where choice is in the statement and not in the proof**, say so, and
   give the constructive form beside it; both are entered in
   `statements.md`.

@@ -23,8 +23,8 @@ with its infoview.
 
 ## 1. The project
 
-Where the campaign's files go was settled at the first act. Either way the
-project is a Lake package in a git repository.
+Where the campaign's files go was settled at the first act. In each
+case below the project is a Lake package in a git repository.
 
 **A folder under `calculi/` of `proof-tools`**: the default. Core Lean
 only. The folder is a package of its own, which requires the library by
@@ -78,7 +78,23 @@ rev = "<a commit, written out>"
 then `lake update proof-tools` and `lake build`. (This form is the
 library README's; it was not run for this skill.) A project that already
 requires the package `lean-certify` replaces that requirement: the two
-packages hold modules of the same names.
+packages hold modules of the same names. Where a dependency of the
+project requires `lean-certify` itself, the requirement cannot be
+replaced, and `proof-tools` cannot be required beside it: with both
+in the workspace Lake reported `LeanCertify.Certifier` out of date and
+looked for a module of one package in the other. Copy the library
+`ProofTools` at a pinned commit and declare it as a `lean_lib` of the
+project; it needs one module of `LeanCertify`, which is the same file
+in both packages.
+`scripts/tutorial_pins.py` is in neither library and is copied
+separately. This is a finding about the library (rule 7).
+
+**Inside a host project**, where the source is a Lean family there: a
+third layout. The modules of the calculus go in the host's library
+folder, and the campaign folder elsewhere in the repository. Where the
+host's library has a glob over its folder, a file "in no library"
+cannot sit beside the modules: `Play/` goes inside the campaign
+folder.
 
 - **Which commit** (of the checkout, in the first case; of `rev`, in the
   second): one that contains `3fa25c0`, at which this text was checked.
@@ -109,7 +125,13 @@ inductive Move where … deriving DecidableEq, Repr, Lean.ToExpr
   flat).
 - **A move names a rule by its data**: one constructor for each rule, with
   what is needed to say which instance of the rule is meant, and no more.
-  Nothing a move could compute from the judgment need be in it.
+  Nothing a move could compute from the judgment need be in it. In a
+  two-sided calculus, let the move of a right rule name its formula
+  all the same (`tensorR A B Δ`, not `tensorR Δ`), and let `step`
+  compare: a move that reads `A ⊗ B` off the conclusion makes S1 a
+  match on the shape of the conclusion, with a case of refusal for each
+  other shape, or a cast (DILL). The pattern with holes fills the
+  formula in for the user.
 - **A move's name is not a keyword of Lean.** The tactic reads a move
   by its name, and a line `mallmove with p q` does not parse, though
   `Move.with` and `.with A B` are accepted. Where the source's name for
@@ -220,6 +242,13 @@ the form, compiled). Prove it in Adopt where you can: it is the one
 check that `step` refuses no instance of a rule. Where it stays OPEN, the
 closing page says so among the checks.
 
+Where the family is into `Prop` and indexed by a height, what holds is
+an existential over the height, and the ninth kind of test (§10) has
+no object. Where the moves normalise contexts (a formula is added
+only if it is absent), S2 does not go through with one node for each
+constructor: prove it with weakening in the induction, for every
+context that contains the derivation's.
+
 ## 5. The editor's part
 
 None of it is trusted. In a file of code (the template's `Tactic.lean`):
@@ -248,7 +277,10 @@ declare_move_tactic mycalc for S
   `LeanCertify` imported, `size` is a keyword (from
   `certify_chunks … size n`) and cannot name a function of yours. The
   sign is a parse error at a name that was accepted the day before:
-  rename, do not quote.
+  rename, do not quote. In a host project with a large library, expect
+  any short word to be taken: a field `over` was a keyword there,
+  `![…]` was read as a vector, and the template's structure `Rule` took
+  the natural name of the relation of rule instances.
 - `candidates` should propose every move that could apply: queries offer
   from it, and a line with holes is matched against it. Too many costs
   nothing (those that do not apply are dropped); one missing is a move a
@@ -559,8 +591,11 @@ and the theorems explained). Its link to the Lean is part of its format
   library differ. Before committing, run `tutorial_pins.py check
   tutorial.md`, which fails if the page was edited and `write` not run.
 - **Links name a commit.** `write` links at `HEAD` and warns when a
-  linked source file differs from it: commit the Lean first, then run
-  `write`, then commit the page.
+  linked source file differs from it: commit the Lean and push it, then
+  run `write`, then commit the page. Where several sessions push to
+  one branch a push may rebase, and a link may name only a commit that
+  is already there (DILL: 112 links at a commit no longer on the
+  branch, and `write` run again after the push).
 - **Say on the page what is checked**: the statements, statuses and links
   of the pins; and that the prose describing how a proof goes is a
   reading, not checked. Versions of the page for different readers
@@ -573,6 +608,13 @@ and the theorems explained). Its link to the Lean is part of its format
   refuting instance. (A finding about the library, 2026-11-26: a
   status REFUTED, and `#statement` printing what is negated, would
   make it an exact pin.)
+- **Four more limits of the script, until it is changed**: `#statement`
+  on a structure prints its head only (pin the fields through their
+  projections); a definition is given the status PROVED; where a pin
+  has no block yet, `write` leaves the caption directly above the next
+  line of prose (add the blank line by hand); and every link goes to
+  the repository's remote, so that the page of a private repository
+  has links that do not open.
 - **Every campaign writes the page** (`SKILL.md`, stage 4, step 3):
   graded exercises in parts, a file of them to type in
   (`Play/<Calculus>Exercises.lean`, in no library), and a module of the

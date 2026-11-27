@@ -201,6 +201,29 @@ more than one:
   makes the certificate complete. The semantics is in the theorem, not
   in the check. Its size is the search's: measure it.
   `calculi/MALL/MALL/Saturated.lean` is the worked case.
+
+  Its soundness needs no model, and the syntactic proof is the first
+  to try: an induction on a derivation without cut (the last rule of
+  a member has a premise in the set), with cut elimination to reach
+  the calculus with cut (DILL: 250 lines, no semantics). The model is
+  wanted only where the countermodel itself is. The induction is on
+  the derivation and not on the set, so it does not ask that premises
+  be smaller: a member may be its own premise, and members may ask for
+  each other round a cycle. Where the rules keep their principal
+  formula (a calculus on sets), take membership up to weakening: a
+  premise need only be *below* a member, with the same conclusion and
+  a larger context. Without it the set is exponential for a reason
+  that is not the search's (`2ⁿ` members for `n` conjunctions on the
+  left; measured, 65 536 against 1, in a campaign on a set-based
+  calculus with a cyclic certificate). Soundness then uses the
+  height-preserving weakening of the calculus, and the list is the
+  generators of the refutation: a theorem that the sequents below a
+  closed list are closed in the strict sense, with its converse, keeps
+  the definition and lets the checker use the short form. The worlds
+  of the model of such a set are not its members but those with a
+  maximal context among the members of the same conclusion; the truth
+  lemma needs a maximal member above each member, which a list has by
+  induction on the list.
 - *No certificate*: where a search is proved and the kernel can run it
   (§4), a certifier whose certificate is `Unit` and whose check is the
   decision procedure is a certifier against what holds. An instance
@@ -239,6 +262,12 @@ out the answer is `flag`, never `fail`.
   tool, never a verdict.
 - **A termination bound that makes a proof easy is seldom runnable.** The
   search does not use it.
+- **A memo of failures is sound only where premises are smaller.** On a
+  graph with cycles a failure can be provisional: a node met again
+  while it is still being worked on. Search there by rounds. A failure
+  is remembered for its round only; when a round adds no derivable
+  node, its failures are final, and its fully tried nodes are the
+  certificate (§3).
 - Bound every generator of test inputs before running it (a size, a
   count, a deadline). One that ran away wrote oversized files for
   minutes before it was stopped.
@@ -343,7 +372,7 @@ code; its certificate has to be written into a term.
   `<name>run prove '<judgment>'`. It is what a person with no Lean file
   open can use; what it has to do is the next paragraph.
 
-**A judgment typed at a shell** (`prove`). Five instances, all of
+**A judgment typed at a shell** (`prove`). Four instances here, all of
 2026-11-26: Brünnler's K (a judgment that nests, a search that always
 answers, a countermodel on the "no" side), GLS (a formula or a
 two-sided sequent, two searches, a compiled check slower than the
@@ -352,7 +381,9 @@ on the "no" side), DILL (two zones, a budget, flags that are real
 answers); each is `<Name>/Parse.lean` with the `prove` part of
 `Main.lean`, a test file, and `Corpus/prove_corpus.py`. Read the one
 nearest your calculus. The lines below are what the owners' notes found
-missing from earlier wordings (K 72 to 75, GLS 27, MALL 29, DILL 22).
+missing from earlier wordings (K 72 to 80, GLS 27, MALL 29, DILL 22,
+and a fifth campaign, on a set-based calculus with a cyclic
+certificate, whose notes are not in this repository).
 
 - *The reader.* It takes the signs of a keyboard as well as the signs
   the calculus prints (`-o` for ⊸, `[]` for □), and binds the
@@ -370,7 +401,13 @@ missing from earlier wordings (K 72 to 75, GLS 27, MALL 29, DILL 22).
   and let the refusal of a letter name them. GLS, MALL and DILL take
   `p q r s` and a numbered family only, each with its own numbering; a
   person who goes from one command to another meets the difference at
-  once.
+  once. Where the atoms of the formulas are words (a host library's),
+  every word is a letter but for a list the reader keeps: the
+  constants, and words refused with the sign to write. A letter that
+  is a word of Lean, or a name of the file, is written out in the
+  printed file, which declares its atoms in a namespace of its own.
+  The misreading to test there is a constant's name read as a letter
+  (`false`, once).
 - *The printers, and two tests.* The first line shows the judgment in
   the calculus's notation; the fact is stated of the judgment as Lean
   source. So there are at least two printers (three with `--ascii`),
@@ -380,7 +417,9 @@ missing from earlier wordings (K 72 to 75, GLS 27, MALL 29, DILL 22).
   each test file). The second is not implied by the first. Where the
   reader computes (a negation that is a function, an implication that
   is defined), the first line shows the result and not the text typed:
-  the user's guide says so, or it looks like a misreading.
+  the user's guide says so, or it looks like a misreading. So does a
+  member of a printed set whose hypotheses are in the order of the
+  search's table, under a first line in the order typed.
 - *What is printed.* The first line is a comment: the verdict
   (`derivable`, `not derivable`, `flag`) and the judgment as it was
   read. After it, a Lean file: the fact with its certificate through
@@ -396,6 +435,9 @@ missing from earlier wordings (K 72 to 75, GLS 27, MALL 29, DILL 22).
   command took 13.7 s to print what the search found in 19 ms). Write
   a printer, a node to a line; what guards a printer of one's own is
   that the files are elaborated. Count the spaces in a large file.
+  Where a member of a printed set may be its own premise, or ask for a
+  member that asks for it back, a comment above the set says that this
+  is meant.
 - *One kernel check, several facts.* Where one certificate gives
   several facts (a derivation as data and the proposition; not valid
   and not derivable), the check is a theorem of its own, stated through
@@ -404,7 +446,12 @@ missing from earlier wordings (K 72 to 75, GLS 27, MALL 29, DILL 22).
   again for each fact (41 s against 20 s on one set, DILL). A second
   statement of the same Boolean is to be measured, not assumed equal:
   stated of the checker's function and not through the certifier, the
-  kernel passed 8 GB on the same set.
+  kernel passed 8 GB on the same set. A fact's import is paid by every
+  answer: each printed file loads it. A second fact by a theorem of
+  the library may be the statement people cite (derivability in
+  natural deduction, by cut elimination). One through a heavier import
+  (the model that a certificate with cycles presents) may stay a
+  theorem about the certificate, and not a fact of the printed file.
 - *More than one kind of answer for a verdict.* A side may have several
   certificates (a cyclic phase structure or a saturated set; a
   derivation as data or, beyond a cap, the proposition only). A comment
@@ -430,7 +477,17 @@ missing from earlier wordings (K 72 to 75, GLS 27, MALL 29, DILL 22).
   number of moves did not; the depth of the sequent had to be a second
   measure, since a file of 1.9 MB was refused where a larger one was
   checked). Between the largest seen checked and the smallest seen to
-  fail nothing is known: word that region as not checked.
+  fail nothing is known: word that region as not checked. Measure the
+  sizes on the file as it is finally printed, and again when its form
+  changes: with the certificate inside an `example` a tree of 257
+  moves was the largest seen checked; as a definition, with the check
+  a theorem of its own, one of 385 was, and a list of 575 sequents was
+  not, where one of 383 was checked in both forms (the campaign with
+  cycles, §3). Say on how many families each size was measured: "every
+  family tried" may be one family. Where the certificate is a
+  list of generators, its size is not the refutation's (`2ⁿ` members
+  below a list of one or two): measure on a family whose generators
+  grow, and give both figures.
 - *The options.* `--short`: the first line only. `--ascii`: the
   judgment in that line with the signs of a keyboard. `--deadline=
   <seconds>` in every case, with a default, over the whole answer, so
@@ -446,8 +503,11 @@ missing from earlier wordings (K 72 to 75, GLS 27, MALL 29, DILL 22).
 - *What a flag is.* Where derivability is not decided, or the search is
   bounded: nothing found within the bound and no certificate that
   there is nothing. Where the search always answers: a search cut off
-  at the deadline. In both: a certificate that the program's check
-  refused, and, where two searches run, both ended and disagreeing
+  at the deadline. Where derivability is decidable and the search is
+  not proved to end, a third wording: "it has answered everything
+  tried; the flags are those made at will". In each: a certificate
+  that the program's check refused, and, where two searches run, both
+  ended and disagreeing
   (defects; say whether each was ever seen, and give a flag that can be
   made at will if there is one). A flag prints no fact.
 - *Run on the corpus, and beyond it.* The tests above are inside the
@@ -464,7 +524,11 @@ missing from earlier wordings (K 72 to 75, GLS 27, MALL 29, DILL 22).
   `lean`). Report the counts by verdict and by kind of certificate, one
   printed file of each kind elaborated, and one of each kind altered
   and refused, the alteration chosen so that it cannot pass (a tree of
-  moves altered at random may still be a derivation). A text typed at a
+  moves altered at random may still be a derivation; a list of
+  generators with its first member left out may still be closed, where
+  the empty list in place of a list of one cannot pass, nor a list
+  without a member that alone has its conclusion and that another
+  member's rule instance needs). A text typed at a
   shell has a largest size, the operating system's limit on a command
   line (K met it at 2.6 MB, before any limit of Lean's on the "no"
   side): a family may end there, and no command yet reads its text from
@@ -477,10 +541,17 @@ reported. There is no driver for this in the library: the same executable
 serves, run under a deadline imposed from outside (the operating system's
 `timeout`, where it has one: macOS does not, and the deadline of the
 script that runs the cases serves), with a case that is cut off
-reported as a flag.
+reported as a flag. Where a status is cross-checked with another tool
+that decides the logic: give that tool a deadline, read what it wrote
+only if it ended (one tool sometimes did not end after its answer),
+report a timeout as no verdict, and call no tool the reference.
 
 **Measure** (R8), and put the figures in `measurements.md`, with the machine and
-the date. A search is measured compiled, by the driver, under a
+the date. Set a budget before the first run: so many sizes of each
+family, or so many minutes in all. The closing page needs the order of
+the frontier, and a lower bound serves (DILL: a chain taken to 96
+formulas, one capped case at a time, with the rest of the campaign
+queued behind it). A search is measured compiled, by the driver, under a
 deadline, from the first run: `#eval` runs it in the interpreter, and a
 sizing loop by `#eval` did not end in five minutes on inputs the
 compiled driver settled in milliseconds. A long timing run goes in the

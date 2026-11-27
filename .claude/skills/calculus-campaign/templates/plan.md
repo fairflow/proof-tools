@@ -3,7 +3,9 @@
 *Template: the Survey's deliverable. It can be read without opening any
 code. **No Lean of the calculus before it is written**, beyond the
 scratch screens it reports. It is read again at the start of every
-stage, and changed when a decision changes, with the date.*
+stage, and changed when a decision changes, with the date. Its time is
+read before it is written: run `date` first, in a call of its own, and
+paste (pitfall 11).*
 
 Written <date and time, from the clock>. The target, the place of the
 files and the rules of the project: `decisions.md`, the first entry.

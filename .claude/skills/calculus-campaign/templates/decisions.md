@@ -2,8 +2,10 @@
 
 *Template. One entry for each choice the operator made, in order, and one
 for each word of the reviewer. Written when the choice is made, not
-afterwards. The closing page lists the entries by what they cost to
-reverse, the costliest first.*
+afterwards. The time of an entry is read before the entry is written:
+run `date` first, in a call of its own, and paste (pitfall 11). The
+closing page lists the entries by what they cost to reverse, the
+costliest first.*
 
 The cost to reverse is one of:
 
@@ -29,9 +31,11 @@ the folder point here.*
   the place the reviewer named>.
 * **The library**: <the checkout and its commit; the remote's `main` at
   <commit>; updated, or why not>.
-* **The source's files**: <each file fetched: its name, where from, its
-  size; compiled or not. Public material needs no asking (`SKILL.md`,
-  "Downloading"). Not public, and asked of the reviewer on <date>: …>.
+* **The source's files**: <the folder they are kept in, outside the
+  repository and outside any scratch folder; each file fetched: its
+  name, where from, its size; compiled or not. Public material needs no
+  asking (`SKILL.md`, "Downloading"). Not public, and asked of the
+  reviewer on <date>: …>.
 * **Pushing**: <where, and by which standing instruction; or: nothing is
   pushed, and the closing page is delivered by …>.
 * **Not touched**: <…>. Only the reviewer contacts the source's authors.

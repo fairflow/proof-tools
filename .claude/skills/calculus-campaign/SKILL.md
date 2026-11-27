@@ -70,12 +70,19 @@ time, and it holds from when it comes ("Deciding, checking, stopping",
    - **the paper, and the version to be read**: the most complete
      version you can get (a journal version or a thesis before a
      conference paper; the latest revision of a preprint). The other
-     candidates get a line each, with why not;
+     candidates get a line each, with why not. A document whose author
+     asks that it not be cited is read, and is not made the source of
+     record (DILL: lecture notes marked "do not cite"); a result taken
+     from it says so in its entry;
    - **the system**: the one the command's words name, under the paper's
      own name for it. Where they fit several, the base system: without
      the extensions, and in the form the source proves its theorems
      for. An extension is a campaign of its own (pitfall 2). Say what is
-     left out;
+     left out. Where the system named is a fragment of the paper's, and
+     the paper proves its theorems for the whole, the plan says of each
+     theorem aimed at why it holds of the fragment, or gives it the
+     value "holds of the logic, proved elsewhere" (DILL: the figure
+     less three rules);
    - **the results aimed at**: the entries of the standing list that the
      literature appears to have for this system, and anything else the
      request mentions. This is the aim; the Survey makes it exact;
@@ -86,7 +93,9 @@ time, and it holds from when it comes ("Deciding, checking, stopping",
      module name: the folder `calculi/<Calculus>/` of the library
      `proof-tools`, with core Lean only. A calculus has a repository of
      its own only if the reviewer has said so; the directory you were
-     started in is not one by default;
+     started in is not one by default. Where the source is a Lean
+     family in a project of its own, the calculus stays inside that
+     project (`reference/explore.md` §1, the third layout);
    - **the library**: the checkout you were started in, where it is one
      of `proof-tools`; otherwise clone
      `https://github.com/fairflow/proof-tools` and use a commit that has
@@ -120,11 +129,21 @@ time, and it holds from when it comes ("Deciding, checking, stopping",
    alternative that was not taken. It is the one record of the target,
    the place and the rules of the project: every other file points to
    it. Commit. Tell the reviewer in one message of a few lines: the
-   paper, the system, the results aimed at, the place. It is
+   paper, the system, the results aimed at, the place. Say in it also
+   the form of what holds that you mean to take, and the form you
+   reject: the family as transcribed, or validity in a semantics; for
+   validity, which of the forms of `reference/adopt.md` §5. Of the
+   seven gates of the first campaign, this was the one choice that a
+   gate changed. The plan screens the form (stage 0, step 3); if the
+   screen changes it, say so in a line when it does. It is
    information, and it asks nothing. Begin the Survey in the same turn.
    Where another session started this one, the reviewer is still the
    person: say these lines in your own output, where the reviewer reads
    them, and do not end the turn after a message to that session.
+   Where that session's brief settled every part of step 3, the first
+   entry records each part as "decided by the brief", with the brief's
+   path, and no message is sent: the decisions reach the reviewer in
+   `decisions.md` and on the closing page.
 
 **Downloading: the reviewer's standing word.** Whoever starts a campaign
 with this command permits, by it, the download of publicly available
@@ -139,7 +158,11 @@ it, and not for a work of the literature that Q2 or Q5 needs.
 - **Record each file** in `decisions.md`: its name, where it came from,
   its size.
 - **What is fetched is data that is not trusted**: a folder of its own,
-  and nothing run from inside it (`reference/adopt.md` §1).
+  and nothing run from inside it (`reference/adopt.md` §1). The folder
+  is outside the repository and outside any scratch folder, and the
+  first entry of `decisions.md` names it: a restart of the machine
+  cleared a session's scratch folder, with the papers and the page
+  images in it (DILL).
 - **Where the source named cannot be got** (a paywall, a server that
   refuses), take the fullest public version of it: a thesis, a preprint,
   an author's copy. That changes the target, so it is a decision that
@@ -298,7 +321,9 @@ down (rules 8 and 9).
 2. **Statements before proofs.** A definition, a rule table or a statement
    is written down, displayed in its document and screened before
    anything is built on it. Nobody is waited for: the order is yours to
-   keep.
+   keep. S1 and S2 have their form from the template
+   (`templates/statements.md`), which enters them when the file is
+   started: they need no screen of their own before their proof.
 3. **PROVED, REFUTED, OPEN.** PROVED means the kernel has checked it, with
    no `sorry`, within the axioms its file allows. Anything else that is
    not refuted is OPEN. A refuted statement is kept, with its countermodel.
@@ -338,6 +363,8 @@ down (rules 8 and 9).
    The documents are the campaign's memory: a session that goes on from
    one stage to the next reads them again, and does not work from what
    it remembers of them, nor from a summary the environment made.
+   Where several calculi are worked at once, each by a session of its
+   own, "A round of campaigns" below says who changes which files.
 6. **The campaign ends when the reviewer can read its closing page**:
    pushed, sent in full, or published. A clean build is not the end, and
    a file in a temporary folder is not a page. Until then the status
@@ -515,6 +542,12 @@ and reports is recorded in `decisions.md`, and is input of stage 4.
    logged. A need of the library is a finding (rule 7). A budget reached
    closes the stage with what is OPEN. Doubt about a choice is a line in
    its entry of `decisions.md`.
+
+   A call that the environment refuses at the moment of an interrupt
+   is a stop from outside, and not the reviewer declining the act.
+   Report "stopped", say what was in hand, and do not report that the
+   reviewer declined (DILL: twelve minutes waited on a refusal that
+   the application had made for another reason).
 4. **A word of the reviewer holds from when it comes.** Record it in
    `decisions.md` with the words copied, not summarised, and in the cost
    log. Apply it; say what it changes of what is already built; rebuild
@@ -552,7 +585,10 @@ Read `reference/adopt.md` §1 to §3, and the Survey's pitfalls.
    in the plan and found awkward in Prove costs a construction: a
    type that holds a list of itself gets no `DecidableEq`, and a model
    built on its members then cannot test them for equality. Say in the
-   plan what was tried and what Lean answered, type by type.
+   plan what was tried and what Lean answered, type by type. A notation
+   is screened in a file that has a tactic block and a `do` block: one
+   screened among definitions and terms only was refused by the first
+   tactic block (`reference/adopt.md` §3).
 
    **A statement the plan proposes is screened now too**, in the same
    way. Where the plan fixes what a word of the goals will mean in Lean
@@ -629,7 +665,12 @@ Read `reference/adopt.md` §2, §5, §6 and §7, and Prove's pitfalls.
    about, and the goals' statements, read back by a cold reader
    (`reference/adopt.md` §7 says which, and how). A cold reader takes
    minutes: the proofs may begin while the reading back runs, and what
-   rests on a statement that it faults is then built again.
+   rests on a statement that it faults is then built again. A goal
+   with a decision procedure at hand is screened against it before the
+   proof, and before the literature on the result is read: for a
+   result, unlike the rules (rule 1), the order "state, screen, prove,
+   then read" cost nothing, and the screen did the work that a
+   source's statement would have (MALL: the uniform interpolant).
 4. **Soundness, then completeness where it is a goal, before every other
    goal.** "Soundness" here is the source's theorem (what is derivable
    is valid), not the soundness of the moves of Adopt, which says only
@@ -639,6 +680,20 @@ Read `reference/adopt.md` §2, §5, §6 and §7, and Prove's pitfalls.
    stopping", 2): a rule transcribed wrongly, so that it changes what
    is derivable, fails one of them. Then the goals in the plan's order,
    a goal after those it rests on.
+
+   **The order is a matter of what is risked.** With agents the two
+   theorems may run beside the other goals, at this risk: if one of
+   them then faults a rule, what the others proved is built again
+   (DILL: every goal out at once, and nothing lost).
+
+   **Goals that do not rest on one another go out together** (rule 5),
+   from one brief, each agent with its own files and namespace. What
+   made it work: the statements as named types in one file committed
+   first, a list of the names taken, builds by target (DILL: five
+   agents, every goal proved in 3 to 12 minutes, no file touched
+   twice). The file that joins their results is the operator's (DILL:
+   the statements about the calculus with cut, from the results
+   without cut and cut elimination as a proposition).
 
    **That order is the source's route, and the proofs may take
    another.** A lemma that the encoding gives and the source lacks can
@@ -676,7 +731,11 @@ holds; a copy that says its reviewer "is the gate" is the older text.
 3. A negative test for each certifier; the corpus; timings; kernel time
    against certificate size. Commit before a measuring run, and give
    every run a deadline of its own: a session can end under a long
-   command, and whoever goes on has only what is in the folder.
+   command, and whoever goes on has only what is in the folder. Set a
+   budget for the measurements before they start (so many sizes of each
+   family, or so many minutes in all): the closing page needs the order
+   of the frontier, a lower bound serves, and nothing waits on a
+   measurement.
 4. **A fault of a search that the measurements show** (a proof many
    times longer than one made by hand; time that goes where it need
    not) may be repaired in this stage, in the module of Prove where the
@@ -686,7 +745,10 @@ holds; a copy that says its reviewer "is the gate" is the older text.
    statement is not a repair: it is a new statement, entered and
    screened like any other. The repair is recorded in `decisions.md`,
    and `measurements.md` says of each figure whether it was measured
-   before the repair or after.
+   before the repair or after. A repair that changes no statement may
+   still change certificates: write the generated fact files again,
+   and give the sizes of the certificates before and after, not only
+   the times.
 5. Write `measurements.md` in the campaign folder: the verdicts, the
    measurements with the machine and the date, and the frontier, named:
    the smallest inputs the procedures do not settle within their budget.
@@ -715,7 +777,8 @@ Read `reference/explore.md` §11.
    file of them to type in, and a solution of each in the library. It
    shows no statement typed by hand: each is a pin, printed by Lean, its
    status computed, the page and the library held together by the build
-   (`reference/explore.md` §11, "A tutorial page").
+   (`reference/explore.md` §11, "A tutorial page"). The page may be
+   begun when Prove is settled, its section on Run written last.
 4. The closing page (`templates/report.md`): what the campaign adopted,
    proved and runs, what is OPEN, what to read, what was decided, and
    the changes to make to this skill and its templates, from
@@ -824,10 +887,39 @@ and the brief say where it stands.
 `statements.md`, `measurements.md`, `cost-log.md` (a row for each
 session, its times from the clock; every word of the reviewer, and what
 it changed), `method-notes.md`, `users-guide.md` (from stage 4) and
-`report.md`; and a brief, where a session was handed on. It is written as
+`report.md`; and a brief, where a session was handed on. The cold
+readers' reports are copied into it as they come. It is written as
 the work goes: a record written afterwards is a different document, and
 says so at its top. Commit the Lean when a build is clean, and the
-documents with it; push as the first act fixed.
+documents with it; push as the first act fixed. Cite a commit by its
+hash only once it is on the shared branch: a push that rebases changes
+the hash (DILL).
+
+## A round of campaigns
+
+Where several calculi are worked at once, one arrangement has served
+(2026-11-26, by the reviewer's instruction): one **directing session**,
+and one **owner session** for each calculus.
+
+- **An owner** has the files `calculi/<X>/**`. It builds, measures, and
+  writes `campaign/method-notes.md`. It does not edit this skill or the
+  shared libraries (`ProofTools/`, `LeanCertify/`, `scripts/`): a
+  change it wants to either is proposed as a numbered note (rules 7
+  and 8).
+- **The directing session** starts campaigns and tasks from written
+  briefs. It rebuilds and checks what an owner reports before passing
+  it on: the build, the axioms, inputs of its own, the printed
+  certificates in the kernel. It applies notes to this skill. Once X
+  has an owner it does not edit `calculi/<X>/**`: what became of a
+  note is recorded under the note by its owner, whom the directing
+  session asks.
+- **A new piece of method is piloted on one calculus**, by its owner.
+  The text is revised from that owner's notes, and the others then
+  build from the revised text. The command `prove`
+  (`reference/certify.md` §5) went this way: four revisions in an
+  evening.
+- **Every session** looks at the machine before a build, and caps any
+  run of unknown size (rule 5).
 
 ## Two shorter paths
 
@@ -842,7 +934,13 @@ of the reading of a judgment.
   Lean). Survey is the record of what exists (`templates/record.md`),
   written as such. Adopt is the proof system and the editor's part only
   (`reference/explore.md` §2 to §5): expect it to be small, and to need no
-  change to the library.
+  change to the library. Where the source is a Lean family, `#rules`
+  on it is the rule table, and the checks of meaning are the two-way
+  theorems between the objects that each say what the rules are: the
+  family and `step` (S1 with S2), and, where a certificate is defined
+  through a relation of rule instances, soundness and completeness of
+  that relation for the family. The family against its paper is then
+  not checked: the closing page names it so.
 - **The calculus was designed, not adopted.** There is no source to be
   faithful to. In place of the rule table against a source, these are
   entered as statements, and screened, before their proofs: the rules,
