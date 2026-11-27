@@ -388,3 +388,38 @@ the folder point here.*
   proved again: a repair within stage 3, step 4, in kind, but not made:
   the page first (rule 6), and no measurement was to wait on it.
 * **Cost to reverse**: little.
+
+## 2026-11-27 10:37 GMT. After the close: the two checks repaired
+
+On the directing session's task of 10:02 (the reviewer's judgment, as it
+relays it: a cost that the kernel shows and compiled code hides is a
+fault of the checker's definition). The figures: `measurements.md` and
+`measurements-sat.md`, "The cost of the check"; method note 23.
+
+* **Decided: the definitions stay, and what is run is proved against
+  them.** `Move.rule` and `refutedBy` are unchanged, with every
+  theorem about them. `step` runs `Move.ruleF` (equal to
+  `Move.rule`, S19); the two certifiers of sets check by
+  `refutedFast` (sound for `refutedBy`, S20). The other way, changing
+  the definitions to the forms that run, would have had S1, S2 and the
+  induction of S16 proved again over the new forms. **Cost to reverse**:
+  little; one line in `step`, two in `DILL/SatRun.lean`.
+* **Decided: for the sets, soundness and not equality.** The check that
+  is run puts each zone in one order by a number computed from each
+  formula, and two formulas with one number can leave a zone in two
+  orders: a saturated set can be refused. So equality with the
+  definition is false as the check is written. An order on formulas
+  themselves would make it true and cost a comparison of formulas at
+  each step, which is what the repair removes. A set refused is a flag,
+  never a fact. **Cost to reverse**: a file (`DILL/SatFast.lean`).
+* **Decided: a number for a formula** (`hashF`), compared before the
+  formulas and never in their place. Nothing rests on it; the tests say
+  what it has not broken (16 sets rejected, 2557 accepted, by both
+  checks). **Cost to reverse**: little.
+* **Decided: a large set is stated in parts.** Not asked for. The
+  kernel's memory is kept until a theorem is done, and a set of 1197
+  passed the 4 GB of the task's cap in one run. The parts are of about
+  6000 questions each (`partBudget`, `Main.lean`), stated one after
+  another. **Cost to reverse**: little; the printed file only.
+* **Not done**, and named: the check of the sets by arithmetic alone;
+  the equality of S20; a search that writes the short tree for a chain.

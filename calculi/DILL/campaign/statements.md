@@ -312,6 +312,69 @@ bound on axioms).
 that `Seq.form` is written through an order of the hypotheses.
 **PROVED**, from `Sem.valid_iff_derivable`.
 
+### S19. The rule of a move as it is run is the rule (2026-11-27; ours)
+
+    ∀ (m : Move) (j : Seq), m.ruleF j = m.rule j
+    ∀ (l Γ : List Form), subAll l Γ = permB l (Γ ++ sub l Γ)
+
+`Move.ruleF_eq`, `DILL/Proof.lean`; `subAll_eq_permB` (with `subAll_iff`,
+`eqH_eq`, `memH_eq`, `eraseH_eq`, `subH_eq`, `subAllH_eq`),
+`DILL/Perm.lean`. `Move.rule` is the definition, unchanged: what a move
+asks of a sequent and what it leaves. `Move.ruleF` is what `step` runs:
+the same record, with a formula looked for and taken out by `eqH` (the
+numbers of the two formulas compared first, then the formulas), and the
+part named at ⊗R, ⊸L and cut checked in one pass (`subAll`: each formula
+of the part in turn is in what is left) where the definition counts
+every formula of the zone in both lists (`permB`). For compiled code
+`eqH` is the plain equality (`eqH_csimp`): the numbers are for the
+kernel. The statement is an
+equality of two functions into a record of a Boolean, a list of
+sequents and a text: it says that no certificate passes that did not,
+none fails that passed, and no message changes. Source: none. Screened
+before the proof by the tests that existed: the 75 pinned messages of
+`DILL/Test.lean` and the 10 negative tests of `DILL/RunTest.lean` built
+unchanged against the new `step`. Entered here at 10:34 GMT, after the
+proof: the statement was written in the Lean file and proved in the same
+quarter of an hour. Not read back by a cold reader.
+**PROVED** (the files are within their bound on axioms).
+
+### S20. The check of a saturated set as it is run is sound (2026-11-27; ours)
+
+    ∀ (D : List Seq) (j : Seq), refutedFast D j = true → refutedBy (D.map Sat.canon) j = true
+    ∀ (D : List Seq) (j : Seq), refutedFast D j = true → Nonempty (CF j) → False
+    ∀ D c l, Sat.restOk D (l.take c) = true → Sat.restOk D (l.drop c) = true → Sat.restOk D l = true
+    ∀ D j, Sat.headOk D j = true → Sat.restOk D (D.map Sat.canon) = true → noCFBySet.check j D = true
+
+`refutedFast_sound`, `not_cf_of_refutedFast`, `Sat.restOk_step`,
+`DILL/SatFast.lean`; `noCFBySet_check_of_parts`, `DILL/SatRun.lean`.
+`refutedBy` (S16) is the definition, unchanged. `refutedFast` is what
+the two certifiers check by: every unrestricted zone of the set empty;
+the zones put in one order (`Sat.canon`, by the numbers of the
+formulas); the members in a binary tree, each at the leaf that the
+digits of a number computed from it lead to; a premise built in the one
+order, looked for at its leaf, and compared there with a member formula
+by formula. `D.map Sat.canon` is `D` with each zone in that order: the
+statement is that this set, not `D` as written, is saturated and has `j`
+as a member, which is all the soundness of S16 needs. The last two are
+the check in parts: `refutedFast D j` is `headOk D j && restOk D (D.map
+canon)`, and the second can be proved a part of the list at a time.
+
+**The converse is not claimed, and is false in general.** Screened: if
+two formulas of one zone have the same number, `insH` puts a formula
+before an equal number and a zone built in two ways can come in two
+orders; the comparison at the leaf then fails, and a saturated set is
+refused. A set refused is a flag, never a fact. No such pair has been
+seen: on the 2557 sets that the producer makes for the 3615 small
+sequents of `DILL/SatTest.lean`, the check that is run and the
+definition both accept, and the check that is run rejects each of the
+16 sets that the definition rejects there. An equality with the
+definition would need the order to be one on formulas (not on their
+numbers) and the definition's `Sat.unr_nil`; it was not attempted.
+Source: none. Entered here at 10:34 GMT, after the proof, as S19. Not
+read back by a cold reader.
+**PROVED** (the files are within their bound on axioms; the lints R2 and
+R3 of `lean-certify` pass on both certifiers with the new check).
+
 ## The reading back
 
 Run 2026-11-26 15:21 to 15:28 GMT by a cold reader (an agent given one
@@ -377,4 +440,4 @@ and `cutEliminationProp` carries it to the calculus with cut.
 |---|---|---|---|
 | of the goals from the standing list (cut elimination: S8, S4b; the deduction theorems: S9; the disjunction property: S13) | 3 | 0 | 0 |
 | of the other goals (S3, S4, S5, S6, the inversions of S9, S11, S12, consistency, S14, S15; S7 and S10 expected refuted) | 10 | 2 (eight statements) | 0 |
-| of our own (S1, S2, S16, S17, S18) | 5 (S1, S2, S16, S17, S18) | 0 | 0 |
+| of our own (S1, S2, S16, S17, S18; S19 and S20 of 2026-11-27) | 7 (S1, S2, S16, S17, S18, S19, S20) | 0 | 0 |

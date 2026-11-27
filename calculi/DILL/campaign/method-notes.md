@@ -313,3 +313,99 @@ what was done there. Kept to what would change that text.
     (a loose end of the closing page); a `--budget` that is not a
     number, and an option that does not exist, are refused with exit
     code 2 where the first panicked and the second was dropped.
+23. **Two checks whose cost in the kernel had been recorded as a limit**
+    (2026-11-27, 10:02 GMT on; by the owner session, on the directing
+    session's task; `reference/certify.md` §5, "The program's own
+    check", as of `40a4988`). The figures and the experiments are in
+    `measurements-sat.md` and `measurements.md`, each under "The cost of
+    the check"; the statements are S19 and S20.
+    1. *Both limits were faults of the checker's definition*, as the
+       paragraph says to suppose, and both were in the compiled check
+       too, where they had been read as something else: the scan of the
+       set as "the producer's time" (31.8 s at 6366 sequents), the
+       counting at a division as "quadratic at each node", named and
+       left. *Proposed*: where a record says "the kernel stops at `n`",
+       ask for the count of what the check did at `n` (a copy of the
+       check that counts, run by `#eval`) before the limit is recorded.
+       The count found the cause in one run; the timings alone had not.
+    2. *The kernel's price list.* A step of a recursion over a list:
+       about 10 µs. An arithmetic operation: 3.5 to 6 µs, whatever the
+       size up to thousands of bits. A term met before: 3 µs. Two
+       different formulas compared by the derived `DecidableEq`: 180 µs.
+       None of this is in the skill, and the design of a check for the
+       kernel follows from it: few list steps, numbers where a number
+       will do (compared first, never trusted), `bif` and `Nat.beq`
+       where `if … == …` would unfold instances at each step (0.3 to 0.5 s of
+       1.9 s on one loop). *Proposed*: put the list in `certify.md`,
+       with the way to measure it (a list made for the purpose,
+       `decide +kernel`, `set_option profiler true`).
+    3. *"The same Boolean, stated twice" was not the kernel.* Note 22,
+       point 4, recorded that `checked` stated of the checker's function
+       ran the kernel past 8 GB where the statement through the
+       certifier took 20 s, cause not looked for. The kernel takes the
+       same 16 s and 5.7 GB for either. The cost was the elaborator's:
+       each fact that takes `checked` has to find its type equal to
+       `K.check s c = true`, and where the two are not the same text
+       Lean computes the check itself, outside the kernel, once for each
+       fact (3.6 s each at 76 sequents, beside the kernel's 1.4 s).
+       *Proposed*: in the paragraph on the printed file, "state the
+       check as `K.check s c = true` and in no other form: any other
+       form makes the elaborator run the check"; and correct the
+       sentence that came from note 22 (`certify.md` §5: "stated of the
+       checker's function and not through the certifier, the kernel
+       passed 8 GB on the same set"): it was not the kernel.
+    4. *A proof of equality says nothing of cost; nor does a first
+       repair.* The one-pass test at a division (`subAll`), proved equal
+       to the counting, took the chain of 64 from 8.1 s to 0.95 s and
+       left the growth the square of the size. The second cause (the
+       derived equality on a formula looked for in the zone) showed only
+       when the first was gone. Three forms of the tree for the sets
+       were measured before one was proved. *Confirms* the paragraph;
+       *adds*: measure the repair one size beyond before proving it, in
+       a file of its own with no proofs, since the proof is the
+       expensive part.
+    5. *Sound, not equal.* The paragraph offers "proved equal to the
+       present one (or sound in its own right)". For the trees the
+       equality was a line (`cases m <;> simp only […]`). For the sets
+       the equality is false as the check is written (two formulas with
+       one number), and soundness goes through a set that is not the
+       certificate but the certificate with its zones in one order:
+       `refutedFast D j = true → refutedBy (D.map canon) j = true`.
+       *Proposed*: say that soundness "of the definition at a
+       certificate computed from the one given" is enough, and that the
+       tests then carry what the equality would have (here: 16 sets
+       rejected by both, 2557 accepted by both).
+    6. *The kernel's memory is per theorem.* A check that the kernel
+       cannot hold in one run can be stated as several theorems and
+       joined by a lemma, if the check is a conjunction over a list:
+       1197 sequents in 8 parts within 2.8 GB, where one run passed
+       4 GB. The parts are stated one after another
+       (`set_option Elab.async false`): in threads of their own they
+       would be in memory together. *Proposed*: add this to "A
+       certificate beyond the kernel", before "let the first line say
+       what the answer rests on": a certificate beyond one run of the
+       kernel is not yet beyond the kernel.
+    7. *A second family.* The paragraph asks for a family made against
+       whatever is thought to make the check fast. For the trees: `fan`,
+       where the part named is one formula at the far end of the zone,
+       beside `chain`, where it is the rest of the zone. For the sets
+       only the one family was measured: named in the table.
+    8. *What is fast for the kernel can be slow compiled, and a cap is
+       not always a cap.* (a) With the numbers of two formulas compared
+       before the formulas, the kernel's check of a tree was ten to twenty times
+       faster and the compiled check twice slower than before any
+       repair: compiled code keeps no number and computes both each
+       time. `@[csimp]` gives compiled code the plain equality. The
+       paragraph has `@[csimp]` for the case "a fast form for compiled
+       code, the plain one for the kernel"; this is the other way
+       round. (b) Under `-M 4000` one run reached 7 395 MB and went on
+       for 72 s: the kernel had refused a check at the cap, and
+       `decide +kernel` then, it seems, computed it again in the
+       elaborator to say why. *Proposed*: in "Measure", say that a file
+       expected to be refused at the cap is not a safe thing to run,
+       and that the peak of the process is to be recorded beside the
+       cap (`/usr/bin/time -l`), as the two can differ.
+    Not done: a check of the sets by arithmetic alone (formulas, zones
+    and the set as numbers), which the price list says would be the
+    one near the compiled cost; an equality of `refutedFast` with the
+    definition; a search that writes the short tree for a chain.

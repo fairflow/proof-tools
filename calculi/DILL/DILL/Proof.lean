@@ -129,10 +129,72 @@ def Move.rule (j : Seq) : Move → Rule
       "cut: the zone named for the first premise is not part of the linear zone"⟩
   | .cutU A => ⟨true, [j.unr ⨾ [] ⟹ A, A :: j.unr ⨾ j.lin ⟹ j.goal], "cut!: always applies"⟩
 
+/-- **The rule of a move, as it is run.**  The same rule with each test
+written for the kernel: a formula is looked for, and taken out, with the
+numbers of the formulas compared first (`eqH`), and the part named at a
+rule that divides the zone is checked in one pass (`subAllH`), where
+`Move.rule` counts every formula of the zone.  `Move.ruleF_eq` says the
+two are one function. -/
+def Move.ruleF (j : Seq) : Move → Rule
+  | .init => ⟨decide (j.lin = [j.goal]), [],
+      "init: the linear zone is not exactly the conclusion"⟩
+  | .copy A => ⟨memH (A) j.unr, [j.unr ⨾ A :: j.lin ⟹ j.goal],
+      "copy: the formula is not in the unrestricted zone"⟩
+  | .tensorL A B => ⟨memH (A ⊗ B) j.lin,
+      [j.unr ⨾ A :: B :: eraseH (A ⊗ B) j.lin ⟹ j.goal],
+      "⊗L: the formula is not in the linear zone"⟩
+  | .tensorR A B Δ => ⟨decide (j.goal = A ⊗ B) && subAllH j.lin Δ,
+      [j.unr ⨾ Δ ⟹ A, j.unr ⨾ subH j.lin Δ ⟹ B],
+      if decide (j.goal = A ⊗ B) then
+        "⊗R: the zone named for the first premise is not part of the linear zone"
+      else "⊗R: the conclusion is not this tensor"⟩
+  | .oneL => ⟨memH (𝟏) j.lin, [j.unr ⨾ eraseH 𝟏 j.lin ⟹ j.goal],
+      "1L: 1 is not in the linear zone"⟩
+  | .oneR => ⟨decide (j.goal = 𝟏) && decide (j.lin = []), [],
+      if decide (j.goal = 𝟏) then "1R: the linear zone is not empty"
+      else "1R: the conclusion is not 1"⟩
+  | .lolliL A B Δ =>
+      ⟨memH (A ⊸ B) j.lin &&
+          subAllH (eraseH (A ⊸ B) j.lin) Δ,
+        [j.unr ⨾ Δ ⟹ A, j.unr ⨾ B :: subH (eraseH (A ⊸ B) j.lin) Δ ⟹ j.goal],
+        if decide (A ⊸ B ∈ j.lin) then
+          "⊸L: the zone named for the first premise is not part of the rest of the linear zone"
+        else "⊸L: the formula is not in the linear zone"⟩
+  | .lolliR A B => ⟨decide (j.goal = A ⊸ B), [j.unr ⨾ A :: j.lin ⟹ B],
+      "⊸R: the conclusion is not this implication"⟩
+  | .withL₁ A B => ⟨memH (A & B) j.lin, [j.unr ⨾ A :: eraseH (A & B) j.lin ⟹ j.goal],
+      "&L₁: the formula is not in the linear zone"⟩
+  | .withL₂ A B => ⟨memH (A & B) j.lin, [j.unr ⨾ B :: eraseH (A & B) j.lin ⟹ j.goal],
+      "&L₂: the formula is not in the linear zone"⟩
+  | .withR A B => ⟨decide (j.goal = A & B), [j.unr ⨾ j.lin ⟹ A, j.unr ⨾ j.lin ⟹ B],
+      "&R: the conclusion is not this formula"⟩
+  | .topR => ⟨decide (j.goal = ⊤), [], "⊤R: the conclusion is not ⊤"⟩
+  | .zeroL => ⟨memH (𝟎) j.lin, [], "0L: 0 is not in the linear zone"⟩
+  | .plusL A B => ⟨memH ((A ⊕ B)) j.lin,
+      [j.unr ⨾ A :: eraseH (A ⊕ B) j.lin ⟹ j.goal, j.unr ⨾ B :: eraseH (A ⊕ B) j.lin ⟹ j.goal],
+      "⊕L: the formula is not in the linear zone"⟩
+  | .plusR₁ A B => ⟨decide (j.goal = (A ⊕ B)), [j.unr ⨾ j.lin ⟹ A],
+      "⊕R₁: the conclusion is not this formula"⟩
+  | .plusR₂ A B => ⟨decide (j.goal = (A ⊕ B)), [j.unr ⨾ j.lin ⟹ B],
+      "⊕R₂: the conclusion is not this formula"⟩
+  | .bangL A => ⟨memH ((!A)) j.lin, [A :: j.unr ⨾ eraseH (!A) j.lin ⟹ j.goal],
+      "!L: the formula is not in the linear zone"⟩
+  | .bangR A => ⟨decide (j.goal = !A) && decide (j.lin = []), [j.unr ⨾ [] ⟹ A],
+      if decide (j.goal = !A) then "!R: the linear zone is not empty"
+      else "!R: the conclusion is not this formula"⟩
+  | .cut A Δ => ⟨subAllH j.lin Δ,
+      [j.unr ⨾ Δ ⟹ A, j.unr ⨾ A :: subH j.lin Δ ⟹ j.goal],
+      "cut: the zone named for the first premise is not part of the linear zone"⟩
+  | .cutU A => ⟨true, [j.unr ⨾ [] ⟹ A, A :: j.unr ⨾ j.lin ⟹ j.goal], "cut!: always applies"⟩
+
+theorem Move.ruleF_eq (m : Move) (j : Seq) : m.ruleF j = m.rule j := by
+  cases m <;>
+    simp only [Move.ruleF, Move.rule, memH_eq, eraseH_eq, subAllH_eq, subH_eq, subAll_eq_permB]
+
 /-- **One step**: the premises of the move at the sequent, or why it does
 not apply. -/
 def step (m : Move) (j : Seq) : Except String (List Seq) :=
-  if (m.rule j).ok then .ok (m.rule j).prems else .error (m.rule j).why
+  if (m.ruleF j).ok then .ok (m.ruleF j).prems else .error (m.ruleF j).why
 
 /-- **DILL as a proof system.** -/
 abbrev S : ProofSystem where
@@ -143,12 +205,13 @@ abbrev S : ProofSystem where
 theorem step_of {m : Move} {j : Seq} (h : (m.rule j).ok = true) :
     S.step m j = .ok (m.rule j).prems := by
   show step m j = _
-  simp [step, h]
+  simp [step, Move.ruleF_eq, h]
 
 theorem step_ok {m : Move} {j : Seq} {ps : List Seq} (h : S.step m j = .ok ps) :
     (m.rule j).ok = true ∧ ps = (m.rule j).prems := by
   have h' : step m j = .ok ps := h
   unfold step at h'
+  rw [Move.ruleF_eq] at h'
   split at h'
   · next hok => exact ⟨hok, (Except.ok.inj h').symm⟩
   · cases h'

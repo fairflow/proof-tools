@@ -292,3 +292,22 @@ expansion proved here are the lemmas a focused calculus is built on;
 the search of `DILL/Lazy.lean` already chains the left rules, unproved;
 `toILL` and `ofILL` are the pattern for a translation between a
 two-zone and a one-zone system, which LNL's adjunction would repeat.
+
+## After the close
+
+Added 2026-11-27. The page above is as it was delivered on 2026-11-26
+(the published copy is that one); two of its sentences no longer hold.
+
+* Section 1 gives two limits of the kernel: a tree of moves, "a chain of
+  64 formulas in 8 s, not settled at 96", and a saturated set, "a set of 200
+  sequents is checked in about 19 s and one of 499 not in 120 s". Each was a fault
+  of the check's definition, found and repaired on 2026-11-27: the
+  kernel now checks the tree of a chain of 64 in 0.9 s and of 256 in
+  16 s, a set of 200 in 1.6 s and one of 2790 in 198 s (in 28 parts,
+  each a theorem of its own); a set of 6366 it still does not, within
+  4 GB. The definitions are unchanged; what is run is proved against
+  them (statements S19 and S20). `measurements.md` and
+  `measurements-sat.md`, "The cost of the check"; method note 23.
+* `dillrun prove '<sequent>'` (2026-11-26, evening) answers for a
+  sequent typed at a shell and prints a Lean file with the facts; the
+  user's guide, "From the command line"; method notes 21 and 22.

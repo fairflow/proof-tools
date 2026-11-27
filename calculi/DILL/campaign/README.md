@@ -19,6 +19,11 @@ at a shell (`DILL/Parse.lean`, `Main.lean`; method notes 21 and 22). The
 round now has one directing session and an owner session for each
 calculus; this folder's owner is the session that ran the campaign.
 
+2026-11-27, morning: the two checks whose cost in the kernel had been
+recorded as a limit, each with its cause found and repaired
+(`DILL/SatFast.lean`, `Move.ruleF` in `DILL/Proof.lean`; statements S19
+and S20; method note 23).
+
 Waiting on the reviewer: nothing.
 
 ## Status
@@ -27,8 +32,8 @@ Waiting on the reviewer: nothing.
 |---|---|---|---|
 | 0. Survey | done (14:47 to 14:59 GMT, 2026-11-26) | the plan's choices screened and recorded: 4 entries; what "valid" means screened on four sequents in a model | [plan.md](plan.md), [decisions.md](decisions.md), [survey-report.md](survey-report.md) |
 | 1. Adopt | done (15:13 to 15:42) | `#rules` beside the figure: 20 rules, one misprint of the source (W1); `#slime`: none; worked derivations as terms: 13 of 13; the second transcription: run, no difference; S2: PROVED | [rule-table.md](rule-table.md), `DILL/System.lean`, `DILL/Proof.lean`, `Play/DILL.lean` |
-| 2. Prove | done (15:20 to 15:33) | statements read back: all 35, no fault; goals PROVED: 13 of 13; OPEN: 0; REFUTED, as expected: 8 statements | [statements.md](statements.md) |
-| 3. Run | done (15:29 to 16:27), at level 2; the command for a sequent typed at a shell added after the close (22:16 to 22:34 GMT) | negative tests: 10 for trees and scripts, 16 for saturated sets; the frontier: the kernel's check of a stated tree stops between a chain of 64 and of 96 formulas, and of a saturated set between 200 and 499 sequents; with `!` on the left of a sequent with no derivation the answer is `flag`; `dillrun prove` on the 56 entries: 39 derivable, 13 not derivable each with a saturated set, 4 flags, none against the status, every printed file elaborated, two altered certificates refused | [measurements.md](measurements.md), [measurements-sat.md](measurements-sat.md), `DILL/Run.lean`, `DILL/SatRun.lean`, `DILL/Engine.lean`, `DILL/Parse.lean`, `Corpus/prove_corpus.py` |
+| 2. Prove | done (15:20 to 15:33) | statements read back: all 35, no fault; goals PROVED: 13 of 13; OPEN: 0; REFUTED, as expected: 8 statements; two statements of our own added 2026-11-27 (S19, S20), PROVED, not read back | [statements.md](statements.md) |
+| 3. Run | done (15:29 to 16:27), at level 2; the command for a sequent typed at a shell added after the close (22:16 to 22:34 GMT); the two checks repaired (2026-11-27, 10:02 to 11:13 GMT) | negative tests: 10 for trees and scripts, 16 for saturated sets; the frontier, as measured 2026-11-27 with the two checks repaired (`-M 4000`, a deadline of 300 s): a tree of moves is checked by the kernel to `chain 256` (16 s) and `fan 256` (9 s), the largest tried; a saturated set to 2790 sequents (198 s, in 28 parts), and one of 6366 is not (the cap on memory); until then the kernel's check of a stated tree stopped between a chain of 64 and of 96 formulas, and of a saturated set between 200 and 499 sequents; with `!` on the left of a sequent with no derivation the answer is `flag`; `dillrun prove` on the 56 entries: 39 derivable, 13 not derivable each with a saturated set, 4 flags, none against the status, every printed file elaborated, two altered certificates refused | [measurements.md](measurements.md), [measurements-sat.md](measurements-sat.md), `DILL/Run.lean`, `DILL/SatRun.lean`, `DILL/Engine.lean`, `DILL/Parse.lean`, `Corpus/prove_corpus.py` |
 | 4. Explore | done (15:34 to 16:33) | the tutorial: every line elaborated and pinned (`DILL/TutorialTest.lean`); the tutorial page: 25 pins hold, by `tutorial_pins.py check` | `tutorial.md`, `Play/DILLTutorial.lean`, `Play/DILLExercises.lean`, [users-guide.md](users-guide.md), [report.md](report.md) |
 
 ## Files here
@@ -61,7 +66,7 @@ Waiting on the reviewer: nothing.
 
     (cd ~/Lean/Sources/proof-tools/calculi/DILL && lake build DILL dillrun)
 
-116 jobs. The exercises and the tutorial file are in no library:
+118 jobs. The exercises and the tutorial file are in no library:
 
     (cd ~/Lean/Sources/proof-tools/calculi/DILL && lake env lean Play/DILL.lean)
 
@@ -88,16 +93,17 @@ Theory files, each ending with `#axioms_within_file [propext, Quot.sound]`:
 * `DILL/Translate.lean`: to and from one-zone ILL.
 * `DILL/Goals.lean`: the goals joined from the others, and the eight
   refutations.
-* `DILL/Run.lean`, `DILL/Saturated.lean`, `DILL/SatRun.lean`,
-  `DILL/Engine.lean`: the certifiers, the saturated sets and their
-  soundness, the engine.
+* `DILL/Run.lean`, `DILL/Saturated.lean`, `DILL/SatFast.lean`,
+  `DILL/SatRun.lean`, `DILL/Engine.lean`: the certifiers, the saturated
+  sets and their soundness, the check of a set as it is run, the engine.
 
 Code and tests, with no bound: `DILL/Tactic.lean` (printers, candidates,
 the tactic `dillmove`), `DILL/Lazy.lean` (the search), `DILL/Refute.lean`
 (the producer of saturated sets), `DILL/Parse.lean` (a sequent read from
 text), `DILL/Corpus/Basic.lean` (the corpus), `Main.lean` (the driver
 `dillrun`, with `dillrun prove '<sequent>'`), `Corpus/` (the measuring
-scripts, and `prove_corpus.py`: the command on every entry),
+scripts; `prove_corpus.py`: the command on every entry;
+`measure_checks.py`: the two checks on families that grow),
 `DILL/Test.lean`, `DILL/RunTest.lean`, `DILL/SatTest.lean`,
 `DILL/ParseTest.lean`, `DILL/TutorialTest.lean`, `DILL/TutorialPins.lean`
 (generated by `scripts/tutorial_pins.py`).

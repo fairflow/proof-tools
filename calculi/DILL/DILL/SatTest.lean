@@ -172,6 +172,61 @@ init. -/
 theorem bangL_rejected' :
     refutedBy [[] ⨾ [(!p)] ⟹ p, [p] ⨾ [] ⟹ p] ([] ⨾ [(!p)] ⟹ p) = false := by decide +kernel
 
+
+/-! ## The check that is run (`refutedFast`, `DILL/SatFast.lean`)
+
+The certifiers check by it, so every fact above has passed it.  Here:
+the two sets accepted "up to the equivalence"; each set rejected above,
+rejected by it as well (its soundness says no more than that it accepts
+only sets that refute; these say it has not come to accept less than the
+definition on them, nor more); the check in parts; and its agreement
+with the definition on the producer's sets. -/
+
+example : refutedFast [[] ⨾ [p, q] ⟹ p] ([] ⨾ [q, p] ⟹ p) = true := by decide +kernel
+example :
+    refutedFast [[] ⨾ [p, q] ⟹ p ⊗ r, [] ⨾ [p, q] ⟹ p, [] ⨾ [q] ⟹ r, [] ⨾ [q] ⟹ p, [] ⨾ [] ⟹ p]
+      ([] ⨾ [p, q] ⟹ p ⊗ r) = true := by decide +kernel
+-- The members in another order, and their zones in another.
+example :
+    refutedFast [[] ⨾ [] ⟹ p, [] ⨾ [q] ⟹ p, [] ⨾ [q, p] ⟹ p ⊗ r, [] ⨾ [q] ⟹ r, [] ⨾ [q, p] ⟹ p]
+      ([] ⨾ [p, q] ⟹ p ⊗ r) = true := by decide +kernel
+
+example : refutedFast [[] ⨾ [(p ⊕ q)] ⟹ p] ([] ⨾ [(p ⊕ q)] ⟹ p) = false := by decide +kernel
+example : refutedFast [[] ⨾ [p] ⟹ p] ([] ⨾ [p] ⟹ p) = false := by decide +kernel
+example : refutedFast [[] ⨾ [] ⟹ 𝟏] ([] ⨾ [] ⟹ 𝟏) = false := by decide +kernel
+example : refutedFast [[] ⨾ [p] ⟹ ⊤] ([] ⨾ [p] ⟹ ⊤) = false := by decide +kernel
+example : refutedFast [[] ⨾ [p, 𝟎] ⟹ q] ([] ⨾ [p, 𝟎] ⟹ q) = false := by decide +kernel
+example : refutedFast [[] ⨾ [p, p ⊸ q] ⟹ q, [] ⨾ [] ⟹ p] ([] ⨾ [p, p ⊸ q] ⟹ q) = false := by decide +kernel
+example : refutedFast [[] ⨾ [p, p ⊸ q] ⟹ q, [] ⨾ [] ⟹ p, [] ⨾ [p] ⟹ p, [] ⨾ [q] ⟹ q] ([] ⨾ [p, p ⊸ q] ⟹ q) = false := by decide +kernel
+example : refutedFast [[] ⨾ [p] ⟹ 𝟏] ([] ⨾ [] ⟹ 𝟏) = false := by decide +kernel
+example : refutedFast [[] ⨾ [p] ⟹ 𝟏] ([q] ⨾ [p] ⟹ 𝟏) = false := by decide +kernel
+example : refutedFast [[] ⨾ [p, q] ⟹ p ⊗ r, [] ⨾ [p, q] ⟹ p, [] ⨾ [q] ⟹ p, [] ⨾ [] ⟹ p] ([] ⨾ [p, q] ⟹ p ⊗ r) = false := by decide +kernel
+example : refutedFast [[] ⨾ [p] ⟹ p ⊗ p] ([] ⨾ [p] ⟹ p ⊗ p) = false := by decide +kernel
+example : refutedFast [[] ⨾ [p ⊸ q] ⟹ q] ([] ⨾ [p ⊸ q] ⟹ q) = false := by decide +kernel
+example : refutedFast [[p] ⨾ [] ⟹ q] ([p] ⨾ [] ⟹ q) = false := by decide +kernel
+example : refutedFast [[p] ⨾ [] ⟹ q, [p] ⨾ [p] ⟹ q] ([p] ⨾ [] ⟹ q) = false := by decide +kernel
+example : refutedFast [[] ⨾ [(!p)] ⟹ q] ([] ⨾ [(!p)] ⟹ q) = false := by decide +kernel
+example : refutedFast [[] ⨾ [(!p)] ⟹ p, [p] ⨾ [] ⟹ p] ([] ⨾ [(!p)] ⟹ p) = false := by decide +kernel
+
+/-- The check in parts: the head, the condition at the first two members
+and at the other three, each a run of the kernel of its own, joined. -/
+def five : List Seq :=
+  [[] ⨾ [p, q] ⟹ p ⊗ r, [] ⨾ [p, q] ⟹ p, [] ⨾ [q] ⟹ r, [] ⨾ [q] ⟹ p, [] ⨾ [] ⟹ p]
+
+theorem five_head : Sat.headOk five ([] ⨾ [p, q] ⟹ p ⊗ r) = true := by decide +kernel
+theorem five_0 : Sat.restOk five ((five.map Sat.canon).take 2) = true := by decide +kernel
+theorem five_1 : Sat.restOk five ((five.map Sat.canon).drop 2) = true := by decide +kernel
+theorem five_checked : noCFBySet.check ([] ⨾ [p, q] ⟹ p ⊗ r) five = true :=
+  noCFBySet_check_of_parts five_head (Sat.restOk_step five 2 five_0 five_1)
+theorem five_fact : ¬ CFDerivable ([] ⨾ [p, q] ⟹ p ⊗ r) := noCFBySet.verdict _ five five_checked
+
+-- A part that fails is a part that fails: without its last member the set
+-- is not saturated, and it is the second part that says so.
+example : Sat.restOk (five.take 4) (((five.take 4).map Sat.canon).take 2) = false := by
+  decide +kernel
+example : Sat.restOk (five.take 4) (((five.take 4).map Sat.canon).drop 2) = true := by
+  decide +kernel
+
 /-! ## The producer
 
 Compiled evaluation: the producer is code, and is not run by the kernel. -/
@@ -228,6 +283,11 @@ def smallSeqs : List Seq :=
 #guard smallSeqs.all fun j => (refuteSet j).isSome == (Dec.searchCF j.lin j.goal).isNone
 #guard (smallSeqs.filter fun j => (refuteSet j).isSome).length == 2557
 #guard smallSeqs.all fun j => isRefuted j || isDerivable j
+-- On every set the producer makes for them, the check that is run and the
+-- definition agree (the producer hands on a set only if the first accepts).
+#guard smallSeqs.all fun j => match refuteSet j with
+  | some D => refutedFast D j && refutedBy D j
+  | none => true
 
 -- R1: the producer counts no domain.
 #certify_domain DILL.refuteSet
@@ -239,6 +299,7 @@ def smallSeqs : List Seq :=
 #certify_axioms DILL.SatTest.pfenning60_derivable
 #certify_axioms DILL.SatTest.bang_lolli
 #certify_axioms DILL.SatTest.bang_in_plus
+#certify_axioms DILL.SatTest.five_fact
 #certify_structural DILL.SatTest.pfenning60
 
 end DILL.SatTest

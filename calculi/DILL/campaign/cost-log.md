@@ -124,6 +124,16 @@ the script with every file elaborated, and the sizing of "a large
 answer". One run was stopped by hand: the command on 24 equal atoms,
 before it had a deadline (about 100 s; the free memory of the machine stayed at 90%).
 
+On 2026-11-27, 10:02 to 11:13 GMT, the owner session, no agents, on the
+directing session's task (the reviewer's words, as it relays them: the
+remaining cases of a cost that the kernel shows and compiled code hides
+"to be sorted out today"): the two checks' causes found and repaired
+(method note 23). Four builds of the whole (118 jobs); the measuring
+script run twice for each check, and the corpus script once with every
+file elaborated. Kernel runs one at a time under `-M 4000`, but for two
+under `-M 8000` to reproduce the figure of note 22; one run passed its
+cap (7 395 MB, note 23, point 8). No run was stopped by hand.
+
 ## What the operator did unaided, and what it did not
 
 The operator wrote the target, the plan, the formulas, the family, the

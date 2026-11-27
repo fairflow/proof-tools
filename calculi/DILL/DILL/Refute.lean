@@ -19,7 +19,7 @@ kernel checks what it returns (`noCFBySet`, `DILL/SatRun.lean`).
   other rules is smaller than its conclusion, so the search ends.
 * `refuteSet j` is the set of the sequents settled "no", cut down to the
   members that the witnesses need from `j` on, and checked with
-  `refutedBy` before it is handed on.  It is `none` at once where the
+  `refutedFast` (the certifiers' check) before it is handed on.  It is `none` at once where the
   unrestricted zone of `j` is not empty, and `none` where the search
   answers `true` of `j`: then `j` has a derivation without cut, or a
   sequent was set aside on the way and `j` has no saturated set.
@@ -29,7 +29,7 @@ Not proved, and not needed by any fact: that the search finds a set
 whenever one exists (the saturated sets are closed under union, and the
 search computes membership in the largest).
 -/
-import DILL.Saturated
+import DILL.SatFast
 import DILL.Tactic
 import Std.Data.HashMap
 
@@ -196,7 +196,7 @@ def setOf (s : St) (ch : Choice) (j : Seq) : List Seq :=
 
 /-- What the producer found. -/
 inductive Outcome where
-  /-- A saturated set of which the sequent is a member; `refutedBy`
+  /-- A saturated set of which the sequent is a member; `refutedFast`
   accepts it. -/
   | refuted (D : List Seq)
   /-- The search found a derivation without cut, and set nothing aside. -/
@@ -218,7 +218,7 @@ def outcome (j : Seq) (ch : Choice := .first) : Outcome :=
         else s!"{s.aside} sequents with ! in the linear zone were set aside")
     else
       let D := setOf s ch j
-      if refutedBy D j then .refuted D else .defect D
+      if refutedFast D j then .refuted D else .defect D
 
 /-! ## Printing -/
 

@@ -236,6 +236,20 @@ sequents the set has. (Before 2026-11-26 22:16 GMT these were two
 comment lines of their own after the first; they are kept, inside that
 comment.)
 
+**A large set is checked in parts.** The kernel keeps what it has
+computed until a theorem is done, and the check of a set asks the set
+several questions at each member (about 190 KB kept for each). So where
+the check would ask more than some 6000 questions, the file states it
+as several theorems, one after another: `head` (the sequent is a
+member), `part_0`, `part_1`, … (the condition at the members of each
+part, about 6000 questions a part), `from_i` (the parts joined, by
+`Sat.restOk_step`), and `checked` from them
+(`noCFBySet_check_of_parts`). The facts are the same, and each part is
+a run of the kernel of its own. The set of 499 sequents has 2 parts,
+that of 1197 has 8 (38 s in all, within 2.8 GB) and that of 2790 has 28
+(198 s, within 3.5 GB); a set of 6366 is not checked within 4 GB
+(`measurements-sat.md`, "The cost of the check").
+
 **The options.** `--short` prints the first line only. `--ascii` writes
 the sequent in it with the signs of a keyboard (the Lean file keeps the
 notations of `DILL/Form.lean`). `--budget=<n>` is the number of copies

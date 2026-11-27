@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Measurements of the saturated sets (the "no" side of the Run stage).
+"""(2026-11-27: superseded for the check's cost by `Corpus/measure_checks.py`,
+which measures the check that is now run, in one run and in parts.  This
+script's table in `campaign/measurements-sat.md` is of the definition's
+check, as it was run until then.)
+
+Measurements of the saturated sets (the "no" side of the Run stage).
 
 For each member of the family "the chain with its last link missing",
 in growing size, and for each of the producer's two ways to choose a
@@ -30,15 +35,25 @@ PRODUCER_DEADLINE = 60.0
 KERNEL_DEADLINE = 120.0
 SIZES = list(range(1, 15))       # the family is bounded: at most n = 14
 CHOICES = ["first", "shortest"]
-MODULES = ["Form", "Perm", "System", "Decide", "Saturated", "Proof", "Tactic", "Refute"]
+MODULES = ["Form", "Perm", "System", "Decide", "Saturated", "SatFast", "Proof", "Tactic", "Refute"]
 
 
 def timed(cmd, deadline):
+    """A run under a deadline that ends the whole process group (ending
+    `lake` alone leaves `lean` running), and, for a run of Lean, under a
+    cap on memory."""
+    import signal
+    if cmd[:3] == ["lake", "env", "lean"] and "-M" not in cmd:
+        cmd = cmd[:3] + ["-M", "4000"] + cmd[3:]
     t0 = time.monotonic()
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
+                         start_new_session=True)
     try:
-        r = subprocess.run(cmd, capture_output=True, text=True, timeout=deadline)
-        return time.monotonic() - t0, r.returncode, r.stdout + r.stderr
+        out, err = p.communicate(timeout=deadline)
+        return time.monotonic() - t0, p.returncode, out + err
     except subprocess.TimeoutExpired:
+        os.killpg(p.pid, signal.SIGKILL)
+        p.communicate()
         return None, None, ""
 
 

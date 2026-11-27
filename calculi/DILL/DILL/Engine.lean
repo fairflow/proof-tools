@@ -4,8 +4,9 @@ Both sides of the Run stage and the producer, as one engine: level 2.
 * **For a derivation**: a script (or a tree of moves), checked by running
   `step`; its soundness is S1 (`DILL/Run.lean`).
 * **Against a derivation**: a saturated set of sequents, checked by
-  `refutedBy`; its soundness is `not_cf_of_refutedBy` with cut
-  elimination (`DILL/SatRun.lean`).
+  `refutedFast` (`DILL/SatFast.lean`: the check of the definition
+  `refutedBy`, as it is run, proved sound for it); its soundness is
+  `not_cf_of_refutedBy` with cut elimination (`DILL/SatRun.lean`).
 * **The producer**: the search with a budget on copy; where it finds
   nothing at the budget, the producer of saturated sets; where that gives
   no set, `flag`.  Each answer is checked before it is handed on.

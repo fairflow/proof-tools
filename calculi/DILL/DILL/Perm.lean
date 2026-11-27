@@ -172,6 +172,139 @@ theorem sub_perm {l Γ Δ : List Form} (h : l.Perm (Γ ++ Δ)) : (sub l Γ).Perm
   | nil => exact h
   | cons a Γ ih => exact ih (perm_erase_of_cons h)
 
+/-! ## A part of a list, checked in one pass -/
+
+/-- **`Γ` is a part of `l`**: each member of `Γ` in turn is in what is
+left of `l`.  One pass over `Γ`, each step as long as the place of the
+member in what is left; no formula is counted.  (The test it replaces,
+`permB l (Γ ++ sub l Γ)`, counts every formula of `l` in both lists: the
+square of the length of `l` whatever `Γ` is.  In the kernel that was the
+cost of a tree of moves: `campaign/measurements.md`.) -/
+def subAll : List Form → List Form → Bool
+  | _, [] => true
+  | l, a :: Γ => l.contains a && subAll (l.erase a) Γ
+
+/-- The one pass decides what the rules ask: `l` is `Γ` and what `sub`
+leaves, together. -/
+theorem subAll_iff {l Γ : List Form} : subAll l Γ = true ↔ l.Perm (Γ ++ sub l Γ) := by
+  induction Γ generalizing l with
+  | nil => exact ⟨fun _ => .refl _, fun _ => rfl⟩
+  | cons a Γ ih =>
+    have hs : sub l (a :: Γ) = sub (l.erase a) Γ := rfl
+    constructor
+    · intro h
+      have h' : (l.contains a && subAll (l.erase a) Γ) = true := h
+      have h₁ := (Bool.and_eq_true_iff.1 h').1
+      have h₂ := (Bool.and_eq_true_iff.1 h').2
+      have ha : a ∈ l := List.contains_iff_mem.1 h₁
+      rw [hs]
+      exact (perm_cons_erase ha).trans ((ih.1 h₂).cons a)
+    · intro h
+      rw [hs] at h
+      have h : l.Perm (a :: (Γ ++ sub (l.erase a) Γ)) := h
+      have ha : a ∈ l := h.mem_iff.2 (List.mem_cons_self ..)
+      have h₂ := ih.2 (perm_erase_of_cons h)
+      show (l.contains a && subAll (l.erase a) Γ) = true
+      exact Bool.and_eq_true_iff.2 ⟨List.contains_iff_mem.2 ha, h₂⟩
+
+/-- **The one pass is the test it replaces.** -/
+theorem subAll_eq_permB (l Γ : List Form) : subAll l Γ = permB l (Γ ++ sub l Γ) := by
+  cases h : subAll l Γ with
+  | true => exact (permB_iff.2 (subAll_iff.1 h)).symm
+  | false =>
+    cases h' : permB l (Γ ++ sub l Γ) with
+    | false => rfl
+    | true => rw [subAll_iff.2 (permB_iff.1 h')] at h; cases h
+
+/-! ## Equality with a number compared first -/
+
+/-- **A number for a formula**, computed by arithmetic.  Nothing rests on
+it: two formulas with one number are compared as formulas.  It is there
+for the kernel, which keeps the number of a formula it has met, and for
+which an equality of two numbers is one step where the equality of two
+formulas is a recursion over both. -/
+def hashF : Form → Nat
+  | .atom n => (n * 2654435761 + 97) % 4294967296
+  | .one => 3
+  | .top => 5
+  | .zero => 7
+  | .tensor A B => (hashF A * 1000003 + hashF B * 8191 + 11) % 4294967296
+  | .lolli A B => (hashF A * 1000003 + hashF B * 8191 + 13) % 4294967296
+  | .wth A B => (hashF A * 1000003 + hashF B * 8191 + 17) % 4294967296
+  | .plus A B => (hashF A * 1000003 + hashF B * 8191 + 19) % 4294967296
+  | .bang A => (hashF A * 1000003 + 23) % 4294967296
+
+/-- Equality of two formulas, their numbers compared first. -/
+def eqH (a b : Form) : Bool := Nat.beq (hashF a) (hashF b) && decide (a = b)
+
+theorem eqH_eq (a b : Form) : eqH a b = decide (a = b) := by
+  unfold eqH
+  by_cases h : a = b
+  · subst h
+    simp
+  · simp [h]
+
+/-- For compiled code `eqH` is the plain equality: compiled code keeps no
+number of a formula, and would compute both numbers at every comparison
+(the compiled check of the tree of `chain 64` took 2.6 ms with them and
+1.3 ms without).  The kernel reduces the definition above. -/
+def eqPlain (a b : Form) : Bool := decide (a = b)
+
+@[csimp] theorem eqH_csimp : @eqH = @eqPlain := by
+  funext a b
+  exact eqH_eq a b
+
+/-- Membership, by `eqH`. -/
+def memH (x : Form) : List Form → Bool
+  | [] => false
+  | a :: l => eqH a x || memH x l
+
+theorem memH_eq (x : Form) (l : List Form) : memH x l = decide (x ∈ l) := by
+  induction l with
+  | nil => simp [memH]
+  | cons a l ih =>
+    by_cases h : a = x
+    · simp [memH, eqH_eq, h]
+    · have h' : ¬ x = a := fun e => h e.symm
+      simp [memH, eqH_eq, h, h', ih]
+
+/-- `List.erase`, by `eqH`. -/
+def eraseH (x : Form) : List Form → List Form
+  | [] => []
+  | a :: l => bif eqH a x then l else a :: eraseH x l
+
+theorem eraseH_eq (x : Form) (l : List Form) : eraseH x l = l.erase x := by
+  induction l with
+  | nil => rfl
+  | cons a l ih =>
+    by_cases h : a = x
+    · simp [eraseH, eqH_eq, h]
+    · simp [eraseH, eqH_eq, h, ih]
+
+/-- `sub`, by `eqH`. -/
+def subH (l Γ : List Form) : List Form := Γ.foldl (fun l a => eraseH a l) l
+
+theorem subH_eq (l Γ : List Form) : subH l Γ = sub l Γ := by
+  induction Γ generalizing l with
+  | nil => rfl
+  | cons a Γ ih =>
+    show subH (eraseH a l) Γ = sub (l.erase a) Γ
+    rw [eraseH_eq]
+    exact ih _
+
+/-- `subAll`, by `eqH`. -/
+def subAllH : List Form → List Form → Bool
+  | _, [] => true
+  | l, a :: Γ => memH a l && subAllH (eraseH a l) Γ
+
+theorem subAllH_eq (l Γ : List Form) : subAllH l Γ = subAll l Γ := by
+  induction Γ generalizing l with
+  | nil => rfl
+  | cons a Γ ih =>
+    show (memH a l && subAllH (eraseH a l) Γ) = (l.contains a && subAll (l.erase a) Γ)
+    rw [memH_eq, eraseH_eq, ih]
+    simp
+
 end DILL
 
 #axioms_within_file [propext, Quot.sound]

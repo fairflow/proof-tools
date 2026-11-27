@@ -267,6 +267,11 @@ Deadlines: each run of the driver 20 s (search and compiled check together), eac
 
 ## The frontier
 
+(As measured 2026-11-26, with `step` as it was. The rows of the compiled
+check of a tree and of the fact with the tree are superseded by "The
+cost of the check of a tree" below: `chain` and `fan` are now settled to
+256 in the kernel.)
+
 The smallest input not settled, for each column (in bold); and where a
 column was not taken that far, the largest settled, as a lower bound.
 
@@ -360,6 +365,139 @@ line read "not found to the budget, where figure finds a tree").
 Chaining puts in one branch two copies that a derivation of the figure
 can put in two. So "the least budget" in the corpus table is the
 chained search's; on the corpus the two modes agree.
+
+## The cost of the check of a tree: its cause, and the repair (2026-11-27)
+
+By the owner session, on the directing session's task (method note 23).
+The family table above, and "The frontier" below, are of `step` as it
+was until this date: the fact with the tree of `chain 64` in 8.14 s,
+`chain 96` not settled within 8 GB. `step` now runs `Move.ruleF`
+(statement S19), proved equal to `Move.rule`. Each run of Lean below:
+one at a time, `-M 4000`, a deadline on the process group.
+
+**The first cause: the division counted.** At ⊗R, ⊸L and cut the rule
+checked the part named by `permB l (Δ ++ sub l Δ)`, which counts every
+formula of the zone in both lists: for a zone of `m` formulas, `4m²`
+comparisons of formulas, whatever `Δ` is. Measured before the change:
+
+| `chain n` | the kernel, the fact | peak | one `permB` at the zone of the root, alone |
+|---|---|---|---|
+| 16 | 0.22 s | 1 398 MB | under 0.1 s |
+| 32 | 1.10 s | 1 793 MB | 0.17 s |
+| 48 | 3.40 s | 2 624 MB | 0.39 s |
+| 64 | 8.14 s (2026-11-26) | | |
+
+One test is the square of the zone (2.4 times from 33 formulas to 49),
+and there is one at each of the `n` nodes: the cube. The smallest input
+that shows it is `chain 16` to `chain 32`: twice the formulas, five
+times the time.
+
+**The repair of it, and what it left.** `subAll l Δ`: each formula of
+`Δ` in turn is in what is left of `l`; proved to be the same test
+(`subAll_eq_permB`). With it alone:
+
+| `chain n` | the kernel | peak |
+|---|---|---|
+| 32 | 0.23 s | 1 411 MB |
+| 64 | 0.95 s | 1 781 MB |
+| 96 | 2.29 s | 2 362 MB |
+| 128 | 4.04 s | 3 191 MB |
+
+Still the square of `n`. Not the order in which the part is named (the
+search names it in the reverse of the zone's order; named in the zone's
+order, `chain 64` took 1.06 s against 0.94 s, and `chain 128` 4.37 s
+against 4.04 s).
+
+**The second cause: a formula looked for with the derived equality.**
+At each node the rule looks for its principal formula in the zone and
+takes it out (`decide (X ∈ l)`, `l.erase X`). The search takes the last
+implication of the chain first, so the zone is gone through to its end
+at every node, and each formula met is compared with one that it is not
+equal to. That comparison, by the derived `DecidableEq`, costs the
+kernel 180 µs (a zone of 128 searched 32 times for a late formula:
+0.65 s; with an equality written by hand 0.36 s; with the numbers of
+the two formulas compared first 0.15 s). The kernel keeps the number of
+a formula it has met, so the last is a comparison of two numbers.
+
+**The repair of that.** `eqH`, `memH`, `eraseH`, `subH`, `subAllH`
+(`DILL/Perm.lean`), each proved equal to what it replaces, and
+`Move.ruleF` built from them.
+
+### Before and after
+
+`python3 -I Corpus/measure_checks.py trees`. `chain n` is the family
+the cost was found on; `fan n` (`· ; aₙ, …, a₁ ⟹ a₁ ⊗ (a₂ ⊗ …)`) is the
+second family, made against what could make the first fast: each ⊗R
+names one formula, and it is the last of the zone. The times of the
+kernel's column are of the whole file, the tree elaborated as well as
+checked. Before, from the family table above (2026-11-26, the same
+machine): the fact with the tree of `chain 64` 8.14 s and of `chain 96`
+not elaborated; of `fan 64` 4.66 s and of `fan 96` 13.14 s; the
+compiled check 1.3 ms at `chain 64`, 9.7 ms at `chain 128`, 0.8 ms at
+`fan 64`, 2.6 ms at `fan 96`.
+
+Machine: arm64, macOS-15.8.3-arm64-arm-64bit; Lean v4.31.0.  Date: 2026-11-27 11:03 GMT.  Each run of Lean: `-M 4000`, a deadline of 300 s on the process group, one at a time.  Loading the imports: 1.08 s, taken off the times; the peaks of memory include it (about 1300 MB).
+
+| family | n | formulas in the sequent | the tree: moves | the search | the compiled check of the tree | the fact with the tree, elaborated: the kernel checks the tree |
+|---|---|---|---|---|---|---|
+| chain | 8 | 9 | 17 | 0.0 ms | 0.0 ms | 0.05 s, 1289 MB |
+| chain | 16 | 17 | 33 | 0.0 ms | 0.0 ms | 0.08 s, 1299 MB |
+| chain | 32 | 33 | 65 | 0.0 ms | 0.0 ms | 0.26 s, 1332 MB |
+| chain | 64 | 65 | 129 | 0.1 ms | 0.1 ms | 0.92 s, 1459 MB |
+| chain | 96 | 97 | 193 | 0.1 ms | 0.2 ms | 2.15 s, 1659 MB |
+| chain | 128 | 129 | 257 | 0.2 ms | 0.3 ms | 3.95 s, 1907 MB |
+| chain | 192 | 193 | 385 | 0.3 ms | 0.7 ms | 9.02 s, 2648 MB |
+| chain | 256 | 257 | 513 | 0.5 ms | 1.2 ms | 16.35 s, 3612 MB |
+| fan | 8 | 9 | 15 | 0.0 ms | 0.0 ms | 0.02 s, 1285 MB |
+| fan | 16 | 17 | 31 | 0.0 ms | 0.0 ms | 0.04 s, 1295 MB |
+| fan | 32 | 33 | 63 | 0.0 ms | 0.0 ms | 0.13 s, 1318 MB |
+| fan | 64 | 65 | 127 | 0.2 ms | 0.1 ms | 0.48 s, 1400 MB |
+| fan | 96 | 97 | 191 | 0.2 ms | 0.1 ms | 1.17 s, 1516 MB |
+| fan | 128 | 129 | 255 | 0.3 ms | 0.2 ms | 2.10 s, 1630 MB |
+| fan | 192 | 193 | 383 | 0.5 ms | 0.5 ms | 4.82 s, 1975 MB |
+| fan | 256 | 257 | 511 | 0.9 ms | 0.8 ms | 8.57 s, 2447 MB |
+
+What the table says:
+
+* **`chain 64`: 8.14 s to 0.9 s. `chain 96`, not settled within 8 GB,
+  in 2.2 s; `chain 256` in 16 s within 3.6 GB. `fan 64`: 4.66 s to
+  0.5 s; `fan 96`: 13.14 s to 1.2 s; `fan 256` in 8.6 s.** The frontier
+  is no longer between 64 and 96: both families are settled to 256, the
+  largest size tried.
+* **The growth is the square of `n` on both families** (4.1 to 4.4
+  times for twice the size from 64 on), where it was the cube. On
+  `chain` the tree is itself the square of `n` ("Not repaired", below).
+  On `fan` the tree is of the size of `n`, and the square is the zone
+  gone through at each node for a formula at its end.
+* **Compiled, the check is 13 to 30 times faster than it was**: 0.1 ms
+  at `chain 64` (1.3 ms), 0.3 ms at `chain 128` (9.7 ms), 0.1 ms at
+  `fan 96` (2.6 ms). One form on the way was slower compiled than the
+  check it replaced: with the numbers of the formulas compared first in
+  compiled code too, the compiled check of `chain 64` took 2.6 ms, since
+  compiled code keeps no number and computes both at every comparison.
+  `eqH` is therefore the plain equality for compiled code
+  (`@[csimp] eqH_csimp`, `DILL/Perm.lean`), and the kernel reduces the
+  definition. The table is of that form; the kernel's column is the
+  same either way (a run before it: `chain 256` 14.8 s, `fan 256`
+  7.2 s).
+* Further, compiled only (`dillrun run focus <family> <n> 0`): the check
+  of the tree of `chain 256`, `512`, `1024` takes 1.2 ms, 4.9 ms,
+  19.3 ms, where "The frontier" above has 77.9 ms, 606.2 ms, 4716.0 ms;
+  of `fan 1024`, 14.4 ms (2515.8 ms). Four times for twice the size, where it was
+  eight.
+* The kernel is still four orders of magnitude from compiled code
+  (0.3 ms and 3.95 s at `chain 128`).
+
+### Not repaired
+
+* The tree of `chain n` is itself the square of `n`: each ⊸L names the
+  part of the zone that goes to its first premise, and the search takes
+  the last implication first, so the part named is the rest of the
+  zone (1.16 MB of source at 256, and 7.6 s for Lean to elaborate it
+  before the kernel sees it). The check is now a pass over what it is
+  given. A search that took the first implication first would write a
+  tree of the size of `n`; the search was not changed.
+* The equality of two formulas that are equal is still the derived one.
 
 ## The command on the corpus
 

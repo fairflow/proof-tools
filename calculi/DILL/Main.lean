@@ -37,6 +37,13 @@
                                         whole has a deadline (10 s): past it
                                         the answer is `flag`
 
+    dillrun settime <n> [def]           the family `chainBad` (a chain with its
+                                        last link missing): the size of its
+                                        saturated set, and the time of the
+                                        check that is run (`refutedFast`); with
+                                        `def`, also of the definition's
+                                        (`refutedBy`)
+
     dillrun corpus                      the corpus as texts, a line for each
                                         entry: its name, its recorded status,
                                         and the sequent three times (in the
@@ -134,7 +141,7 @@ open DILL DILL.Corpus ProofTools.Explore
 
 def factFile (stmt : String) (body : String) : String :=
   "import DILL.Corpus.Basic\nopen DILL DILL.Corpus ProofTools.Explore\n\n" ++
-  "set_option maxRecDepth 100000 in\n" ++
+  "set_option maxHeartbeats 0 in\nset_option maxRecDepth 1000000 in\n" ++
   s!"def fact : Fam true ({stmt}) :=\n  {body}\n"
 
 /-- A script as Lean source. -/
@@ -265,24 +272,91 @@ theorem derivable : Derivable sequent := ⟨derivation⟩
 theorem valid : Valid sequent := soundness _ derivable
 " ++ proveFoot
 
+/-- A measure of the questions that the check asks of the set at one
+member: a division of the zone for each implication in it, and for a
+tensor as conclusion. -/
+def askWeight (k : Seq) : Nat :=
+  let m := k.lin.length
+  let lollis := (k.lin.filter fun A => match A with | .lolli _ _ => true | _ => false).length
+  let g := match k.goal with | .tensor _ _ => 2 | _ => 0
+  (lollis + g) * 2 ^ (m - 1) + m + 1
+
+/-- The members in parts, in their order, each part of a weight of at
+most `budget` (or one member): the sizes of the parts. -/
+def partSizes (D : List Seq) (budget : Nat) : List Nat := Id.run do
+  let mut sizes : Array Nat := #[]
+  let mut n := 0
+  let mut w := 0
+  for k in D do
+    let wk := askWeight k
+    if n > 0 && w + wk > budget then
+      sizes := sizes.push n
+      n := 0
+      w := 0
+    n := n + 1
+    w := w + wk
+  if n > 0 then sizes := sizes.push n
+  return sizes.toList
+
+/-- The weight of a part of the check that one run of the kernel takes:
+about 6000 questions, which the kernel answers in some 5 s and 1.2 GB
+(`campaign/measurements-sat.md`). -/
+def partBudget : Nat := 6000
+
+/-- The check stated in parts, each a run of the kernel of its own, and
+joined (`noCFBySet_check_of_parts`). -/
+def checkedInParts (sizes : List Nat) : String := Id.run do
+  let K := sizes.length
+  let mut out := s!"
+/- The check in {K} parts, each a run of the kernel of its own, one after
+another, so that no run keeps more than its part in memory: that the
+sequent is a member (`head`); the condition at the members of each part
+(`part_i`); and the parts joined (`from_i`: the condition from the
+`i`-th part on). -/
+set_option Elab.async false
+
+theorem head : Sat.headOk saturated sequent = true := by decide +kernel
+"
+  let mut l := "(saturated.map Sat.canon)"
+  let mut lists : Array String := #[]
+  for c in sizes do
+    lists := lists.push l
+    l := s!"({l}.drop {c})"
+  for i in [0:K] do
+    let li := lists[i]!
+    if i + 1 < K then
+      out := out ++ s!"\ntheorem part_{i} : Sat.restOk saturated ({li}.take {sizes[i]!}) = true := by decide +kernel\n"
+    else
+      out := out ++ s!"\ntheorem part_{i} : Sat.restOk saturated {li} = true := by decide +kernel\n"
+  out := out ++ s!"\ntheorem from_{K - 1} : Sat.restOk saturated {lists[K - 1]!} = true := part_{K - 1}\n"
+  for j in [0:K - 1] do
+    let i := K - 2 - j
+    out := out ++ s!"theorem from_{i} : Sat.restOk saturated {lists[i]!} = true :=\n  Sat.restOk_step saturated {sizes[i]!} part_{i} from_{i + 1}\n"
+  out := out ++ "
+/-- The check, from its parts: the sequent is a member of the set, and
+the set is saturated. -/
+theorem checked : noCFBySet.check sequent saturated = true := noCFBySet_check_of_parts head from_0
+"
+  return out
+
 /-- The facts that a saturated set gives, as a Lean file. -/
 def proveNo (j : Seq) (D : List Seq) : String :=
   let large := D.length > 60 || (D.map seqSize).sum > 1500 || seqSize j > 150
+  let sizes := partSizes D partBudget
   proveHead j D
-    (s!"A saturated set of {D.length} {if D.length == 1 then "sequent" else "sequents"}, of which it is a member." ++
-      (if D.length > 200 then "\nA set of this size: the compiled check has passed it; the kernel's check of\na set of 499 sequents did not end in 120 s (`campaign/measurements-sat.md`)." else ""))
-    large ++ s!"
+    s!"A saturated set of {D.length} {if D.length == 1 then "sequent" else "sequents"}, of which it is a member." large ++ s!"
 /-- A set of sequents that is saturated: of each rule of the figure that
 could end in a member, one premise is a member.  The sequent is a member. -/
 def saturated : List Seq :=
   [" ++ ",\n   ".intercalate (D.map Refute.srcSeq) ++ "]
-
+" ++ (if sizes.length > 1 then checkedInParts sizes else "
 /-- The kernel computes the check, once: the sequent is a member of the
-set, and the set is saturated.  (Stated through the certifier's check:
-stated of `refutedBy` itself, the kernel's run on a set of 200 sequents
-passed 8 GB.) -/
+set, and the set is saturated.  (Stated through the certifier, so that
+the facts below take it as it is: stated of the checker's own function,
+Lean has to find the two statements equal for each fact, and does it by
+running the check again outside the kernel.) -/
 theorem checked : noCFBySet.check sequent saturated = true := by decide +kernel
-
+") ++ "
 /-- No derivation without cut. -/
 theorem notCutFree : ¬ CFDerivable sequent := noCFBySet.verdict _ saturated checked
 
@@ -367,6 +441,27 @@ def prove (args : List String) : IO UInt32 := do
 def main (args : List String) : IO UInt32 := do
   match args with
   | "prove" :: rest => prove rest
+  | "settime" :: n :: rest =>
+    -- the family `chainBad`: the set, and the times of the two checks
+    let j := chainBad n.toNat!
+    let stdout ← IO.getStdout
+    let t₀ ← IO.monoNanosNow
+    let (b, st) := Refute.search j.lin j.goal
+    if b then IO.println s!"n={n} derivable"; return 1
+    let D := Refute.setOf st .first j
+    IO.println s!"n={n} formulas={j.lin.length + 1} set={D.length} longest={(D.map (·.lin.length)).foldl max 0} parts={(partSizes D partBudget).length}"
+    let t₁ ← IO.monoNanosNow
+    let ok := refutedFast D j
+    IO.println s!"check={ok}"
+    let t₂ ← IO.monoNanosNow
+    IO.println s!"producer_us={(t₁ - t₀) / 1000} check_us={(t₂ - t₁) / 1000}"
+    stdout.flush
+    if rest.contains "def" then
+      let okd := refutedBy D j
+      IO.println s!"checkdef={okd}"
+      let t₃ ← IO.monoNanosNow
+      IO.println s!"checkdef_us={(t₃ - t₂) / 1000}"
+    return 0
   | ["corpus"] =>
     for e in entries do
       IO.println s!"{e.name}\t{if e.derivable then "derivable" else "not derivable"}\t{showSeq e.seq}\t{seqSrc e.seq}\t{Parse.asciiSeq e.seq}"
