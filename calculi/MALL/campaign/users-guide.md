@@ -103,7 +103,9 @@ i`, `up`, `left`, `right`, `top`, `goal k`); a block `example : Walk d
 | `refuteBy Γ` | a phase structure on a small cyclic group that refutes `Γ`, where it finds one among those it tries | no: checked by the next line |
 | `noDerivableBy.verdict Γ z`, `noValidBy.verdict Γ z` | `¬ Derivable Γ`, `¬ Valid Γ`, from a structure `z = ⟨k, bot, val⟩` on ℤ/(k+1): the antiphases and a set for each letter, as lists of Booleans | yes: the kernel computes the interpretation |
 | `refuteSet Γ` | a saturated set of sequents of which `Γ` is a member, for every `Γ` with no derivation (it always ends; the set can be large where ⊗ divides a context many ways) | no: checked by the next line |
-| `noDerivableBySet.verdict Γ D`, `noValidBySet.verdict Γ D` | `¬ Derivable Γ`, `¬ Valid Γ`, from a set `D`: the kernel checks that `Γ` is in it and that every rule that could conclude a member has a premise in it | yes |
+| `noDerivableBySet.verdict Γ D`, `noValidBySet.verdict Γ D` | `¬ Derivable Γ`, `¬ Valid Γ`, from a set `D` written as lists of formulas: the kernel checks that `Γ` is in it and that every rule that could conclude a member has a premise in it | yes; for a set of a few tens of sequents (the kernel's memory doubles with each formula beside a ⊗: `measurements.md`) |
+| `Encode.encode D Γ` | the set `D` written in numbers, a `CodeCert`: a table of its formulas, a search tree of numbers, one for each sequent | no: checked by the next line |
+| `noDerivableByCode.verdict Γ C`, `noValidByCode.verdict Γ C`, `countermodel_of_code` | the same two facts, and the finite phase structure, from a set written in numbers; `C.sequents` is the set of sequents it stands for, and `refutedBy_of_code` says that set passes the check of the line above | yes: this is the form to use, and the one `mallrun prove` writes |
 | `describeCountermodel Γ` (with `#eval IO.println`) | the set, and the finite phase structure it presents: how many phases, and that the sequent, computed in it, does not hold | no: to be read |
 | `(craigInterpolation Γ Δ d).C` | the interpolant of `⊢ Γ, Δ` computed from a derivation without cut `d : CF (Γ ++ Δ)`; the fields `.left`, `.right` are the two derivations | yes: a function proved by its type |
 | `forallP p A`, `existsP p A`, `ui p Γ` | the uniform interpolants for the letter numbered `p`: the weakest formula without it that implies `A`, the strongest that `A` implies | yes: `ui_spec`. The kernel computes them (`by decide +kernel`) |
@@ -146,20 +148,30 @@ Three things to know:
 * **The "no" side** is a phase structure on a small cyclic group where
   one is found, and otherwise a saturated set of sequents. Either gives
   `¬ Derivable` and `¬ Valid`.
+* **A saturated set is written in numbers** (`MALL/Coded.lean`): a table
+  of its formulas, and one number for each sequent, whose digit at a
+  formula's place is how many times the formula occurs. The printed
+  file names the check (`refuted`), and from it states that the set of
+  sequents the numbers stand for passes the check of saturated sets
+  (`refutedAsSequents`), `notDerivable`, `notValid` and `countermodel`.
+  To read the sequents: `#eval refutation.sequents` at the end of the
+  file.
 * **A "not derivable" that the kernel may not check says so in its first
-  line.** A saturated set can be large. Under a cap of 8 GB of memory
-  the kernel checked the printed file for sets of up to 102 sequents
-  (the largest in 16.7 s); beyond that it was stopped at the cap, at
-  119 sequents on one family and 192 on another. So above 102 the first
-  line reads
+  line.** A saturated set can be large. Above 600 sequents its check is
+  stated in several theorems, so that the kernel's memory stays that of
+  one part. Under a cap of 4 GB of memory the kernel checked the printed
+  file for every set tried, up to 11 110 sequents (a sequent of eight
+  formulas; 102 s); its time grows with the set, about 9 ms a sequent
+  there. Above 11 110 the first line reads
 
-      -- not derivable, by the compiled check only (a set of 238 sequents; the kernel has checked sets of up to 102): ⊢ …
+      -- not derivable, by the compiled check only (a set of N sequents; the kernel has checked sets of up to 11110): ⊢ …
 
   and the exit code is still 1. A plain `-- not derivable:` is an answer
   of a size the kernel has been seen to check: a cyclic phase structure,
-  or a set of at most 102. In every case the fact is the file's, once
+  or a set of at most 11 110 sequents. In every case the fact is the file's, once
   it is elaborated; the first line is the program's, which is not
-  trusted.
+  trusted. (Until 2026-11-27 the set was written as lists of formulas,
+  and the bound was 102 sequents under 8 GB: `measurements.md`.)
 
 Options: `--short`, the first line only; `--ascii`, the sequent in it
 with the signs of a keyboard; `--deadline=N`, seconds, 10 if not given.

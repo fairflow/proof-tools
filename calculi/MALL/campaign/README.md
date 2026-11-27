@@ -17,6 +17,12 @@ The page was pushed to `main` (`ddd34e6`) and published to the reviewer
 as a private page (https://claude.ai/artifact/HXsUnPBBZSQdoc9Ku72b1E),
 2026-11-26 11:06 GMT.
 
+Since then, each at a word of the reviewer or a task of the directing
+session: sections 7 to 9 of the closing page. The last (2026-11-27 11:34 GMT): the
+kernel could not check a saturated set of more than about a hundred
+sequents; the cause was the definition, and a set is now written in
+numbers (S27), checked by the kernel up to 11 110 sequents.
+
 ## Status
 
 | stage | state | the checks | where |
@@ -101,6 +107,9 @@ Theory (each ends with `#axioms_within_file [propext, Quot.sound]`):
   as certificates of non-derivability, the finite phase structure a set
   presents, and the completeness of the certificate (added after the
   closing page).
+* `MALL/Coded.lean`, `MALL/CodedSound.lean`: a saturated set written in
+  numbers, the form of the check that the kernel evaluates cheaply, and
+  that it implies the check of sets (S27; added 2026-11-27).
 
 Code (no bound; nothing in it is trusted):
 
@@ -109,6 +118,10 @@ Code (no bound; nothing in it is trusted):
 * `MALL/Lazy.lean`: the search by lazy splitting.
 * `MALL/Refute.lean`: the producer of saturated sets; the structure of
   a set computed by tables.
+* `MALL/Encode.lean`: a set of sequents written in numbers
+  (`Encode.encode`). `mallrun screen` tries the statement S27 on altered
+  certificates; `Corpus/measure_sets.py` measures the two checks on two
+  families, compiled and in the kernel.
 * `MALL/Parse.lean`: a sequent read from text, and written with the
   signs of a keyboard, for `mallrun prove`; `Corpus/prove_corpus.py`
   runs the command on the corpus.

@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
-"""Saturated sets on the two families `bots` and `parbots`: the producer,
+"""Saturated sets on the two families `bots` and `parBots`: the producer,
 the two compiled checks, and the kernel on the two written forms.
 
     python3 -I Corpus/measure_sets.py bots 1 3 5 7 --lists
-    python3 -I Corpus/measure_sets.py parbots 10 13
+    python3 -I Corpus/measure_sets.py parBots 10 13
 
 Run in calculi/MALL after `lake build MALL mallrun`.  For each member:
 `mallrun refute <family> <n>` (with `--lists`: also the compiled check of
 the set as lists, and the set written as lists), then Lean on the file in
-numbers, and with `--lists` on the file in lists.  Each Lean run is one
+numbers, and with `--lists` on the file in lists (`--lists-compiled`: the
+compiled check of the lists only).  Each Lean run is one
 process group under a deadline, with `-M <cap>` megabytes (default 4000);
 one at a time.  The table is printed in Markdown.  Peak memory is that of
 the process less that of a file with the imports alone.
@@ -36,16 +37,20 @@ def lean(path, cap, deadline):
         return f"cut off at {deadline} s", dt, None
     m = re.search(r"(\d+)\s+maximum resident set size", err)
     rss = int(m.group(1)) / 2**20 if m else None
-    text = out + err
+    # the lines of /usr/bin/time speak of memory too: look at Lean's own
+    text = out + "\n".join(l for l in err.split("\n") if not l.startswith("  ") and " real " not in l)
     if code == 0 and "error" not in out:
         return "checked", dt, rss
-    if "memory" in text or "Stack overflow" in text:
-        return f"stopped at the cap of {cap} MB" if "memory" in text else "stack overflow", dt, rss
-    return "failed: " + text.strip()[:80], dt, rss
+    if "excessive memory" in text or "out of memory" in text:
+        return f"stopped at the cap of {cap} MB", dt, rss
+    if "Stack overflow" in text:
+        return "stack overflow", dt, rss
+    return "FAILED: " + " ".join(text.split())[:120], dt, rss
 
 def main():
     args = sys.argv[1:]
-    lists = "--lists" in args
+    lists = "--lists" in args or "--lists-compiled" in args
+    kernel_lists = "--lists" in args
     cap = 4000
     deadline = 300
     for a in args:
@@ -81,7 +86,7 @@ def main():
             why, t, rss = lean(path, cap, deadline)
             extra = f", {t - bt:.1f} s" + (f", {max(rss - brss, 0):.0f} MB" if rss else "")
             return why + extra
-        kl = cell(f"{OUT}{fam}_{n}_lists.lean") if wrote_lists else "not run"
+        kl = cell(f"{OUT}{fam}_{n}_lists.lean") if wrote_lists and kernel_lists else "not run"
         kn = cell(f"{OUT}{fam}_{n}_set.lean")
         print(f"| `{fam}` | {n} | {size} | {found / 1000:.1f} ms | {lc} | {chk / 1000:.2f} ms ({ok}) | {kl} | {kn} |",
               flush=True)

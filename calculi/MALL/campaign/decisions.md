@@ -548,6 +548,50 @@ the argument, and attributes it.
   fixes four).
 * **Cost to reverse**: little.
 
+## 2026-11-27 11:13 GMT. The kernel's check of a saturated set: found and repaired by a check in numbers
+
+* **Whose decision**: the task is the directing session's, at the
+  reviewer's word ("Please sort out both issues. Delegate or fix
+  yourself. Do it now."); the form of the repair is this session's.
+* **Done**: the cause found by experiment (`measurements.md`, "Why the
+  kernel could not check a set"): the definition, in three ways. S27
+  stated, screened, then proved (`MALL/Coded.lean`,
+  `MALL/CodedSound.lean`): a set written in numbers, and its check,
+  which implies `refutedBy` of the set it stands for. `mallrun prove`
+  writes its sets in that form; the memoised search divides a context
+  without repetition; the two measured families are in the corpus's
+  families by name (`bots`, `parBots`: the second was called `plusbot`
+  on 2026-11-26, which misnamed its connective).
+* **Decided**: (a) a new certificate type and an implication, not a new
+  function on lists proved equal to `refutedBy`: a list of a thousand
+  sequents of sixty formulas costs the kernel more to read than the
+  budget allows, whatever is then done with it; (b) `refutedBy`,
+  `noDerivableBySet`, `refutation_complete` and `certified` stay as
+  they are, and the two new certifiers stand beside them; (c) a sequent
+  as one number in an odd base, not a list of counts (a comparison of
+  two lists is a step for each formula of the table) and not a power of
+  two (ten times slower past 2⁶⁴, measured); (d) the set as a search
+  tree whose order is not checked: a tree out of order only fails to
+  find, so soundness asks nothing of it; (e) the logical axiom and the
+  rule 1 are refused once for each member (a member of at most two
+  formulas is decoded and looked at), not at each formula; (f) the base
+  leaves room for two units above every digit, so that no addition the
+  check makes can carry, and the check tests no addition; (g) above 600
+  sequents the printed check is several theorems, one for each part of
+  the tree of at most 150 numbers, put together by `codeRefutes_of_parts`
+  (as one theorem the kernel was stopped at 4 GB at 2 057 sequents; DILL's
+  owner had done the same); (h) the printed file states its facts by the
+  soundness lemmas applied to the named check, not through
+  `Certifier.verdict`, which made the elaborator redo part of the check
+  for each fact; (i) `kernelSeen` is 11 110, the largest set checked.
+* **Not taken**: a hash table of numbers in one large numeral (each
+  look-up would leave a numeral of the table's size in the kernel's
+  memory); a proof
+  that every saturated set has a certificate in numbers (it needs the
+  encoder verified; the producer's certificate is checked case by case).
+* **Cost to reverse**: the old form is still there; `mallrun prove`
+  would print it again by one line of `Main.lean`.
+
 ## Stops
 
 *Each time a turn ended to wait for the reviewer. None so far.*

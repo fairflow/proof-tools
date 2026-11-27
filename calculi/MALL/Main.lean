@@ -167,11 +167,21 @@ def proveFoot : String :=
   "\nend MALL.Answer\n\n#axioms_within_file [propext, Quot.sound]\n"
 
 /-- **The largest saturated set the kernel has been seen to check**, in
-numbers, under `lake env lean -M 4000` (`campaign/measurements.md`,
-2026-11-27): 1569 sequents.  An answer whose set is larger than this
-says so in its first line.  (Written as lists and checked by `refutedBy`,
-the limit was 102 sequents under 8 GB.) -/
-def kernelSeen : Nat := 1569
+numbers and stated in parts, under `lake env lean -M 4000`
+(`campaign/measurements.md`, 2026-11-27): 11 110 sequents, in 102 s.
+Nothing smaller that was tried failed.  An answer whose set is larger than
+this says so in its first line.  (Written as lists and checked by
+`refutedBy`, the limit was 102 sequents under 8 GB.) -/
+def kernelSeen : Nat := 11110
+
+/-- Above this many sequents the check of a set is stated in several
+theorems, each for a part of the tree of at most `partSize` numbers.  As
+one theorem the kernel was stopped at 4 GB at 2 057 sequents on one family
+and passed at 1 717; in parts of at most 150 it stayed under 1 GB over the
+imports at 11 110. -/
+def partsFrom : Nat := 600
+
+def partSize : Nat := 150
 
 /-- The answer for what was found: the exit code, the verdict, and the
 rest of the file. -/
@@ -219,34 +229,75 @@ theorem notDerivable : ¬ Derivable sequent := noDerivableBy.verdict sequent cou
 kernel has checked sets of up to {kernelSeen})"
       else "not derivable"
     let warn := if beyond then s!"
--- The set below has {n} sequents.  Under a cap of 4 GB of memory the
--- kernel has checked sets of up to {kernelSeen} sequents written this way
--- (`campaign/measurements.md`).  This file may not be checked under that
--- cap; if it is not, the answer rests on the compiled check of this
--- program, which is not trusted.
+-- The set below has {n} sequents.  The kernel has checked sets of up to
+-- {kernelSeen} sequents written this way, the largest in 102 s under a cap
+-- of 4 GB of memory (`campaign/measurements.md`); its time grows with the
+-- set.  Until this file is elaborated the answer rests on the compiled
+-- check of this program, which is not trusted.
 " else ""
-    (1, verdict, proveHead Γ ++ warn ++ s!"
-/-- A saturated set of sequents of which the sequent is a member: every
+    let doc := s!"/-- A saturated set of sequents of which the sequent is a member: every
 rule that could conclude a member has a premise in the set.  It is written
 in numbers (`MALL/Coded.lean`): `table` lists the formulas, each by its
 connective and how many entries later its two parts stand; a number of
 `tree` is a sequent, its digit in base `B` at a formula's place the number
 of times the formula occurs; `goal` is the places of the formulas of the
-sequent.  The {n} sequents themselves: `#eval refutation.sequents`. -/
+sequent.  The {n} sequents themselves: `#eval refutation.sequents`. -/"
+    let check :=
+      if n ≤ partsFrom then s!"
+{doc}
 def refutation : CodeCert :=
   {Encode.showCert C}
 
 /-- The kernel checks the membership and the saturation, in numbers. -/
 theorem refuted : codeRefutes refutation sequent = true := by decide +kernel
+"
+      else
+        let depth := (List.range 32).find? (fun d => n / 2 ^ d ≤ partSize) |>.getD 31
+        let ((top, pf), (parts, keys)) := (Encode.cut depth C.tree).run (#[], #[])
+        let defs := String.join ((List.range parts.size).map fun i =>
+          s!"def part{i} : Tree := {Encode.showTree (parts.getD i .leaf)}\n")
+        let partsOk := String.join ((List.range parts.size).map fun i =>
+          s!"theorem part{i}_ok : Tree.all refutation.memberOK part{i} = true := by decide +kernel\n")
+        let keysOk := String.join ((List.range keys.size).map fun i =>
+          s!"theorem key{i}_ok : refutation.memberOK {keys.getD i 0} = true := by decide +kernel\n")
+        s!"
+-- The tree of the set, in {parts.size} parts.
+{defs}
+{doc}
+def refutation : CodeCert :=
+  {Encode.showCertWith C top}
 
+-- The check is stated in parts, one theorem for the sequent, one for each
+-- part of the tree and one for each number above the parts, and they are
+-- elaborated one after another: the kernel keeps what it has reduced until
+-- a theorem ends, so one theorem for a set of this size would need the
+-- memory of all of them together.
+set_option Elab.async false
+
+/-- The sequent is the one at the places `goal`, and its number is in the
+tree. -/
+theorem goalOk : refutation.goalOK sequent = true := by decide +kernel
+
+{partsOk}
+{keysOk}
+/-- The kernel has checked the membership and the saturation, in numbers:
+by the theorems above, put together. -/
+theorem refuted : codeRefutes refutation sequent = true :=
+  codeRefutes_of_parts goalOk
+    {pf}
+"
+    (1, verdict, proveHead Γ ++ warn ++ check ++ s!"
 /-- So the set of sequents that the numbers stand for passes the check of
 saturated sets (S27). -/
 theorem refutedAsSequents : refutedBy refutation.sequents sequent = true :=
   refutedBy_of_code refutation sequent refuted
 
-theorem notDerivable : ¬ Derivable sequent := noDerivableByCode.verdict sequent refutation refuted
+/-- By the soundness of the certifier `noDerivableByCode`
+(`MALL/SatRun.lean`), applied to the check above as it is stated. -/
+theorem notDerivable : ¬ Derivable sequent := not_derivable_of_code refuted
 
-theorem notValid : ¬ Valid sequent := noValidByCode.verdict sequent refutation refuted
+/-- By that of `noValidByCode`. -/
+theorem notValid : ¬ Valid sequent := not_valid_of_code refuted
 
 /-- The set presents a finite phase structure in which the sequent does
 not hold. -/
@@ -335,7 +386,7 @@ def main (args : List String) : IO UInt32 := do
     let mut accepted := 0
     let mut bad := 0
     let fams := (List.range 6).filterMap (fun n => (family "bots" n).map (·.1)) ++
-      (List.range 4).filterMap (fun n => (family "parbots" (n + 1)).map (·.1))
+      (List.range 4).filterMap (fun n => (family "parBots" (n + 1)).map (·.1))
     for Γ in (entries.filter (!·.derivable)).map (·.seq) ++ fams do
       match refuteSet Γ with
       | none => pure ()

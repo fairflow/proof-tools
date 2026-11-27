@@ -106,6 +106,27 @@ theorem carry_rejected :
     codeRefutes { B := 4, table := [.top, .natom 0], goal := [0, 0, 0, 0], tree := .node .leaf 4 .leaf }
       [⊤, ⊤, ⊤, ⊤] = false := by decide +kernel
 
+/-! ## A check stated in parts -/
+
+def leftPart : Tree := .node .leaf 1 .leaf
+
+def rightPart : Tree := .node .leaf 25 .leaf
+
+/-- The certificate of `contraction`, its tree given by two named parts. -/
+def contractionParts : CodeCert := { contraction with tree := .node leftPart 5 rightPart }
+
+theorem left_ok : Tree.all contractionParts.memberOK leftPart = true := by decide +kernel
+
+theorem right_ok : Tree.all contractionParts.memberOK rightPart = true := by decide +kernel
+
+theorem five_ok : contractionParts.memberOK 5 = true := by decide +kernel
+
+/-- The check from one theorem for the sequent, one for each part of the
+tree and one for the number above them: the form `mallrun prove` writes
+for a large set. -/
+theorem contraction_by_parts : codeRefutes contractionParts [a ⊕ aᗮ] = true :=
+  codeRefutes_of_parts (by decide +kernel) (Tree.all_node left_ok five_ok right_ok)
+
 /-! ## A set beyond the reach of the check of lists -/
 
 /-- `⊢ ((p ⊗ q) & (p ⊗ r))⊥, p ⊗ (q & r)` beside seven copies of ⊥

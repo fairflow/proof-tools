@@ -15,6 +15,9 @@ derivation. The rest of the page is as it was written.
 **Amended again 2026-11-26 15:22 GMT**, by a command relayed from the reviewer: section
 8, Craig and uniform interpolation.
 
+**Amended 2026-11-27 11:34 GMT**, by a task of the directing session at the reviewer's
+word: section 9, the kernel's check of a saturated set.
+
 ## 1. What was adopted, proved, and runs
 
 Propositional multiplicative-additive linear logic, in the one-sided
@@ -384,4 +387,92 @@ is long: it is not simplified up to commutativity.
 
 **The tutorial** has a section 5.8 with the two statements pinned and
 three exercises (D6 to D8), their solutions checked by the build.
+
+## 9. The kernel's check of a saturated set
+
+Added 2026-11-27, by a task of the directing session at the reviewer's
+word. Section 7 left a limit: the kernel checked a saturated set of 102
+sequents and was stopped at 8 GB of memory at 119. The cause was looked
+for by experiment and was the definition, in three ways, each enough
+alone ([measurements.md](https://github.com/fairflow/proof-tools/blob/main/calculi/MALL/campaign/measurements.md),
+"Why the kernel could not check a set, and the check in numbers"):
+
+* the ways to divide the context of a ⊗ were listed with repetition:
+  `2ᵏ` for `k` formulas, where `k` copies of one formula have `k + 1`
+  (one ⊗ beside ten copies of ⊥, 22 sequents: 1.6 GB);
+* each premise was looked for through the whole set (150 sequents of
+  one formula: 0.8 GB);
+* two sequents were compared by counting every formula of both in both
+  (two sequents of 100 letters: 0.8 GB).
+
+The compiled check had the first of these too; it had been timed only
+at sizes where it did not show (1.4 s at 204 sequents, five times more
+for each two formulas added).
+
+The repair is a second written form of the same certificate, and one
+statement, S27:
+
+    ∀ (C : CodeCert) (Γ : List Form),
+      codeRefutes C Γ = true → refutedBy C.sequents Γ = true        (refutedBy_of_code, MALL/CodedSound.lean)
+    PROVED: a saturated set written in numbers that passes stands for a set that passes the check of section 7
+
+The formulas of the set are listed once in a table; a sequent is one
+number, whose digit at a formula's place is how many times the formula
+occurs; the set is a search tree of those numbers; the ways to divide a
+context are counted on the digits, each once. The kernel compares no
+two formulas of the set, and an addition or a comparison of numerals is
+one step for it whatever their size. `refutedBy` and its theorems are
+as they were: the new check implies the old one of the set it stands
+for, so `¬ Derivable`, `¬ Valid` and the finite phase structure follow.
+`mallrun prove` writes its sets in this form.
+
+Measured under a cap of 4 GB of memory for the kernel, each run one
+process group under a deadline; time and memory are over the imports
+(1.0 s, 1 214 MB) for the first four lines and whole for the last three:
+
+| the set | as lists, before | in numbers, after |
+|---|---|---|
+| 85 sequents (`bots 4`) | checked, 5.6 s, 1 536 MB | checked, 0.1 s, 47 MB |
+| 102 sequents (`bots 5`) | stopped at the cap after 24 s | checked, 0.2 s, 56 MB |
+| 1 003 sequents (`bots 58`) | not run: the compiled check of the lists takes 1.3 s at 204 sequents and five times more for each two ⊥ | checked, 3.6 s, 882 MB |
+| 957 sequents (`parBots 10`) | stopped at the cap from 277 | checked, 2.8 s, 758 MB |
+| 3 347 sequents (a sequent of seven formulas) | | checked in 32 parts, 16 s, peak 1.6 GB |
+| 7 927 sequents (`parBots 30`) | | checked in 64 parts, 47 s, peak 1.8 GB |
+| 11 110 sequents (a sequent of eight formulas) | | checked in 128 parts, 102 s, peak 2.2 GB |
+
+As one theorem the new check passes at 1 717 and 2 334 sequents on the
+two families and is stopped at the cap at 2 057 and 3 592: the kernel
+keeps what it has reduced until a theorem ends. So above 600 sequents
+`mallrun prove` states the check in several theorems, one for each part
+of the tree, put together by a lemma; nothing tried that way failed. One
+thing found by measuring a size beyond: with a base that is a power of
+two the kernel took ten times longer once the numbers passed 2⁶⁴ (55 s
+against 4.6 s at 1 003 sequents); the base is odd.
+
+**The checks.** The statement was entered and screened before its proof:
+45 998 altered certificates, 6 278 of them accepted by the check in
+numbers, and of those none whose decoded set the check of section 7
+refuses. The screen was itself checked by weakening the check in two
+known ways: it caught one (18 cases) and did not reach the other, for
+which a case was written by hand (`carry_rejected`,
+`MALL/CodedTest.lean`). Ten refused certificates in the kernel. The
+corpus's counts by `mallrun prove` are unchanged (derivable 23, not
+derivable 15, no flag, every printed file elaborated). Not read back by
+a cold reader.
+
+**Not repaired, and not proved.**
+
+* `refutedBy` itself is unchanged: it is the definition to read, and
+  the kernel still cannot run it on a set of a hundred sequents.
+* That every saturated set has a certificate in numbers that passes is
+  not proved (it needs the encoder verified). The producer's
+  certificate is checked each time, and the completeness of the
+  certificate as lists (S21) stands.
+* There is still a bound, now of time: the kernel takes about 9 ms a
+  sequent at 11 110 sequents (102 s), and that is the largest set it
+  has been seen to check. Above it the first line of `mallrun prove`
+  says the answer rests on the compiled check until the file is
+  elaborated.
+* The check of a cyclic phase structure was not looked at: it has not
+  been seen to fail.
 

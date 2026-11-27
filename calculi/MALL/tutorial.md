@@ -457,15 +457,29 @@ and the structure it presents:
 **Which certificate.** The limit of the first is existence: `refuteBy`
 tries a few cyclic groups and may find nothing. The limit of the second
 is size. Every way to divide the context of every ⊗ needs a premise in
-the set, so the set grows quickly with the number of ⊗, and the check
-compares each such premise with the whole set. Measured: a set of 86
-sequents is checked by the kernel in 3.4 s, and one of 305 not within a
-minute (the campaign's
-[measurements](https://github.com/fairflow/proof-tools/blob/5e0d563/calculi/MALL/campaign/measurements.md),
-"Refutations by a saturated set"); a cyclic structure for a sequent of
-130 formulas is checked in about a second. For the converse of
-half-distributivity, where `refuteBy` finds nothing, `refuteSet`
+the set, so the set grows quickly with the number of ⊗. For the converse
+of half-distributivity, where `refuteBy` finds nothing, `refuteSet`
 returns seventeen sequents, and the check accepts them.
+
+**The set in numbers.** `refutedBy` is the definition to read, and the
+kernel runs it on a set of a few tens of sequents. It is not the form to
+run on a large one: it lists the ways to divide a context with
+repetition (`2ᵏ` for `k` formulas, where `k` copies of one formula have
+`k + 1`), it looks for each premise through the whole set, and it
+compares two sequents by counting every formula of both. Under 4 GB the
+kernel was stopped on a set of 102 sequents. So a set is also written
+in numbers (`CodeCert`, `MALL/Coded.lean`): its formulas listed once in
+a table; a sequent one number, whose digit at a formula's place is how
+many times the formula occurs; the set a search tree of those numbers.
+`codeRefutes C Γ` is the same check read in numbers, and
+`refutedBy_of_code` proves that it implies `refutedBy C.sequents Γ`, so
+the theorems above hold of the set that the numbers stand for.
+`Encode.encode D Γ` writes a set in numbers (code, not trusted);
+`noDerivableByCode.verdict Γ C` is the certifier, and it is what
+`mallrun prove` writes. Measured: a set of 1 003 sequents is checked by
+the kernel in under 5 s (the campaign's
+[measurements](https://github.com/fairflow/proof-tools/blob/main/calculi/MALL/campaign/measurements.md),
+"Why the kernel could not check a set, and the check in numbers").
 
 ### Exercises C: phase semantics, and the two certificates
 

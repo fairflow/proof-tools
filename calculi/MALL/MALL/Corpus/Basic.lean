@@ -145,7 +145,7 @@ def family : String → Nat → Option (List Form × Bool)
   | "withTree", n => some (withTree n, true)
   | "slack", n => some (slack n, true)
   | "bots", n => some (bots n, false)
-  | "parbots", n => some (parBots n, false)
+  | "parBots", n => some (parBots n, false)
   | _, _ => none
 
 end MALL.Corpus

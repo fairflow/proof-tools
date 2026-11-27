@@ -514,7 +514,26 @@ the bound on the digits, 18 accepted certificates decode to sets that
 `refutedBy` refuses; with the sequent's number taken as the sum of its
 units and nothing taken out, the alterations reach no failure, and one
 is made by hand (four times ⊤ at a base of 4: a negative test of
-`MALL/CodedTest.lean`). **OPEN** (entered; the proof follows).
+`MALL/CodedTest.lean`). Proved by `refutedBy_of_code`,
+`MALL/CodedSound.lean`, within `[propext, Quot.sound]`; the certifiers
+are in `MALL/SatRun.lean`, and `not_derivable_of_code`,
+`not_valid_of_code`, `countermodel_of_code` give the three consequences.
+The proof: a unit added to a number whose digits have room puts the
+formula at that place in the sequent (`dec_add_unit`); a unit taken from
+a place with a digit that is not 0 takes it out (`dec_sub_unit`); every
+way to divide the sequent of a number in two is the sequents of two
+numbers with that sum, the first reached by the enumeration
+(`dec_split`, by `split4` of `MALL/Split.lean`); a number found in the
+tree is one of its numbers whatever the tree's order
+(`Tree.mem_of_has`); and the walk of a member along the table gives the
+condition of S20 at each formula of its sequent (`CodeCert.member_sat`).
+For a large set the check is stated as several theorems and put
+together by `codeRefutes_of_parts` and `Tree.all_node`. Tests:
+`MALL/CodedTest.lean` (three facts with certificates written by hand,
+ten refused certificates, a check in parts, a set of 136 sequents, the
+producer on the 15 non-theorems and on nine members of the two
+families). Not read
+back by a cold reader. **PROVED.**
 
 ### The reading back of S22 to S25
 
@@ -574,3 +593,4 @@ Nothing was set aside by the reviewer.
 | of our own (S1, S2, S3, S18, S19, S20, S21) | 7 | 0 | 0 |
 | added by command after the closing page (interpolation: S22 to S25) | 4 | 0 | 0 |
 | added by the starting session's decision (S26) | 1 | 0 | 0 |
+| added by a task of the directing session, at the reviewer's word (S27) | 1 | 0 | 0 |

@@ -84,6 +84,28 @@ def showNode : Node → String
   | .wth a c => s!".wth {a} {c}"
   | .plus a c => s!".plus {a} {c}"
 
+/-- A tree cut at a depth, for a check stated in parts: the top of the
+tree as source with the subtrees below it named `part0`, `part1`, …; those
+subtrees; the numbers of the top; and the proof, as source, that every
+number passes, from theorems `part0_ok`, … and `key0_ok`, … -/
+partial def cut : Nat → Tree → StateM (Array Tree × Array Nat) (String × String)
+  | _, .leaf => pure (".leaf", "rfl")
+  | 0, t => do
+    let i := (← get).1.size
+    modify fun (ts, ks) => (ts.push t, ks)
+    pure (s!"part{i}", s!"part{i}_ok")
+  | d + 1, .node l k r => do
+    let (sl, pl) ← cut d l
+    let j := (← get).2.size
+    modify fun (ts, ks) => (ts, ks.push k)
+    let (sr, pr) ← cut d r
+    pure (s!"(.node {sl} {k} {sr})", s!"(Tree.all_node {pl} key{j}_ok {pr})")
+
+/-- The certificate with the tree given as source. -/
+def showCertWith (C : CodeCert) (tree : String) : String :=
+  "{ B := " ++ toString C.B ++ "\n    table := [" ++ ", ".intercalate (C.table.map showNode) ++
+  "]\n    goal := " ++ toString C.goal ++ "\n    tree := " ++ tree ++ " }"
+
 /-- The certificate as Lean source. -/
 def showCert (C : CodeCert) : String :=
   "{ B := " ++ toString C.B ++ "\n    table := [" ++ ", ".intercalate (C.table.map showNode) ++

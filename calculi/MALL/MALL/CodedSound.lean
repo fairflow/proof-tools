@@ -250,6 +250,13 @@ theorem Tree.all_spec {P : Nat → Bool} : ∀ {t : Tree}, Tree.all P t = true �
     · exact h.1.2
     · exact Tree.all_spec h.2 _ hk
 
+/-- A tree passes where its two subtrees and its number do: the lemma by
+which a check stated in several theorems, one for each part of the tree,
+is put together. -/
+theorem Tree.all_node {P : Nat → Bool} {l r : Tree} {k : Nat} (hl : Tree.all P l = true)
+    (hk : P k = true) (hr : Tree.all P r = true) : Tree.all P (.node l k r) = true := by
+  simp only [Tree.all, hl, hk, hr, Bool.and_self]
+
 /-! ## The table of formulas -/
 
 theorem forms_length : ∀ T : List Node, (forms T).length = T.length
@@ -442,6 +449,14 @@ theorem refutedBy_of_code : CodeSoundness := by
     intro δ hδ pk hpk
     obtain ⟨k, hk, rfl⟩ := List.mem_map.1 hδ
     exact C.member_sat (hmem k hk) hpk
+
+/-- **The check, from its parts.**  The kernel keeps what it has reduced
+until a theorem ends, so the check of a large set is stated as several
+theorems (the sequent; each part of the tree) and put together here and by
+`Tree.all_node`. -/
+theorem codeRefutes_of_parts {C : CodeCert} {Γ : List Form} (hg : C.goalOK Γ = true)
+    (ht : Tree.all C.memberOK C.tree = true) : codeRefutes C Γ = true := by
+  simp only [codeRefutes, hg, ht, Bool.and_self]
 
 /-- A certificate in numbers that passes: the sequent has no derivation. -/
 theorem not_derivable_of_code {C : CodeCert} {Γ : List Form} (h : codeRefutes C Γ = true) :

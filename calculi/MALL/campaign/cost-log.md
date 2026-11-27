@@ -59,6 +59,17 @@ the tutorial's section and its exercises were written by the operator.
 Errors found by the build on the way: a `simp` and an `omega` that used
 `Classical.choice` (found by the file's bound, located by `#axiom_path`).
 
+The kernel's check of a saturated set, a task of the directing session:
+began 2026-11-27 10:06, records written 11:34 GMT (the same session, its
+context summarised by the environment once before the task). No agent
+was started. Measuring ran in the background beside the proof: about
+25 minutes of Lean runs by their own clocks, one at a time under 4 GB.
+Errors on the way: the second family's files named a definition by the
+family's key (`parbots` for `parBots`), and the measuring script read
+the failure as a memory stop because the lines of `/usr/bin/time` have
+the word (found by a time of 0.0 s; one rerun); a time written in a
+note without reading the clock (corrected).
+
 ## What went wrong, and what it cost
 
 | what | found by | cost |

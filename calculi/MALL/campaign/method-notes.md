@@ -277,6 +277,111 @@ a note says where a choice made here would, or would not, carry over.
     letters (seven formulas) is answered in 25 s by a set of
     3 347 sequents, and flags at the default deadline of 10 s.
 
+## A check the kernel could not run (a task from the directing session)
+
+30. **Why the kernel could not check a saturated set, and what the
+    repair showed** (2026-11-27; `measurements.md`, "Why the kernel
+    could not check a set", has the figures). The presumption of
+    `reference/certify.md` §5 held: the definition was at fault.
+
+    (a) *The experiments that found it, in the order that paid.* The
+    file's parts timed apart (the literal alone; membership of the
+    sequent; saturation): one run each, and only saturation cost
+    anything. `#print` of each function on the path: all by structural
+    recursion. Then a copy of the check that counts its own operations,
+    run compiled: at 68 sequents, 166 326 comparisons of formulas for
+    386 questions of membership. Then three families of small inputs,
+    each growing in one thing only (one ⊗ beside `k` equal formulas;
+    many sequents of one formula; two wide sequents): each alone
+    exhausted 4 GB, so there were three causes and not one. *Proposed*
+    for §5: "time the parts of the file apart; count the operations of
+    the check, compiled; then grow one thing at a time".
+
+    (b) *"Compiled in milliseconds" was a property of the sizes tried.*
+    The compiled check of the set as lists took 1.4 s at 204 sequents
+    and five times more for every two formulas added beside the ⊗. So
+    the kernel was not hiding a fault that compiled code did not have:
+    nobody had run the compiled check one size beyond the kernel's
+    limit. *Proposed*: where the kernel fails, run the compiled check
+    two sizes further before anything else; a check that grows there is
+    the cause.
+
+    (c) *What the kernel pays for.* Measured here, Lean 4.31: a
+    comparison of two formulas it has not met costs 20 to 60 KB and 50
+    to 180 µs (by the derived `DecidableEq`, three times a Boolean
+    equality written by hand, and a stack overflow at 20 000
+    comparisons of nested formulas); a step of a recursion along a list
+    some thousands of bytes; an addition or a comparison of numerals,
+    near nothing whatever their size. And it keeps what it has reduced
+    until the declaration ends, so memory follows work. §5 says "check
+    over a form that does not [grow] (sets for multisets)". Here the
+    form is **numbers**: a multiset as one number whose digits are the
+    multiplicities (equal up to order is one comparison; a formula put
+    in is one addition), the formulas listed once in a table by their
+    connective and the places of their parts (so the kernel never
+    compares two formulas), a set as a search tree of the numbers, and
+    the divisions of a multiset counted without repetition. A set of
+    1 003 sequents: stopped at 8 GB at 119 before; 4.6 s and 0.9 GB
+    after. *Proposed*: add "numbers for multisets and a search tree for
+    a set" to the repairs of §5.
+
+    (d) *A base that is a power of two cost ten times.* Found only by
+    measuring one size beyond: with base 32 a set of 510 sequents took
+    1.1 s over the imports, with base 64 a set of 527 took 10.5 s, and
+    at 1 003 sequents 55 s against 4.6 s with base 61. The numbers
+    passed 2⁶⁴ at that step and, the place of the repeated formula
+    being the highest, differed only above bit 64. An odd base, in
+    which a high digit changes the low bits, removed it. The inference,
+    not looked at in the kernel's source: its tables key a numeral by
+    its low 64 bits. *Proposed*: say in §5 that large numerals that
+    agree in their low 64 bits are slow in the kernel, and that a
+    numbering in an odd base avoids it.
+
+    (e) *Sound in its own right, not equal.* GLS proved its new checks
+    equal to the old ones (its note 28 b). Here the certificate's type
+    had to change: the kernel cannot read a thousand sequents of sixty
+    formulas as lists for less than the old check cost. So the new
+    check is proved to imply the old one of the decoded set, the old
+    certifier and its completeness stay as they were, and what is not
+    proved is said (that every saturated set has a certificate in
+    numbers that passes). *Proposed*: §5 names both forms of repair;
+    say when the second is forced.
+
+    (f) *The screen of the statement was by alteration, with controls.*
+    45 998 altered certificates, each accepted one decoded and given to
+    the old check. Two controls, the check weakened in two known ways:
+    the first was caught (18 cases); the second was not reached by any
+    alteration and needed a case made by hand. *Proposed* for the
+    screens of a checker: weaken the check and see that the screen
+    fails; a control the screen misses is a test to write.
+
+    (g) *A clock read around a pure computation read 0 µs.* The
+    compiler moved the computation after the second reading. In a
+    compiled measurement, force each timed value (`IO.lazyPure`).
+
+    (h) *A fact stated through the certifier after a named check cost
+    the elaborator part of the check again.* The printed file names
+    its check (`refuted : codeRefutes refutation sequent = true`) and
+    states three facts from it. With `noDerivableByCode.verdict sequent
+    refutation refuted`, Lean has to find `codeRefutes …` and
+    `noDerivableByCode.check …` equal, and at 697 sequents each such
+    fact added 0.4 s and 180 MB to a check of 2.1 s; with the soundness
+    lemma applied to the named theorem (`not_derivable_of_code
+    refuted`) nothing is added. DILL's owner found the same at a larger
+    scale (its note in the shared folder). *Proposed* for the paragraph
+    "The program's own check" or for `certify.md` §5 on the printed
+    file: one named check, and every fact from it by a lemma whose
+    hypothesis is that statement letter for letter.
+
+    (i) *The kernel's memory is that of one theorem.* As one theorem
+    the new check was stopped at 4 GB at 2 057 sequents. Stated as one
+    theorem for each part of the tree (at most 150 numbers) and put
+    together by a lemma, with `set_option Elab.async false`, a set of
+    11 110 sequents is checked in 102 s within 1 GB over the imports.
+    DILL's owner found the same. *Proposed* for §5: a check that is a
+    conjunction over the certificate is printed in parts above a
+    measured size, and the bound that is left is one of time.
+
 ## For phase 2 (dual intuitionistic linear logic)
 
 * The linear zone: this campaign's form (a variable conclusion, a
