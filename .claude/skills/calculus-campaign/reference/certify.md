@@ -171,6 +171,17 @@ to show both sides; your level is the plan's.
 - Level 3 is a completeness theorem: a result of Q2, proved if it is a
   goal. Trust never needs it: without it the answer is sometimes `flag`,
   and never wrong.
+  State it as a function into the two subtypes of certificates,
+  `(s) → { c // yes.check s c = true } ⊕ { r // no.check s r = true }`,
+  and make the producer that function. A decision that returns the
+  derivation as data is as large as the derivation, whatever the
+  search does (GLS: `2ⁿ` by its type, cut off at 28 nested boxes); the
+  derivation is kept for the theorem about the calculus, which nothing
+  runs. Where a second search is written because the proved one is
+  slow, try its proof before building a fallback from one to the
+  other: GLS ran an unproved search in front of an exponential proved
+  one for two days, and the proof took an hour once the invariant was
+  seen.
 
 **Where the countermodel comes from** is a question for the Survey (Q3),
 because calculi differ. In some an unfinished derivation that can go no
@@ -443,10 +454,14 @@ certificate, whose notes are not in this repository).
   and not derivable), the check is a theorem of its own, stated through
   the certifier (`K.check s c = true := by decide +kernel`), and passed
   to each `verdict`: the default argument of `verdict` runs the check
-  again for each fact (41 s against 20 s on one set, DILL). A second
-  statement of the same Boolean is to be measured, not assumed equal:
-  stated of the checker's function and not through the certifier, the
-  kernel passed 8 GB on the same set. A fact's import is paid by every
+  again for each fact (41 s against 20 s on one set, DILL). State the
+  check as `K.check s c = true` and in no other form: where the type
+  of the named check is not the same text as what `verdict` asks for,
+  the elaborator computes the check itself to find the two equal,
+  outside the kernel and once for each fact (3.6 s each at 76
+  sequents, beside the kernel's 1.4 s; an earlier wording here blamed
+  the kernel). Where even that costs, use the soundness lemma directly
+  in place of `verdict` (MALL). A fact's import is paid by every
   answer: each printed file loads it. A second fact by a theorem of
   the library may be the statement people cite (derivability in
   natural deduction, by cut elimination). One through a heavier import
@@ -493,6 +508,44 @@ certificate, whose notes are not in this repository).
   size beyond. A deadline is not a cap on memory; and a timing taken
   inside compiled code is compared with the time of the whole process
   (one read 80 µs for work of 0.1 s).
+- *A check the kernel cannot run is a fault of the checker too.* Three
+  campaigns recorded "the kernel stops at `n`" as a limit of the route
+  (MALL: a set of 119 sequents, 8 GB; DILL: a set of 200 in 16 s and
+  5.7 GB, a tree at a chain of 96 not settled). Each was a definition
+  at fault, and each fault was in the compiled check as well, where
+  nobody had run it one size beyond the kernel's limit. The causes
+  found: for each premise, a scan of the whole set; two sequents
+  compared by counting every formula of both; the divisions of a
+  context listed with repetition (`2ᵏ` for `k` copies of one formula,
+  where there are `k + 1`); the principal formula looked for with the
+  derived `DecidableEq`. How they were found, in the order that paid:
+  time the parts of the printed file apart (the literal, membership,
+  the check); `#print` each function on the path (`brecOn`, not
+  `._unary`); run a copy of the check that counts its own operations
+  (at 68 sequents, 166 326 comparisons of formulas for 386 questions:
+  the count found in one run what the timings had not); then grow one
+  thing at a time, and run the compiled check two sizes beyond where
+  the kernel stops.
+  What the kernel pays (Lean 4.31, measured in MALL and DILL): two
+  formulas it has not met, compared by the derived `DecidableEq`, 50
+  to 180 µs and 20 to 60 KB; a step of a recursion along a list, about
+  10 µs; an operation on numerals, a few µs whatever their size; a
+  term met before, about 3 µs. It keeps what it has reduced until the
+  declaration ends, so memory follows work. A check written for the
+  kernel therefore has few list steps and no comparison of formulas:
+  a table of the formulas, each sequent a number whose digits are the
+  multiplicities, a set as a search tree of the numbers (MALL: stopped
+  at 119 sequents before, 1 003 in 3.6 s after, 11 110 in parts; an
+  odd base, since a power of two cost ten times once the numbers
+  passed 64 bits); `bif` and `Nat.beq` where `if … == …` unfolds
+  instances at every step. Where one theorem still passes the cap,
+  state the check as several, one for each part of the set, joined by
+  a proved lemma. The new check may be proved equal to the old one, or
+  only sound for it at a certificate computed from the one given (the
+  set with its zones in one order): that is enough, and a certificate
+  it refuses is a flag. Measure each form before proving it, in a file
+  with no proofs: three forms were tried in each of the three
+  campaigns.
 - *A certificate beyond the kernel.* A search can print in
   milliseconds a certificate that Lean does not check within the
   memory cap (MALL: a saturated set of 238 sequents, stopped at 8 GB).
