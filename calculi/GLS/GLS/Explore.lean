@@ -36,12 +36,23 @@ worlds it sees directly below it and one step in.  A world sees every
 world below it, at any depth. -/
 def Tree.draw (t : Tree) : String := "\n".intercalate (t.lines "")
 
+mutual
+  /-- The height of the derivation that a tree of moves is: 1 for a move
+  with no premise (as `Fam.height`). -/
+  def certHeight : Cert S → Nat
+    | .node _ cs => certHeightL cs + 1
+  /-- The greatest height in a list. -/
+  def certHeightL : List (Unit × Cert S) → Nat
+    | [] => 0
+    | (_, c) :: cs => max (certHeight c) (certHeightL cs)
+end
+
 /-- **What the search says of a sequent**: that it is derivable, with the
 height of the derivation found; or the countermodel, drawn. -/
 def explain (s : Seq) : String :=
-  match proofOrRef s with
-  | .inl d => s.show ++ "\n  is derivable in GLS: the search found a derivation of height " ++
-      toString d.height
+  match certOrRef s with
+  | .inl c => s.show ++ "\n  is derivable in GLS: the search found a derivation of height " ++
+      toString (certHeight c.1)
   | .inr r => s.show ++ "\n  is not derivable in GLS: it is false at the root of\n" ++ r.1.draw
 
 /-! ## Tactics of the calculus -/

@@ -6,7 +6,7 @@ definition it is proved equal to.
 
 Code, not theory: nothing here is trusted, and the file has no bound on
 axioms.  A screen that fails is a `#guard` that fails the build.  The
-statements are S25 to S27 of `campaign/statements.md`.
+statements are S25 to S29 of `campaign/statements.md`.
 -/
 import GLS.Table
 import GLS.Counts
@@ -30,7 +30,8 @@ open GLS.Screen (seqsSmall worlds trees2 forms2)
 #guard seqsSmall.any fun j => ((worlds trees2).take 200).any fun w => j.refutedT w
 #guard seqsSmall.any fun j => ((worlds trees2).take 200).any fun w => !j.refutedT w
 
-/-- The tree of the search over sets, where it finds one. -/
+/-- The tree of worlds of the search, where the sequent has none of
+moves. -/
 def treeOf (j : Seq) : Option Tree :=
   match produceSet j with
   | some (.inr t) => some t
@@ -51,7 +52,7 @@ def treeOf (j : Seq) : Option Tree :=
 
 /-! ## S27: the replay by counts -/
 
-/-- The tree of moves of the search over sets, where it finds one. -/
+/-- The tree of moves of the search, where there is one. -/
 def movesOf (j : Seq) : Option (Cert S) :=
   match produceSet j with
   | some (.inl c) => some c
@@ -100,5 +101,68 @@ def smallMoves : List (Seq × Cert S) :=
   (.mk (.impL p ⊥) [.mk (.impL p ⊥) [.mk (.idP 0) [], .mk .botL []], .mk .botL []])
 #guard (([p ⟶ ⊥, p ⟶ ⊥, p] ⇒ [] : Seq)).countCheck
   (.mk (.impL p ⊥) [.mk (.impL p ⊥) [.mk (.idP 0) [], .mk .botL []], .mk .botL []])
+
+/-! ## S28: the search at sequents without repeated formulas
+
+`certOrRef` is proved; these were the screens of its statement and of the
+lemma under it, run with the search that was not proved before the proof
+was written, and they are kept as guards. -/
+
+-- on the 1 024 small sequents one side answers, and its certificate
+-- passes the certifier's check
+#guard seqsSmall.all fun j => match certOrRef j with
+  | .inl c => j.countCheck c.1
+  | .inr r => j.refutedT r.1
+
+/-- Sequents that have the formulas of a sequent, and more. -/
+def more (j : Seq) : List Seq :=
+  [twice j, j.ant ++ [□p, q] ⇒ j.suc, j.ant ⇒ j.suc ++ [□□p, p ⟶ q],
+    [p ⟶ q] ++ j.ant ++ j.ant ⇒ [□p] ++ j.suc ++ j.suc]
+
+-- a tree found for a sequent replays at every sequent with its formulas
+#guard smallMoves.all fun (j, c) => (more j).all fun j' => j'.countCheck c
+-- a sequent with repeats at the root: the tree of the sequent less its
+-- repeats replays at it, and a tree of worlds refutes it
+#guard (seqsSmall.take 300).all fun j => match certOrRef j.dedup with
+  | .inl c => (twice j).countCheck c.1 && j.countCheck c.1
+  | .inr r => (twice j).refutedT r.1
+-- a control: a tree does not replay at a sequent that lacks a formula
+#guard smallMoves.any fun (j, c) => !(([] ⇒ j.suc : Seq)).countCheck c
+-- where the search over multisets is cut off: 64 nested boxes
+#guard (certOrRef (boxChain 64)).isLeft && (certOrRef (lastChain 64)).isLeft
+#guard (certOrRef (consis 64)).isRight
+
+/-! ## S29: a script with its goals by counts -/
+
+/-- The two replays of a script agree. -/
+def agreeS (j : Seq) (ls : Script S) : Bool := j.scriptCheck ls == derives S j ls
+
+-- the script of each tree at its own sequent: both accept
+#guard smallMoves.all fun (j, c) => agreeS j (certScript c) && j.scriptCheck (certScript c)
+-- at its sequent written twice, and at 40 other sequents; both answers occur
+#guard smallMoves.all fun (j, c) => agreeS (twice j) (certScript c)
+#guard smallMoves.all fun (_, c) => ((seqsSmall.drop 500).take 40).all fun j => agreeS j (certScript c)
+#guard smallMoves.any fun (_, c) => ((seqsSmall.drop 500).take 40).any fun j => !j.scriptCheck (certScript c)
+-- a script cut short leaves a goal, a line too many has no goal, a goal
+-- that is not there: refused by both
+#guard smallMoves.all fun (j, c) =>
+  let ls := certScript c
+  agreeS j ls.dropLast && !j.scriptCheck ls.dropLast &&
+  agreeS j (ls ++ ls.take 1) && !j.scriptCheck (ls ++ ls.take 1) &&
+  agreeS j (ls.map fun l => { l with goal := l.goal + 1 }) &&
+  !j.scriptCheck (ls.map fun l => { l with goal := l.goal + 1 })
+-- lines in another order: the second premise of ImpL first (goal 1)
+#guard agreeS ([p ⟶ ⊥, p] ⇒ []) [⟨0, .impL p ⊥⟩, ⟨1, .botL⟩, ⟨0, .idP 0⟩] &&
+  (([p ⟶ ⊥, p] ⇒ [] : Seq)).scriptCheck [⟨0, .impL p ⊥⟩, ⟨1, .botL⟩, ⟨0, .idP 0⟩]
+#guard agreeS ([p ⟶ ⊥, p] ⇒ []) [⟨0, .impL p ⊥⟩, ⟨1, .idP 0⟩, ⟨0, .botL⟩] &&
+  !(([p ⟶ ⊥, p] ⇒ [] : Seq)).scriptCheck [⟨0, .impL p ⊥⟩, ⟨1, .idP 0⟩, ⟨0, .botL⟩]
+-- the script of a tree is the script of the derivation the tree is
+#guard smallMoves.all fun (j, c) =>
+  if h : Cert.check j c = true then
+    toString (repr (certScript c)) == toString (repr (Der.ofCert j c h).script)
+  else false
+-- where the library's replay is not run: 64 nested boxes
+#guard (movesOf (boxChain 64)).any fun c => (boxChain 64).scriptCheck (certScript c)
+#guard (movesOf (lastChain 64)).any fun c => (lastChain 64).scriptCheck (certScript c)
 
 end GLS.CheckTest

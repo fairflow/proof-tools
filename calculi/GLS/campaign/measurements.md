@@ -47,9 +47,14 @@ of Tables 1 and 2):
 
     lastChain n  ⇒ □p → □ⁿq → □ⁿp                               derivable; GLR nested n deep, the p of IdP last in the antecedent
 
-## Table 1: the search over multisets
+## Table 1: the search over multisets (a record of 2026-11-25)
 
-Measured at 09:53, before the search over sets existed. Loading the
+**A record, not a measurement of the program as it is.** It is of
+`proofOrRef`, the search that returns a derivation of GLS as a term,
+which no command runs since 2026-11-27, and of the certifiers' checks as
+they then were (the definitions). The program as it is: Table 5.
+
+Measured on 2026-11-25 at 09:53, before the search over sets existed. Loading the
 imports: 1.17 s, taken off the last three columns. Deadlines: the
 producer 20 s, each check 30 s. `flag`: cut off at the deadline; the
 column stops there.
@@ -99,9 +104,13 @@ holds those sequents, and the compiled search builds them. The cause is
 the calculus on multisets as the source states it, not the order of the
 search.
 
-## Table 2: the search over sets
+## Table 2: the search over sets (a record of 2026-11-25)
 
-Measured at 13:20 to 13:27, **after** the repair of `dedup`
+**A record, as Table 1 is.** It is of the search over sets before it was
+proved, and of the certifiers' checks as they then were. The program as
+it is: Table 5.
+
+Measured on 2026-11-25 at 13:20 to 13:27, **after** the repair of `dedup`
 (`method-notes.md`, 26). Before the repair this search was cut off at
 `kChain 16`, `consis 16` and `binTree 4` (20 s); that table is not
 kept. Loading the imports: 0.91 s, taken off the last three columns.
@@ -344,7 +353,10 @@ countermodel). With `--proved --deadline=5` on the same 25: 23 agree
 and 2 are flags at the deadline (`boxChain 32`, `consis 32`), as
 before.
 
-**Not repaired**, and why:
+**Not repaired** at that hour, and why. (Later the same day the search
+and the scripts, the second and third below, were repaired: "The search
+and the scripts", after this section, which has the list as it now
+stands.)
 
 * **The derivation as data is still `2ⁿ` large.** `treeCert.verdict s
   c : Fam s` is a term of the family, whose sequents are those of GLS
@@ -374,9 +386,156 @@ before.
   sequents with their repeated formulas removed: not changed, and
   slower in the kernel than `treeCert` (Table 2).
 
-**Tables 1 and 2 were not measured again.** Their columns for
-`treeCert` and `noDerivable` are of the checks as they were on
-2026-11-25 (the definitions); Tables 3 and 4 are of the checks as they
-are. Not measured: memory, except where a cap was reached; `binTree`
+Tables 1 and 2 are of the checks as they were on 2026-11-25 (the
+definitions); Tables 3 and 4 are of the checks as they are. Not
+measured in Tables 3 and 4: memory, except where a cap was reached; `binTree`
 with the new checks beyond the corpus script's `binTree 4`; anything
 between 64 and 128 or beyond 256.
+
+## The search and the scripts: Table 5, which takes the place of Tables 1 and 2
+
+Added 2026-11-27 10:37 GMT. Why: `decisions.md`, the second entry of 2026-11-27. Every
+column is of the program as it is: the search of `GLS/Decide.lean`
+(S28), the certifiers' checks of S26, S27 and S29. Run by `python3 -I
+Corpus/measure.py`, from `calculi/GLS/` after `lake build GLS glsrun`.
+Machine: arm64, macOS-15.8.3-arm64-arm-64bit.  Loading the imports: 0.93 s, taken off the kernel's columns
+(so a kernel's column includes reading the certificate as a term, which
+Tables 3 and 4 took off). Deadlines: the search 20 s, each kernel check
+60 s; Lean under `-M 4000`, a cap of 4 GB; a column stops at its first
+flag. The compiled checks are one run of `glsrun check`.
+
+| family | n | verdict | size of the certificate | the search, compiled | `treeCert` or `noDerivable`, compiled | `scriptCert`, compiled | the tree by `treeCert` or `noDerivable`, kernel | the tree of moves by `setCert`, kernel | the script by `scriptCert`, kernel | the kernel running the search (`decide +kernel`) |
+|---|---|---|---|---|---|---|---|---|---|---|
+| boxChain | 16 | pass | 19 | 0 ms | 15 µs | 20 µs | 0.01 s | 0.05 s | 0.03 s | 0.10 s |
+| boxChain | 32 | pass | 35 | 0 ms | 48 µs | 56 µs | 0.06 s | 0.35 s | 0.07 s | 0.43 s |
+| boxChain | 64 | pass | 67 | 2 ms | 239 µs | 279 µs | 0.15 s | 2.02 s | 0.17 s | 2.46 s |
+| boxChain | 128 | pass | 131 | 25 ms | 1.8 ms | 1.9 ms | 0.46 s | flag: over the cap on memory, 4 GB | 0.71 s | flag: over the cap on memory, 4 GB |
+| boxChain | 256 | pass | 259 | 340 ms | 10.7 ms | 11.2 ms | 1.61 s | not run | 2.84 s | not run |
+| boxChain | 512 | pass | 515 | 4983 ms | 61.6 ms | 65.1 ms | 6.73 s | not run | 16.32 s | not run |
+| lastChain | 16 | pass | 19 | 0 ms | 25 µs | 30 µs | 0.07 s | 0.15 s | 0.03 s | 0.17 s |
+| lastChain | 32 | pass | 35 | 1 ms | 109 µs | 124 µs | 0.15 s | 0.87 s | 0.16 s | 1.06 s |
+| lastChain | 64 | pass | 67 | 7 ms | 520 µs | 544 µs | 0.66 s | 6.57 s | 0.66 s | 7.16 s |
+| lastChain | 128 | pass | 131 | 83 ms | 3.9 ms | 4.2 ms | 2.87 s | flag: over the cap on memory, 4 GB | 2.97 s | flag: over the cap on memory, 4 GB |
+| lastChain | 256 | pass | 259 | 1263 ms | 25.9 ms | 26.6 ms | flag: over the cap on memory, 4 GB | not run | flag: over the cap on memory, 4 GB | not run |
+| lastChain | 512 | pass | 515 | 19333 ms | no answer | no answer | not run | not run | not run | not run |
+| kChain | 16 | pass | 51 | 0 ms | 14 µs | 14 µs | 0.16 s | 0.34 s | 0.14 s | 0.44 s |
+| kChain | 32 | pass | 99 | 2 ms | 34 µs | 36 µs | 0.32 s | 1.96 s | 0.42 s | 2.64 s |
+| kChain | 64 | pass | 195 | 10 ms | 103 µs | 103 µs | 1.02 s | flag (> 60 s) | 1.83 s | flag: over the cap on memory, 4 GB |
+| kChain | 128 | pass | 387 | 84 ms | 376 µs | 392 µs | 4.65 s | not run | 8.59 s | not run |
+| kChain | 256 | pass | 771 | 611 ms | 1.4 ms | 1.5 ms | flag (> 60 s) | not run | flag: over the cap on memory, 4 GB | not run |
+| kChain | 512 | pass | 1539 | 4456 ms | 5.4 ms | 6.1 ms | not run | not run | not run | not run |
+| consis | 16 | fail | 17 | 0 ms | 8 µs | not a derivation | 0.00 s | not a derivation | not a derivation | 0.07 s |
+| consis | 32 | fail | 33 | 0 ms | 24 µs | not a derivation | 0.07 s | not a derivation | not a derivation | 0.49 s |
+| consis | 64 | fail | 65 | 2 ms | 121 µs | not a derivation | 0.35 s | not a derivation | not a derivation | 2.31 s |
+| consis | 128 | fail | 129 | 24 ms | 504 µs | not a derivation | 1.00 s | not a derivation | not a derivation | flag: over the cap on memory, 4 GB |
+| consis | 256 | fail | 257 | 319 ms | 1.9 ms | not a derivation | 4.60 s | not a derivation | not a derivation | not run |
+| consis | 512 | fail | 513 | 4640 ms | 8.1 ms | not a derivation | flag (> 60 s) | not a derivation | not a derivation | not run |
+| binTree | 4 | fail | 31 | 0 ms | 111 µs | not a derivation | 0.05 s | not a derivation | not a derivation | 0.71 s |
+| binTree | 6 | fail | 127 | 5 ms | 1.8 ms | not a derivation | 0.10 s | not a derivation | not a derivation | 8.99 s |
+| binTree | 8 | fail | 511 | 43 ms | 29.0 ms | not a derivation | 0.15 s | not a derivation | not a derivation | flag (> 60 s) |
+| binTree | 10 | fail | 2047 | 385 ms | 477.0 ms | not a derivation | 0.52 s | not a derivation | not a derivation | not run |
+| binTree | 12 | fail | 8191 | 3541 ms | 7.71 s | not a derivation | 2.01 s | not a derivation | not a derivation | not run |
+
+Read:
+
+* **The search** answers every member up to 512 within its 20 s:
+  `boxChain 512` in 5.0 s, `lastChain 512` in 19.3 s, `kChain 512` in
+  4.5 s, `consis 512` in 4.6 s, `binTree 12` (8 191 worlds) in 3.5 s. It
+  grows about as the fourth power of the number of nested boxes (0.34 s
+  at `boxChain 256`, 5.0 s at 512): each step removes the repeated
+  formulas of a list by comparing its formulas two by two, and a
+  comparison of two formulas with `k` boxes takes `k` steps. The search
+  that returned a derivation of GLS was cut off at 28 (Table 1).
+* **The certifiers' checks compiled** are under 0.1 s on every member
+  measured but `binTree 10` and `12` (below).
+* **In the kernel**, under 4 GB: `treeCert` to `boxChain 512` (6.7 s),
+  `lastChain 128` (2.9 s), `kChain 128` (4.7 s); `scriptCert` to
+  `boxChain 512` (16.3 s), `lastChain 128`, `kChain 128` (8.6 s);
+  `noDerivable` to `consis 256` (4.6 s) and `binTree 12` (2.0 s). Where
+  a column has a next member, it passes the cap of 4 GB or the 60 s. Under
+  8 GB and with the certificate's own time taken off, Table 4 has
+  `treeCert` at `lastChain 256` in 11 s and at `kChain 256` in 5.7 s.
+* **`setCert` in the kernel** stops first: `boxChain 64` (2.0 s),
+  `lastChain 64` (6.6 s), `kChain 32` (2.0 s); beyond, the cap or the
+  deadline. Its check removes repeated formulas at every step.
+* **The kernel running the search itself** (`decide +kernel` on `Valid`,
+  with no certificate): to 64 on `boxChain` (2.5 s), `lastChain`
+  (7.2 s) and `consis` (2.3 s), to `kChain 32` and `binTree 6`; beyond,
+  the cap or the deadline. On 2026-11-25 the kernel running the search
+  over multisets was cut off at 16 (Table 1).
+
+**A third check compiled slower than in the kernel, found by this
+table and not repaired: `noDerivable` on `binTree`.** At `binTree 12`
+the check by the marks takes 7.7 s compiled and 2.0 s in the kernel; at
+10, 0.48 s and 0.52 s. The formula `Dₙ` has `Dₙ₋₁` in it twice, so it
+is `2ⁿ` connectives written out and `n` different subformulas. The
+marks are computed once for each occurrence of a subformula: `2ⁿ`
+occurrences times `2ⁿ⁺¹` worlds, which is the size of the formula as
+written times the size of the tree, the bound one expects of the
+algorithm for a formula given as text. The kernel keeps the marks of a
+subformula it has seen, so it pays `n` times the worlds. By the rule of
+`reference/certify.md` §5 ("a compiled check slower than the kernel's is
+a fault of the checker") this is one: the repair is a table over the
+different subformulas, with its equality to S25's function. It does not
+arise for a sequent typed at a shell, whose formula is its text.
+
+**The commands, timed** (one run each, the whole process, on this
+machine; memory is the most the process held):
+
+| command | time | memory |
+|---|---|---|
+| `glsrun run boxChain 32` | 0.02 s | 37 MB |
+| `glsrun run consis 32` | 0.02 s | 37 MB |
+| `glsrun cert boxChain 32` (three files written) | 0.02 s | 38 MB |
+| `glsrun cert consis 32` | 0.02 s | 37 MB |
+| `glsrun status` (the 16 of the corpus; 16 agree) | 0.02 s | 37 MB |
+| `glsrun facts` (the same file as before, to the byte) | 0.02 s | 37 MB |
+| `glsrun run boxChain 256` | 0.43 s | 38 MB |
+| `glsrun run lastChain 256` | 1.34 s | 40 MB |
+| `glsrun run kChain 256` | 0.60 s | 42 MB |
+| `glsrun run consis 256` | 0.34 s | 39 MB |
+
+Before this change `run`, `cert`, `status` and `facts` ran the search
+over multisets: `glsrun run boxChain 30` stopped at the cap of 8 GB
+after 8 s.
+
+**The corpus script after the change** (`python3 -I
+Corpus/prove_corpus.py --elaborate`, Lean under `-M 4000`): 25
+sequents; by verdict derivable 13, not derivable 12, flag 0, as before;
+disagreeing 0; printed files elaborated 25 of 25; by kind, the
+derivation as data 13, a countermodel 12; `--sets` on `axLob` and
+`boxChain 32` elaborated; four altered files refused. `glsrun facts`
+writes `GLS/Corpus/Facts.lean` unchanged, so the search finds the trees
+it found before.
+
+### What remains exponential, and why
+
+* **A derivation of GLS as data.** `Fam s`, `Der S s`, and so
+  `proofOrRef` (S4), `treeCert.verdict`, `Der.ofCert`, `famOfDer`: the
+  term holds every sequent of the derivation, and the premise of GLR
+  doubles the boxed part of an antecedent. It is the calculus on
+  multisets as the source states it. Nothing in `glsrun` builds one;
+  the kernel checks that one exists without reducing it. `proofOrRef`
+  is kept as the theorem (completeness as data) and run by the tutorial
+  and the tests on small sequents; its record is Table 1, cut off at 28
+  nested boxes.
+* **The explorer on such a derivation**: `#walk`, `apply_script`,
+  `glsmove` show and hold each goal written out. Tried under a cap of
+  4 GB on `boxChain n`: at 10 the walk to the last sequent (2 049
+  formulas, a line of 40 000 characters) takes 1.6 s; at 14 the
+  derivation takes 23 s and 3 GB to define; at 16 Lean stops at the cap
+  (`users-guide.md`).
+* **The definitions** `Form.holds`, `Seq.refutedAt`, `Cert.check` on
+  lists, and the library's `derives`: each is the statement that a
+  check of S25 to S29 is proved equal to. Compiled code calls them only
+  in screens and tests on small cases (the largest: `boxChain 12`) and
+  in `glsrun check --definitions`, which measures them under its
+  deadline and its cap of 40 000 000 formulas.
+* **Not exponential, and not repaired**: the check by the marks on a
+  formula with repeated subformulas (above); `setCert` in the kernel;
+  the fourth power in the search.
+
+Not measured: members between the last that passed and the first
+flagged in a column; any column under more than 4 GB; `lastChain 512`
+compiled checks (the command that times them runs the search again, and
+the two passed its 20 s).

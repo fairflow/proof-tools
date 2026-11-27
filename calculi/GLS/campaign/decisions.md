@@ -543,3 +543,58 @@ have an error, no? … It shouldn't happen."
   `GLS/CheckTest.lean`, `Corpus/measure_checks.py`.
 * **Cost to reverse**: little; the definitions and their theorems are
   untouched.
+
+## 2026-11-27 10:14 GMT. After the campaign: the search and the scripts write no sequent out
+
+By the owner of `calculi/GLS`, at the directing session's request,
+which relayed the reviewer's words on what the entry above left ("Please
+sort out both issues. Delegate or fix yourself. Do it now."), and its
+own: "a cap on a known exponential is a fence, not a repair".
+
+* **Route (a), of the two offered**: a proved decision that does not
+  build what it does not read (S28), and not route (b), every command on
+  the search over sets with its answers checked and the search over
+  multisets kept behind a size. **Why**: (a) was within reach in the
+  hour. The search over sets was already the search of S4 with each
+  premise less its repeated formulas, and S4's proof has two parts that
+  carry over. Its measure (S9) does not rise when repetitions are
+  removed. Its refutations look at which formulas a sequent has, not how
+  often. The one new fact is on the other side: a tree of moves found
+  for a sequent without repetitions replays at every sequent with its
+  formulas (`Yes`), which is where "no formula repeated" is used. With
+  (b) the proved decision would have stayed exponential and one command
+  would have needed a stated size at which it stops.
+* **Decided.** `certOrRef` (`GLS/Decide.lean`) is the producer of every
+  command of `glsrun` and of the library (`prove?`, `refute?`,
+  `produce`, the decisions `derivableDecidableFast` and
+  `validDecidableFast`, the `Decidable (Valid s)` of the corpus, the
+  explorer's `found` and `explain`). The search over sets that was not
+  proved is deleted, with the fallback from it. `glsrun prove --proved`
+  is gone: there is one search, and it is proved.
+* **Kept as theory**: `proofOrRef` and S4 to S6 as they were proved
+  (completeness as data is a derivation of GLS, which is `2ⁿ` large as a
+  term), with the tutorial's and the tests' uses of them on small
+  sequents. No command runs `proofOrRef`. Table 1 of `measurements.md`
+  is its record: cut off at 28 nested boxes.
+* **Scripts** (S29): `scriptCert` and the engine's yes side check a
+  script with its goals by counts. The library's `derives` is first
+  proved equal to a run on a bare list of goals, for every proof system
+  (`derives_eq_goalsDone`); that half belongs in the library, and is
+  asked of the directing session in method note 29.
+* **The script of a tree of moves** (`certScript`) is computed from the
+  tree, not from the derivation the tree is, which `Der.ofCert` would
+  write out. That the two scripts are one is tested on 385 trees and not
+  proved.
+* **`glsrun check`** runs the definitions (`Cert.check` on lists,
+  `Seq.refutedAt`) only with `--definitions`, to measure them, under its
+  deadline and the cap of 40 000 000 formulas. It is the one command
+  that writes a sequent out, and only when asked.
+* **Still `2ⁿ`, and why**: `measurements.md`, "What remains exponential".
+* **Found and left**: the check by the marks is slower compiled than in
+  the kernel on `binTree 12` (7.7 s against 2.0 s), a formula with
+  repeated subformulas; `measurements.md`, under Table 5, and method
+  note 29 (h).
+* **Rests on it**: `GLS/Decide.lean`, `GLS/Scripts.lean`, `GLS/Run.lean`,
+  `GLS/SetSearch.lean` (now `setCert` and the producer's old name),
+  `Main.lean`, `Corpus/measure.py`.
+* **Cost to reverse**: little; nothing proved before was changed.

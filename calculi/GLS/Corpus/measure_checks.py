@@ -11,7 +11,7 @@ out.  For members of three families this script times all four, compiled
 certificate alone).
 
 Every run has a deadline that ends its process group; Lean runs under a
-cap on memory (`-M 8000`); `glsrun check` does not run the list replay
+cap on memory (`-M 4000`); `glsrun check` does not run the list replay
 where a side would pass 40 000 000 formulas.  Run from `calculi/GLS/`
 after `lake build GLS glsrun`:
     python3 -I Corpus/measure_checks.py [family ...] [n ...] > <report>
@@ -46,7 +46,7 @@ def micro(text):
     return text
 
 def kernel(path, base):
-    code, t, out, err = run(["lake", "env", "lean", "-M", "8000", path], KERNEL_DEADLINE)
+    code, t, out, err = run(["lake", "env", "lean", "-M", "4000", path], KERNEL_DEADLINE)
     if code is None:
         return f"cut off at {KERNEL_DEADLINE} s"
     if code != 0:
@@ -60,7 +60,7 @@ print("| member | certificate | definition, compiled | certifier's check, compil
 print("|---|---|---|---|---|---|")
 for fam in FAMILIES:
     for n in SIZES:
-        code, _, out, _ = run([EXE, "check", fam, str(n), f"--deadline={COMPILED_DEADLINE}", "--files"],
+        code, _, out, _ = run([EXE, "check", fam, str(n), f"--deadline={COMPILED_DEADLINE}", "--files", "--definitions"],
                               COMPILED_DEADLINE + 40)
         lines = out.splitlines()
         if not lines:
@@ -71,7 +71,7 @@ for fam in FAMILIES:
         certifier = got.get("treeCert.check") or got.get("noDerivable.check") or ""
         definition = got.get("Cert.check") or got.get("Seq.refutedAt") or ""
         stem = f"Corpus/out/check/{fam}_{n}"
-        base = min(run(["lake", "env", "lean", "-M", "8000", stem + "_base.lean"], KERNEL_DEADLINE)[1]
+        base = min(run(["lake", "env", "lean", "-M", "4000", stem + "_base.lean"], KERNEL_DEADLINE)[1]
                    for _ in range(2))
         kd = kernel(stem + "_definition.lean", base)
         kc = kernel(stem + "_certifier.lean", base)

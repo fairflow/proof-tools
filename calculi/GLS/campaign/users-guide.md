@@ -84,6 +84,20 @@ pattern: the line the tactic offers back is written after them.
 | `#walk d`, `#walk d down 0 down 1` | a derivation or an attempt, looked at a node at a time |
 | `famOfDer d : Fam j` | the derivation `d : Der S j` as a derivation of GLS as the source states it, on which the theorems act |
 
+**A derivation with many nested GLR cannot be printed or walked.** A
+derivation of GLS holds each of its sequents written out, and the premise
+of GLR has `B, □B` for each `□B` of the antecedent, so a derivation of
+`□p → □ⁿ⁺¹p` ends in a sequent of `2ⁿ⁺¹ + 1` formulas: at `n = 32`, some
+8 000 000 000. `#walk` shows such a derivation as it shows any other, a
+node at a time with its sequent in full, as far as the derivation can be
+built. Tried on 2026-11-27 with `apply_script (found j).getD []` under a
+cap of 4 GB: at `n = 3` the last sequent has 17 formulas; at 10 the walk
+to it takes 1.6 s and its line has 40 000 characters; at 14 the
+derivation takes 23 s and 3 GB to define; at 16 Lean stopped at the cap.
+What stays small is the certificate: the tree of moves (35 moves at
+`n = 32`), which `glsrun prove` prints, the kernel checks in under a
+second, and `certOrRef` returns.
+
 `apply_script` takes its script as a closed term: the sequent is written
 out again for `routine` and `found`. No tactic applies either to the goal
 in front of you (a limit of the library, recorded on the closing page).
@@ -158,22 +172,22 @@ opens a list, and only at the start of a side.
 nothing on the standard output: what was expected, the place counted
 from character 1, and a mark under it.
 
-**The search** is the one over sets, which is not proved; its answer is
-checked by the program before anything is printed, by the check of the
-certifier that the printed file names, the same function the kernel then
-runs (`campaign/measurements.md`, "The two checks"). An answer that did
-not pass would be replaced by that of the proved search (this has not
-been seen). `--proved` asks for the answer of the proved search itself,
-which writes the sequents of GLS out and is cut off beyond about 28
-nested boxes. `--deadline=N`: the seconds allowed (10). The program
-holds at most 8 GB of memory: above that it leaves with a flag.
+**The search** is made at sequents without repeated formulas, so that it
+writes no sequent of GLS out, and it is proved: it ends, and what it
+returns is a tree of moves that replays at the sequent typed, or a tree
+of worlds at whose root the sequent is false (`certOrRef`,
+`GLS/Decide.lean`). The program runs the check of the certifier that the
+printed file names before it prints, the same function the kernel then
+runs (`campaign/measurements.md`, "The two checks"). `--deadline=N`: the
+seconds allowed (10). The program holds at most 8 GB of memory: above
+that it leaves with a flag.
 
 **The exit code**: 0 derivable, 1 not derivable, 3 flag, 2 a text not
 read. Derivability in GLS is decided, so **a flag** is one of
-three things: no answer within the deadline; the cap on memory reached
-(only the proved search has been seen to reach it); or a certificate of
-the proved search that the certifier's check refused, which would be a
-defect and has not been seen. A flag prints no fact.
+three things: no answer within the deadline; the cap on memory reached;
+or a certificate that the certifier's check refused. The last two would
+be defects of the program, and have not been seen since the search
+changed (2026-11-27). A flag prints no fact.
 
 `glsrun corpus` and `glsrun families` list the corpus and some members
 of the families as texts; `Corpus/prove_corpus.py` runs the command on

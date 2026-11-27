@@ -447,6 +447,71 @@ replay were changed twice after the first proof, for the kernel's time
 form kept at every build, and the proof is of that form. Status:
 **PROVED**, within `[propext, Quot.sound]`.
 
+### S28. For every sequent, a tree of moves that replays or a tree that refutes, with no sequent written out (2026-11-27; our own)
+
+Why it is wanted: `decisions.md`, 2026-11-27, the second entry. S4 gives
+a derivation of GLS as a term, which holds every sequent of the
+derivation, `2ⁿ` formulas after `n` nested GLR; the search that returns
+it builds them (Table 1: cut off at 28 boxes). This is level 3 over the
+checks that the certifiers run, as a function:
+
+    certOrRef : (s : Seq) → { c : Cert S // Cert.check s c = true } ⊕ { t : Tree // s.refutedAt t = true }
+
+`certOrRef`, `GLS/Decide.lean`; with S27 and S26 the two sides are
+`s.countCheck c = true` and `s.refutedT t = true`, the certifiers'
+checks (`decided`, S22, is now read off it). The search is S4's, made at
+sequents without repeated formulas: each premise has its repetitions
+removed before the search goes on. The lemma under it:
+
+    Yes q := { c : Cert S // ∀ q', q.Sub q' → Cert.check q' c = true }
+
+a tree of moves found for `q` replays at every sequent `q'` that has the
+formulas of `q` on each side; from a `Yes` for each premise of a move
+less its repetitions, a `Yes` for the conclusion, **if no formula of the
+conclusion is repeated** (`Yes.impR`, `Yes.impL`, `Yes.glr`). The
+hypothesis is needed: with `A → B` twice in a succedent, the premise of
+ImpR at the sequent with it once has lost it and the premise at the
+other has not. The steps are enough by the measure of S9, which removing
+repetitions does not raise (`weight_dedup_le`). No item of the source
+(the source's PSGLS is on multisets), so not read back.
+**Screened before its proof**, with the search over sets that was not
+proved (kept as guards in `GLS/CheckTest.lean`): on the 1 024 small
+sequents one side answers and its certificate passes the certifier's
+check; each of the 385 trees of moves replays at four sequents with the
+formulas of its own and more; for 300 sequents, the tree of the sequent
+less its repetitions replays at the sequent written twice; a control (a
+tree at a sequent that lacks a formula) is refused. Status: **PROVED**,
+within `[propext, Quot.sound]`. The search that was not proved
+(`searchSet`) is gone: `produceSet` is this function without its proof.
+
+### S29. The replay of a script by counts is the library's (2026-11-27; our own)
+
+Why it is wanted: the library's `derives` runs a script on an attempt, a
+partial derivation that holds every open goal written out; S27 repaired
+the replay of a tree of moves and left this one.
+
+    Seq.scriptCheck s ls := goalsDone countStep [CSeq.of s] ls
+    ∀ (s : Seq) (ls : Script S),  s.scriptCheck ls = derives S s ls
+
+`scriptCheck_eq`, `GLS/Scripts.lean`. `goalsDone step gs ls` runs the
+script on a bare list of goals: a line replaces the goal it names by the
+premises of its move, and the script must end with no goal. On the way,
+for every proof system and not only this one:
+
+    ∀ (S : ProofSystem) (j : S.Judg) (ls : Script S),  derives S j ls = goalsDone (stepOpt S) [j] ls
+
+(`derives_eq_goalsDone`, from the library's `Att.moveAt_ok`,
+`Att.moveAt_error`, `Att.moveAt_inr`); then `goalsDone_rep`, by S27's
+`countStep_rep`. `Seq.scriptCheck` is the check of `scriptCert` and of
+the engine's yes side, compiled and in the kernel. **The proof was
+written with the definitions and passed; the screen was run after it**
+(`GLS/CheckTest.lean`): the two replays agree on the script of each of
+the 385 trees at its own sequent (accepted), at the sequent written
+twice and at 40 others (both answers occur); a script cut short, with a
+line too many, and with every goal number one too high are refused by
+both; lines in another order (the second premise first) are accepted by
+both. Status: **PROVED**, within `[propext, Quot.sound]`.
+
 ## Refuted
 
 None.
@@ -466,7 +531,7 @@ None.
 |---|---|---|---|
 | of the goals from the standing list (S7; S10 with S19; S24) | 3 | 0 | 0 |
 | of the other goals (S3 to S6, S8, S9; S11 to S18) | 14 | 0 | 0 |
-| of our own (S1, S2, S20 to S23, S25 to S27) | 9 | 0 | 0 |
+| of our own (S1, S2, S20 to S23, S25 to S29) | 11 | 0 | 0 |
 
 Counted by entry, with S11 to S17 seven entries and S19 counted with
 S10 (one statement, two definitions).

@@ -739,10 +739,11 @@ for. The full proof is `box_bot_not_derivable` in
 **D8.** 1, 3, 7, 15, 31, 63, 127. Each boxed formula of the antecedent
 gives two formulas in the premise, and one is added. Contraction would
 remove the repetitions; it is admissible but not part of the rule, and
-the rule as the source states it keeps every copy. This is why the
-proved search slows on deeply nested boxes, and why the development has
-a second search over sets whose answers are checked (the campaign's
-`measurements.md`).
+the rule as the source states it keeps every copy. This is why a search
+that returns a derivation of GLS as a term (`proofOrRef`) slows on
+deeply nested boxes, and why the development has a second proved search,
+at sequents without repeated formulas, which returns a tree of moves
+(`certOrRef`; the campaign's `measurements.md`).
 
 ### Part E
 

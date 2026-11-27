@@ -111,8 +111,10 @@ def family (name : String) (n : Nat) : Option (Seq × Bool) :=
   else if name == "lastChain" then some (lastChain n, true)
   else none
 
-/-- The kernel can run the search: validity decided with no certificate. -/
-instance (s : Seq) : Decidable (Valid s) := validDecidable s
+/-- The kernel can run the search: validity decided with no certificate.
+(The search at sequents without repeated formulas, `GLS/Decide.lean`;
+until 2026-11-27 the search over multisets, `validDecidable`.) -/
+instance (s : Seq) : Decidable (Valid s) := validDecidableFast s
 
 /-- The number of nodes of a tree. -/
 def nodes (t : Tree) : Nat := t.size

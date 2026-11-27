@@ -37,5 +37,7 @@ import GLS.Corpus.Facts
 import GLS.Parse
 import GLS.Table
 import GLS.Counts
+import GLS.Decide
+import GLS.Scripts
 import GLS.CheckTest
 import GLS.ParseTest

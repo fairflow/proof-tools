@@ -23,9 +23,14 @@ exponential where a formula has many nested boxes, run as they are
 written: `Form.holds` asks again for what it has computed, and
 `Cert.check` writes out sequents that GLR doubles
 (`campaign/measurements.md`, "The two checks").
-* **The producer** is the search of `GLS/Search.lean`, compiled.  It is
-  proved to end and to be right, but nothing here rests on that: what it
-  returns is checked.
+* **For a script**: the checker runs it with the goals kept by counts
+  (`Seq.scriptCheck`, `GLS/Scripts.lean`), which is the library's
+  `derives` by S29.
+* **The producer** is the search of `GLS/Decide.lean`, compiled: at
+  sequents without repeated formulas, so that it writes no sequent of GLS
+  out.  It is proved to end and to be right (S28).  (Until 2026-11-27 it
+  was the search of `GLS/Search.lean`, which returns a derivation of GLS
+  as a term and so builds every sequent of it.)
 
 Theory file: it ends with its bound on axioms.
 -/
@@ -33,6 +38,8 @@ import GLS.Completeness
 import GLS.Proof
 import GLS.Table
 import GLS.Counts
+import GLS.Decide
+import GLS.Scripts
 import LeanCertify
 
 namespace GLS
@@ -54,8 +61,16 @@ theorem treeCert_check (s : Seq) (c : Cert S) : treeCert.check s c = Cert.check 
   countCheck_eq s c
 
 /-- **Scripts, checked**: a script that runs to the end from `s` gives a
-derivation of `s` in GLS. -/
-def scriptCert : Certify.Certifier Seq (Script S) Fam := certifier step_sound
+derivation of `s` in GLS.  The check runs the script with its goals kept
+by counts (`Seq.scriptCheck`, `GLS/Scripts.lean`), which is the library's
+`derives` by S29. -/
+def scriptCert : Certify.Certifier Seq (Script S) Fam where
+  check s ls := s.scriptCheck ls
+  sound s ls h := (certifier step_sound).sound s ls ((scriptCheck_eq s ls).symm.trans h)
+
+/-- The check of `scriptCert` is the library's check of a script. -/
+theorem scriptCert_check (s : Seq) (ls : Script S) : scriptCert.check s ls = derives S s ls :=
+  scriptCheck_eq s ls
 
 /-- **Finite trees, checked against validity**: if `s` is computed false
 at the root of `t`, then `s` is not valid. -/
@@ -123,33 +138,48 @@ theorem Fam.check_toCert {s : Seq} (d : Fam s) : Cert.check s d.toCert = true :=
 
 /-! ## The producers -/
 
-/-- A tree of moves for `s`, where the search finds a derivation. -/
+/-- A tree of moves for `s`, where there is a derivation. -/
 def prove? (s : Seq) : Option (Cert S) :=
-  match proofOrRef s with
-  | .inl d => some d.toCert
+  match certOrRef s with
+  | .inl c => some c.1
   | .inr _ => none
 
-/-- A tree that refutes `s`, where the search finds one. -/
+/-- A tree that refutes `s`, where there is one. -/
 def refute? (s : Seq) : Option Tree :=
-  match proofOrRef s with
+  match certOrRef s with
   | .inl _ => none
   | .inr r => some r.1
 
-/-- **The producer**: the search, with what it returns checked before it
-is handed on.  A script for a derivation, a tree against one, or `flag`
-if the check fails, which would be a defect of this file and not an
-answer.  The number is not used: the search ends by itself. -/
+mutual
+  /-- **The script of a tree of moves**: each move at the first open goal,
+  a node before its children and the children from the left.  It is the
+  script of the derivation that the tree is, without the derivation being
+  built: `Der.ofCert` writes every sequent out.  (That the two scripts
+  are one is not proved; `GLS/RunTest.lean` compares them.) -/
+  def certScript : Cert S → Script S
+    | .node m cs => ⟨0, m⟩ :: certScriptL cs
+  /-- `certScript` on a list. -/
+  def certScriptL : List (Unit × Cert S) → Script S
+    | [] => []
+    | (_, c) :: cs => certScript c ++ certScriptL cs
+end
+
+/-- **The producer**: the search.  A script for a derivation, or a tree
+against one.  It never answers `flag`, and the number is not used: the
+search ends by itself. -/
 def produce (s : Seq) (_ : Nat) : Certify.Verdict (Script S) Tree :=
-  match proofOrRef s with
-  | .inl d =>
-    if h : treeCert.check s d.toCert = true then
-      .pass (Der.ofCert s d.toCert ((treeCert_check s _).symm.trans h)).script
-    else .flag
-  | .inr r => if noDerivable.check s r.1 then .fail r.1 else .flag
+  match certOrRef s with
+  | .inl c => .pass (certScript c.1)
+  | .inr r => .fail r.1
 
 /-- **Both sides and the producer, as one engine.** -/
-def glsEngine : Certify.Engine Seq (Script S) Tree Derivable :=
-  engine step_sound_derivable noDerivable produce
+def glsEngine : Certify.Engine Seq (Script S) Tree Derivable where
+  yes :=
+    { check := fun s ls => s.scriptCheck ls
+      sound := fun s ls h =>
+        derives_sound step_sound_derivable ((scriptCheck_eq s ls).symm.trans h) }
+  no := noDerivable
+  produce := produce
 
 #certify_domain GLS.produce
 
@@ -159,9 +189,23 @@ def glsEngine : Certify.Engine Seq (Script S) Tree Derivable :=
 or a finite tree that the check against validity accepts. -/
 theorem decided (s : Seq) :
     (∃ c, treeCert.check s c = true) ∨ (∃ t, noValid.check s t = true) := by
-  rcases proofOrRef s with d | r
-  · exact .inl ⟨d.toCert, (treeCert_check s _).trans d.check_toCert⟩
+  rcases certOrRef s with c | r
+  · exact .inl ⟨c.1, (treeCert_check s _).trans c.2⟩
   · exact .inr ⟨r.1, (noValid_check s _).trans r.2⟩
+
+/-- **Derivability in GLS is decidable, by the search over sets**: a tree
+of moves that replays gives a derivation, and a tree at whose root the
+sequent is false shows there is none. -/
+@[reducible] def derivableDecidableFast : DerivableDecidable := fun s =>
+  match certOrRef s with
+  | .inl c => isTrue ⟨(Cert.certifier step_sound).sound s c.1 c.2⟩
+  | .inr r => isFalse (noDerivable.sound s r.1 ((noValid_check s r.1).trans r.2))
+
+/-- **Validity is decidable, by the search over sets**, in the same way. -/
+@[reducible] def validDecidableFast : ValidDecidable := fun s =>
+  match certOrRef s with
+  | .inl c => isTrue (soundness s ((Cert.certifier step_sound).sound s c.1 c.2))
+  | .inr r => isFalse (noValid.sound s r.1 ((noValid_check s r.1).trans r.2))
 
 /-- The producer answers `pass` for every sequent that has a derivation. -/
 theorem glsEngine_complete : glsEngine.Complete := by
@@ -169,10 +213,8 @@ theorem glsEngine_complete : glsEngine.Complete := by
   refine ⟨0, ?_⟩
   show ∃ c, produce s 0 = .pass c
   unfold produce
-  cases hs : proofOrRef s with
-  | inl d =>
-    refine ⟨(Der.ofCert s d.toCert d.check_toCert).script, ?_⟩
-    simp [(treeCert_check s _).trans d.check_toCert]
+  cases hs : certOrRef s with
+  | inl c => exact ⟨_, rfl⟩
   | inr r => exact absurd ⟨d₀⟩ (noDerivable.sound s r.1 ((noValid_check s _).trans r.2))
 
 end GLS

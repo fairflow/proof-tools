@@ -449,3 +449,92 @@ own check", as it stood at commit `525f9cd`.
     *Asked of the directing session*: (a), (b), (c) in "The program's
     own check"; (d) there or in §5's advice on measuring; (e) with the
     advice on measuring.
+
+## 2026-11-27: the search and the scripts, after the two checks
+
+Written by the owner of `calculi/GLS`, at the directing session's
+request. The text built from: `reference/certify.md` §5 as it stood at
+commit `40a4988`.
+
+29. **What finishing the repair found.**
+
+    a. **A proved search that returns a derivation is not the proved
+       decision one runs.** Goal 2 as the campaign stated it
+       ("completeness as data") is `(s : Seq) → Fam s ⊕ Refutation s`.
+       The `Fam s` is a term that holds every sequent, so the function
+       is `2ⁿ` by its type, whatever the search does. The decision one
+       runs returns the certificate of the certifier, `{ c //
+       check s c = true }`, and its proof is the old one with the family
+       replaced by "a tree that replays here and at every sequent with
+       these formulas". The skill's level 3 ("one side always answers",
+       `reference/certify.md`) is stated as a proposition; it wants a
+       line: **state level 3 as a function into the two subtypes of
+       certificates, and make the producer that function**, and keep
+       the derivation as data for the theorem about the calculus, which
+       nothing runs.
+    b. **The search that was "not proved, its answers checked" took an
+       hour to prove**, once the invariant was seen (no formula repeated;
+       the tree replays at every larger sequent). For two days the
+       campaign ran an unproved search in front of a proved one that was
+       exponential, with a fallback from the first to the second that
+       was never taken. The skill's wording ("the producer is not
+       trusted") made that look finished. It could ask: where a second
+       search is written because the proved one is slow, try its proof
+       before building the fallback.
+    c. **The library's `derives` can be read as a run on a bare list of
+       goals, for every proof system**: `derives S j ls = goalsDone
+       (stepOpt S) [j] ls` (`GLS/Scripts.lean`, `derives_eq_goalsDone`,
+       60 lines from `Att.moveAt_ok`, `Att.moveAt_error`,
+       `Att.moveAt_inr`). With it a campaign whose judgments grow can
+       check a script over any compact form of a judgment that its
+       `step` commutes with, without touching attempts or cursors. It is
+       proved in GLS's folder because the owner does not change the
+       library. *Asked of the directing session*: move `goalsLine`,
+       `goalsRun`, `goalsDone`, `stepOpt`, `Att.step_goals`,
+       `stepsFrom_done` and `derives_eq_goalsDone` into
+       `ProofTools/Explore/Certify.lean`.
+    d. **The same for a tree of moves**: the library's `Cert.certifier`
+       fixes `check := Cert.check`. A campaign that replays by another
+       form of its judgments has to write its certifier by hand with
+       `sound` through an equality (GLS's `treeCert`, `scriptCert`, and
+       the engine's yes side). A constructor in the library that takes
+       the check and its equality with `Cert.check` (or with `derives`)
+       would say it once.
+    e. **A file written for the kernel needs the two options that lift
+       Lean's limits**, or what is measured is the limit: the first run
+       of the new table stopped the `setCert` column and the kernel's
+       own search at 128 boxes with "maximum number of heartbeats",
+       where the check itself takes seconds. `glsrun prove` had them
+       (K's note on `maxRecDepth`); the files of `glsrun cert` did not.
+    f. **"Statements first, screened before proof" again**: kept for
+       S28. (The lemma under it is false in its first form, at any
+       sequent: with `A → B` twice in a succedent. That was seen on
+       paper, and the screen was written for the form with "no formula
+       repeated".) Not kept for S29, whose proof
+       passed before a screen was written. Two of five statements of
+       this day were proved before they were screened; each time the
+       proof was a simulation whose statement left nothing to choose.
+    g. **A table of an old function is a record, not a measurement of
+       the program**: Tables 1 and 2 are kept under that heading with
+       their date, and nothing in the page reads a figure from them for
+       the program as it is.
+
+    h. **The new table found a third check compiled slower than in the
+       kernel, and it is left**: truth by the marks on `binTree 12`,
+       7.7 s compiled and 2.0 s in the kernel. The formula has a
+       subformula twice at each level, `2ⁿ` connectives written out
+       and `n` different subformulas; compiled code computes the marks
+       for each occurrence and the kernel for each different one. For a
+       formula given as text the compiled cost is the expected one
+       (formula times worlds), so §5's rule ("a compiled check slower
+       than the kernel's is a fault of the checker") and "the algorithm
+       one would run" part ways here: the rule could say what the size
+       of a formula is (written out, or its different subformulas), and
+       that a family whose formulas share subformulas is to be among
+       those measured. Not repaired: a table over the different
+       subformulas with its equality to S25's function is the next
+       piece of work, if it is wanted.
+
+    *Asked of the directing session*: (a) and (b) in `reference/certify.md`
+    (level 3, and "the producer"); (c), (d) in the library; a ruling
+    on (h).

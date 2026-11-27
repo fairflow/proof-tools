@@ -11,7 +11,7 @@ derivable; and the three answers are compared with one another.
 
 With `--elaborate`, the file the command prints for each sequent is
 written to `Corpus/out/prove/<name>.lean` and elaborated (`lake env lean
--M 8000`, under a deadline that ends the whole process group): the kernel
+-M 4000`, under a deadline that ends the whole process group): the kernel
 then checks its certificate.  The third kind of answer, a derivation
 checked over sets only, is asked for by `--sets` on two sequents, since
 no sequent of the corpus or of the families gives it otherwise.  Three
@@ -43,7 +43,7 @@ def run(cmd, deadline=DEADLINE):
         return None, "", "cut off at the deadline"
 
 def elaborate(path):
-    code, out, err = run(["lake", "env", "lean", "-M", "8000", path])
+    code, out, err = run(["lake", "env", "lean", "-M", "4000", path])
     good = code == 0 and "error" not in out and "sorry" not in out
     return good, (out + err).strip().splitlines()[:1]
 
