@@ -27,9 +27,13 @@ import MALL.Model
 import MALL.ModelRun
 import MALL.ModelTest
 import MALL.Saturated
+import MALL.Coded
+import MALL.CodedSound
 import MALL.SatRun
 import MALL.Refute
+import MALL.Encode
 import MALL.SatTest
+import MALL.CodedTest
 import MALL.TutorialTest
 import MALL.TutorialPins
 import MALL.Split

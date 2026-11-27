@@ -102,8 +102,9 @@ inductive Found where
   /-- A phase structure on a cyclic group in which the sequent does not
   hold. -/
   | model (z : ZModel)
-  /-- A saturated set of sequents of which the sequent is a member. -/
-  | set (D : List (List Form))
+  /-- A saturated set of sequents of which the sequent is a member,
+  written in numbers (`MALL/Coded.lean`). -/
+  | set (C : CodeCert)
   /-- A certificate that the compiled check refused: a defect of the
   program. -/
   | defect (why : String)
@@ -120,7 +121,8 @@ def refuteSide (Γ : List Form) : Option Found :=
   | none =>
     match refuteSet Γ with
     | some D =>
-      if refutedBy D Γ then some (.set D)
+      let C := Encode.encode D Γ
+      if codeRefutes C Γ then some (.set C)
       else some (.defect "the set of sequents found did not pass the check of saturation")
     | none => none
 
@@ -164,13 +166,12 @@ def sequent : List Form := {srcForms Γ}
 def proveFoot : String :=
   "\nend MALL.Answer\n\n#axioms_within_file [propext, Quot.sound]\n"
 
-/-- **The largest saturated set the kernel has been seen to check on every
-family tried**, under `lake env lean -M 8000` (`campaign/measurements.md`,
-2026-11-26): 102 sequents, in 16.7 s.  Above it the check was stopped at
-the cap of 8 GB on one family at 119 sequents, and passed on another at
-124 (9.2 s) and was stopped at 192.  An answer whose set is larger than
-this says so in its first line. -/
-def kernelSeen : Nat := 102
+/-- **The largest saturated set the kernel has been seen to check**, in
+numbers, under `lake env lean -M 4000` (`campaign/measurements.md`,
+2026-11-27): 1569 sequents.  An answer whose set is larger than this
+says so in its first line.  (Written as lists and checked by `refutedBy`,
+the limit was 102 sequents under 8 GB.) -/
+def kernelSeen : Nat := 1569
 
 /-- The answer for what was found: the exit code, the verdict, and the
 rest of the file. -/
@@ -210,37 +211,47 @@ theorem notValid : ¬ Valid sequent := noValidBy.verdict sequent countermodel re
 /-- By soundness. -/
 theorem notDerivable : ¬ Derivable sequent := noDerivableBy.verdict sequent countermodel refutes
 " ++ proveFoot)
-  | .set D =>
-    let beyond := D.length > kernelSeen
+  | .set C =>
+    let n := C.tree.keys.length
+    let beyond := n > kernelSeen
     let verdict := if beyond then
-      s!"not derivable, by the compiled check only (a set of {D.length} sequents; the \
+      s!"not derivable, by the compiled check only (a set of {n} sequents; the \
 kernel has checked sets of up to {kernelSeen})"
       else "not derivable"
     let warn := if beyond then s!"
--- The set below has {D.length} sequents.  The kernel's check of a set grows
--- fast with its size: under a cap of 8 GB of memory, sets of up to
--- {kernelSeen} sequents were checked (the largest in 16.7 s), and of two
--- families one was stopped at the cap at 119 and the other at 192.  This
--- file may not be checked; if it is not, the answer rests on the compiled
--- check of this program, which is not trusted.
+-- The set below has {n} sequents.  Under a cap of 4 GB of memory the
+-- kernel has checked sets of up to {kernelSeen} sequents written this way
+-- (`campaign/measurements.md`).  This file may not be checked under that
+-- cap; if it is not, the answer rests on the compiled check of this
+-- program, which is not trusted.
 " else ""
     (1, verdict, proveHead Γ ++ warn ++ s!"
 /-- A saturated set of sequents of which the sequent is a member: every
-rule that could conclude a member has a premise in the set. -/
-def refutation : List (List Form) :=
-  {showFlat D}
+rule that could conclude a member has a premise in the set.  It is written
+in numbers (`MALL/Coded.lean`): `table` lists the formulas, each by its
+connective and how many entries later its two parts stand; a number of
+`tree` is a sequent, its digit in base `B` at a formula's place the number
+of times the formula occurs; `goal` is the places of the formulas of the
+sequent.  The {n} sequents themselves: `#eval refutation.sequents`. -/
+def refutation : CodeCert :=
+  {Encode.showCert C}
 
-/-- The kernel checks the membership and the saturation. -/
-theorem refuted : refutedBy refutation sequent = true := by decide +kernel
+/-- The kernel checks the membership and the saturation, in numbers. -/
+theorem refuted : codeRefutes refutation sequent = true := by decide +kernel
 
-theorem notDerivable : ¬ Derivable sequent := noDerivableBySet.verdict sequent refutation refuted
+/-- So the set of sequents that the numbers stand for passes the check of
+saturated sets (S27). -/
+theorem refutedAsSequents : refutedBy refutation.sequents sequent = true :=
+  refutedBy_of_code refutation sequent refuted
 
-theorem notValid : ¬ Valid sequent := noValidBySet.verdict sequent refutation refuted
+theorem notDerivable : ¬ Derivable sequent := noDerivableByCode.verdict sequent refutation refuted
+
+theorem notValid : ¬ Valid sequent := noValidByCode.verdict sequent refutation refuted
 
 /-- The set presents a finite phase structure in which the sequent does
 not hold. -/
 theorem countermodel : ∃ S : PhaseStructure, S.Finite ∧ ¬ S.Sat sequent :=
-  countermodel_of_refutedBy refuted
+  countermodel_of_code refuted
 " ++ proveFoot)
   | .defect why => (3, "flag", s!"-- {why}: a defect of `mallrun`\n")
 
@@ -378,47 +389,6 @@ def main (args : List String) : IO UInt32 := do
     IO.println s!"certificates tried: {total}; accepted by the check in numbers: {accepted}; \
 of those, decoded sets that the check of sets refuses: {bad}"
     return (if bad == 0 then 0 else 1)
-  | "code" :: rest =>
-    -- provisional: the saturated set in numbers, with the times of the
-    -- producer and of the compiled checks
-    let old := rest.contains "--old"
-    let text := " ".intercalate (rest.filter (· != "--old"))
-    match Parse.parseSeq text with
-    | .error f => IO.eprintln s!"mallrun code: {f.report text}"; return 2
-    | .ok Γ =>
-      let t₀ ← IO.monoNanosNow
-      match ← IO.lazyPure (fun _ => refuteSet Γ) with
-      | none => IO.println "-- derivable"; return 0
-      | some D =>
-        let n := D.length
-        let t₁ ← IO.monoNanosNow
-        let C ← IO.lazyPure fun _ => Encode.encode D Γ
-        let k := C.tree.keys.length
-        let t₂ ← IO.monoNanosNow
-        let ok ← IO.lazyPure fun _ => codeRefutes C Γ
-        let t₃ ← IO.monoNanosNow
-        IO.println s!"-- set of {n} sequents ({k} numbers, table of {C.table.length}, base {C.B}); \
-found in {(t₁ - t₀) / 1000} µs, written in numbers in {(t₂ - t₁) / 1000} µs; \
-the compiled check in numbers: {ok}, {(t₃ - t₂) / 1000} µs"
-        if old then
-          let t₄ ← IO.monoNanosNow
-          let ok' ← IO.lazyPure fun _ => refutedBy D Γ
-          let t₅ ← IO.monoNanosNow
-          IO.println s!"-- the compiled check of the set as lists: {ok'}, {(t₅ - t₄) / 1000} µs"
-        IO.println s!"import MALL.Coded
-namespace MALL.Answer
-open MALL
-abbrev p : Form := .atom 0
-abbrev q : Form := .atom 1
-abbrev r : Form := .atom 2
-set_option maxRecDepth 1000000
-set_option maxHeartbeats 0
-def sequent : List Form := {srcForms Γ}
-def cert : CodeCert :=
-  {Encode.showCert C}
-theorem refuted : codeRefutes cert sequent = true := by decide +kernel
-end MALL.Answer"
-        return 0
   | ["corpus"] =>
     for e in entries do
       IO.println s!"{e.name}\t{if e.derivable then "derivable" else "not derivable"}\t{showSeq e.seq}\t{srcForms e.seq}\t{asciiSeq e.seq}"
@@ -454,27 +424,45 @@ end MALL.Answer"
           s!"import MALL.Corpus.Basic\nimport MALL.ModelRun\nopen MALL MALL.Corpus\n\ntheorem fact : ¬ Derivable (Corpus.{fam} {n}) :=\n  noDerivableBy.verdict _ ({showFlat z})\n"
       | none => pure ()
       return 0
-  | ["refute", fam, n] =>
+  | "refute" :: fam :: n :: opts =>
+    -- The producer of saturated sets on a member of a family, with the
+    -- times of the compiled checks; `--lists` also runs the check of the
+    -- set as lists (`refutedBy`), whose time doubles with each formula
+    -- beside a ⊗, and writes the set in that form.
     let n := n.toNat!
     match family fam n with
     | none => IO.eprintln s!"no family {fam}"; return 2
     | some (Γ, _) =>
-      let t₀ ← IO.monoMsNow
-      let out := refuteSet Γ
-      IO.println s!"{fam} {n}: {match out with | some D => s!"a set of {D.length}" | none => "none"}"
-      let t₁ ← IO.monoMsNow
-      IO.println s!"producer ms: {t₁ - t₀}"
-      match out with
+      let t₀ ← IO.monoNanosNow
+      match ← IO.lazyPure (fun _ => refuteSet Γ) with
+      | none => IO.println s!"{fam} {n}: none"; return 0
       | some D =>
-        let ok := refutedBy D Γ
-        IO.println s!"check: {ok}"
-        let t₂ ← IO.monoMsNow
-        IO.println s!"check ms: {t₂ - t₁}"
-        IO.println s!"phases: {(Table.ofSet D).card}"
+        let count := D.length
+        let t₁ ← IO.monoNanosNow
+        let C ← IO.lazyPure fun _ => Encode.encode D Γ
+        let k := C.tree.keys.length
+        let t₂ ← IO.monoNanosNow
+        let ok ← IO.lazyPure fun _ => codeRefutes C Γ
+        let t₃ ← IO.monoNanosNow
+        IO.println s!"{fam} {n}: a set of {count} ({k} numbers, a table of {C.table.length}, \
+base {C.B}); found in {(t₁ - t₀) / 1000} µs; written in numbers in {(t₂ - t₁) / 1000} µs; \
+the check in numbers: {ok}, {(t₃ - t₂) / 1000} µs"
         IO.FS.writeFile s!"Corpus/out/{fam}_{n}_set.lean"
-          s!"import MALL.Corpus.Basic\nimport MALL.SatRun\nopen MALL MALL.Corpus\n\nset_option maxRecDepth 100000 in\ntheorem fact : ¬ Derivable (Corpus.{fam} {n}) :=\n  noDerivableBySet.verdict _ ({showFlat D})\n"
-      | none => pure ()
-      return 0
+          s!"import MALL.Corpus.Basic\nimport MALL.SatRun\nopen MALL MALL.Corpus\n\n\
+set_option maxRecDepth 1000000\nset_option maxHeartbeats 0\n\n\
+theorem fact : ¬ Derivable (Corpus.{fam} {n}) :=\n  noDerivableByCode.verdict _\n  {Encode.showCert C}\n"
+        if opts.contains "--lists" then
+          let t₄ ← IO.monoNanosNow
+          let ok' ← IO.lazyPure fun _ => refutedBy D Γ
+          let t₅ ← IO.monoNanosNow
+          IO.println s!"{fam} {n}: the check of the set as lists: {ok'}, {(t₅ - t₄) / 1000} µs"
+          IO.FS.writeFile s!"Corpus/out/{fam}_{n}_lists.lean"
+            s!"import MALL.Corpus.Basic\nimport MALL.SatRun\nopen MALL MALL.Corpus\n\n\
+set_option maxRecDepth 1000000\nset_option maxHeartbeats 0\n\n\
+theorem fact : ¬ Derivable (Corpus.{fam} {n}) :=\n  noDerivableBySet.verdict _ ({showFlat D})\n"
+        if opts.contains "--phases" then
+          IO.println s!"phases: {(Table.ofSet D).card}"
+        return 0
   | ["countermodel", name] =>
     match entries.find? (·.name == name) with
     | none => IO.eprintln s!"no entry {name}"; return 2
