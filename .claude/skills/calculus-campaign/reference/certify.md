@@ -458,11 +458,30 @@ certificate, whose notes are not in this repository).
   in the file says which was used, and "one printed file of each kind"
   below counts kinds of certificate, not verdicts.
 - *The program's own check.* The program prints only what it has
-  checked. Usually that is the certifier's check, compiled. Where that
-  is the slow side (GLS: a replay on multisets, and an evaluation that
-  keeps nothing, each slower compiled than in the kernel), check by
-  other means, tested against the certifier's check, and let the
-  kernel check the printed certificate by the certifier.
+  checked, and that is the certifier's check, compiled. If the compiled
+  check is slower than the kernel's on the same certificate, the
+  checker's definition is at fault, and the kernel is hiding it: treat
+  it as a defect and find it, do not work round it. Two were measured
+  in GLS (2026-11-27), each `2ⁿ` compiled and neither a failure to end.
+  A countermodel's evaluation that recomputes: `□A` at a world asks
+  for `A` at every world below and keeps nothing, so a chain of `n`
+  worlds costs `2ⁿ` calls for `n²` different questions (18.6 s at 30;
+  the kernel, which keeps the terms it has reduced, 0.1 s at 32 and
+  0.9 s at 64). And a replay that builds what it never reads: the
+  calculus's own sequents double at each nested modal step, compiled
+  code builds every one (1.3 s and 2.2 GB at 24, so some 500 GB at
+  32: a danger to the machine, not only a wait), and the kernel
+  reduces only as far as each step's test looks (no measurable time at
+  48). The repairs: write the check as the algorithm one would run (a
+  table over subformulas and worlds), proved sound, or prove it equal
+  to the plain one and give it to compiled code by `@[csimp]` (the
+  fast path of `lean-certify`); for a judgment that grows, check over
+  a form that does not (sets for multisets), and cap the size of what
+  a compiled check may build. A second check that is only tested
+  against the certifier's is a stopgap: say so where it is used.
+  Measure both sides on a family that grows before believing either:
+  a check that is fast in the kernel has not been shown to be a good
+  algorithm.
 - *A certificate beyond the kernel.* A search can print in
   milliseconds a certificate that Lean does not check within the
   memory cap (MALL: a saturated set of 238 sequents, stopped at 8 GB).
