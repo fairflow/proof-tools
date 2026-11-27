@@ -20,6 +20,11 @@ the formula times the number of worlds.
     Form.holdsT A t = Form.holds A t                    (Form.holdsT_eq)
     Seq.refutedT s t = Seq.refutedAt s t                (Seq.refutedT_eq)
 
+and, with the marks of each different subformula kept in a table, which
+is the check the certifiers run:
+
+    Seq.refutedM s t = Seq.refutedAt s t                (Seq.refutedM_eq)
+
 Theory file: it ends with its bound on axioms.
 -/
 import GLS.Semantics
@@ -164,6 +169,172 @@ theorem Form.holdsT_eq (A : Form) (t : Tree) : A.holdsT t = A.holds t := by
 /-- **S26.  The two checks of a countermodel are one function.** -/
 theorem Seq.refutedT_eq (s : Seq) (t : Tree) : s.refutedT t = s.refutedAt t := by
   simp only [Seq.refutedT, Seq.refutedAt, Form.holdsT_eq]
+
+/-! ## A table over the different subformulas
+
+`Form.marks` computes the marks of a formula for each **occurrence** of a
+subformula.  A formula in which a subformula occurs twice at each level
+(`binForm n` of the corpus: `2ⁿ` connectives written out, `n` different
+subformulas) costs its written size times the worlds, where the kernel,
+which keeps what it has reduced, pays for each different subformula once
+(7.7 s compiled against 2.0 s in the kernel at `binTree 12`).
+
+Here the marks of a subformula are kept in a table once computed, and
+looked up before the subformula is entered.  An entry holds the size of
+its formula, and the table is in order of size, the largest first: a
+subformula is entered after its parts, so it goes in at the head, and a
+search for a formula stops at the first smaller entry.  A variable and
+`⊥` are not kept.  Nothing proved rests on the order or on the sizes:
+an entry found for a formula has that formula. -/
+
+/-- **The table**: formulas with their marks on one tree, each with the
+size of the formula. -/
+abbrev Memo : Type := List (Nat × Form × Marks)
+
+/-- The marks kept for a formula of size `s`, if any: among the entries
+of that size. -/
+def Memo.find (s : Nat) (A : Form) : Memo → Option Marks
+  | [] => none
+  | (u, B, m) :: memo =>
+    if s < u then Memo.find s A memo
+    else if u < s then none
+    else if B = A then some m
+    else Memo.find s A memo
+
+/-- A formula of size `s` put into the table with its marks, before the
+first entry that is not larger. -/
+def Memo.put (s : Nat) (A : Form) (m : Marks) : Memo → Memo
+  | [] => [(s, A, m)]
+  | (u, B, x) :: memo =>
+    if s < u then (u, B, x) :: Memo.put s A m memo
+    else (s, A, m) :: (u, B, x) :: memo
+
+/-- **The marks of a formula on a tree, with a table**: the marks, and
+the table with the subformulas met. -/
+def Form.marksM (t : Tree) : Form → Memo → Marks × Memo
+  | .var p, memo => (Marks.of (fun u => u.val.contains p) t, memo)
+  | ⊥, memo => (Marks.of (fun _ => false) t, memo)
+  | A ⟶ B, memo =>
+    match memo.find (A ⟶ B).size (A ⟶ B) with
+    | some m => (m, memo)
+    | none =>
+      let ra := A.marksM t memo
+      let rb := B.marksM t ra.2
+      (ra.1.imp rb.1, rb.2.put (A ⟶ B).size (A ⟶ B) (ra.1.imp rb.1))
+  | □A, memo =>
+    match memo.find (□A).size (□A) with
+    | some m => (m, memo)
+    | none =>
+      let ra := A.marksM t memo
+      (ra.1.box, ra.2.put (□A).size (□A) ra.1.box)
+
+/-- Truth at the root of a tree of each formula of a list, with a
+table. -/
+def holdsM (t : Tree) : List Form → Memo → List Bool × Memo
+  | [], memo => ([], memo)
+  | A :: l, memo =>
+    let ra := A.marksM t memo
+    let rl := holdsM t l ra.2
+    (ra.1.here :: rl.1, rl.2)
+
+/-- **A sequent is false at the root of a tree, by the marks with one
+table for the sequent**: every formula of the antecedent is true there
+and none of the succedent. -/
+def Seq.refutedM (s : Seq) (t : Tree) : Bool :=
+  let ra := holdsM t s.ant []
+  let rs := holdsM t s.suc ra.2
+  ra.1.all (fun b => b) && rs.1.all (fun b => !b)
+
+/-- **Every entry of the table has the marks of its formula** on the
+tree. -/
+def Memo.Ok (t : Tree) (memo : Memo) : Prop := ∀ e ∈ memo, e.2.2 = e.2.1.marks t
+
+theorem Memo.ok_nil (t : Tree) : Memo.Ok t [] := fun _ h => nomatch h
+
+theorem Memo.find_sound {t : Tree} {s : Nat} {A : Form} {m : Marks} :
+    (memo : Memo) → memo.Ok t → memo.find s A = some m → m = A.marks t
+  | [], _, h => by cases h
+  | (u, B, x) :: memo, hok, h => by
+    have hrest : Memo.Ok t memo := fun e he => hok e (List.mem_cons_of_mem _ he)
+    unfold Memo.find at h
+    split at h
+    · exact Memo.find_sound memo hrest h
+    · split at h
+      · cases h
+      · split at h
+        · next hBA =>
+          cases h
+          subst hBA
+          exact hok (u, B, m) (List.mem_cons_self ..)
+        · exact Memo.find_sound memo hrest h
+
+theorem Memo.put_ok {t : Tree} {s : Nat} {A : Form} {m : Marks} (hm : m = A.marks t) :
+    (memo : Memo) → memo.Ok t → (memo.put s A m).Ok t
+  | [], _ => by
+    intro e he
+    rcases List.mem_singleton.1 he with rfl
+    exact hm
+  | (u, B, x) :: memo, hok => by
+    have hrest : Memo.Ok t memo := fun e he => hok e (List.mem_cons_of_mem _ he)
+    unfold Memo.put
+    split
+    · intro e he
+      rcases List.mem_cons.1 he with rfl | he
+      · exact hok _ (List.mem_cons_self ..)
+      · exact Memo.put_ok hm memo hrest e he
+    · intro e he
+      rcases List.mem_cons.1 he with rfl | he
+      · exact hm
+      · exact hok e he
+
+/-- **The marks with a table are the marks**, and the table stays
+right. -/
+theorem Form.marksM_spec (t : Tree) : (A : Form) → (memo : Memo) → memo.Ok t →
+    (A.marksM t memo).1 = A.marks t ∧ (A.marksM t memo).2.Ok t
+  | .var p, memo, h => ⟨rfl, h⟩
+  | ⊥, memo, h => ⟨rfl, h⟩
+  | A ⟶ B, memo, h => by
+    unfold Form.marksM
+    cases hf : memo.find (A ⟶ B).size (A ⟶ B) with
+    | some m => exact ⟨Memo.find_sound memo h hf, h⟩
+    | none =>
+      obtain ⟨ha, hma⟩ := Form.marksM_spec t A memo h
+      obtain ⟨hb, hmb⟩ := Form.marksM_spec t B _ hma
+      have e : (A.marksM t memo).1.imp (B.marksM t (A.marksM t memo).2).1 = (A ⟶ B).marks t := by
+        rw [ha, hb]
+        rfl
+      exact ⟨e, Memo.put_ok e _ hmb⟩
+  | □A, memo, h => by
+    unfold Form.marksM
+    cases hf : memo.find (□A).size (□A) with
+    | some m => exact ⟨Memo.find_sound memo h hf, h⟩
+    | none =>
+      obtain ⟨ha, hma⟩ := Form.marksM_spec t A memo h
+      have e : (A.marksM t memo).1.box = (□A).marks t := by
+        rw [ha]
+        rfl
+      exact ⟨e, Memo.put_ok e _ hma⟩
+
+theorem holdsM_spec (t : Tree) : (l : List Form) → (memo : Memo) → memo.Ok t →
+    (holdsM t l memo).1 = l.map (fun A => A.holds t) ∧ (holdsM t l memo).2.Ok t
+  | [], memo, h => ⟨rfl, h⟩
+  | A :: l, memo, h => by
+    obtain ⟨ha, hma⟩ := Form.marksM_spec t A memo h
+    obtain ⟨hl, hml⟩ := holdsM_spec t l _ hma
+    refine ⟨?_, hml⟩
+    show (A.marksM t memo).1.here :: (holdsM t l (A.marksM t memo).2).1 = _
+    rw [ha, hl, List.map_cons]
+    exact congrArg (· :: _) (Form.holdsT_eq A t)
+
+/-- **S30.  The check with a table is the definition**: the two checks of
+a countermodel are one function. -/
+theorem Seq.refutedM_eq (s : Seq) (t : Tree) : s.refutedM t = s.refutedAt t := by
+  obtain ⟨ha, hma⟩ := holdsM_spec t s.ant [] (Memo.ok_nil t)
+  obtain ⟨hs, _⟩ := holdsM_spec t s.suc _ hma
+  show ((holdsM t s.ant []).1.all (fun b => b) &&
+    (holdsM t s.suc (holdsM t s.ant []).2).1.all (fun b => !b)) = _
+  rw [ha, hs, Seq.refutedAt, List.all_map, List.all_map]
+  rfl
 
 end GLS
 

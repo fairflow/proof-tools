@@ -305,9 +305,10 @@ first). No item of the source, so not read back.
     sound : ∀ s t, s.refutedAt t = true → Valid s → False
     sound : ∀ s t, s.refutedAt t = true → Nonempty (Fam s) → False
 
-Since 2026-11-27 the check of both is `s.refutedT t` (S26), which is
-`s.refutedAt t` computed one formula at a time over all the worlds; the
-statements above are theorems still (`noValid_check`, with S26).
+Since 2026-11-27 the check of both is `s.refutedM t` (S30; for some
+hours `s.refutedT t`, S26), which is `s.refutedAt t` computed one
+subformula at a time over all the worlds; the statements above are
+theorems still (`noValid_check`, with S30).
 
 `noValid`, `noDerivable`, `GLS/Run.lean`. No budget in `Holds`. Screened
 (`GLS/Screen.lean`): no sequent of the 1 024 that the bounded search
@@ -321,7 +322,7 @@ within `[propext, Quot.sound]` (`GLS/Run.lean`); negative tests:
     ∀ s : Seq,  (∃ c, treeCert.check s c = true) ∨ (∃ t, noValid.check s t = true)
 
 (Since 2026-11-27 `treeCert.check` is the replay by counts, S27, and
-`noValid.check` truth by the marks, S26; the statement is as it was.)
+`noValid.check` truth by the marks, S30; the statement is as it was.)
 `decided`, `GLS/Run.lean`; and that the engine's producer answers `pass`
 for every derivable sequent (`glsEngine_complete :
 glsEngine.Complete`). Status: **PROVED**, within `[propext,
@@ -404,7 +405,8 @@ Quot.sound]`.
     Seq.refutedT s t := s.ant.all (·.holdsT t) && s.suc.all (!·.holdsT t)
     ∀ (s : Seq) (t : Tree),  s.refutedT t = s.refutedAt t
 
-`Seq.refutedT_eq`, `GLS/Table.lean`. `Seq.refutedT` is the check of
+`Seq.refutedT_eq`, `GLS/Table.lean`. `Seq.refutedT` was, until S30 the
+same day, the check of
 `noValid` and `noDerivable` (S21), compiled and in the kernel. Screened
 (`GLS/CheckTest.lean`): equal on the 1 024 small sequents at 200
 worlds, where both answers occur; on the trees the search returns for
@@ -457,8 +459,8 @@ checks that the certifiers run, as a function:
 
     certOrRef : (s : Seq) → { c : Cert S // Cert.check s c = true } ⊕ { t : Tree // s.refutedAt t = true }
 
-`certOrRef`, `GLS/Decide.lean`; with S27 and S26 the two sides are
-`s.countCheck c = true` and `s.refutedT t = true`, the certifiers'
+`certOrRef`, `GLS/Decide.lean`; with S27 and S30 the two sides are
+`s.countCheck c = true` and `s.refutedM t = true`, the certifiers'
 checks (`decided`, S22, is now read off it). The search is S4's, made at
 sequents without repeated formulas: each premise has its repetitions
 removed before the search goes on. The lemma under it:
@@ -512,6 +514,33 @@ line too many, and with every goal number one too high are refused by
 both; lines in another order (the second premise first) are accepted by
 both. Status: **PROVED**, within `[propext, Quot.sound]`.
 
+### S30. The check with a table over the different subformulas is the definition (2026-11-27; our own)
+
+Why it is wanted: Table 5 of `measurements.md` found the check of S26
+slower compiled than in the kernel on `binTree 12` (7.7 s against
+2.0 s). S25's marks are computed for each occurrence of a subformula;
+`binForm n` has a subformula twice at each level. The marks of a
+subformula are now kept in a table once computed and looked up before
+the subformula is entered, with one table for the whole sequent
+(`GLS/Table.lean`).
+
+    Seq.refutedM s t := the antecedent's formulas all true at the root and the succedent's none,
+                        by Form.marksM, the table handed from formula to formula
+    ∀ (s : Seq) (t : Tree),  s.refutedM t = s.refutedAt t
+
+`Seq.refutedM_eq`, `GLS/Table.lean`; on the way `Form.marksM_spec`: from
+a table every entry of which has the marks of its formula, the marks
+returned are `A.marks t` and the table returned is such a table. The
+order of the table and the sizes kept in it are not part of what is
+proved. `Seq.refutedM` is the check of `noValid` and `noDerivable`,
+compiled and in the kernel, in place of S26's. **Screened before its
+proof** (kept as guards, `GLS/CheckTest.lean`): equal to the definition
+on the 1 024 small sequents at 200 worlds, both answers occurring; on
+380 sequents whose formulas share subformulas and repeat on both sides,
+at 100 worlds; on `binTree 1` to `5` at every world of the refuting
+tree; a tree too short refused. No disagreement was found. Status:
+**PROVED**, within `[propext, Quot.sound]`.
+
 ## Refuted
 
 None.
@@ -531,7 +560,7 @@ None.
 |---|---|---|---|
 | of the goals from the standing list (S7; S10 with S19; S24) | 3 | 0 | 0 |
 | of the other goals (S3 to S6, S8, S9; S11 to S18) | 14 | 0 | 0 |
-| of our own (S1, S2, S20 to S23, S25 to S29) | 11 | 0 | 0 |
+| of our own (S1, S2, S20 to S23, S25 to S30) | 12 | 0 | 0 |
 
 Counted by entry, with S11 to S17 seven entries and S19 counted with
 S10 (one statement, two definitions).

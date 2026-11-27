@@ -13,8 +13,9 @@ proved sound certifies it in the kernel.
   the moves is S1 (`step_sound`).  `treeCert.verdict s c : Fam s`.
 * **Against validity, and against derivability**: the certificate is a
   finite tree; the checker computes that the sequent is false at its
-  root, one formula at a time over all the worlds (`Seq.refutedT`,
-  `GLS/Table.lean`), which is `Seq.refutedAt` by S26 (`Seq.refutedT_eq`).
+  root, one subformula at a time over all the worlds, each different
+  subformula once (`Seq.refutedM`, `GLS/Table.lean`), which is
+  `Seq.refutedAt` by S30 (`Seq.refutedM_eq`).
   `noValid.verdict s t : Valid s → False`.
 
 Each check is the algorithm one would run, and the kernel and compiled
@@ -75,19 +76,19 @@ theorem scriptCert_check (s : Seq) (ls : Script S) : scriptCert.check s ls = der
 /-- **Finite trees, checked against validity**: if `s` is computed false
 at the root of `t`, then `s` is not valid. -/
 def noValid : Certify.Certifier Seq Tree (fun s => Valid s → False) where
-  check s t := s.refutedT t
-  sound s t h hv := not_satSeq_of_refutedAt ((Seq.refutedT_eq s t).symm.trans h)
+  check s t := s.refutedM t
+  sound s t h hv := not_satSeq_of_refutedAt ((Seq.refutedM_eq s t).symm.trans h)
     (hv treeModel treeModel_GL treeModel_twoValued t)
 
 /-- The check of `noValid`, and of `noDerivable`, is the definition
 `Seq.refutedAt`. -/
 theorem noValid_check (s : Seq) (t : Tree) : noValid.check s t = s.refutedAt t :=
-  Seq.refutedT_eq s t
+  Seq.refutedM_eq s t
 
 /-- The same against derivability: by soundness, what is not valid has no
 derivation. -/
 def noDerivable : Certify.Certifier Seq Tree (fun s => Derivable s → False) where
-  check s t := s.refutedT t
+  check s t := s.refutedM t
   sound s t h := fun ⟨d⟩ => noValid.sound s t h (soundness s d)
 
 #certify_structural GLS.treeCert

@@ -402,7 +402,10 @@ Machine: arm64, macOS-15.8.3-arm64-arm-64bit.  Loading the imports: 0.93 s, take
 (so a kernel's column includes reading the certificate as a term, which
 Tables 3 and 4 took off). Deadlines: the search 20 s, each kernel check
 60 s; Lean under `-M 4000`, a cap of 4 GB; a column stops at its first
-flag. The compiled checks are one run of `glsrun check`.
+flag. The compiled checks are one run of `glsrun check`. **The rows of
+`consis` and `binTree` are of a second run, the same day, after S30**
+(the countermodel check with a table over the different subformulas);
+what they were before it is below the reading.
 
 | family | n | verdict | size of the certificate | the search, compiled | `treeCert` or `noDerivable`, compiled | `scriptCert`, compiled | the tree by `treeCert` or `noDerivable`, kernel | the tree of moves by `setCert`, kernel | the script by `scriptCert`, kernel | the kernel running the search (`decide +kernel`) |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -424,34 +427,34 @@ flag. The compiled checks are one run of `glsrun check`.
 | kChain | 128 | pass | 387 | 84 ms | 376 µs | 392 µs | 4.65 s | not run | 8.59 s | not run |
 | kChain | 256 | pass | 771 | 611 ms | 1.4 ms | 1.5 ms | flag (> 60 s) | not run | flag: over the cap on memory, 4 GB | not run |
 | kChain | 512 | pass | 1539 | 4456 ms | 5.4 ms | 6.1 ms | not run | not run | not run | not run |
-| consis | 16 | fail | 17 | 0 ms | 8 µs | not a derivation | 0.00 s | not a derivation | not a derivation | 0.07 s |
-| consis | 32 | fail | 33 | 0 ms | 24 µs | not a derivation | 0.07 s | not a derivation | not a derivation | 0.49 s |
-| consis | 64 | fail | 65 | 2 ms | 121 µs | not a derivation | 0.35 s | not a derivation | not a derivation | 2.31 s |
-| consis | 128 | fail | 129 | 24 ms | 504 µs | not a derivation | 1.00 s | not a derivation | not a derivation | flag: over the cap on memory, 4 GB |
-| consis | 256 | fail | 257 | 319 ms | 1.9 ms | not a derivation | 4.60 s | not a derivation | not a derivation | not run |
-| consis | 512 | fail | 513 | 4640 ms | 8.1 ms | not a derivation | flag (> 60 s) | not a derivation | not a derivation | not run |
-| binTree | 4 | fail | 31 | 0 ms | 111 µs | not a derivation | 0.05 s | not a derivation | not a derivation | 0.71 s |
-| binTree | 6 | fail | 127 | 5 ms | 1.8 ms | not a derivation | 0.10 s | not a derivation | not a derivation | 8.99 s |
-| binTree | 8 | fail | 511 | 43 ms | 29.0 ms | not a derivation | 0.15 s | not a derivation | not a derivation | flag (> 60 s) |
-| binTree | 10 | fail | 2047 | 385 ms | 477.0 ms | not a derivation | 0.52 s | not a derivation | not a derivation | not run |
-| binTree | 12 | fail | 8191 | 3541 ms | 7.71 s | not a derivation | 2.01 s | not a derivation | not a derivation | not run |
+| consis | 16 | fail | 17 | 0 ms | 12 µs | not a derivation | 0.01 s | not a derivation | not a derivation | 0.11 s |
+| consis | 32 | fail | 33 | 0 ms | 31 µs | not a derivation | 0.05 s | not a derivation | not a derivation | 0.44 s |
+| consis | 64 | fail | 65 | 2 ms | 131 µs | not a derivation | 0.26 s | not a derivation | not a derivation | 2.59 s |
+| consis | 128 | fail | 129 | 27 ms | 519 µs | not a derivation | 1.45 s | not a derivation | not a derivation | flag: over the cap on memory, 4 GB |
+| consis | 256 | fail | 257 | 357 ms | 1.9 ms | not a derivation | 5.56 s | not a derivation | not a derivation | not run |
+| consis | 512 | fail | 513 | 5259 ms | 7.8 ms | not a derivation | flag (> 60 s) | not a derivation | not a derivation | not run |
+| binTree | 4 | fail | 31 | 0 ms | 36 µs | not a derivation | 0.13 s | not a derivation | not a derivation | 0.86 s |
+| binTree | 6 | fail | 127 | 5 ms | 181 µs | not a derivation | 0.16 s | not a derivation | not a derivation | 9.96 s |
+| binTree | 8 | fail | 511 | 47 ms | 987 µs | not a derivation | 0.26 s | not a derivation | not a derivation | flag (> 60 s) |
+| binTree | 10 | fail | 2047 | 401 ms | 4.6 ms | not a derivation | 0.63 s | not a derivation | not a derivation | not run |
+| binTree | 12 | fail | 8191 | 3633 ms | 22.5 ms | not a derivation | 2.28 s | not a derivation | not a derivation | not run |
 
 Read:
 
 * **The search** answers every member up to 512 within its 20 s:
   `boxChain 512` in 5.0 s, `lastChain 512` in 19.3 s, `kChain 512` in
-  4.5 s, `consis 512` in 4.6 s, `binTree 12` (8 191 worlds) in 3.5 s. It
+  4.5 s, `consis 512` in 5.3 s, `binTree 12` (8 191 worlds) in 3.6 s. It
   grows about as the fourth power of the number of nested boxes (0.34 s
   at `boxChain 256`, 5.0 s at 512): each step removes the repeated
   formulas of a list by comparing its formulas two by two, and a
   comparison of two formulas with `k` boxes takes `k` steps. The search
   that returned a derivation of GLS was cut off at 28 (Table 1).
 * **The certifiers' checks compiled** are under 0.1 s on every member
-  measured but `binTree 10` and `12` (below).
+  measured, and on none slower than the same check in the kernel.
 * **In the kernel**, under 4 GB: `treeCert` to `boxChain 512` (6.7 s),
   `lastChain 128` (2.9 s), `kChain 128` (4.7 s); `scriptCert` to
   `boxChain 512` (16.3 s), `lastChain 128`, `kChain 128` (8.6 s);
-  `noDerivable` to `consis 256` (4.6 s) and `binTree 12` (2.0 s). Where
+  `noDerivable` to `consis 256` (5.6 s) and `binTree 12` (2.3 s). Where
   a column has a next member, it passes the cap of 4 GB or the 60 s. Under
   8 GB and with the certificate's own time taken off, Table 4 has
   `treeCert` at `lastChain 256` in 11 s and at `kChain 256` in 5.7 s.
@@ -460,24 +463,33 @@ Read:
   deadline. Its check removes repeated formulas at every step.
 * **The kernel running the search itself** (`decide +kernel` on `Valid`,
   with no certificate): to 64 on `boxChain` (2.5 s), `lastChain`
-  (7.2 s) and `consis` (2.3 s), to `kChain 32` and `binTree 6`; beyond,
+  (7.2 s) and `consis` (2.6 s), to `kChain 32` and `binTree 6`; beyond,
   the cap or the deadline. On 2026-11-25 the kernel running the search
   over multisets was cut off at 16 (Table 1).
 
-**A third check compiled slower than in the kernel, found by this
-table and not repaired: `noDerivable` on `binTree`.** At `binTree 12`
-the check by the marks takes 7.7 s compiled and 2.0 s in the kernel; at
-10, 0.48 s and 0.52 s. The formula `Dₙ` has `Dₙ₋₁` in it twice, so it
-is `2ⁿ` connectives written out and `n` different subformulas. The
-marks are computed once for each occurrence of a subformula: `2ⁿ`
-occurrences times `2ⁿ⁺¹` worlds, which is the size of the formula as
-written times the size of the tree, the bound one expects of the
-algorithm for a formula given as text. The kernel keeps the marks of a
-subformula it has seen, so it pays `n` times the worlds. By the rule of
-`reference/certify.md` §5 ("a compiled check slower than the kernel's is
-a fault of the checker") this is one: the repair is a table over the
-different subformulas, with its equality to S25's function. It does not
-arise for a sequent typed at a shell, whose formula is its text.
+**A third check compiled slower than in the kernel, found by the first
+run of this table and repaired (S30).** The countermodel check of S26
+computed the marks of a formula for each occurrence of a subformula.
+The formula `Dₙ` of `binTree n` has `Dₙ₋₁` in it twice: `2ⁿ`
+connectives written out, `n` levels of different subformulas. The
+kernel keeps the marks of a subformula it has seen, and compiled code
+did not. With a table over the different subformulas (`Seq.refutedM`):
+
+| member | S26's check, compiled | S26's, kernel | S30's check, compiled | S30's, kernel |
+|---|---|---|---|---|
+| `binTree 8` | 29.0 ms | 0.15 s | 1.0 ms | 0.26 s |
+| `binTree 10` | 0.48 s | 0.52 s | 4.6 ms | 0.63 s |
+| `binTree 12` | 7.71 s | 2.01 s | 22.5 ms | 2.28 s |
+| `consis 64` | 121 µs | 0.35 s | 131 µs | 0.26 s |
+| `consis 128` | 504 µs | 1.00 s | 519 µs | 1.45 s |
+| `consis 256` | 1.9 ms | 4.60 s | 1.9 ms | 5.56 s |
+| `consis 512` | 8.1 ms | flag (> 60 s) | 7.8 ms | flag (> 60 s) |
+
+Compiled, `binTree 12` went from 7.7 s to 23 ms and `consis` did not
+change. In the kernel the table costs something where no subformula
+repeats: 1.45 s against 1.00 s at `consis 128`, 5.6 s against 4.6 s at
+256 (one run each; the kernel's column includes reading the tree of
+worlds as a term).
 
 **The commands, timed** (one run each, the whole process, on this
 machine; memory is the most the process held):
@@ -531,9 +543,8 @@ it found before.
   in screens and tests on small cases (the largest: `boxChain 12`) and
   in `glsrun check --definitions`, which measures them under its
   deadline and its cap of 40 000 000 formulas.
-* **Not exponential, and not repaired**: the check by the marks on a
-  formula with repeated subformulas (above); `setCert` in the kernel;
-  the fourth power in the search.
+* **Not exponential, and not repaired**: `setCert` in the kernel, which
+  stops first of the checks; the fourth power in the search.
 
 Not measured: members between the last that passed and the first
 flagged in a column; any column under more than 4 GB; `lastChain 512`

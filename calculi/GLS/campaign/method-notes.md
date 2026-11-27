@@ -520,7 +520,7 @@ commit `40a4988`.
        the program as it is.
 
     h. **The new table found a third check compiled slower than in the
-       kernel, and it is left**: truth by the marks on `binTree 12`,
+       kernel**: truth by the marks on `binTree 12`,
        7.7 s compiled and 2.0 s in the kernel. The formula has a
        subformula twice at each level, `2ⁿ` connectives written out
        and `n` different subformulas; compiled code computes the marks
@@ -531,10 +531,14 @@ commit `40a4988`.
        one would run" part ways here: the rule could say what the size
        of a formula is (written out, or its different subformulas), and
        that a family whose formulas share subformulas is to be among
-       those measured. Not repaired: a table over the different
-       subformulas with its equality to S25's function is the next
-       piece of work, if it is wanted.
+       those measured. Repaired later the same day, on the reviewer's
+       word (S30): 23 ms compiled at `binTree 12`. The table was given
+       its form for the kernel from the start this time (entries in
+       order of size, a search that stops early), after note 28 (c),
+       and was measured in the kernel before it was recorded: it costs
+       the kernel a fifth to a half more where no subformula repeats
+       (5.6 s against 4.6 s at `consis 256`).
 
     *Asked of the directing session*: (a) and (b) in `reference/certify.md`
-    (level 3, and "the producer"); (c), (d) in the library; a ruling
-    on (h).
+    (level 3, and "the producer"); (c), (d) in the library; in §5, what
+    (h) says of the size of a formula.

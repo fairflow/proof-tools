@@ -6,7 +6,7 @@ definition it is proved equal to.
 
 Code, not theory: nothing here is trusted, and the file has no bound on
 axioms.  A screen that fails is a `#guard` that fails the build.  The
-statements are S25 to S29 of `campaign/statements.md`.
+statements are S25 to S30 of `campaign/statements.md`.
 -/
 import GLS.Table
 import GLS.Counts
@@ -101,6 +101,34 @@ def smallMoves : List (Seq × Cert S) :=
   (.mk (.impL p ⊥) [.mk (.impL p ⊥) [.mk (.idP 0) [], .mk .botL []], .mk .botL []])
 #guard (([p ⟶ ⊥, p ⟶ ⊥, p] ⇒ [] : Seq)).countCheck
   (.mk (.impL p ⊥) [.mk (.impL p ⊥) [.mk (.idP 0) [], .mk .botL []], .mk .botL []])
+
+/-! ## S30: truth by the marks, with a table over the different subformulas
+
+The screens of the statement, run before its proof. -/
+
+-- on 1 024 sequents and 200 worlds; both answers occur
+#guard seqsSmall.all fun j => ((worlds trees2).take 200).all fun w => j.refutedM w == j.refutedAt w
+#guard seqsSmall.any fun j => ((worlds trees2).take 200).any fun w => j.refutedM w
+#guard seqsSmall.any fun j => ((worlds trees2).take 200).any fun w => !j.refutedM w
+
+/-- Sequents whose formulas share subformulas, and repeat on both sides. -/
+def shared : List Seq :=
+  (forms2.flatMap fun A => forms2.map fun B => [A ⟶ B, A, □(A ⟶ B)] ⇒ [B, □A ⟶ □B, A ⟶ B]) ++
+  (forms2.map fun A => [(A ⟶ A) ⟶ (A ⟶ A), □(A ⟶ A)] ⇒ [□□(A ⟶ A) ⟶ A, A])
+
+#guard shared.length == 380
+#guard shared.all fun j => ((worlds trees2).take 100).all fun w => j.refutedM w == j.refutedAt w
+#guard shared.any fun j => ((worlds trees2).take 100).any fun w => j.refutedM w
+-- a formula with a subformula twice at each level: on the tree that
+-- refutes it, and at every world of that tree
+#guard [1, 2, 3, 4, 5].all fun n => (treeOf (binTree n)).all fun t =>
+  (binTree n).refutedM t && (binTree n).refutedAt t &&
+  (t :: t.desc).all fun u => (binTree n).refutedM u == (binTree n).refutedAt u
+-- a tree too short is refused
+#guard [3, 8, 12].all fun n => (treeOf (consis n)).all fun t =>
+  (consis n).refutedM t && !(consis (n + 1)).refutedM t
+-- where the marks without a table take seconds: 8 191 worlds
+#guard (treeOf (binTree 12)).all fun t => (binTree 12).refutedM t
 
 /-! ## S28: the search at sequents without repeated formulas
 

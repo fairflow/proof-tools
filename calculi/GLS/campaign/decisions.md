@@ -590,11 +590,37 @@ own: "a cap on a known exponential is a fence, not a repair".
   deadline and the cap of 40 000 000 formulas. It is the one command
   that writes a sequent out, and only when asked.
 * **Still `2ⁿ`, and why**: `measurements.md`, "What remains exponential".
-* **Found and left**: the check by the marks is slower compiled than in
-  the kernel on `binTree 12` (7.7 s against 2.0 s), a formula with
-  repeated subformulas; `measurements.md`, under Table 5, and method
-  note 29 (h).
+* **Found, and left at that hour**: the check by the marks is slower
+  compiled than in the kernel on `binTree 12` (7.7 s against 2.0 s), a
+  formula with repeated subformulas; `measurements.md`, under Table 5,
+  and method note 29 (h). Repaired in the next entry.
 * **Rests on it**: `GLS/Decide.lean`, `GLS/Scripts.lean`, `GLS/Run.lean`,
   `GLS/SetSearch.lean` (now `setCert` and the producer's old name),
   `Main.lean`, `Corpus/measure.py`.
 * **Cost to reverse**: little; nothing proved before was changed.
+
+## 2026-11-27 11:03 GMT. After the campaign: the countermodel check keeps a table over the different subformulas
+
+By the owner of `calculi/GLS`, on the reviewer's word in the session
+("Yes, repair it"), to the question the entry above ended on.
+
+* **What was wrong.** The check of S26 computes the marks of a formula
+  for each occurrence of a subformula. On `binTree 12`, whose formula
+  has a subformula twice at each level, it took 7.7 s compiled and
+  2.0 s in the kernel, which keeps what it has reduced.
+* **Decided.** `noValid` and `noDerivable` check by `Seq.refutedM`
+  (S30): the marks of a subformula are kept in a table once computed,
+  looked up before the subformula is entered, one table for the whole
+  sequent. Proved equal to `Seq.refutedAt`.
+* **The table's form, chosen for the kernel as well as for compiled
+  code**: an entry holds the size of its formula, the table is in order
+  of size with the largest first, and a search stops at the first
+  smaller entry. A subformula is entered after its parts, so it goes in
+  at the head. Variables and `⊥` are not kept. A table searched from
+  end to end by equality of formulas would have cost, on a chain of `n`
+  boxes, `n²` comparisons each of up to `n` steps (the fault of the
+  first replay by counts, entry of this morning).
+* **Kept**: `Form.marks`, `Form.holdsT`, `Seq.refutedT` and S25, S26,
+  which S30's proof goes through.
+* **Rests on it**: `GLS/Table.lean`, `GLS/Run.lean`.
+* **Cost to reverse**: little.
