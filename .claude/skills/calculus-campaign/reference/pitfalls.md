@@ -1,8 +1,7 @@
 # What has gone wrong before
 
 Stated as facts, because each cost hours and each is cheap to avoid. Read
-a stage's entries when the stage begins. What a rule of `SKILL.md` or a
-step of a part already says is not repeated here.
+a stage's entries when the stage begins.
 
 ## Survey
 
@@ -24,10 +23,10 @@ step of a part already says is not repeated here.
    policy excludes `Classical.choice`, it is a constraint from the first
    definition. Taking it out later cost a rewrite of a completeness
    construction.
-5. **Two packages with modules of the same names.** A project could not
-   require both; replacing one rebuilt everything that used it, and that
-   was most of the waiting in a stage. Settle dependencies in the plan,
-   and count the build in the cost log.
+5. **Two packages with modules of the same names** cannot both be
+   required (`reference/explore.md` §1), and replacing one rebuilds
+   everything that used it. Settle dependencies in the plan, and count
+   the build in the cost log.
 
 ## Adopt
 
@@ -62,23 +61,16 @@ step of a part already says is not repeated here.
     before it was sent. Before writing that something holds, name the
     file, the test or the document that shows it; otherwise write
     "not checked".
-11. **An estimate written as a fact.** A time in a campaign's record, and the
-    value a test was to pin, were written from expectation, not from
-    the clock and not from Lean. Both were wrong. A time comes from
-    `date`; a pinned value from Lean's output: run it, then pin it.
-    Knowing this did not prevent it: one campaign typed three such
-    values after this entry was written, each wrong, each refused by
-    the build. So as an order of work: evaluate, read the output, paste
-    it. There is then no moment at which a value is typed. The same for
-    a time told to the reviewer: from the session's record, never "at
-    about". Mechanically: no document is written in the same call as
-    the `date` it quotes. Run `date` first, in a call of its own, and
-    paste (DILL: five times ahead of the clock in one campaign, each
-    in a document composed in the call that read the clock). The same
-    order holds for a sum (a count of lines is computed, read and
-    pasted), and for a certificate: one in a test or in a module of
-    solutions comes from the producer, pasted from the runner or
-    written by a script that calls it.
+11. **An estimate written as a fact.** A time, a count, the value a
+    test is to pin, a certificate: each comes from the clock, from Lean
+    or from the producer, and none is typed from expectation. As an
+    order of work: evaluate, read the output, paste it, so that there
+    is no moment at which a value is typed; and no document is written
+    in the same call as the `date` it quotes. A time told to the
+    reviewer is from the session's record, never "at about". Every
+    campaign has done this with the entry in front of it (twenty
+    recorded instances in four campaigns, each refused by the build or
+    corrected in the next call): expect it of yourself.
 12. **A document written through the shell.** A heredoc with an unquoted
     delimiter ran the words between backticks as commands. Write a
     document with the file tool, or under a quoted delimiter

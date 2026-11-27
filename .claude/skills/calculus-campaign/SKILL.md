@@ -293,11 +293,12 @@ down (rules 8 and 9).
    build side by side while the machine has room: this is not a
    one-at-a-time rule. Hold a build back when memory is short, swap is
    in use, or several builds are already running; and never run an
-   open-ended search beside a large build. Say this in each brief, and run any evaluation of unknown size under
-   `lean -M <megabytes>`. Give an agent your design where you have
-   one, and say that another is welcome. End a session before the
-   campaign is done only where the environment forces it: write the brief, and enter the end
-   in `decisions.md` as a stop, since someone must then open a session
+   open-ended search beside a large build. Say this in each brief, and
+   run any evaluation of unknown size under
+   `lake env lean -M <megabytes>`. Give an agent your design where you
+   have one, and say that another is welcome. End a session before the
+   campaign is done only where the environment forces it: write the
+   brief, and enter the end in `decisions.md` as a stop, since someone must then open a session
    with `/calculus-campaign` and the brief's path.
    The documents are the campaign's memory: a session that goes on from
    one stage to the next reads them again, and does not work from what

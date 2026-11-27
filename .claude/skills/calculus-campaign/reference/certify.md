@@ -7,11 +7,7 @@ its reviewer, read "the reviewer". Its rule R10 (statements first) is
 met here by displaying and screening the statements before their proofs
 (`SKILL.md`, stage 3, step 1): nothing waits for an answer, and the
 report that R10 speaks of is the closing page. Read the file in the
-checkout, not a skill of the same name from your session's list: that
-may be a copy from another repository, and older. One that says its
-reviewer "is the gate" is the older text, and the file in the checkout
-holds. This part
-says only what a calculus
+checkout (`SKILL.md`, stage 3). This part says only what a calculus
 brings to them: which of the six steps the explorer library has already
 done for every calculus, and which are written by hand for each.
 
@@ -64,10 +60,6 @@ and not only for there being one. For a proposition proved sound by
 membership (`h : S.Sound P`), the certifiers are `Cert.certifier h.soundT`
 and `certifier h.soundT`.
 
-`import LeanCertify` brings the words of its syntax with it: `size`
-becomes a keyword, and a function of yours with that name no longer
-parses (`reference/explore.md` §5).
-
 Compiled, in the template's instance: both lints pass on both certifiers,
 with the property a type. For the script, R3 adds a note that the path
 reaches `Nat.repr` (the library's message for a failing line), "so this
@@ -90,8 +82,9 @@ certificate of record (Q3), and it is recorded with the plan.
 `step` (and the check of a model). `Cert.check` and `derives` are the
 library's functions that run `step` over a tree and along a script; with
 your theorem each is the checker of its certifier. So "a negative test
-for each certifier" means: one for each certifier of derivations that the
-campaign uses, and one for the certifier against what holds.
+for each certifier" means: for each certifier of derivations that the
+campaign uses, a certificate with a wrong move and one that stops early
+(§5); and one for the certifier against what holds.
 
 State a result with the named certifier (`treeCert.verdict j c`), not
 through an engine (`E.yes.verdict j ls`): the second names the engine and
@@ -175,13 +168,10 @@ to show both sides; your level is the plan's.
   `(s) → { c // yes.check s c = true } ⊕ { r // no.check s r = true }`,
   and make the producer that function. A decision that returns the
   derivation as data is as large as the derivation, whatever the
-  search does (GLS: `2ⁿ` by its type, cut off at 28 nested boxes); the
-  derivation is kept for the theorem about the calculus, which nothing
+  search does; the derivation is kept for the theorem about the calculus, which nothing
   runs. Where a second search is written because the proved one is
   slow, try its proof before building a fallback from one to the
-  other: GLS ran an unproved search in front of an exponential proved
-  one for two days, and the proof took an hour once the invariant was
-  seen.
+  other.
 
 **Where the countermodel comes from** is a question for the Survey (Q3),
 because calculi differ. In some an unfinished derivation that can go no
@@ -198,9 +188,8 @@ more than one:
   interpretation computed by the check. The producer of structures is
   seldom complete. Where the kernel is to compute over a finite carrier,
   tabulate each set once, as a list of Booleans indexed by the carrier,
-  when it is made: an evaluator by closures did not end in 120 s on
-  four elements, and the tabulated one was linear in the families
-  measured.
+  when it is made: an evaluator by closures does not end on four
+  elements.
 - *The record of a failed search*: a finite set of judgments, saturated
   (the judgment is a member; no member is an axiom; every rule instance
   concluding a member has a premise in the set). The check is
@@ -216,7 +205,7 @@ more than one:
   Its soundness needs no model, and the syntactic proof is the first
   to try: an induction on a derivation without cut (the last rule of
   a member has a premise in the set), with cut elimination to reach
-  the calculus with cut (DILL: 250 lines, no semantics). The model is
+  the calculus with cut. The model is
   wanted only where the countermodel itself is. The induction is on
   the derivation and not on the set, so it does not ask that premises
   be smaller: a member may be its own premise, and members may ask for
@@ -225,8 +214,7 @@ more than one:
   premise need only be *below* a member, with the same conclusion and
   a larger context. Without it the set is exponential for a reason
   that is not the search's (`2ⁿ` members for `n` conjunctions on the
-  left; measured, 65 536 against 1, in a campaign on a set-based
-  calculus with a cyclic certificate). Soundness then uses the
+  left). Soundness then uses the
   height-preserving weakening of the calculus, and the list is the
   generators of the refutation: a theorem that the sequents below a
   closed list are closed in the strict sense, with its converse, keeps
@@ -247,10 +235,6 @@ derivation is complete, and level 3 is not a goal: the plan sets level
 refutation is stated, if at all, for a fragment whose search space is
 finite. Say which fragment in the plan, before the Run stage is
 designed.
-
-A calculus whose derivations are disproofs is a calculus, with its own
-proof system and its own campaign. No instance has used one as the no
-side of an engine.
 
 ## 4. The producer
 
@@ -280,8 +264,7 @@ out the answer is `flag`, never `fail`.
   node, its failures are final, and its fully tried nodes are the
   certificate (§3).
 - Bound every generator of test inputs before running it (a size, a
-  count, a deadline). One that ran away wrote oversized files for
-  minutes before it was stopped.
+  count, a deadline).
 
 **Where Prove left a search that is proved, and structural: try the
 direct decision first.** `lean-certify` is built for a producer that is
@@ -302,20 +285,15 @@ Plain `decide` may stop where `decide +kernel` goes through, since it
 does not unfold the search. So, in this case:
 
 - measure both routes on the corpus, the fact with its certificate and
-  the kernel running the search, and report both (§5). In the one
-  instance measured (`calculi/BrunnlerK/` of `proof-tools`) the kernel
-  running the search was the cheaper at every size tried for a proof
-  (0.44 s against 1.81 s at a tree of 655 moves) and answered where
-  the certificate was not elaborated; against validity the tree was
-  the cheaper (0.07 s against 2.04 s at 65 nodes);
+  the kernel running the search, and report both (§5): which is the
+  cheaper differs by calculus and by side, and the kernel running the
+  search may answer where a certificate is not elaborated;
 - keep the certifiers all the same, for what the direct decision does
   not give: the proof as an object (a value of `Fam j` to print, walk
   and compare; a tree of moves to keep), and any producer that is not
   proved (a faster search, a person, a language model);
 - the compiled producer is still that search, with its answer checked
-  before it is handed on (above): being proved does not excuse it from
-  the check, which costs little and guards the file against its own
-  defects.
+  before it is handed on (above).
 
 Where the search is not structural (well-founded recursion, a budget),
 the kernel does not run it: R3. This route is then closed, and the
@@ -337,8 +315,7 @@ is a decision procedure that the kernel runs, and is right whatever
 `fast` does. Say in the frontier which property each certifier
 certifies. And before a second search is blamed on the calculus,
 compare the two on a small member: a second search that is slower than
-the first there has a fault in its code (one such was a helper that
-called itself twice on each element).
+the first there has a fault in its code.
 
 The fast search serves the "yes" side only: its tree is checked, and
 the proof is had. For a judgment with no derivation the kernel must
@@ -351,13 +328,9 @@ derivable, before the closing page (rule 6).
 
 ## 5. Statements, tests, measurements
 
-**Statements first (R10).** The library's two certifiers of derivations
-and the certifier against what holds were fixed in the plan: what holds,
-the certificate of record, the level, the notion of model. Before any
-producer is written, record in `decisions.md` which producers, and why
-(who relies on the answers); and for any certifier of your own, enter
-`Holds`, the certificate, and the type of `sound` in `statements.md`,
-displayed and screened.
+**Statements first (R10).** `SKILL.md`, stage 3, step 1: the producers
+recorded with why each is wanted, and each certifier of your own stated
+and screened, before any producer is written.
 
 **Negative tests (R9).** For each certifier, one corrupted certificate,
 rejected in the kernel and pinned. For a tree and for a script, two each:
@@ -383,18 +356,14 @@ code; its certificate has to be written into a term.
   `<name>run prove '<judgment>'`. It is what a person with no Lean file
   open can use; what it has to do is the next paragraph.
 
-**A judgment typed at a shell** (`prove`). Four instances here, all of
-2026-11-26: Brünnler's K (a judgment that nests, a search that always
-answers, a countermodel on the "no" side), GLS (a formula or a
-two-sided sequent, two searches, a compiled check slower than the
-kernel's), MALL (one side, two searches run together, two certificates
-on the "no" side), DILL (two zones, a budget, flags that are real
-answers); each is `<Name>/Parse.lean` with the `prove` part of
+**A judgment typed at a shell** (`prove`). Each calculus under
+`calculi/` has one: `<Name>/Parse.lean` with the `prove` part of
 `Main.lean`, a test file, and `Corpus/prove_corpus.py`. Read the one
-nearest your calculus. The lines below are what the owners' notes found
-missing from earlier wordings (K 72 to 80, GLS 27, MALL 29, DILL 22,
-and a fifth campaign, on a set-based calculus with a cyclic
-certificate, whose notes are not in this repository).
+nearest your calculus: Brünnler's K (a judgment that nests, a search
+that always answers, a countermodel on the "no" side), GLS (a formula
+or a two-sided sequent, two searches), MALL (one side, two searches run
+together, two certificates on the "no" side), DILL (two zones, a
+budget, flags that are real answers).
 
 - *The reader.* It takes the signs of a keyboard as well as the signs
   the calculus prints (`-o` for ⊸, `[]` for □), and binds the
@@ -407,18 +376,17 @@ certificate, whose notes are not in this repository).
   no turnstile; a two-sided text for a one-sided calculus. A text that
   is not a judgment is refused on the error stream, with nothing on the
   standard output: what was expected, and the place, counted from
-  character 1, with a mark under it. The letters: take `p q r s`,
-  `a b c d` and a numbered family (`p0`, `p1`, …), as K's reader does,
-  and let the refusal of a letter name them. GLS, MALL and DILL take
-  `p q r s` and a numbered family only, each with its own numbering; a
-  person who goes from one command to another meets the difference at
-  once. Where the atoms of the formulas are words (a host library's),
+  character 1, with a mark under it. The letters: `p q r s` and a
+  numbered family, and let the refusal of a letter name them. The
+  readers here differ in the family's letter and in its numbering, and
+  a person who goes from one command to another meets the difference
+  at once: the user's guide says the letters. Where the atoms of the formulas are words (a host library's),
   every word is a letter but for a list the reader keeps: the
   constants, and words refused with the sign to write. A letter that
   is a word of Lean, or a name of the file, is written out in the
   printed file, which declares its atoms in a namespace of its own.
   The misreading to test there is a constant's name read as a letter
-  (`false`, once).
+  (`false`).
 - *The printers, and two tests.* The first line shows the judgment in
   the calculus's notation; the fact is stated of the judgment as Lean
   source. So there are at least two printers (three with `--ascii`),
@@ -437,13 +405,12 @@ certificate, whose notes are not in this repository).
   the campaign's certifiers, as declarations with names (an `example`
   cannot be audited), ending with the bound on axioms
   (`#axioms_within_file [propext, Quot.sound]`). The file writes both
-  options that lift Lean's limits (below), in every file: a threshold
-  on the size of the answer looked at the wrong size once (MALL: nine
-  formulas, a letter numbered 92, refused without the options). Do not
-  print a certificate by `Repr`: it indents each line by its depth in
-  the term, so the size of the text is the size of the term times its
-  depth (K: 86 MB for a tree of 2 335 moves, 82 MB of it spaces; the
-  command took 13.7 s to print what the search found in 19 ms). Write
+  options that lift Lean's limits (`maxRecDepth` and `maxHeartbeats`,
+  below), in every file: a threshold
+  on the size of the answer looks at the wrong size. Do not print a
+  certificate by `Repr`: it indents each line by its depth in the
+  term, so the size of the text is the size of the term times its
+  depth, most of it spaces. Write
   a printer, a node to a line; what guards a printer of one's own is
   that the files are elaborated. Count the spaces in a large file.
   Where a member of a printed set may be its own premise, or ask for a
@@ -454,14 +421,13 @@ certificate, whose notes are not in this repository).
   and not derivable), the check is a theorem of its own, stated through
   the certifier (`K.check s c = true := by decide +kernel`), and passed
   to each `verdict`: the default argument of `verdict` runs the check
-  again for each fact (41 s against 20 s on one set, DILL). State the
+  again for each fact. State the
   check as `K.check s c = true` and in no other form: where the type
   of the named check is not the same text as what `verdict` asks for,
   the elaborator computes the check itself to find the two equal,
-  outside the kernel and once for each fact (3.6 s each at 76
-  sequents, beside the kernel's 1.4 s; an earlier wording here blamed
-  the kernel). Where even that costs, use the soundness lemma directly
-  in place of `verdict` (MALL). A fact's import is paid by every
+  outside the kernel and once for each fact. Where even that costs,
+  use the soundness lemma directly in place of `verdict`. A fact's
+  import is paid by every
   answer: each printed file loads it. A second fact by a theorem of
   the library may be the statement people cite (derivability in
   natural deduction, by cut elimination). One through a heavier import
@@ -476,97 +442,80 @@ certificate, whose notes are not in this repository).
   checked, and that is the certifier's check, compiled. If the compiled
   check is slower than the kernel's on the same certificate, the
   checker's definition is at fault, and the kernel is hiding it: treat
-  it as a defect and find it, do not work round it. Two were measured
-  in GLS (2026-11-27), each `2ⁿ` compiled and neither a failure to end.
-  A countermodel's evaluation that recomputes: `□A` at a world asks
-  for `A` at every world below and keeps nothing, so a chain of `n`
-  worlds costs `2ⁿ` calls for `n²` different questions (18.6 s at 30;
-  the kernel, which keeps the terms it has reduced, 0.1 s at 32 and
-  0.9 s at 64). And a replay that builds what it never reads: the
-  calculus's own sequents double at each nested modal step, compiled
-  code builds every one (1.3 s and 2.2 GB at 24, so some 500 GB at
-  32: a danger to the machine, not only a wait), and the kernel
-  reduces only as far as each step's test looks (no measurable time at
-  48). That speed was a property of the family: with the formula that
-  the axiom needs put last in the antecedent, the kernel on the same
-  replay took 10 s at 16 and overflowed its stack from 24. The repairs: write the check as the algorithm one would run (a
-  table over subformulas and worlds), proved sound, or prove it equal
-  to the plain one and give it to compiled code by `@[csimp]` (the
-  fast path of `lean-certify`); for a judgment that grows, check over
-  a form that does not (sets for multisets), and cap the size of what
-  a compiled check may build. A second check that is only tested
-  against the certifier's is a stopgap: say so where it is used.
-  Measure both sides on a family that grows before believing either:
-  a check that is fast in the kernel has not been shown to be a good
-  algorithm, and "fast in the kernel" needs a second family made
-  against whatever is thought to make it fast. GLS's repair (both
-  checks proved equal to their definitions, the certifiers checking by
-  the new ones: 0.03 s for the whole command at 64) took three forms:
-  the first replay by counts was itself too slow in the kernel. A
-  proof of equality says nothing of cost, so a repaired check is
-  measured as the faulty one was, compiled and in the kernel, and one
-  size beyond. A deadline is not a cap on memory; and a timing taken
-  inside compiled code is compared with the time of the whole process
-  (one read 80 µs for work of 0.1 s).
-- *A check the kernel cannot run is a fault of the checker too.* Three
-  campaigns recorded "the kernel stops at `n`" as a limit of the route
-  (MALL: a set of 119 sequents, 8 GB; DILL: a set of 200 in 16 s and
-  5.7 GB, a tree at a chain of 96 not settled). Each was a definition
-  at fault, and each fault was in the compiled check as well, where
-  nobody had run it one size beyond the kernel's limit. The causes
-  found: for each premise, a scan of the whole set; two sequents
-  compared by counting every formula of both; the divisions of a
-  context listed with repetition (`2ᵏ` for `k` copies of one formula,
-  where there are `k + 1`); the principal formula looked for with the
-  derived `DecidableEq`. How they were found, in the order that paid:
-  time the parts of the printed file apart (the literal, membership,
-  the check); `#print` each function on the path (`brecOn`, not
-  `._unary`); run a copy of the check that counts its own operations
-  (at 68 sequents, 166 326 comparisons of formulas for 386 questions:
-  the count found in one run what the timings had not); then grow one
-  thing at a time, and run the compiled check two sizes beyond where
-  the kernel stops.
-  What the kernel pays (Lean 4.31, measured in MALL and DILL): two
-  formulas it has not met, compared by the derived `DecidableEq`, 50
-  to 180 µs and 20 to 60 KB; a step of a recursion along a list, about
-  10 µs; an operation on numerals, a few µs whatever their size; a
-  term met before, about 3 µs. It keeps what it has reduced until the
-  declaration ends, so memory follows work. A check written for the
-  kernel therefore has few list steps and no comparison of formulas:
-  a table of the formulas, each sequent a number whose digits are the
-  multiplicities, a set as a search tree of the numbers (MALL: stopped
-  at 119 sequents before, 1 003 in 3.6 s after, 11 110 in parts; an
-  odd base, since a power of two cost ten times once the numbers
-  passed 64 bits); `bif` and `Nat.beq` where `if … == …` unfolds
-  instances at every step. Where one theorem still passes the cap,
-  state the check as several, one for each part of the set, joined by
-  a proved lemma. The new check may be proved equal to the old one, or
-  only sound for it at a certificate computed from the one given (the
-  set with its zones in one order): that is enough, and a certificate
-  it refuses is a flag. Measure each form before proving it, in a file
-  with no proofs: three forms were tried in each of the three
-  campaigns.
+  it as a defect and find it, do not work round it. The kernel keeps
+  the terms it has reduced, and reduces only as far as a test looks;
+  compiled code recomputes, and builds everything. So the two faults
+  to look for are an evaluation that asks the same question again
+  (`□A` at a world asks for `A` at every world below: `2ⁿ` calls for
+  `n²` questions on a chain), and a replay that builds what it never
+  reads (sequents that double at each step: gigabytes compiled and
+  nothing in the kernel, a danger to the machine and not only a wait).
+  The repairs: write the check as the algorithm one would run (a table
+  over subformulas and worlds), proved sound, or prove it equal to the
+  plain one and give it to compiled code by `@[csimp]` (the fast path
+  of `lean-certify`); for a judgment that grows, check over a form
+  that does not (sets for multisets), and cap the size of what a
+  compiled check may build. A second check that is only tested against
+  the certifier's is a stopgap: say so where it is used. Measure both
+  sides on a family that grows before believing either, and on a
+  second family made against whatever is thought to make it fast: a
+  check that is fast in the kernel has not been shown to be a good
+  algorithm. A proof of equality says nothing of cost, so a repaired
+  check is measured as the faulty one was, compiled and in the kernel,
+  and one size beyond. A deadline is not a cap on memory; and a timing
+  taken inside compiled code is compared with the time of the whole
+  process.
+- *A check the kernel cannot run is a fault of the checker too.* "The
+  kernel stops at `n`" is not a limit of the route until the
+  definition has been cleared: the same fault is in the compiled
+  check, where nobody runs it one size beyond the kernel's limit. The
+  causes found so far: for each premise, a scan of the whole set; two
+  sequents compared by counting every formula of both; the divisions
+  of a context listed with repetition (`2ᵏ` for `k` copies of one
+  formula, where there are `k + 1`); the principal formula looked for
+  with the derived `DecidableEq`. How to find one, in the order that
+  paid: time the parts of the printed file apart (the literal,
+  membership, the check); `#print` each function on the path
+  (`brecOn`, not `._unary`); run a copy of the check that counts its
+  own operations (the count found in one run what the timings had
+  not); then grow one thing at a time, and run the compiled check two
+  sizes beyond where the kernel stops.
+  What the kernel pays (Lean 4.31): two formulas it has not met,
+  compared by the derived `DecidableEq`, 50 to 180 µs and 20 to 60 KB;
+  a step of a recursion along a list, about 10 µs; an operation on
+  numerals, a few µs whatever their size; a term met before, about
+  3 µs. It keeps what it has reduced until the declaration ends, so
+  memory follows work. A check written for the kernel therefore has
+  few list steps and no comparison of formulas: a table of the
+  formulas, each sequent a number whose digits are the multiplicities
+  (in an odd base: a power of two cost ten times once the numbers
+  passed 64 bits), a set as a search tree of the numbers; `bif` and
+  `Nat.beq` where `if … == …` unfolds instances at every step. Where
+  one theorem still passes the cap, state the check as several, one
+  for each part of the set, joined by a proved lemma. The new check
+  may be proved equal to the old one, or only sound for it at a
+  certificate computed from the one given: that is enough, and a
+  certificate it refuses is a flag. Measure each form before proving
+  it, in a file with no proofs. The worked cases:
+  `calculi/GLS/GLS/Table.lean`, `calculi/MALL/MALL/Coded.lean`,
+  `calculi/DILL/DILL/SatFast.lean`.
 - *A certificate beyond the kernel.* A search can print in
   milliseconds a certificate that Lean does not check within the
-  memory cap (MALL: a saturated set of 238 sequents, stopped at 8 GB).
-  Find the largest size checked on every family tried (it is not a
-  sharp bound: MALL's kernel checked 124 sequents on one family and
-  not 119 on another, so the bound is 102), and above it let the first
+  memory cap. Find the largest size checked on every family tried (it
+  is not a sharp bound: a larger set of one family may be checked
+  where a smaller of another is not), and above it let the first
   line say what the answer rests on, in words that claim no more than
   was seen: "by the compiled check only (… ; the kernel has checked
-  sets of up to 102)". A verdict line that reads the same for a
+  sets of up to <n>)". A verdict line that reads the same for a
   checked and an unchecked file claims more than was done. One measure
-  of size may not separate the files checked from the others (K: the
-  number of moves did not; the depth of the sequent had to be a second
-  measure, since a file of 1.9 MB was refused where a larger one was
-  checked). Between the largest seen checked and the smallest seen to
+  of size may not separate the files checked from the others (the
+  number of moves may not; the depth of nesting is then a second
+  measure). Between the largest seen checked and the smallest seen to
   fail nothing is known: word that region as not checked. Measure the
   sizes on the file as it is finally printed, and again when its form
-  changes: with the certificate inside an `example` a tree of 257
-  moves was the largest seen checked; as a definition, with the check
-  a theorem of its own, one of 385 was, and a list of 575 sequents was
-  not, where one of 383 was checked in both forms (the campaign with
-  cycles, §3). Say on how many families each size was measured: "every
+  changes: the largest tree checked grew by half when the certificate
+  went from inside an `example` to a definition with the check a
+  theorem of its own. Say on how many families each size was measured: "every
   family tried" may be one family. Where the certificate is a
   list of generators, its size is not the refutation's (`2ⁿ` members
   below a list of one or two): measure on a family whose generators
@@ -576,7 +525,7 @@ certificate, whose notes are not in this repository).
   <seconds>` in every case, with a default, over the whole answer, so
   that the command ends by itself; `--budget=<n>` as well where a
   search has one. Try a family that grows before saying that the
-  command ends: a search with no bound was found only so (DILL). Where
+  command ends: a search with no bound is found only so. Where
   the campaign has two searches, an option that asks the other one, so
   that its branch can be run on the corpus.
 - *The exit codes*: 0 derivable, 1 not derivable, 3 flag, 2 a text not
@@ -613,8 +562,7 @@ certificate, whose notes are not in this repository).
   without a member that alone has its conclusion and that another
   member's rule instance needs). A text typed at a
   shell has a largest size, the operating system's limit on a command
-  line (K met it at 2.6 MB, before any limit of Lean's on the "no"
-  side): a family may end there, and no command yet reads its text from
+  line: a family may end there, and no command yet reads its text from
   the standard input.
 
 **The corpus.** Judgments of known status, with the status and its source:
@@ -626,25 +574,19 @@ serves, run under a deadline imposed from outside (the operating system's
 script that runs the cases serves), with a case that is cut off
 reported as a flag. Where a status is cross-checked with another tool
 that decides the logic: give that tool a deadline, read what it wrote
-only if it ended (one tool sometimes did not end after its answer),
-report a timeout as no verdict, and call no tool the reference.
+only if it ended, report a timeout as no verdict, and call no tool the
+reference.
 
 **Measure** (R8), and put the figures in `measurements.md`, with the machine and
-the date. Set a budget before the first run: so many sizes of each
-family, or so many minutes in all. The closing page needs the order of
-the frontier, and a lower bound serves (DILL: a chain taken to 96
-formulas, one capped case at a time, with the rest of the campaign
-queued behind it). A search is measured compiled, by the driver, under a
+the date, within the budget set before the first run (`SKILL.md`,
+stage 3, step 3). A search is measured compiled, by the driver, under a
 deadline, from the first run: `#eval` runs it in the interpreter, and a
 sizing loop by `#eval` did not end in five minutes on inputs the
 compiled driver settled in milliseconds. A long timing run goes in the
 background, its output to a file. Every such run has a cap on memory
 (`lake env lean -M <megabytes>`) as well as a deadline, and the deadline
 ends the whole process group: ending `lake` leaves the `lean` process
-under it running, with nothing to stop it. Two runs with a deadline and
-no cap were among the likely causes of a restart of the machine
-(DILL, 2026-11-26; the process-group fix was tested there with a shell
-command, not with Lean).
+under it running, with nothing to stop it.
 
 - kernel time against the size of the certificate (Lean's profiler,
   `set_option profiler true`, reports the time of each declaration);
@@ -662,16 +604,13 @@ command, not with Lean).
   learn. Where it can be taught in a few lines (a search that applied a
   branching rule before it looked for an axiom gave `2ⁿ⁺¹ − 1` rule
   instances where one serves), teach it in this stage: stage 3, step 4,
-  of `SKILL.md` says under what conditions and how it is recorded;
-- where there is a search that is proved and structural (§4): the kernel
-  running the search, beside the fact with its certificate.
+  of `SKILL.md` says under what conditions and how it is recorded.
 
 **A certificate written as a term has limits before the kernel.** R6 and
 R8 of `lean-certify` speak of kernel time. A large certificate fails
-earlier, while Lean reads the term: a tree of 2 335 moves, and one of
-258 moves nested 256 deep, were not elaborated (Lean's error names its
-maximum recursion depth), where a tree of 655 moves took 1.8 s and one
-nested 64 deep 0.5 s. So:
+earlier, while Lean reads the term: with the default options a tree of a
+few thousand moves, or one nested a few hundred deep, is not elaborated
+(Lean's error names its maximum recursion depth). So:
 
 - find this limit for your certificate with the family that grows,
   both in size and in depth of nesting, and name it in the frontier as
@@ -685,24 +624,21 @@ nested 64 deep 0.5 s. So:
   deep tree. What does: a smaller certificate (R6); the direct
   decision, where §4 allows it; or a certificate of your own that is
   flat (§2);
-- raising `maxRecDepth` moves the limit: `set_option maxRecDepth
-  100000 in` before a fact let a tree of 195 moves, nested about 130
-  deep, be elaborated where Lean had stopped without it. A driver can
-  write the option before every fact;
-- one option may not be enough. With `maxRecDepth` raised, the two
-  trees named above (2 335 moves; nested 256 deep) stopped at Lean's
-  limit on heartbeats instead; with `set_option maxHeartbeats 0` as
-  well they were elaborated, in 17 s and 13 s (K, 2026-11-26). So a
-  frontier found with the default options is a frontier of those
-  options, not of the route: say which it is, and find the route's
-  with both lifted. The judgment itself, as a term, can meet the limit
-  before its certificate does.
+- two options move the limit, and a driver writes both before every
+  fact: `set_option maxRecDepth 100000 in` and
+  `set_option maxHeartbeats 0 in`. With the first alone a large tree
+  stops at Lean's limit on heartbeats instead. So a frontier found
+  with the default options is a frontier of those options, not of the
+  route: say which it is, and find the route's with both lifted. The
+  judgment itself, as a term, can meet the limit before its
+  certificate does.
 
 ## 6. Deciders
 
-When a command-line tool or several tools with fallbacks are wanted, read
-the section "Deciders" of `lean-certify`: `Certify.Prover.ofEngine` and
-`Certify.Disprover.ofEngine` take the two sides of an engine. They take a
-proposition, so a family into `Type` is reached as `Derivable`. A decider
-is a decision procedure only where level 3 is proved; otherwise it may
+`lean-certify` has deciders, with fallbacks and a command line (its
+section "Deciders": `Certify.Prover.ofEngine` and
+`Certify.Disprover.ofEngine` take the two sides of an engine, as
+propositions). No campaign has used them: each wrote its own command
+(§5), since the library's `main` needs a registry of tools. A decider is
+a decision procedure only where level 3 is proved; otherwise it may
 answer `flag`.

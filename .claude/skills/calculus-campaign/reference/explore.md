@@ -55,37 +55,28 @@ name = "MyCalculus"
 globs = ["MyCalculus", "MyCalculus.+"]
 ```
 
-Build with `lake build`, run in `calculi/<Calculus>/`. This layout was
-built on Lean v4.31.0 at the library's commit `3fa25c0`, as
-`examples/Probe/` (the default folder was then named `examples/`; the
-layout does not depend on the name, only on the folder being two levels
-below the root), with the instance of `templates/Instance.lean.txt`.
-What it showed: the first `lake build` built the library's modules as
-well (39 jobs in all, under a minute); the library's build products went to
-`.lake/` at the root of the checkout and the package's to its own
-`.lake/`, both ignored by the library's `.gitignore`; `git status` at the
-root showed that one folder and nothing else. So no tracked file outside the
-folder changes (rule 7).
+Build with `lake build`, run in `calculi/<Calculus>/`. The library's
+build products go to `.lake/` at the root of the checkout and the
+package's to its own `.lake/`, both ignored by the library's
+`.gitignore`: no tracked file outside the folder changes (rule 7).
 
-**A repository of its own, or a project that exists**: the same lakefile
-with, in place of `path`,
+**A repository of its own**: the same lakefile with, in place of `path`,
 
 ```toml
 git = "https://github.com/fairflow/proof-tools"
 rev = "<a commit, written out>"
 ```
 
-then `lake update proof-tools` and `lake build`. (This form is the
-library README's; it was not run for this skill.) A project that already
-requires the package `lean-certify` replaces that requirement: the two
-packages hold modules of the same names. Where a dependency of the
-project requires `lean-certify` itself, the requirement cannot be
-replaced, and `proof-tools` cannot be required beside it: with both
-in the workspace Lake reported `LeanCertify.Certifier` out of date and
-looked for a module of one package in the other. Copy the library
-`ProofTools` at a pinned commit and declare it as a `lean_lib` of the
-project; it needs one module of `LeanCertify`, which is the same file
-in both packages.
+then `lake update proof-tools` and `lake build`. This is the library
+README's form; no campaign has used it.
+
+**A project that exists and requires `lean-certify`**, itself or through
+a dependency: `proof-tools` cannot be required beside it, since the two
+packages hold modules of the same names. (Where only the project itself
+requires `lean-certify`, that requirement may be replaced by
+`proof-tools`; not tried.) Copy the library `ProofTools` at a pinned
+commit and declare it as a `lean_lib` of the project; it needs one
+module of `LeanCertify`, which is the same file in both packages.
 `scripts/tutorial_pins.py` is in neither library and is copied
 separately. This is a finding about the library (rule 7).
 
@@ -96,11 +87,8 @@ host's library has a glob over its folder, a file "in no library"
 cannot sit beside the modules: `Play/` goes inside the campaign
 folder.
 
-- **Which commit** (of the checkout, in the first case; of `rev`, in the
-  second): one that contains `3fa25c0`, at which this text was checked.
-  The signs are the files `ProofTools/Explore/Cert.lean` and
-  `ProofTools/Explore/Session.lean`. Write the commit in the plan, and do
-  not move it during a stage.
+- **Which commit**: the one the first act recorded. Write it in the
+  plan, and do not move it during a stage.
 - **Which Lean**: v4.31.0, the line of the library's `lean-toolchain`.
   Everything this skill shows was compiled on it; do not use a later one.
 - **Three places for files.** Theory files (definitions, `step`,
@@ -130,12 +118,10 @@ inductive Move where … deriving DecidableEq, Repr, Lean.ToExpr
   all the same (`tensorR A B Δ`, not `tensorR Δ`), and let `step`
   compare: a move that reads `A ⊗ B` off the conclusion makes S1 a
   match on the shape of the conclusion, with a case of refusal for each
-  other shape, or a cast (DILL). The pattern with holes fills the
+  other shape, or a cast. The pattern with holes fills the
   formula in for the user.
-- **A move's name is not a keyword of Lean.** The tactic reads a move
-  by its name, and a line `mallmove with p q` does not parse, though
-  `Move.with` and `.with A B` are accepted. Where the source's name for
-  a rule is a keyword (`with`, `at`, `in`, `from`, `then`), rename the
+- **A move's name is not a keyword of Lean**: the tactic reads a move
+  by its name. Where the source's name for a rule is a keyword (`with`, `at`, `in`, `from`, `then`), rename the
   constructor (`wth`), and enter it as a divergence of representation.
 - `Lean.ToExpr` is needed for the tactics, which write judgments and moves
   as terms. These three `deriving` lines stay within
@@ -172,7 +158,17 @@ after which every lemma about `step` is one case analysis on the move:
     S.step m j = .ok ps → (m.rule j).ok = true ∧ ps = (m.rule j).prems      (step_ok)
 
 - `step` is what the kernel evaluates: structural recursion only, and
-  `Decidable` instances that compute (`reference/certify.md` §2).
+  `Decidable` instances that compute (`reference/certify.md` §2). Try
+  early that one step on a small judgment reduces, since `#guard` does
+  not go through the kernel. Core Lean has no
+  `DecidableEq (Except String (List _))`, so state the check through
+  `Except.toOption`:
+
+  ```lean
+  example : (S.step m j).toOption = some ps := by decide +kernel
+  ```
+
+  and a refusal as `(S.step m j).toOption = none`.
 - The message of a refusal is read by the person at the tactic. Make each
   say which side condition failed, in the source's words.
 - Check each rule as you write it, with `#guard`: it applies where the
@@ -278,9 +274,7 @@ declare_move_tactic mycalc for S
   `certify_chunks … size n`) and cannot name a function of yours. The
   sign is a parse error at a name that was accepted the day before:
   rename, do not quote. In a host project with a large library, expect
-  any short word to be taken: a field `over` was a keyword there,
-  `![…]` was read as a vector, and the template's structure `Rule` took
-  the natural name of the relation of rule instances.
+  any short word to be taken, the template's `Rule` among them.
 - `candidates` should propose every move that could apply: queries offer
   from it, and a line with holes is matched against it. Too many costs
   nothing (those that do not apply are dropped); one missing is a move a
@@ -291,9 +285,7 @@ declare_move_tactic mycalc for S
   first: where it ends its search by a proviso (a rule is not applied
   when its premise has the same formulas as its conclusion, as a set),
   that proviso is the first candidate for `within`, and the source's
-  definition of it is what to write (Q3 of the plan has its place). In
-  one instance it was one line: the premise and the conclusion have the
-  same set sequent, which the source defines.
+  definition of it is what to write (Q3 of the plan has its place).
 - `moveSource` is optional: `m.src` is a function you write that gives
   the move as it is typed after the tactic's name (`andL p q`). Without
   it Lean prints the move's term (`andL (Form.atom 0) (Form.atom 1)`). If
@@ -443,23 +435,11 @@ What looking is for in a campaign: showing what a search found; showing
 what an attempt left open, and where; reading a long derivation a node at
 a time.
 
-**Changing an attempt that is built**, at the position of a cursor, is
-in the library as functions, with what each does to the open goals
-PROVED: `c.rule m` (a move at the open goal in focus), `c.prune` (the
-focus becomes an open goal again), `c.graft d`, `c.script ls`, all uses of
-one change, `c.replace d`. In turn with motions they make a session,
-`Cursor.walk` on a list of commands:
-
-```lean
-#eval IO.println <| match (Cursor.ofAtt att).walk
-    [.motion (.goal 0), .rule .ax, .motion .up, .prune] with
-  | .ok c => c.viewAll
-  | .error (n, why) => s!"command {n} fails: {why}"
-```
-
-(compiled, on an attempt `att` of the template's instance). A session is
-not a certificate: the certificate is read off its result
-(`c.toRoot.script`). **No tactic or command of the editor runs a
+**Changing an attempt that is built**, at the position of a cursor (a
+move at the focus; a subtree pruned, grafted or replaced; a session of
+such commands, `Cursor.walk`), is in the library as functions, with what
+each does to the open goals PROVED. The library's guide has them; no
+campaign has used them. **No tactic or command of the editor runs a
 session**: in the editor an attempt is changed only by a move at an open
 goal.
 
@@ -491,22 +471,14 @@ parse error.
    (`Der.mapOut step_sound`), equal by `rfl` to the same derivation
    written with the family's constructors.
 
-**A printer that writes a combining character.** Where the source marks
-a letter (`p̄` for a negated atom) and the printer writes the letter
-followed by a combining character (the macron U+0304), the text a test
-expects must be those two characters. `#guard` on a string and
-`#guard_msgs` on a message compare character by character, and text
-typed or pasted with the precomposed letter (`ā`, one character) fails
-against output that looks the same.
-
-- In an expected string, spell the mark as an escape: `"ā ∧ b̄"`.
-- In a pinned message no escape is read: paste the message from Lean's
-  output, and do not retype it.
-- Say at the head of the tests file how marked letters are spelt in it,
-  comments included: an editor that composes the two characters into one
-  breaks the comparison.
-- A tool that writes the file for you may put the character where you
-  typed the escape. Read back what is in the file.
+**A printer that writes a combining character** (`p̄` as the letter
+followed by the macron U+0304): the text a test expects must be those
+two characters. `#guard` and `#guard_msgs` compare character by
+character, and a precomposed letter that looks the same fails. In an
+expected string spell the mark as an escape (`"a\u0304"`); a pinned
+message is pasted from Lean's output, not retyped; and read back what a
+tool wrote into the file, which may hold the character where the escape
+was typed.
 
 **The exercises file** (`templates/Play.lean.txt`), in no library. It is
 for a person who wants to try the calculus: the reviewer, at any time
@@ -525,9 +497,7 @@ yours. Check that the file elaborates (§1).
 
 **Every exercise is also in the tests file, run by script, with its
 outcome pinned**: which moves are offered at its first step; the
-derivation, where there is one; where a non-theorem stops, and how. That
-is the check, and the operator runs it. The file is the way in for a
-person, and nothing waits for anyone to type it.
+derivation, where there is one; where a non-theorem stops, and how.
 
 A fault that someone finds with the file is repaired in the calculus's
 modules. A change to the file after it was first committed is recorded
@@ -537,9 +507,8 @@ instance could not do.
 
 ## 11. The full exploration
 
-From Q4, from your own runs of the source's derivations, and from what
-the reviewer has reported from the exercises (`decisions.md`), list what
-a user of this calculus needs. Then serve each from what exists:
+Serve each need that stage 4, step 1 listed (`SKILL.md`) from what
+exists:
 
 | need | from |
 |---|---|
@@ -555,14 +524,15 @@ of the exercises file, in no library, with its prose in comments, that
 takes a new user through building, a query, a pattern, a script, a tactic
 of the calculus, a walk, and one non-theorem. Unlike the exercises it
 explains each step and shows the answers. Its comments are on lines of
-their own, never after a line of the tactic (§6). Elaborate every line
-of it, and pin in the tests what each step shows: a comment that says
-what happens is a claim, and is checked like one.
+their own, never after a line of the tactic (§6).
 
-**A tutorial page**, `tutorial.md` in the calculus's folder, where the
-campaign teaches the calculus in prose (GLS has one: graded exercises,
-and the theorems explained). Its link to the Lean is part of its format
-(added 2026-11-26):
+**A tutorial page**, `tutorial.md` in the calculus's folder: every
+campaign writes one (`SKILL.md`, stage 4, step 3), with graded exercises
+in parts, a file of them to type in (`Play/<Calculus>Exercises.lean`, in
+no library), and a module of the library with a solution of each and
+every output the page quotes (`<Calc>/TutorialTest.lean`). Where there
+are two kinds of certificate, say at each which one the reader is
+looking at. Its link to the Lean is part of its format:
 
 - **Every displayed statement is a pin.** Put `<!-- lean: N -->` above
   the indented block, where `N` is the full name of the declaration, or
@@ -594,8 +564,7 @@ and the theorems explained). Its link to the Lean is part of its format
   linked source file differs from it: commit the Lean and push it, then
   run `write`, then commit the page. Where several sessions push to
   one branch a push may rebase, and a link may name only a commit that
-  is already there (DILL: 112 links at a commit no longer on the
-  branch, and `write` run again after the push).
+  is already there.
 - **Say on the page what is checked**: the statements, statuses and links
   of the pins; and that the prose describing how a proof goes is a
   reading, not checked. Versions of the page for different readers
@@ -605,9 +574,7 @@ and the theorems explained). Its link to the Lean is part of its format
   unfolding of `Not`, not `P`. So display `P` in the usual notation,
   pin it in paraphrase to the theorem that is its negation, and say
   under the caption that the PROVED there is of the negation, with the
-  refuting instance. (A finding about the library, 2026-11-26: a
-  status REFUTED, and `#statement` printing what is negated, would
-  make it an exact pin.)
+  refuting instance.
 - **Four more limits of the script, until it is changed**: `#statement`
   on a structure prints its head only (pin the fields through their
   projections); a definition is given the status PROVED; where a pin
@@ -615,12 +582,6 @@ and the theorems explained). Its link to the Lean is part of its format
   line of prose (add the blank line by hand); and every link goes to
   the repository's remote, so that the page of a private repository
   has links that do not open.
-- **Every campaign writes the page** (`SKILL.md`, stage 4, step 3):
-  graded exercises in parts, a file of them to type in
-  (`Play/<Calculus>Exercises.lean`, in no library), and a module of the
-  library with a solution of each and every output the page quotes
-  (`<Calc>/TutorialTest.lean`). Where there are two kinds of
-  certificate, say at each which one the reader is looking at.
 
 **The user's guide**, `users-guide.md` in the campaign folder: how a goal
 reads, the moves with their rules, the lines of the tactic, the messages.
@@ -630,18 +591,11 @@ The section "Lean tactics" of the library's guide is the model.
 
 - **Recursion on an attempt is written for every `o`**, with `o = false`
   as a hypothesis where it is about derivations: Lean's structural
-  recursion needs the indices of `Att S o j` to be variables. It is the
-  one kind of proof repair an instance has needed.
+  recursion needs the indices of `Att S o j` to be variables.
 - **Judgments that hold functions** (no calculus on lists or trees of
-  formulas has them). The tactic proves a node's equation by `rfl`, which
-  asks the premises as quoted to be by definition what `step` computes,
-  and a function quoted is seldom the function computed. Such an instance
-  sets `eqByDecide := true` in `Explorable` and gives `DecidableEq S.Judg`.
-  For it the kernel does not evaluate a map out into a type on a
-  derivation the tactic built: map out the derivation rebuilt from its
-  script, `Der.ofScript j d.script (derives_script d)`. The library's
-  guide has the reason ("In the kernel"), and its tests both cases.
-- `omega` given a conjunction brings in `Classical.choice`; split first.
+  formulas has them): the instance sets `eqByDecide := true` in
+  `Explorable` and gives `DecidableEq S.Judg`. The library's guide has
+  the reason and what follows for a map out ("In the kernel").
 - The tactics and `#walk` need the judgment, or the attempt, to be a
   closed term, and evaluate compiled code.
 - An equation between a map out and the verdict of a script, by `rfl`,
@@ -687,26 +641,11 @@ Whatever is chosen:
   In the family they stand in side conditions and premises, never in a
   conclusion (`reference/adopt.md` §3). Then S1 is one constructor for
   each move, and S2 one node for each constructor;
-- `step` is on the path the kernel evaluates: try early that one step on a
-  small judgment reduces, since `#guard` does not go through the kernel.
-  Core Lean has no `DecidableEq (Except String (List _))`, so the
-  equation `S.step m j = .ok ps` is not one `decide` can be asked.
-  State the check through `Except.toOption`:
-
-  ```lean
-  example : (S.step m j).toOption = some ps := by decide +kernel
-  ```
-
-  and a refusal as `(S.step m j).toOption = none`;
-- find out during the Survey what derives for the proposed type (a few
-  lines suffice), and budget in the plan the groundwork that remains: the
-  quoting, the equality, the printer, the candidates. Try the same on
-  the type of models and of every other certificate the plan names: a
-  tree of worlds is a type that holds a list of itself, and gets no
-  `DecidableEq`. A construction of Prove that would test two of its
-  members for equality (a model whose worlds are the subtrees of a
-  tree) is then to be designed another way, and the plan is where that
-  is cheap to see;
+- `step` is on the path the kernel evaluates: try early that one step
+  on a small judgment reduces (§3);
+- find out during the Survey what derives for the proposed type
+  (`SKILL.md`, stage 0, step 3), and budget in the plan the groundwork
+  that remains: the quoting, the equality, the printer, the candidates;
 - **S1, where every rule begins by looking its place up.** The
   template's S1 is one match on the move and the judgment, each case a
   constructor: it relies on `m.rule j` reducing once the move and the
@@ -736,12 +675,9 @@ Whatever is chosen:
   proved by `simp` with the side conditions. Compiled:
   `calculi/BrunnlerK/BrunnlerK/Proof.lean` of `proof-tools`
   (`Move.ruleAt`, `diaRule`, `step_sound`);
-- **prove S2 in Adopt.** §4 lets it stay OPEN. For a calculus of this
-  kind it is worth its lines (forty, in the instance above): the
-  premises of `step` and of the family are the same functions applied
-  at a place, and S2 is the one check that `step` refuses no instance
-  of a rule. The tests show a refusal only at the instances they
-  happen to run;
+- **prove S2 in Adopt** (§4 lets it stay OPEN): for a calculus of this
+  kind the premises of `step` and of the family are the same functions
+  applied at a place, and the proof is short;
 - **a term syntax for judgments.** A judgment in a statement, a test
   or an exercise is a closed term, and written with the constructors
   it cannot be read against the source. Write a syntax that reads as

@@ -62,7 +62,7 @@ the folder point here.*
 * **What it is**: a command / a correction / a rescue / a question / an
   answer at a stop / a thing the reviewer asks to pass themselves (a
   gate: `SKILL.md`, "Deciding, checking, stopping", 5) / a report from
-  the exercises file. The cost log has the same seven classes.
+  the exercises file.
 * **What it changes**: <of what was decided; of what was built; what was
   built again, in which commit. For a question: the answer given.>
 

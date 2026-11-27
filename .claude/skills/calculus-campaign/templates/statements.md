@@ -2,8 +2,9 @@
 
 *Template. Started in Adopt (S1 and S2 below), filled in Prove. Every
 statement the campaign will cite, displayed as Lean, with its status. A
-statement is entered here, OPEN, and screened before its proof is begun;
-the statement of a goal is also read back (`reference/adopt.md` §5 and
+statement is first a named Lean type in a committed file, screened
+before its proof is begun; its entry here is written from that file.
+The statement of a goal is also read back (`reference/adopt.md` §5 and
 §7; S1, S2 and the certifiers' statements have no item of the source, and
 are not). Nothing is removed: a refuted statement stays, with its
 countermodel. Lemmas on the way are not entered. Every goal of the plan
@@ -43,10 +44,8 @@ Read these first: no tool checks that they say what the source means.
 
 ## The statements
 
-When this file is started, at step 4 of Adopt, the proof system may not
-yet be written: the rule table is not yet checked. S1 and S2 are then entered
-as displayed below, with "not yet in Lean" for the name and the file,
-OPEN. The names are filled at step 5.
+When this file is started, S1 and S2 are entered as displayed below,
+with their names and their status.
 
 For each: the source's item (by label where there is one), the statement
 as a displayed formula, the Lean name and file, the status, the axioms,

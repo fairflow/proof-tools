@@ -128,6 +128,40 @@ stays there; the occasion is here.
 | a round of campaigns | "one arrangement has served (2026-11-26, by the reviewer's instruction)"; "The command `prove` (`reference/certify.md` §5) went this way: four revisions in an evening." |
 | what is not built | "This text was checked against `proof-tools` at commit `3fa25c0` (2026-11-22)." |
 
-The reference files (`reference/adopt.md`, `certify.md`, `explore.md`,
-`pitfalls.md`) still carry their occasions inside their rules: 44 lines
-at `17acd9b`. They have not been through this pass.
+## From the reference files (second part of the pass, 2026-11-27 14:33 GMT)
+
+The reference files went through the same pass later the same day. The
+occasions taken out of their rules are listed here by rule; the clauses
+themselves stand in the files at commit `fe7c1c4`. Pointers to a worked
+case (a file of a calculus to read) are not history and stay: 16 lines
+still name a campaign for that reason.
+
+| file, and the rule | the occasion that stood in it |
+|---|---|
+| `adopt.md` §1, look at what a download link gave back | a thesis repository (DSpace 7) that gave HTTP 500 at one address and the PDF at another (GLS) |
+| `adopt.md` §1, read a figure as an image | `pdftotext` dropped `□` and `⊠` from one source, and its modal rule read as a rule with no modality (GLS) |
+| `adopt.md` §1, the script for a paper's skeleton | its header said it simulated LaTeX's counters, and that text was old |
+| `adopt.md` §2, a second proof of cut from soundness and completeness | "DILL had it before the syntactic proof, and joined those goals from it at once" |
+| `adopt.md` §3, two signs that cannot be signs of a judgment | "DILL took `⨾`" |
+| `adopt.md` §3, the figure's letters stay | a draft of K that called the node `Δ`, so that the figure's `Δ` became `Λ` |
+| `adopt.md` §5, a goal that is a type of functions | a cold reader's remark on `Decidable`: "inhabited with no proof search at all" (DILL) |
+| `adopt.md` §6, sources of `Classical.choice`; functions on derivations | the tags "(MALL)" and "(DILL)" |
+| `certify.md` §3, level 3 as a function into subtypes | "GLS: `2ⁿ` by its type, cut off at 28 nested boxes"; "GLS ran an unproved search in front of an exponential proved one for two days, and the proof took an hour once the invariant was seen" |
+| `certify.md` §3, a model evaluated; a saturated set | an evaluator by closures that did not end in 120 s on four elements (MALL); "DILL: 250 lines, no semantics"; "65 536 against 1" in the fifth campaign |
+| `certify.md` §4, the direct decision | K's figures: 0.44 s against 1.81 s at a tree of 655 moves; 0.07 s against 2.04 s at 65 nodes. The sentence called K "the one instance measured", which GLS, MALL and DILL had since made untrue |
+| `certify.md` §4, generators of inputs; a second search | a generator that wrote oversized files for minutes; a helper that called itself twice on each element |
+| `certify.md` §5, the command `prove` | "Four instances here, all of 2026-11-26"; the notes it was revised from (K 72 to 80, GLS 27, MALL 29, DILL 22, and the fifth's) |
+| `certify.md` §5, what is printed | "MALL: nine formulas, a letter numbered 92, refused without the options"; "K: 86 MB for a tree of 2 335 moves, 82 MB of it spaces; the command took 13.7 s to print what the search found in 19 ms" |
+| `certify.md` §5, one kernel check, several facts | "41 s against 20 s on one set, DILL"; "3.6 s each at 76 sequents, beside the kernel's 1.4 s; an earlier wording here blamed the kernel" |
+| `certify.md` §5, the program's own check | the two faults measured in GLS on 2026-11-27 (18.6 s at 30 worlds compiled against 0.1 s in the kernel; 1.3 s and 2.2 GB at 24 nested boxes; the kernel 10 s at 16 on a second family), and that GLS's repair took three forms |
+| `certify.md` §5, a check the kernel cannot run | "MALL: a set of 119 sequents, 8 GB; DILL: a set of 200 in 16 s and 5.7 GB, a tree at a chain of 96 not settled"; "at 68 sequents, 166 326 comparisons of formulas for 386 questions"; "MALL: stopped at 119 sequents before, 1 003 in 3.6 s after, 11 110 in parts"; "three forms were tried in each of the three campaigns" |
+| `certify.md` §5, a certificate beyond the kernel | MALL's 238 sequents stopped at 8 GB, and 124 checked on one family where 119 were not on another; K's file of 1.9 MB refused where a larger was checked; the fifth's trees of 257 and 385 moves |
+| `certify.md` §5, measuring | "DILL: a chain taken to 96 formulas, one capped case at a time, with the rest of the campaign queued behind it"; two runs with a deadline and no cap among the likely causes of a restart of the machine (DILL, 2026-11-26) |
+| `certify.md` §5, a certificate as a term | K's trees of 2 335 moves and of 258 moves nested 256 deep, not elaborated; then elaborated in 17 s and 13 s with both options (K, 2026-11-26) |
+| `explore.md` §1, the layout under `calculi/` | built first as `examples/Probe/` at the library's commit `3fa25c0`: 39 jobs, under a minute |
+| `explore.md` §1, a host project | Lake reporting `LeanCertify.Certifier` out of date with both packages in the workspace (the fifth) |
+| `explore.md` §2, a move's name; a right rule's move | "a line `mallmove with p q` does not parse"; the tag "(DILL)" |
+| `explore.md` §5, the tactic's name; `within` | in the fifth's host project a field `over` was a keyword and `![…]` a vector; in K `within` "was one line" |
+| `explore.md` §11, the tutorial page | "GLS has one"; "added 2026-11-26"; "DILL: 112 links at a commit no longer on the branch"; a finding about the library of 2026-11-26 on a status REFUTED |
+| `explore.md` §13, S2 for nested judgments | "forty [lines], in the instance above" (K) |
+| `pitfalls.md` 11, an estimate written as a fact | one campaign typed three such values after the entry was written (MALL); "DILL: five times ahead of the clock in one campaign" |

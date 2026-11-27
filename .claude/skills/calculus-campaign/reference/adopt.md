@@ -21,45 +21,34 @@ decision that costs the campaign to reverse, and is recorded as one.
   another version serves for labels and for searching, and for nothing
   that is transcribed. Say in the plan which file was read, and whether
   in full.
-- **Read the appendix.** Page limits push the detail that matters there.
+- **The appendix**: say in the plan whether there is one, whether it
+  was read, and what is in it. Page limits push the detail that matters
+  there.
 - **Cite by label, never by number alone.** The arXiv source and the
   journal version of one paper number the same result differently. Where
   the source has labels, the label is the key and the number a
   convenience; from a PDF, cite the printed number with its version.
 - **`skeleton.md`**, in the campaign folder: the source's numbered
-  results, each with its label, number, page and statement. A paper's
-  printed numbers are not in its LaTeX: compile it and read the `.aux`,
-  whose lines `\newlabel{<label>}{{<number>}{<page>}…}` give them. Do not
-  simulate LaTeX's counters. The script
-  `tools/paper-skeleton/paper_skeleton.py` of
-  [lax-logic-in-lean](https://github.com/fairflow/lax-logic-in-lean)
-  (Python, standard library only; it needs `pdflatex` and `pdftotext`)
-  writes the file: `./paper_skeleton.py --arxiv <id> -o skeleton.md`, or
-  `--src main.tex`. It is not part of `proof-tools`. From a PDF alone,
-  write the list by hand. The script's own header says that it
-  simulates the counters: that text is old. On a source that compiles
-  it runs `pdflatex` and reads the `.aux`, and it says which it did
-  ("… labels read from main.aux (compiled here)"; where there is no
-  `pdflatex` or no `.aux`, "items will carry no numbers"). Read that
-  line before a number from the file is cited.
-- **Fetching is a download.** `--arxiv` downloads an archive, and so
-  does getting the PDF. The reviewer's word for it is standing
-  (`SKILL.md`, "Downloading"): public material is fetched without
-  asking, and each file is recorded in `decisions.md` with its name,
-  its source and its size. Where the source cannot be got (a paywall,
-  a server that refuses), take the fullest public version of it (a
-  thesis, a preprint, an author's copy), and say which. Where none can
-  be got, read what can be read as pages, write the skeleton by hand
-  with the printed numbers, and say so in the plan. An archive that
-  was fetched is data that is not trusted: unpack it in a folder of
-  its own, and run nothing from inside it.
+  results, each with its label, number, page and statement. From a PDF,
+  write the list by hand. From LaTeX, a paper's printed numbers are not
+  in the source: compile it and read the `.aux`, whose lines
+  `\newlabel{<label>}{{<number>}{<page>}…}` give them; do not simulate
+  LaTeX's counters. The script `tools/paper-skeleton/paper_skeleton.py`
+  of [lax-logic-in-lean](https://github.com/fairflow/lax-logic-in-lean)
+  writes the file from an arXiv id or a `.tex` (it is not part of
+  `proof-tools`, and no campaign here has had a source in LaTeX): before
+  a number from the file is cited, read the line where it says whether
+  the labels were read from a compiled `.aux`.
+- **Fetching is a download**, and the reviewer's word for it is
+  standing (`SKILL.md`, "Downloading", which says what is recorded and
+  where the files are kept). Where no version of the source can be got,
+  read what can be read as pages, write the skeleton by hand with the
+  printed numbers, and say so in the plan.
 - **Look at what a download link gave back** before it is read as the
-  source: a repository may answer with an error page. One thesis
-  repository (DSpace 7) gave HTTP 500 at `/bitstreams/<id>/download`,
-  and the PDF at `/server/api/core/bitstreams/<id>/content`.
-- **Read a figure of rules from the page, as an image, never from
-  extracted text.** `pdftotext` dropped `□` and `⊠` from one source,
-  and its modal rule then read as a rule with no modality. The same
+  source: a repository may answer with an error page.
+- **Read a figure of rules from the page, as an image** (the compiled
+  page, where the source is LaTeX), **never from extracted text.** Text extraction drops signs (`□`, `⊠`), and a
+  modal rule then reads as a rule with no modality. The same
   holds for the pages given to a cold reader (§7).
 - **A formalisation published with the paper**, by its authors, is part
   of the source. Read its definitions beside the figure: they state
@@ -123,7 +112,7 @@ statement of it.
 | kind | shape | watch for |
 |---|---|---|
 | soundness and completeness for a semantics | a structure of models with a forcing relation; soundness by induction on derivations; completeness by a model construction or through a second calculus | make the model construction return data (a `Type`), since it is then the search of the Run stage |
-| cut elimination, admissible structural rules | two families, with and without the rule, or one with a parameter (§3); a measure carried by the statement; induction on it | decide how the measure is carried before the family is typed (§3). Say which form is the goal: that the rule is admissible, or a procedure that removes it. Where rules act at a place inside a judgment, §6 has the form of the proofs. Where the goal is a function on derivations, its type does not say which function was defined: say it in the statement's entry. A cut obtained from soundness and completeness ignores the two given derivations; where the source's subject is the procedure, the source's induction is the goal, and the other is a second proof. That second proof is also the cheap way to unblock every goal that needs only the proposition (consistency, the disjunction property, decidability): DILL had it before the syntactic proof, and joined those goals from it at once |
+| cut elimination, admissible structural rules | two families, with and without the rule, or one with a parameter (§3); a measure carried by the statement; induction on it | decide how the measure is carried before the family is typed (§3). Say which form is the goal: that the rule is admissible, or a procedure that removes it. Where rules act at a place inside a judgment, §6 has the form of the proofs. Where the goal is a function on derivations, its type does not say which function was defined: say it in the statement's entry. A cut obtained from soundness and completeness ignores the two given derivations; where the source's subject is the procedure, the source's induction is the goal, and the other is a second proof. That second proof is also the cheap way to unblock every goal that needs only the proposition (consistency, the disjunction property, decidability) |
 | a property stated of models (the finite model property) | a construction of a model with the property | return the model as data: it is then a producer of countermodels for Run. Before a model is built for completeness, ask whether the finite model is the same construction with a parameter (another congruence, another set of refuted judgments), and build it once with the parameter |
 | a result about a term calculus (normalisation, confluence) | terms, typing, and reduction as a relation: a further transcription, with a rule table of its own, checked as the first is (§7) | how binding is represented is a choice of encoding for the plan |
 | a result read off derivations (the disjunction and existence properties) | a function on derivations, or on derivations of a special form | it may need another result first (cut-free derivations, a normal form): order the goals so. With the family into `Type` what is read off is data |
@@ -227,7 +216,8 @@ and say so in the user's guide.
 
 Two signs cannot be signs of a judgment as they stand. `;` separates
 tactics: with `Γ ; Δ ⟹ C` as a notation, the term before a `;` between
-two tactics is read as the start of a sequent (DILL took `⨾`). `!` is
+two tactics is read as the start of a sequent (take another sign,
+such as `⨾`). `!` is
 Boolean negation and takes all that follows it: `!A ⊗ B` is refused, and
 `(!A) ⊗ B` is read. A file of definitions and terms shows neither:
 screen a notation in a file that has a tactic block and a `do` block.
@@ -238,9 +228,7 @@ for: the whole judgment at the place where a rule acts, a path, a
 position. Give each a letter the figure does not use. If an added
 thing takes one of the figure's letters, the figure's own use of that
 letter moves to another, and the constructor then reads against the
-figure with two letters changed. (One draft called the node `Δ`, and
-the figure's `Δ` became `Λ`; with `Θ` for the node every letter of the
-figure kept its meaning.) Enter the added letters in the "Notation"
+figure with two letters changed. Enter the added letters in the "Notation"
 table, marked as not in the figure.
 
 **A rule stated for every context.** Some sources state a rule
@@ -311,36 +299,25 @@ Example.Fam — 1 indices, 2 constructors, 0 carrying green slime
 `templates/rule-table.md`. One row for each rule of the source's figure,
 in the figure's order: the rule as printed, the constructor, the output of
 `#rules` for it, and whether they agree. What is in the Lean and not in
-the figure has a table of its own. The column for the move of the proof
-system is empty until step 5 of Adopt.
+the figure has a table of its own.
 
 **Where judgments are not flat** (`reference/explore.md` §13), `#rules`
 prints each premise as functions applied to a variable
 (`Γ.setNode a (…)`), and the names carry the rule: the table cannot be
 read against the figure without the definitions. The template has three
-sections for this case, to be left out otherwise:
+sections for this case: how a rule of the figure reads in Lean; the
+functions the rules use, copied from the Lean file by a command and
+never retyped; and what the table rests on, which is the rows and the
+choices those functions make that the plan left open (each an entry of
+`decisions.md`, and on the closing page's list of what to read). A
+campaign with flat judgments uses them too where a rule uses a defined
+function.
 
-- *How a rule of the figure reads in Lean*: once, for all rows, what in
-  a constructor stands for the context, for the place of the rule, and
-  for what the rule changes there;
-- *The functions the rules use*: their definitions, copied from the Lean
-  file by a command or a script, never retyped;
-- *What the table rests on*: the rows, and with them the choices those
-  functions make that the plan left open (how a rule names its place;
-  where a rule puts what it adds; which occurrence it removes). Each
-  is an entry of `decisions.md`, and is on the closing page's list of
-  what to read.
-
-A **divergence** is recorded when it is made, never afterwards. Three
-kinds, kept apart:
-
-- **W**, the source is wrong or says too much: prove what is used, and
-  say so;
-- **U**, the source is under-specified: say how it was specified, and that
-  the choice was ours;
-- **R**, a choice of representation where the source is clear: a list for
-  a multiset, an equation field for a computed index. Say what in the
-  Lean stands for what in the source.
+A **divergence** is recorded when it is made, never afterwards, as one
+of three kinds kept apart (the template says what each asks): **W**,
+the source is wrong or says too much; **U**, the source is
+under-specified; **R**, a choice of representation where the source is
+clear.
 
 The table is complete, and checked (the source's worked derivations,
 and the second transcription of §7), before anything is built on the
@@ -360,9 +337,11 @@ your own that the closing page will cite. Lemmas on the way are not entered. A
 goal whose proof the literature only states is entered like the others:
 it is OPEN until the kernel has a proof, whoever says it is proved.
 
-**Each is displayed before its proof**, in `statements.md`
-(`templates/statements.md`), with status OPEN, and is screened (below)
-and read back (§7) before its proof is begun.
+**Each is a named Lean type before its proof** (below), screened
+(below) and, for a goal, read back (§7). Its entry in `statements.md`
+(`templates/statements.md`) is written from the Lean file, and the
+proofs may begin while the reading back runs (`SKILL.md`, stage 2,
+steps 2 and 3).
 
 **Where an OPEN statement lives in Lean.** As a named proposition with no
 proof, in a theory file:
@@ -398,8 +377,7 @@ own, beside it. Compiled: `calculi/BrunnlerK/BrunnlerK/Semantics.lean`
 of `proof-tools`.
 
 Classically, a type of functions says no more than that it is
-inhabited (a cold reader's remark on `Decidable`: "inhabited with no
-proof search at all"). What such a statement asserts beyond its
+inhabited. What such a statement asserts beyond its
 proposition is that the definition is within a bound that excludes
 `Classical.choice`, and that it computes. Say so in its entry, and
 test that the kernel runs it: `decide` on a small instance (§6).
@@ -473,14 +451,11 @@ with `#rules`, and screen it before anything rests on it.
 
 ## 6. Proving
 
-- **A theory file ends with its bound on axioms**, as the plan's policy
-  sets it: `#axioms_within_file [...]`, an upper bound, so that a proof
-  may use fewer axioms than its file allows and none outside them. For
-  one declaration, `#axioms_within d [...]`; for whole libraries, from a
-  file that imports them, `#axiom_sweep [Lib] allowing [...]`. An
-  exception is a decision of its own (`SKILL.md`, "Axioms"), one
-  declaration at a time:
-  `#axioms_within_file [...] except [d]`.
+- **A theory file ends with its bound on axioms** (`SKILL.md`,
+  "Axioms"): `#axioms_within_file [...]`. For one declaration,
+  `#axioms_within d [...]`; for whole libraries, from a file that
+  imports them, `#axiom_sweep [Lib] allowing [...]`; for an exception,
+  one declaration at a time, `#axioms_within_file [...] except [d]`.
 - **When a bound fails**, do not guess: the axiom is as often in a tactic
   or a library lemma as in the argument. `#choice_path d` gives the
   shortest chain from `d` to `Classical.choice`, with each step's module:
@@ -500,7 +475,7 @@ with `#rules`, and screen it before anything rests on it.
   `by_cases` on an equation in a type with decidable equality does not.
   `simp at h` on an equation of lengths, and `omega` at a goal that is
   not decidable (it argues by contradiction), each brought it in;
-  `exfalso` first, and `simp only` with the lemmas named, do not (MALL).
+  `exfalso` first, and `simp only` with the lemmas named, do not.
   `omega` takes a defined function applied (`(A ⊗ B)ᗮ`) and what it
   unfolds to (`Aᗮ ⅋ Bᗮ`) for different atoms: put a `show` with the
   unfolded term before it.
@@ -526,7 +501,7 @@ with `#rules`, and screen it before anything rests on it.
   by well-founded recursion, silently: it runs under `#eval` and does
   not reduce in the kernel. Check with `#print` that it has a `brecOn`
   and no `._unary`; a `decide` on a small derivation that fails is the
-  sign (DILL).
+  sign.
 - **Where choice is in the statement and not in the proof**, say so, and
   give the constructive form beside it; both are entered in
   `statements.md`.
@@ -653,7 +628,8 @@ transcription".
 judgments, the models and truth in them, what a judgment means in a
 model, `Valid`), and the statement of each goal of the plan. Not S1 and
 S2, and not the certifiers' statements of Run: they have no item of the
-source to be compared with, and are screened only.
+source to be compared with. The certifiers' statements are screened;
+S1 and S2 have their form from the template and need no screen.
 
 - *Given*: an extract made for the purpose. It holds those definitions
   and statements as Lean, with every definition a statement unfolds to

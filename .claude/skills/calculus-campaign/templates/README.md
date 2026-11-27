@@ -1,9 +1,9 @@
 # <CALCULUS>: campaign folder
 
 *Template: the status board. It opens the campaign folder, which sits
-beside the modules of the calculus. Keep it to one screen; change it in
-the same commit as the thing it reports, so that it is true at every
-commit. No other report is written until the closing page.*
+beside the modules of the calculus. Bring it up to date in the commit
+that ends a stage: an interrupted campaign has only the board and the
+brief. No other report is written until the closing page.*
 
 <One paragraph: what the calculus is, for which logic.> The target, the
 paper, the place of the files and the rules of the project:
