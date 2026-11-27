@@ -18,6 +18,11 @@ derivation. The rest of the page is as it was written.
 **Amended 2026-11-27 11:34 GMT**, by a task of the directing session at the reviewer's
 word: section 9, the kernel's check of a saturated set.
 
+**Corrected 2026-11-27 14:15 GMT**, from the directing session's read of the
+records: in section 3's table of the checks of meaning, the row "soundness
+and completeness, before the other goals" said "yes". They were proved
+beside the other goals; the row now says what happened.
+
 ## 1. What was adopted, proved, and runs
 
 Propositional multiplicative-additive linear logic, in the one-sided
@@ -130,7 +135,7 @@ Total: about 270 lines. The goals as named statements, 141 lines:
 | the source's worked derivations | the source draws none for this fragment | ten derivations of what it asserts stand in (`MALL/Source.lean`), as terms and by script |
 | the second transcription, by a cold reader given four page images | yes | 11 rules in both readings, no difference; five ambiguities of the figure settled the same way by both |
 | the reading back of the definitions and the statements, by a cold reader given an extract of 230 lines | yes | no definition or statement says other than what was meant. It found the refutations of weakening and contraction unprompted; its remark that validity is written through an order-dependent formula led to `valid_perm`. The model certifier (S19), written later, was not read back |
-| soundness and completeness, before the other goals | yes | both PROVED, with no excluded middle; so the rules are fixed against the source's semantics |
+| soundness and completeness, before the other goals | not in that order | both PROVED, with no excluded middle, beside the other goals and not before them: cut elimination and the search went to their agents at 10:21, and one commit (`c0324a4`, 10:29) holds soundness, completeness, the finite model property, the decision and the refutations together. Nothing was built again. *Corrected 2026-11-27 14:15 GMT: this row said "yes".* |
 | S2: `step` refuses no instance of a rule | PROVED | `famToDer`, `MALL/Proof.lean` |
 
 Errors of transcription found: none, by any check. What these checks do

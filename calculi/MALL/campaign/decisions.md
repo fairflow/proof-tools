@@ -592,6 +592,27 @@ the argument, and attributes it.
 * **Cost to reverse**: the old form is still there; `mallrun prove`
   would print it again by one line of `Main.lean`.
 
+## 2026-11-27 14:15 GMT. Two corrections from the directing session's read of the records
+
+* **Whose decision**: the directing session asked for both (its read of
+  the campaign records, `docs/campaigns/pruning-2026-11-27.md` at
+  `fe7c1c4`); the choice in the first is this session's.
+* **`MALL/Coded.lean`**: its header said "it ends with its bound on
+  axioms" and it had none. Of the two repairs offered (give it the
+  bound, or correct the header), the bound was given:
+  `#axioms_within_file [propext, Quot.sound]` at the end of the file,
+  as in every other theory file of the campaign. It passes; the header
+  is now true as written.
+* **`campaign/report.md`**, the table of the checks of meaning, the row
+  "soundness and completeness, before the other goals": it said "yes".
+  The cost log has the agents for cut elimination and the search out at
+  10:21, and commit `c0324a4` (10:29) holds soundness, completeness,
+  the finite model property, the decision and the refutations together.
+  The row now says so, with the date of the correction in the row and
+  at the head of the page. Nothing was built again, so no result
+  depends on the order.
+* **Cost to reverse**: one line of Lean; two passages of the page.
+
 ## Stops
 
 *Each time a turn ended to wait for the reviewer. None so far.*

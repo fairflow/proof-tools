@@ -212,3 +212,5 @@ def CodeSoundness : Prop :=
   ∀ (C : CodeCert) (Γ : List Form), codeRefutes C Γ = true → refutedBy C.sequents Γ = true
 
 end MALL
+
+#axioms_within_file [propext, Quot.sound]
