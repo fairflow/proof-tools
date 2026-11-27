@@ -563,7 +563,7 @@ literature as it is written, though on paper it implies it (substitute
 
 `UiSeqVars`, proved as `uiSeq_vars`; `UniformInterpolationVars`, defined
 as `uniformInterpolationVars`; both in `GLS/InterpolationVars.lean`, the
-two types committed before their proofs (`34bb4ff`). S32 is the whole
+two types committed before their proofs (`a1df67a`). S32 is the whole
 statement for formulas: `u : UIFor p A` holds the two formulas, that
 neither contains `p`, and the four derivations (those of
 `uniformInterpolation`, which S32's proof uses unchanged); the new
