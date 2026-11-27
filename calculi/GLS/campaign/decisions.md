@@ -445,6 +445,62 @@ that does not rest on the answer went on.*
   `Play/GLSTutorial.lean` are as they were. Written by the session that
   started this one, not by the campaign's operator.
 
+## 2026-11-26 09:46 GMT. A word of the reviewer, after the campaign: uniform interpolation, the intuitionistic variants, `∧` and `∨`
+
+*Entered on 2026-11-27 14:15 GMT by the owner of `calculi/GLS`, from the
+three reports and from row 2 of the cost log. The work was done by
+another session (Claude Opus 5.5, started by another session from a
+brief; 09:46 to 10:40 by its row, commits `b698279` at 10:38 and
+`d7e79f6` at 11:14), not by the campaign's operator and not by the
+owner. That session wrote its reports and its row and no entry here, so
+this entry is written afterwards, against the rule at the head of this
+page. Nothing below is restated from the reports: each is pointed at.*
+
+* **The words**, as the three reports copy them (each calls them "the
+  reviewer's task, verbatim"):
+
+  > (A) you said that UI holds for GLS; find a proof, then check the
+  > literature (this reverses the usual order: you might find a different,
+  > shorter or interesting proof);
+
+  > (B) report on literature and feasibility of extending these results to
+  > an intuitionistic setting; consistent or not?
+
+  > (C) there's no ∨ or ∧ in this development that I can see, it
+  > corresponds to a minimal logic, can we define these or extend to
+  > these? Clearly multiple premises implies ∧ on the left and multiple
+  > conclusions ∨ on the right, but can we switch sides?
+
+  and, in reply to the first version of the report on (A), as that report
+  copies it (its §3.5): "If you can simplify the interpolant, go ahead".
+* **What they are**: three commands, and a leave to go on.
+* **What they change**:
+  * Interpolation was "not a goal: about other systems" by the decision
+    of 2026-11-25 09:07 ("which results are goals") and by the plan. It
+    stays outside the campaign's goals; uniform interpolation for GL is
+    now proved beside them, at the reviewer's word. The statements are
+    in `GLS/Interpolation.lean`, pinned in `GLS/InterpolationTest.lean`;
+    the report, with what is PROVED and what is OPEN (its §4), is
+    [2026-11-26-ui.md](2026-11-26-ui.md). They have no number in
+    `statements.md` and are not in its summary; the line there under
+    "Not goals, and set aside" says where they are.
+  * The order of work for (A) was the reviewer's: the proof first, the
+    literature after. The report says the order was kept (its §3), and
+    that the claim "UI holds for GLS" was not found anywhere in the
+    campaign's record (its §1).
+  * (B) is a report on the literature:
+    [2026-11-26-intuitionistic.md](2026-11-26-intuitionistic.md). The
+    facts about GL it uses are pinned in `GLS/InterpolationTest.lean`;
+    nothing about an intuitionistic logic is in Lean.
+  * (C) added `GLS/Connectives.lean` and `GLS/ConnectiveRules.lean`; the
+    report is [2026-11-26-connectives.md](2026-11-26-connectives.md).
+    The calculus and its encoding are as they were: `∧` and `∨` are
+    defined, not new constructors of `Form`.
+* **Cost to reverse**: little for the interpolation (nothing imports
+  `GLS/Interpolation.lean` but its test file and `GLS.lean`); a stage
+  for the connectives, since `GLS/Parse.lean` imports
+  `GLS/Connectives.lean`.
+
 ## 2026-11-26 22:28 GMT. After the campaign: `glsrun prove`, and what it checks before it prints
 
 By the owner of `calculi/GLS`, at the directing session's request

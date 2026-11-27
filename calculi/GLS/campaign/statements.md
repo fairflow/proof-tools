@@ -552,7 +552,8 @@ None.
 | `mhd`, the maximal height of an unfinished PSGLS derivation (`PSGLS_termination.v` l. 1598) | not a goal: a lemma on the source's route; termination is S9, and the induction of S19 can be on the measure itself. Decided again if S19 needs it |
 | the decidability of the applicability of each rule (`GLS_PSGLS_dec.v`) | not a goal of Prove: it is `step`, with S1 and S2 |
 | a cut-elimination procedure for a calculus with a cut rule | **a goal after all**, since the thesis states it (Theorem 12.7.2): S24, PROVED |
-| interpolation; arithmetical completeness; a Hilbert system for GL | not goals: about other systems |
+| interpolation | not a goal of the campaign (the plan: about other systems). **Uniform interpolation for GL was PROVED after the campaign**, on 2026-11-26, by another session at the reviewer's word: `GLS.uniformInterpolation` (formulas), `GLS.uniformInterpolationSeq` (sequents), `GLS.uiSeq_iff`, `GLS.uiSeq_free`, `GLS.uiSeqRaw_mdepth`, in `GLS/Interpolation.lean`, each pinned by `#statement` in `GLS/InterpolationTest.lean` as PROVED within `[propext, Quot.sound]`. The statements, the proof and what is OPEN (a size bound, not attempted) are in [2026-11-26-ui.md](2026-11-26-ui.md); the entry of 2026-11-26 09:46 in [decisions.md](decisions.md) has the reviewer's words. These statements have no number here and are not counted in the summary below |
+| arithmetical completeness; a Hilbert system for GL | not goals: about other systems |
 
 ## Summary
 
