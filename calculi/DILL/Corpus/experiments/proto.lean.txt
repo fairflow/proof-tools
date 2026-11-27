@@ -1,0 +1,95 @@
+
+namespace Fast
+open DILL DILL.Sat
+
+def hashF : Form → Nat
+  | .atom n => (n * 2654435761 + 97) % 4294967296
+  | .one => 3 | .top => 5 | .zero => 7
+  | .tensor A B => (hashF A * 1000003 + hashF B * 8191 + 11) % 4294967296
+  | .lolli A B => (hashF A * 1000003 + hashF B * 8191 + 13) % 4294967296
+  | .wth A B => (hashF A * 1000003 + hashF B * 8191 + 17) % 4294967296
+  | .plus A B => (hashF A * 1000003 + hashF B * 8191 + 19) % 4294967296
+  | .bang A => (hashF A * 1000003 + 23) % 4294967296
+
+/-- `A` put into a list kept in the order of the hashes. -/
+def insH (A : Form) : List Form → List Form
+  | [] => [A]
+  | B :: l => bif Nat.ble (hashF A) (hashF B) then A :: B :: l else B :: insH A l
+
+def sortH (l : List Form) : List Form := l.foldr insH []
+
+def keyOf (g : Form) : List Form → Nat
+  | [] => hashF g
+  | A :: l => keyOf g l * 31 + hashF A
+
+inductive BT where
+  | leaf (xs : List Seq)
+  | node (l r : BT)
+
+def BT.ins : Nat → Nat → Seq → BT → BT
+  | 0, _, c, .leaf xs => .leaf (c :: xs)
+  | 0, _, _, .node l r => .node l r
+  | d + 1, k, c, .leaf xs =>
+    bif Nat.beq (k % 2) 0 then .node (BT.ins d (k / 2) c (.leaf xs)) (.leaf []) else .node (.leaf []) (BT.ins d (k / 2) c (.leaf xs))
+  | d + 1, k, c, .node l r =>
+    bif Nat.beq (k % 2) 0 then .node (BT.ins d (k / 2) c l) r else .node l (BT.ins d (k / 2) c r)
+
+def eqL : List Form → List Form → Bool
+  | [], [] => true
+  | a :: l, b :: m => decide (a = b) && eqL l m
+  | _, _ => false
+
+def sameB (k x : Seq) : Bool := decide (k.goal = x.goal) && eqL k.lin x.lin
+
+def anyS (x : Seq) : List Seq → Bool
+  | [] => false
+  | k :: ks => sameB k x || anyS x ks
+
+def BT.has : BT → Nat → Seq → Bool
+  | .leaf xs, _, x => anyS x xs
+  | .node l r, k, x => bif Nat.beq (k % 2) 0 then BT.has l (k / 2) x else BT.has r (k / 2) x
+
+def canon (k : Seq) : Seq := k.unr ⨾ sortH k.lin ⟹ k.goal
+
+def build (d : Nat) (D : List Seq) : BT := D.foldl (fun t k => BT.ins d (keyOf k.goal k.lin) k t) (.leaf [])
+
+def memF (d : Nat) (t : BT) (x : Seq) : Bool := x.unr.isEmpty && BT.has t (keyOf x.goal x.lin) x
+
+def satRW (cons : Form → List Form → List Form) (mem : Seq → Bool) (Γ Δ : List Form) : Form → Bool
+  | .lolli A B => mem (Γ ⨾ cons A Δ ⟹ B)
+  | .wth A B => mem (Γ ⨾ Δ ⟹ A) || mem (Γ ⨾ Δ ⟹ B)
+  | .plus A B => mem (Γ ⨾ Δ ⟹ A) && mem (Γ ⨾ Δ ⟹ B)
+  | .bang A => !Δ.isEmpty || mem (Γ ⨾ [] ⟹ A)
+  | .tensor A B => (Dec.splits Δ).all fun p => mem (Γ ⨾ p.1 ⟹ A) || mem (Γ ⨾ p.2 ⟹ B)
+  | .atom _ => true
+  | .one => true
+  | .top => true
+  | .zero => true
+
+def satLW (cons : Form → List Form → List Form) (mem : Seq → Bool) (Γ : List Form) (C : Form) :
+    Form → List Form → Bool
+  | .tensor A B, Δ => mem (Γ ⨾ cons A (cons B Δ) ⟹ C)
+  | .one, Δ => mem (Γ ⨾ Δ ⟹ C)
+  | .bang A, Δ => mem (A :: Γ ⨾ Δ ⟹ C)
+  | .plus A B, Δ => mem (Γ ⨾ cons A Δ ⟹ C) || mem (Γ ⨾ cons B Δ ⟹ C)
+  | .wth A B, Δ => mem (Γ ⨾ cons A Δ ⟹ C) && mem (Γ ⨾ cons B Δ ⟹ C)
+  | .lolli A B, Δ =>
+      (Dec.splits Δ).all fun p => mem (Γ ⨾ p.1 ⟹ A) || mem (Γ ⨾ cons B p.2 ⟹ C)
+  | .atom _, _ => true
+  | .top, _ => true
+  | .zero, _ => true
+
+def satAtW (cons : Form → List Form → List Form) (mem : Seq → Bool) (k : Seq) : Bool :=
+  !isAxiom k &&
+    ((k.unr.all fun A => mem (k.unr ⨾ cons A k.lin ⟹ k.goal)) &&
+      (satRW cons mem k.unr k.lin k.goal &&
+        (Dec.picks k.lin).all fun p => satLW cons mem k.unr k.goal p.1 p.2))
+
+def fastWith (d : Nat) (D' : List Seq) (t : BT) (j : Seq) : Bool :=
+  memF d t (canon j) && D'.all (satAtW insH (memF d t))
+
+def refutedFast (D : List Seq) (j : Seq) : Bool :=
+  D.all (fun k => k.unr.isEmpty) &&
+    fastWith (Nat.log2 D.length + 1) (D.map canon) (build (Nat.log2 D.length + 1) (D.map canon)) j
+
+end Fast
