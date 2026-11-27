@@ -82,6 +82,7 @@ Theory files are each within `[propext, Quot.sound]`
 * `GLS/CutRule.lean`: GLS + (cut); S24. Theory.
 * `GLS/Connectives.lean`: `¬`, `⊤`, `∧`, `∨`, `◇` defined; their truth at a tree. Theory.
 * `GLS/Interpolation.lean`: uniform interpolation for GL; the interpolant as the bisimulation quantifier; its modal depth. Theory.
+* `GLS/InterpolationVars.lean`: the variables of the interpolant are variables of the formula; S31, S32. Theory.
 * `GLS/ConnectiveRules.lean`: the derived rules of the defined connectives, their inverses, switching sides. Theory.
 * `GLS/InterpolationTest.lean`: the tests of the last three, and their statements pinned. Code.
 * `GLS/Run.lean`: the certifiers, the producer, the engine; S21, S22. Theory.

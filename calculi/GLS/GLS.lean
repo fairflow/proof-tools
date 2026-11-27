@@ -30,6 +30,7 @@ import GLS.ExploreTest
 import GLS.TutorialTest
 import GLS.Connectives
 import GLS.Interpolation
+import GLS.InterpolationVars
 import GLS.ConnectiveRules
 import GLS.InterpolationTest
 import GLS.Corpus.Basic

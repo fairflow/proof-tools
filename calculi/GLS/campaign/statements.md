@@ -541,6 +541,39 @@ at 100 worlds; on `binTree 1` to `5` at every world of the refuting
 tree; a tree too short refused. No disagreement was found. Status:
 **PROVED**, within `[propext, Quot.sound]`.
 
+### S31, S32. Uniform interpolation, the condition on variables (after the campaign, 2026-11-27; our own)
+
+Why they are wanted: uniform interpolation for GL was proved on
+2026-11-26 by another session (`GLS/Interpolation.lean`; the row under
+"Not goals, and set aside" below). Its statement, `UIFor p A`, says that
+`∃p.A` and `∀p.A` do not contain `p`. The usual statement of uniform
+interpolation says more: every variable of `∃p.A` is a variable of `A`.
+With that clause missing, the Lean statement was not the theorem of the
+literature as it is written, though on paper it implies it (substitute
+`⊥` for the other variables; substitution is not in this development).
+
+    S31   UiSeqVars :=
+            ∀ (p q : Nat) (Γ Δ : List Form),
+              (∀ A ∈ Γ ++ Δ, A.occ q = false) → (uiSeq p Γ Δ).occ q = false
+
+    S32   UniformInterpolationVars :=
+            (p : Nat) → (A : Form) →
+              { u : UIFor p A //
+                ∀ q, (u.ex.occ q = true → A.occ q = true) ∧ (u.all.occ q = true → A.occ q = true) }
+
+`UiSeqVars`, proved as `uiSeq_vars`; `UniformInterpolationVars`, defined
+as `uniformInterpolationVars`; both in `GLS/InterpolationVars.lean`, the
+two types committed before their proofs (`34bb4ff`). S32 is the whole
+statement for formulas: `u : UIFor p A` holds the two formulas, that
+neither contains `p`, and the four derivations (those of
+`uniformInterpolation`, which S32's proof uses unchanged); the new
+clause is the one on variables. **Screened before the proofs** (kept as
+guards, `GLS/InterpolationTest.lean`): on the 624 formulas of at most
+two layers over three variables, for each of the three variables and
+both quantifiers, by a second definition of the variables of a formula;
+no failure. Both pinned by `#statement` there. Status: **PROVED**,
+within `[propext, Quot.sound]`.
+
 ## Refuted
 
 None.
@@ -552,7 +585,7 @@ None.
 | `mhd`, the maximal height of an unfinished PSGLS derivation (`PSGLS_termination.v` l. 1598) | not a goal: a lemma on the source's route; termination is S9, and the induction of S19 can be on the measure itself. Decided again if S19 needs it |
 | the decidability of the applicability of each rule (`GLS_PSGLS_dec.v`) | not a goal of Prove: it is `step`, with S1 and S2 |
 | a cut-elimination procedure for a calculus with a cut rule | **a goal after all**, since the thesis states it (Theorem 12.7.2): S24, PROVED |
-| interpolation | not a goal of the campaign (the plan: about other systems). **Uniform interpolation for GL was PROVED after the campaign**, on 2026-11-26, by another session at the reviewer's word: `GLS.uniformInterpolation` (formulas), `GLS.uniformInterpolationSeq` (sequents), `GLS.uiSeq_iff`, `GLS.uiSeq_free`, `GLS.uiSeqRaw_mdepth`, in `GLS/Interpolation.lean`, each pinned by `#statement` in `GLS/InterpolationTest.lean` as PROVED within `[propext, Quot.sound]`. The statements, the proof and what is OPEN (a size bound, not attempted) are in [2026-11-26-ui.md](2026-11-26-ui.md); the entry of 2026-11-26 09:46 in [decisions.md](decisions.md) has the reviewer's words. These statements have no number here and are not counted in the summary below |
+| interpolation | not a goal of the campaign (the plan: about other systems). **Uniform interpolation for GL was PROVED after the campaign**, on 2026-11-26, by another session at the reviewer's word: `GLS.uniformInterpolation` (formulas), `GLS.uniformInterpolationSeq` (sequents), `GLS.uiSeq_iff`, `GLS.uiSeq_free`, `GLS.uiSeqRaw_mdepth`, in `GLS/Interpolation.lean`, each pinned by `#statement` in `GLS/InterpolationTest.lean` as PROVED within `[propext, Quot.sound]`; checked again on 2026-11-27 (the file elaborated afresh, no `sorry`, the axioms printed). Those statements say the interpolant has no `p`; that its variables are variables of the formula is S31 and S32 above. The statements, the proof and what is OPEN (a size bound, not attempted) are in [2026-11-26-ui.md](2026-11-26-ui.md); the entries of 2026-11-26 09:46 and 2026-11-27 14:31 in [decisions.md](decisions.md) have the reviewer's words. The statements of 2026-11-26 have no number here and are not counted in the summary below |
 | arithmetical completeness; a Hilbert system for GL | not goals: about other systems |
 
 ## Summary
@@ -561,7 +594,7 @@ None.
 |---|---|---|---|
 | of the goals from the standing list (S7; S10 with S19; S24) | 3 | 0 | 0 |
 | of the other goals (S3 to S6, S8, S9; S11 to S18) | 14 | 0 | 0 |
-| of our own (S1, S2, S20 to S23, S25 to S30) | 12 | 0 | 0 |
+| of our own (S1, S2, S20 to S23, S25 to S32) | 14 | 0 | 0 |
 
 Counted by entry, with S11 to S17 seven entries and S19 counted with
 S10 (one statement, two definitions).

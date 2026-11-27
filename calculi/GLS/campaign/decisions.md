@@ -680,3 +680,39 @@ By the owner of `calculi/GLS`, on the reviewer's word in the session
   which S30's proof goes through.
 * **Rests on it**: `GLS/Table.lean`, `GLS/Run.lean`.
 * **Cost to reverse**: little.
+
+## 2026-11-27 14:31 GMT. After the campaign: is uniform interpolation proved? Checked, and the condition on variables added
+
+By the owner of `calculi/GLS`, at the reviewer's word.
+
+* **The words** (typed in the owner's session, after the entry of
+  2026-11-26 09:46 above was written): "so well, it seems we don't know
+  if UI has been proved or not. Please find out for us!"
+* **What it is**: a command.
+* **What was found**. The proof is there and the kernel accepts it:
+  `GLS/Interpolation.lean` elaborated afresh (1.7 s), no `sorry`, no
+  axiom declared, nothing `unsafe` or `partial`; `#print axioms` gives
+  `[propext, Quot.sound]` for `uniformInterpolation`,
+  `uniformInterpolationSeq`, `uiSeq_iff`, `uiSeq_free`,
+  `uiSeqRaw_mdepth`, `uiSeq_equiv_raw`, `holds_bisim`. The statement
+  `UIFor p A` was read against the usual one: it has both quantifiers,
+  the interpolant is chosen before `B`, and derivability is `Fam`, the
+  family of S3 and S5. One clause of the usual statement was missing:
+  that every variable of `∃p.A` is a variable of `A` (the statement had
+  only "no `p`").
+* **The choice**: the missing clause is stated and proved, in a file of
+  its own (`GLS/InterpolationVars.lean`), with `UIFor` and the file of
+  2026-11-26 left as they are; the new statement S32 holds a `UIFor p A`
+  and adds the clause. Statements S31 and S32, screened and committed
+  before their proofs.
+* **Not chosen**: adding the clause as a field of `UIFor` (it would
+  change a statement the report of 2026-11-26 quotes); deriving it on
+  paper by substitution and leaving the Lean as it was.
+* **What "for GL" rests on, as before**: `Fam` is derivability in GLS,
+  proved sound and complete for the two-valued transitive, conversely
+  well-founded models (S3, S5). That GLS derives exactly the theorems of
+  the Hilbert system GL is from the literature and is not in Lean (the
+  plan: not a goal).
+* **Rests on it**: `GLS/InterpolationVars.lean`, the guards and pins at
+  the end of `GLS/InterpolationTest.lean`.
+* **Cost to reverse**: little.

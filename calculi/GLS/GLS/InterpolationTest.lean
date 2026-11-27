@@ -6,6 +6,7 @@ battery of random formulas against a pool of consequences.  Code: every
 answer is pinned.
 -/
 import GLS.ConnectiveRules
+import GLS.InterpolationVars
 import GLS.SearchTest
 
 namespace GLS.InterpolationTest
@@ -261,5 +262,57 @@ info: def GLS.peirce (p q : Nat) : Fam ([] ⇒ [((Form.var p ⟶ Form.var q) ⟶
 PROVED · axioms: propext
 -/
 #guard_msgs in #statement GLS.peirce
+
+/-! ## The condition on variables (`GLS/InterpolationVars.lean`) -/
+
+/-- The variables of a formula, by a second definition (`Form.occ` is the
+one the statements use). -/
+def vars : Form → List Nat
+  | .var q => [q]
+  | ⊥ => []
+  | A ⟶ B => vars A ++ vars B
+  | □A => vars A
+
+/-- Every formula over `p`, `q`, `r` built in at most `d` layers. -/
+def layers : Nat → List Form
+  | 0 => [p, q, r, ⊥]
+  | d + 1 =>
+    let fs := layers d
+    fs ++ fs.map Form.box ++ (fs.flatMap fun A => fs.map fun B => A ⟶ B)
+
+/-- Every variable of `E` is one of `A`, and is not the variable `x`. -/
+def varsOK (x : Nat) (A E : Form) : Bool :=
+  (vars E).all fun y => y != x && (vars A).contains y
+
+-- the screen of the statements, run before their proofs: the 624 formulas
+-- of at most two layers, each of the three variables, both quantifiers
+#guard (layers 2).length == 624
+#guard (layers 2).all fun A =>
+  [0, 1, 2].all fun x => varsOK x A (uiExists x A) && varsOK x A (uiForall x A)
+
+-- a variable of the formula that the interpolant does lose, and one it keeps
+#guard vars (uiExists 0 (p ⋏ q)) == [1]
+#guard vars (uiExists 0 ((p ⟶ q) ⋏ (r ⟶ p))) |>.all fun y => y == 1 || y == 2
+
+/--
+info: theorem GLS.uiSeq_vars : UiSeqVars
+  where GLS.UiSeqVars :=
+    ∀ (p q : Nat) (Γ Δ : List Form),
+      (∀ (A : Form), A ∈ Γ ++ Δ → Form.occ q A = false) → Form.occ q (uiSeq p Γ Δ) = false
+PROVED · axioms: Quot.sound, propext
+-/
+#guard_msgs in #statement GLS.uiSeq_vars
+
+/--
+info: def GLS.uniformInterpolationVars : UniformInterpolationVars
+  where GLS.UniformInterpolationVars :=
+    (p : Nat) →
+      (A : Form) →
+        { u //
+          ∀ (q : Nat),
+            (Form.occ q u.ex = true → Form.occ q A = true) ∧ (Form.occ q u.all = true → Form.occ q A = true) }
+PROVED · axioms: Quot.sound, propext
+-/
+#guard_msgs in #statement GLS.uniformInterpolationVars
 
 end GLS.InterpolationTest
