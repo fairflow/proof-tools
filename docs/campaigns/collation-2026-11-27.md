@@ -110,3 +110,10 @@ None of these has been done. Each has a decision; the work itself is proposed in
 - The validity form of what holds, the named hypothesis for a case that will not close, and a campaign that ends with a goal open: none has occurred.
 - The readers of the four public calculi do not take the same letters.
 - This page was not read by a second reader.
+
+## Afterwards: the first pruning pass
+
+The collation only added to the skill. Since 2026-11-27 it is followed
+by a pass that can remove text: `docs/campaigns/pruning-2026-11-27.md`
+has the first, on the skill's main file, with a verdict for each of its
+85 passages from the campaigns' records.
