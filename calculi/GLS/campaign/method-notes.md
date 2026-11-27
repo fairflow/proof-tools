@@ -268,7 +268,8 @@ beside it: Brünnler's K (`BrunnlerK/Parse.lean`, the `prove` part of its
     *The paragraph does not say:*
 
     a. **That the program's own check of a certificate may be the slow
-       one.** The paragraph, and K's `answer`, suppose that what the
+       one.** (2026-11-27: both cases below were faults of the checks'
+       definitions and are repaired; note 28.) The paragraph, and K's `answer`, suppose that what the
        search returns is checked by the compiled certifier before it is
        printed, and that this is cheap. In GLS it is not, twice, and
        both times the kernel is the fast side (note 16 said so of the
@@ -362,3 +363,89 @@ beside it: Brünnler's K (`BrunnlerK/Parse.lean`, the `prove` part of its
     in the paragraph, (a) and (b) under "What is printed" and "What a
     flag is"; (d) under "Run on the corpus"; (g) there too; (e) under
     "The reader". (f): K's script, or a line in the paragraph.
+
+## 2026-11-27: the two checks repaired
+
+Written by the owner of `calculi/GLS`, at the directing session's
+request. The text built from: `reference/certify.md` §5, "The program's
+own check", as it stood at commit `525f9cd`.
+
+28. **What the repair found that the paragraph does not say.**
+
+    a. **The kernel hid the second fault on one family only.** The
+       paragraph says of the list replay that "the kernel reduces only
+       as far as each step's test looks (no measurable time at 48)".
+       That is `boxChain`, where the `p` that IdP asks for is first in
+       the antecedent. On `lastChain n` (`⇒ □p → □ⁿq → □ⁿp`, the same
+       derivation with `□ⁿq` put before `□p`) the kernel on the list
+       replay took 10.4 s at `n = 16` and overflowed its stack at 24,
+       32, 48 and 64. So "fast in the kernel" was a property of the
+       family, and the advice "measure both sides on a family that
+       grows" wants a second clause: on a family made against whatever
+       is thought to make the kernel fast (here: the formula asked for
+       put last).
+    b. **Of the repairs the paragraph names, `@[csimp]` did not fit,
+       for two reasons the paragraph could give.** With `@[csimp]` the
+       kernel goes on running the definition, which is right only if
+       the kernel's run of it has been measured good on such a family
+       (a). And `@[csimp]` replaces a constant: the library's
+       `Cert.check` is one function for every proof system, so a
+       campaign has no constant of its own to replace. What GLS did:
+       the certifier's `check` is the new function, its `sound` is the
+       old soundness after the equality, and two theorems keep the old
+       statements (`treeCert.check s c = Cert.check s c`). One function
+       on both sides, and no attribute.
+    c. **A check proved equal to the definition can be a poor
+       algorithm too, and the proof does not say.** The first replay by
+       counts looked each formula up in the whole side. Compiled it was
+       fast at every size asked for (2.5 ms at `boxChain 64`); in the
+       kernel it took 3.7 s there, and at 128 passed the cap of 8 GB,
+       where the list replay took 0.03 s. It was seen only because the
+       table was carried to 128 and 256, beyond the sizes asked for. A
+       second form (the entries in order of size, the premise of GLR by
+       one merge) was right on `boxChain` and over four times slower than
+       the list replay on `kChain`, where a side has many formulas of
+       one size; the third puts in the formula a move adds with no
+       search. So the paragraph's advice wants: the repaired check is
+       measured as the faulty one was, in the kernel as well as
+       compiled, on every family and one size beyond; and "the
+       algorithm one would run" is to be read for the kernel too, where
+       a step costs some thousand times what it costs compiled. After
+       the repair the kernel is still slower than it was where its
+       laziness served the definition (1.4 s against 0.9 s at `kChain
+       128`): that is not a fault.
+    d. **The same sequents are written out by a search and by a
+       script, and the paragraph speaks of checks only.** The search
+       over multisets returns a derivation of GLS as a term, which
+       holds every sequent; a script is replayed with its goals written
+       out, since the explorer shows them. Neither is a check that can
+       be proved equal to a better one: the size is in what is
+       returned. For those, a deadline is not a cap on memory: at
+       2 GB a second, 20 s is 40 GB. GLS now has a cap on the program's
+       own memory (it asks the system five times a second and leaves
+       with a flag above 8 GB) and the same in its measuring scripts.
+       The skill could ask it of every compiled program of a campaign
+       whose judgments can grow.
+    e. **A timing of compiled code is to be checked against the time of
+       the whole process.** The first timing command gave 80 µs for the
+       list replay at `boxChain 20`, where the process took 0.1 s and
+       137 MB: the work was not inside the clock. The check had been
+       passed to the timer as `fun _ => check s c`; as a function of
+       its own, not unfolded where it is used, with the unit as its
+       last argument, the figure was 82 ms. Why the first form did the
+       work early was not looked into.
+    f. **"Statements first, screened before any proof" was kept for one
+       statement of three.** For S25 and S26 the proof was written with
+       the definitions and passed at once; the screen was run after and
+       is kept as a guard. For S27 the screen came first and the proof
+       took four rounds. The rule has no clause for a proof that takes
+       less time than the screen; the statements page says which order
+       each had.
+    g. **A third kind of answer that no input gives any more** needs an
+       option to ask for it, or the test "one printed file of each
+       kind" has nothing to elaborate: `--sets`, as `--proved` for the
+       fallback (note 27 c).
+
+    *Asked of the directing session*: (a), (b), (c) in "The program's
+    own check"; (d) there or in §5's advice on measuring; (e) with the
+    advice on measuring.

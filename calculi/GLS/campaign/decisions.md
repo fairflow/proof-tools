@@ -474,3 +474,72 @@ owner for each calculus).
 * **Rests on it**: `GLS/Parse.lean`, `GLS/FastCheck.lean`, the `prove`
   part of `Main.lean`, `Corpus/prove_corpus.py`.
 * **Cost to reverse**: little.
+
+## 2026-11-27 09:00 GMT. After the campaign: the two checks are the algorithms one would run
+
+By the owner of `calculi/GLS`, at the directing session's request,
+which relayed the reviewer's words on note 27 (a) ("the compiled check
+can be the slow side"): "so that's not right. The compiled checker must
+have an error, no? … It shouldn't happen."
+
+* **What was wrong.** Two definitions were also the checks of the
+  certifiers, and each is exponential run as it is written. `Form.holds`
+  asks for `A` at every world below a world for each `□A` and keeps
+  nothing. `Cert.check` writes each premise out, and GLR doubles the
+  boxed part of an antecedent. The kernel keeps the terms it has
+  reduced and reduces a list only as far as it is looked at, which hid
+  both on the families first measured. It does not hide the second on
+  every family: on `lastChain` (`⇒ □p → □ⁿq → □ⁿp`, where the `p` that
+  IdP asks for is last in the antecedent) the kernel took 10 s on the
+  list replay at `n = 16` and overflowed its stack at 20.
+* **Decided.** The check of `noValid` and `noDerivable` is
+  `Seq.refutedT` (`GLS/Table.lean`): each formula evaluated at all the
+  worlds of the tree at once. The check of `treeCert` is
+  `Seq.countCheck` (`GLS/Counts.lean`): the replay with each side by
+  counts. Each is proved equal to the definition it replaces (S25 to
+  S27), the soundness of each certifier goes through that equality, and
+  the kernel and compiled code run the same function. `Form.holds`,
+  `Seq.refutedAt` and `Cert.check` stay as the definitions that the
+  theorems of the development are about.
+* **Not taken: `@[csimp]`**, the definition for the kernel and the new
+  function for compiled code. The kernel's run of the list replay is
+  not good either (above), and `Cert.check` is the library's function
+  for every proof system, so there is no constant of GLS for `@[csimp]`
+  to replace. Not taken either: a check by the marks proved sound with
+  no equality; the equality costs no more and keeps the old statements
+  as theorems (`noValid_check`, `treeCert_check`).
+* **The replay by counts took three forms**, and the first was itself
+  too slow in the kernel (`measurements.md`, "The two checks"). The
+  first looked each formula up in the whole side: at each GLR the
+  square of the number of entries in comparisons of formulas; in the
+  kernel 3.7 s at `boxChain 64` and over the cap of 8 GB at 128, where
+  the list replay it replaced took 0.03 s. Seen only because the table
+  was carried beyond the sizes asked for. The form kept: the entries of
+  a side in order of the size of the formula, the premise of GLR by one
+  merge, and the formula that ImpR or ImpL adds put in with no search.
+  The proof of S27 was made again for it; only the lemmas about one
+  side changed.
+* **What it costs.** Where the kernel's laziness served the list
+  replay, the replay by counts is somewhat slower in the kernel: 1.4 s
+  against 0.9 s at `kChain 128`, 0.1 s against 0.02 s at `boxChain
+  256`. Where it did not (`lastChain`), the list replay overflows the
+  stack from 24 and the replay by counts takes 11 s at 256.
+* **Gone with it.** `GLS/FastCheck.lean`, the program's second check of
+  a countermodel, which was only tested against the certifier's; the
+  cap of 4 096 formulas in `glsrun prove`, and with it the third kind
+  of answer as the normal answer for `□p → □ⁿp` from `n = 12` (the
+  decision of 2026-11-26 above): the derivation is now stated as data
+  at every size tried. The kind remains for a tree of moves over sets
+  that would not replay as a derivation of GLS, which has not been
+  seen; `--sets` asks for it.
+* **Also decided: a cap on the program's own memory**, 8 GB
+  (`watchMemory`, `Main.lean`), and in the measuring scripts a cap on
+  the memory of what they run, with a deadline that ends the process
+  group. The search over multisets still writes the sequents out (it
+  returns a derivation of GLS as a term, which holds them): a deadline
+  alone let it take what it could reach in 20 s.
+* **Not repaired**: `measurements.md`, "The two checks", at its end.
+* **Rests on it**: `GLS/Run.lean` (the certifiers), `Main.lean`,
+  `GLS/CheckTest.lean`, `Corpus/measure_checks.py`.
+* **Cost to reverse**: little; the definitions and their theorems are
+  untouched.

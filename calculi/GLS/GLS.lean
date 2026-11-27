@@ -35,5 +35,7 @@ import GLS.InterpolationTest
 import GLS.Corpus.Basic
 import GLS.Corpus.Facts
 import GLS.Parse
-import GLS.FastCheck
+import GLS.Table
+import GLS.Counts
+import GLS.CheckTest
 import GLS.ParseTest

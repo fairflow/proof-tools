@@ -82,7 +82,7 @@ theorem short_script_rejected :
 #guard_msgs in
 #certify_axioms GLS.RunTest.converseK_not_derivable
 
-/-- info: R4 passes: lob depends on [propext] ⊆ [propext, Quot.sound] -/
+/-- info: R4 passes: lob depends on [propext, Quot.sound] ⊆ [propext, Quot.sound] -/
 #guard_msgs in
 #certify_axioms GLS.RunTest.lob
 

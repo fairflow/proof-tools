@@ -11,11 +11,12 @@ For each member of a family, in growing size:
     which gives the derivation in GLS as data;
   * the kernel running the checked decision over sets (`decide +kernel`
     with `derivableDecidableFast`).
-Every run is under a deadline; a run cut off is a flag, and the column
+Every run is under a deadline that ends its process group, and a cap on
+memory of 8 GB; a run cut off is a flag, and the column
 stops there.  Run from `calculi/GLS/` after `lake build glsrun
 GLS.SetSearch`:  python3 -I Corpus/measure_set.py > <report>
 """
-import subprocess, time, os, platform, datetime
+import subprocess, signal, time, os, platform, datetime
 
 EXE = ".lake/build/bin/glsrun"
 PRODUCER_DEADLINE = 20.0
@@ -28,16 +29,27 @@ FAMILIES = {
 }
 VALID = {"boxChain": True, "kChain": True, "consis": False, "binTree": False}
 
-def timed(cmd, deadline):
+def timed(cmd, deadline, cap_mb=8000):
+    """Run under a deadline and a cap on memory.  At the deadline, or when
+    the process holds more than the cap, its whole process group ends."""
     t0 = time.monotonic()
-    try:
-        r = subprocess.run(cmd, capture_output=True, text=True, timeout=deadline)
-        return time.monotonic() - t0, r.returncode, r.stdout + r.stderr
-    except subprocess.TimeoutExpired:
-        return None, None, ""
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
+                         start_new_session=True)
+    while True:
+        try:
+            out, err = p.communicate(timeout=0.2)
+            return time.monotonic() - t0, p.returncode, out + err
+        except subprocess.TimeoutExpired:
+            rss = subprocess.run(["ps", "-o", "rss=", "-p", str(p.pid)],
+                                 capture_output=True, text=True).stdout.strip()
+            over = rss.isdigit() and int(rss) > cap_mb * 1024
+            if over or time.monotonic() - t0 > deadline:
+                os.killpg(p.pid, signal.SIGKILL)
+                p.communicate()
+                return None, None, "over the cap on memory" if over else ""
 
 def lean(path, deadline):
-    return timed(["lake", "env", "lean", path], deadline)
+    return timed(["lake", "env", "lean", "-M", "8000", path], deadline)
 
 def check(path, base):
     tc, rcc, outc = lean(path, KERNEL_DEADLINE + base)

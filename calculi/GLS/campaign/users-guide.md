@@ -121,8 +121,8 @@ kernel check the certificate. There are three kinds:
 
 | verdict | the certificate | the facts |
 |---|---|---|
-| derivable | a tree of moves, checked on multisets | `proof : Fam sequent` (the derivation as data), `derivable : Derivable sequent`, `valid : Valid sequent` |
-| derivable | the same tree, checked over sets | `derivable`, `valid`. The derivation is not stated as data: on multisets a sequent of it has more than 4 096 formulas on a side (GLR doubles the boxed part of an antecedent), and the program does not print a fact it has not checked. For `□p → □ⁿp`: from `n = 12` |
+| derivable | a tree of moves, replayed as a derivation of GLS | `proof : Fam sequent` (the derivation as data), `derivable : Derivable sequent`, `valid : Valid sequent` |
+| derivable | a tree of moves, checked over sets only | `derivable`, `valid`, and no data. Printed where the tree of the search over sets is not a derivation of GLS itself, which has not been seen (every tree of that search has replayed); `--sets` asks for this kind |
 | not derivable | a finite tree of worlds, the sequent false at its root | `countermodel : Tree`, `notValid : ¬ Valid sequent`, `notDerivable : ¬ Derivable sequent` |
 
 **What is read.** A sequent is `Γ ⇒ Δ`; either side may be empty. A text
@@ -159,17 +159,21 @@ nothing on the standard output: what was expected, the place counted
 from character 1, and a mark under it.
 
 **The search** is the one over sets, which is not proved; its answer is
-checked by the program before anything is printed, and an answer that
-did not pass would be replaced by that of the proved search (this has
-not been seen). `--proved` asks for the answer of the proved search
-itself, which is cut off beyond about 28 nested boxes. `--deadline=N`:
-the seconds allowed (10).
+checked by the program before anything is printed, by the check of the
+certifier that the printed file names, the same function the kernel then
+runs (`campaign/measurements.md`, "The two checks"). An answer that did
+not pass would be replaced by that of the proved search (this has not
+been seen). `--proved` asks for the answer of the proved search itself,
+which writes the sequents of GLS out and is cut off beyond about 28
+nested boxes. `--deadline=N`: the seconds allowed (10). The program
+holds at most 8 GB of memory: above that it leaves with a flag.
 
 **The exit code**: 0 derivable, 1 not derivable, 3 flag, 2 a text not
-read. Derivability in GLS is decided, so **a flag** is one of two
-things: no answer within the deadline; or a certificate of the proved
-search that the program's own check refused, which would be a defect and
-has not been seen. A flag prints no fact.
+read. Derivability in GLS is decided, so **a flag** is one of
+three things: no answer within the deadline; the cap on memory reached
+(only the proved search has been seen to reach it); or a certificate of
+the proved search that the certifier's check refused, which would be a
+defect and has not been seen. A flag prints no fact.
 
 `glsrun corpus` and `glsrun families` list the corpus and some members
 of the families as texts; `Corpus/prove_corpus.py` runs the command on

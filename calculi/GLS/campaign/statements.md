@@ -305,6 +305,10 @@ first). No item of the source, so not read back.
     sound : ∀ s t, s.refutedAt t = true → Valid s → False
     sound : ∀ s t, s.refutedAt t = true → Nonempty (Fam s) → False
 
+Since 2026-11-27 the check of both is `s.refutedT t` (S26), which is
+`s.refutedAt t` computed one formula at a time over all the worlds; the
+statements above are theorems still (`noValid_check`, with S26).
+
 `noValid`, `noDerivable`, `GLS/Run.lean`. No budget in `Holds`. Screened
 (`GLS/Screen.lean`): no sequent of the 1 024 that the bounded search
 derives is accepted with any of the 964 trees; the plan's five
@@ -316,6 +320,8 @@ within `[propext, Quot.sound]` (`GLS/Run.lean`); negative tests:
 
     ∀ s : Seq,  (∃ c, treeCert.check s c = true) ∨ (∃ t, noValid.check s t = true)
 
+(Since 2026-11-27 `treeCert.check` is the replay by counts, S27, and
+`noValid.check` truth by the marks, S26; the statement is as it was.)
 `decided`, `GLS/Run.lean`; and that the engine's producer answers `pass`
 for every derivable sequent (`glsEngine_complete :
 glsEngine.Complete`). Status: **PROVED**, within `[propext,
@@ -372,6 +378,75 @@ sequent"). Status: **PROVED**, twice, within `[propext, Quot.sound]`:
 `cutElimination` (each cut removed by `cutBySource`, S19: the source's
 proof) and `cutEliminationBySearch` (each cut removed by S10).
 
+### S25. Truth by the marks is truth (after the campaign, 2026-11-27; our own)
+
+Why it is wanted: `decisions.md`, 2026-11-27. `Form.holds`, run as it
+is written, asks for `A` at every world below a world for each `□A` and
+keeps nothing: `2ⁿ` calls on a chain of `n` worlds and `n` nested boxes.
+The marks of a formula on a tree are a tree of the same shape with two
+bits at each world (true there; true there and at every world below),
+computed for `A ⟶ B` from the marks of `A` and of `B`, and for `□A` from
+those of `A` (`GLS/Table.lean`).
+
+    Form.holdsT A t := (A.marks t).here
+    ∀ (A : Form) (t : Tree),  A.holdsT t = A.holds t
+
+`Form.holdsT_eq`, `GLS/Table.lean`; on the way, `Form.marks_eq : A.marks
+t = Marks.of (fun u => A.holds u) t`. No item of the source, so not read
+back. Screened (`GLS/CheckTest.lean`): equal on the 19 formulas of the
+screens at 200 worlds. **The proof was written with the definitions and
+passed at once, so the screen was run after it, not before** (the order
+asked for was the other one). Status: **PROVED**, within `[propext,
+Quot.sound]`.
+
+### S26. The two checks of a countermodel are one function (2026-11-27; our own)
+
+    Seq.refutedT s t := s.ant.all (·.holdsT t) && s.suc.all (!·.holdsT t)
+    ∀ (s : Seq) (t : Tree),  s.refutedT t = s.refutedAt t
+
+`Seq.refutedT_eq`, `GLS/Table.lean`. `Seq.refutedT` is the check of
+`noValid` and `noDerivable` (S21), compiled and in the kernel. Screened
+(`GLS/CheckTest.lean`): equal on the 1 024 small sequents at 200
+worlds, where both answers occur; on the trees the search returns for
+the corpus and for `consis 3, 8, 12`, `binTree 2, 3`, accepted by both;
+a tree too short refused by both. As for S25, the screen was run after
+the proof. Status: **PROVED**, within `[propext, Quot.sound]`.
+
+### S27. The replay by counts is the replay (2026-11-27; our own)
+
+Why it is wanted: `Cert.check` runs `step`, which writes each premise
+out as a pair of lists, and the premise of GLR has `B, □B` for each `□B`
+of the antecedent: `2ⁿ` formulas after `n` nested GLR. No rule of GLS
+looks at more than how often a formula occurs (the source: "based on
+multisets"). A side by counts is a list of formulas each with a number;
+`countStep` reads the side conditions and the premises of `Move.rule`
+on the counts (`GLS/Counts.lean`). The entries are kept in order of the
+size of the formula and the premise of GLR is made by one merge; the
+order is not part of the statement, nor of its proof (a count is the
+sum over the entries of a formula, wherever they are).
+
+    Seq.countCheck s c := countCheck (CSeq.of s) c
+    ∀ (s : Seq) (c : Cert S),  s.countCheck c = Cert.check s c
+
+`countCheck_eq`, `GLS/Counts.lean`. On the way: `count_xbox` (how often
+a formula occurs in `xbox Γ`: once for each `□B` of `Γ`, and, if it is
+boxed, once for each occurrence of it), and `countStep_rep` (at the
+counts of a sequent, `countStep` applies where the move does, and its
+premises are the counts of the move's premises). `Seq.countCheck` is the
+check of `treeCert`, compiled and in the kernel; its verdict is the
+derivation that `Cert.check` gives, as before. Entered and **screened
+before its proof** (`GLS/CheckTest.lean`): the two replays agree on the
+385 trees of moves that the search over sets returns for the 1 024 small
+sequents, each at its own sequent (all accepted), at its sequent with
+each side written twice, and at 40 other sequents (both answers occur);
+on the trees of the proved search; on the corpus and `boxChain 3, 8,
+12`, `kChain 4, 8`; and a formula used once more than it occurs is
+refused by both. No disagreement was found. The definitions of the
+replay were changed twice after the first proof, for the kernel's time
+(`decisions.md`); the statement is the same, the screens are run on the
+form kept at every build, and the proof is of that form. Status:
+**PROVED**, within `[propext, Quot.sound]`.
+
 ## Refuted
 
 None.
@@ -391,7 +466,7 @@ None.
 |---|---|---|---|
 | of the goals from the standing list (S7; S10 with S19; S24) | 3 | 0 | 0 |
 | of the other goals (S3 to S6, S8, S9; S11 to S18) | 14 | 0 | 0 |
-| of our own (S1, S2, S20 to S23) | 6 | 0 | 0 |
+| of our own (S1, S2, S20 to S23, S25 to S27) | 9 | 0 | 0 |
 
 Counted by entry, with S11 to S17 seven entries and S19 counted with
 S10 (one statement, two definitions).

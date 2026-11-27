@@ -7,11 +7,22 @@ holds; a producer that is not trusted computes a certificate; a checker
 proved sound certifies it in the kernel.
 
 * **For a derivation**: the certificate is a tree of moves; the checker
-  is the library's `Cert.check`, which runs `step`; its soundness is S1
-  (`step_sound`).  `treeCert.verdict s c : Fam s`.
+  replays it with each side of a sequent kept by counts
+  (`Seq.countCheck`, `GLS/Counts.lean`), which is the library's
+  `Cert.check`, running `step`, by S27 (`countCheck_eq`); the soundness of
+  the moves is S1 (`step_sound`).  `treeCert.verdict s c : Fam s`.
 * **Against validity, and against derivability**: the certificate is a
-  finite tree; the checker computes that the sequent is false at its root
-  (`Seq.refutedAt`).  `noValid.verdict s t : Valid s → False`.
+  finite tree; the checker computes that the sequent is false at its
+  root, one formula at a time over all the worlds (`Seq.refutedT`,
+  `GLS/Table.lean`), which is `Seq.refutedAt` by S26 (`Seq.refutedT_eq`).
+  `noValid.verdict s t : Valid s → False`.
+
+Each check is the algorithm one would run, and the kernel and compiled
+code run the same one.  The definitions they are proved equal to are
+exponential where a formula has many nested boxes, run as they are
+written: `Form.holds` asks again for what it has computed, and
+`Cert.check` writes out sequents that GLR doubles
+(`campaign/measurements.md`, "The two checks").
 * **The producer** is the search of `GLS/Search.lean`, compiled.  It is
   proved to end and to be right, but nothing here rests on that: what it
   returns is checked.
@@ -20,6 +31,8 @@ Theory file: it ends with its bound on axioms.
 -/
 import GLS.Completeness
 import GLS.Proof
+import GLS.Table
+import GLS.Counts
 import LeanCertify
 
 namespace GLS
@@ -28,9 +41,17 @@ open ProofTools ProofTools.Explore
 
 /-! ## The certifiers -/
 
-/-- **Trees of moves, checked**: a tree that `Cert.check` accepts for `s`
-gives a derivation of `s` in GLS. -/
-def treeCert : Certify.Certifier Seq (Cert S) Fam := Cert.certifier step_sound
+/-- **Trees of moves, checked**: a tree that the replay by counts accepts
+for `s` gives a derivation of `s` in GLS.  The replay by counts is
+`Cert.check` (S27), and a tree that `Cert.check` accepts is a derivation
+of the proof system, mapped out by the soundness of the moves. -/
+def treeCert : Certify.Certifier Seq (Cert S) Fam where
+  check s c := s.countCheck c
+  sound s c h := (Cert.certifier step_sound).sound s c ((countCheck_eq s c).symm.trans h)
+
+/-- The check of `treeCert` is the library's check of a tree of moves. -/
+theorem treeCert_check (s : Seq) (c : Cert S) : treeCert.check s c = Cert.check s c :=
+  countCheck_eq s c
 
 /-- **Scripts, checked**: a script that runs to the end from `s` gives a
 derivation of `s` in GLS. -/
@@ -39,13 +60,19 @@ def scriptCert : Certify.Certifier Seq (Script S) Fam := certifier step_sound
 /-- **Finite trees, checked against validity**: if `s` is computed false
 at the root of `t`, then `s` is not valid. -/
 def noValid : Certify.Certifier Seq Tree (fun s => Valid s → False) where
-  check s t := s.refutedAt t
-  sound _ t h hv := not_satSeq_of_refutedAt h (hv treeModel treeModel_GL treeModel_twoValued t)
+  check s t := s.refutedT t
+  sound s t h hv := not_satSeq_of_refutedAt ((Seq.refutedT_eq s t).symm.trans h)
+    (hv treeModel treeModel_GL treeModel_twoValued t)
+
+/-- The check of `noValid`, and of `noDerivable`, is the definition
+`Seq.refutedAt`. -/
+theorem noValid_check (s : Seq) (t : Tree) : noValid.check s t = s.refutedAt t :=
+  Seq.refutedT_eq s t
 
 /-- The same against derivability: by soundness, what is not valid has no
 derivation. -/
 def noDerivable : Certify.Certifier Seq Tree (fun s => Derivable s → False) where
-  check s t := s.refutedAt t
+  check s t := s.refutedT t
   sound s t h := fun ⟨d⟩ => noValid.sound s t h (soundness s d)
 
 #certify_structural GLS.treeCert
@@ -115,7 +142,8 @@ answer.  The number is not used: the search ends by itself. -/
 def produce (s : Seq) (_ : Nat) : Certify.Verdict (Script S) Tree :=
   match proofOrRef s with
   | .inl d =>
-    if h : Cert.check s d.toCert = true then .pass (Der.ofCert s d.toCert h).script
+    if h : treeCert.check s d.toCert = true then
+      .pass (Der.ofCert s d.toCert ((treeCert_check s _).symm.trans h)).script
     else .flag
   | .inr r => if noDerivable.check s r.1 then .fail r.1 else .flag
 
@@ -132,8 +160,8 @@ or a finite tree that the check against validity accepts. -/
 theorem decided (s : Seq) :
     (∃ c, treeCert.check s c = true) ∨ (∃ t, noValid.check s t = true) := by
   rcases proofOrRef s with d | r
-  · exact .inl ⟨d.toCert, d.check_toCert⟩
-  · exact .inr ⟨r.1, r.2⟩
+  · exact .inl ⟨d.toCert, (treeCert_check s _).trans d.check_toCert⟩
+  · exact .inr ⟨r.1, (noValid_check s _).trans r.2⟩
 
 /-- The producer answers `pass` for every sequent that has a derivation. -/
 theorem glsEngine_complete : glsEngine.Complete := by
@@ -144,8 +172,8 @@ theorem glsEngine_complete : glsEngine.Complete := by
   cases hs : proofOrRef s with
   | inl d =>
     refine ⟨(Der.ofCert s d.toCert d.check_toCert).script, ?_⟩
-    simp [d.check_toCert]
-  | inr r => exact absurd ⟨d₀⟩ (noDerivable.sound s r.1 r.2)
+    simp [(treeCert_check s _).trans d.check_toCert]
+  | inr r => exact absurd ⟨d₀⟩ (noDerivable.sound s r.1 ((noValid_check s _).trans r.2))
 
 end GLS
 

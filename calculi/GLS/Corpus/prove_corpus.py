@@ -12,8 +12,11 @@ derivable; and the three answers are compared with one another.
 With `--elaborate`, the file the command prints for each sequent is
 written to `Corpus/out/prove/<name>.lean` and elaborated (`lake env lean
 -M 8000`, under a deadline that ends the whole process group): the kernel
-then checks its certificate.  Three files, one of each kind of answer,
-are then altered in their certificates and must be refused.
+then checks its certificate.  The third kind of answer, a derivation
+checked over sets only, is asked for by `--sets` on two sequents, since
+no sequent of the corpus or of the families gives it otherwise.  Three
+files, one of each kind of answer, are then altered in their
+certificates and must be refused.
 
 Run from `calculi/GLS/` after `lake build GLS glsrun`:
     python3 -I Corpus/prove_corpus.py [--elaborate]
@@ -60,7 +63,7 @@ for listing in ("corpus", "families"):
 if ELABORATE:
     os.makedirs("Corpus/out/prove", exist_ok=True)
 
-counts, kinds, disagree, bad, printed = {}, {}, 0, 0, {}
+counts, kinds, disagree, bad, printed, texts = {}, {}, 0, 0, {}, {}
 print("| sequent | recorded | from the source's notation | from Lean source | from the signs of a keyboard | the answer |" +
       (" elaborated |" if ELABORATE else ""))
 print("|---|---|---|---|---|---|" + ("---|" if ELABORATE else ""))
@@ -77,6 +80,7 @@ for name, status, shown, src, ascii in entries:
     k = kind(o1)
     kinds[k] = kinds.get(k, 0) + 1
     printed[name] = o1
+    texts[name] = shown
     row = f"| `{name}` | {status} | {word} | {WORD.get(c2, 'cut off')} | {WORD.get(c3, 'cut off')} | {k} |"
     if ELABORATE:
         path = f"Corpus/out/prove/{name}.lean"
@@ -95,10 +99,29 @@ print(f"{len(entries)} sequents; by verdict: " +
       f"; disagreeing with the recorded status, or the three texts answered differently: {disagree}" +
       (f"; files not elaborated: {bad}" if ELABORATE else ""))
 
+# The third kind of answer: a derivation checked over sets only.
+print()
+for name in ("axLob", "boxChain_32"):
+    code, out, _ = run([EXE, "prove", "--sets", texts[name]])
+    k = kind(out)
+    good = code == 0 and k == "derivable, the proposition only"
+    line = f"`{name}` with `--sets`: {k}"
+    if ELABORATE and good:
+        path = f"Corpus/out/prove/{name}_sets.lean"
+        with open(path, "w") as f:
+            f.write(out)
+        good, first = elaborate(path)
+        line += "; elaborated" if good else f"; NOT elaborated: {first}"
+    if not good:
+        bad += 1
+    printed[name + "_sets"] = out
+    print(line)
+
 # One file of each kind with its certificate altered: each must be refused.
 ALTER = [
     ("axLob", r"GLS\.Move\.idP\s+0", "GLS.Move.idP 7", "the last move IdP p made IdP p7"),
     ("boxChain_32", r"GLS\.Move\.idP\s+0", "GLS.Move.idP 7", "the last move IdP p made IdP p7"),
+    ("boxChain_32_sets", r"GLS\.Move\.idP\s+0", "GLS.Move.idP 7", "the last move IdP p made IdP p7"),
     ("notT", r"GLS\.Tree\.node \[\] \[\]", "GLS.Tree.node [0] []", "p made true at the root"),
 ]
 accepted = 0

@@ -65,7 +65,7 @@ def entries : List Entry := [
   entry "notLinear" ([] ⇒ [□(□p ⟶ q), □(□q ⟶ p)]) false "two leaves that do not see each other"
 ]
 
-/-! ## Four families that grow -/
+/-! ## Five families that grow -/
 
 /-- `⇒ □p → □ⁿ⁺¹p`: derivable (the axiom 4, `n` times).  A derivation
 with GLR nested `n + 1` deep. -/
@@ -95,12 +95,20 @@ def binForm : Nat → Form
 `2ⁿ⁺¹ − 1` worlds. -/
 def binTree (n : Nat) : Seq := [] ⇒ [binForm n]
 
+/-- `⇒ □p → □ⁿq → □ⁿp`: derivable, as `boxChain` is.  GLR nested `n` deep
+with `□ⁿq` before `□p` in the antecedent: written out as a list, the
+premise of the last GLR has some `2ⁿ` formulas from `□ⁿq` before the `p`
+that IdP asks for.  (A replay that writes the sequents out and looks no
+further than it must looks that far here.) -/
+def lastChain (n : Nat) : Seq := [] ⇒ [□p ⟶ boxes n q ⟶ boxes n p]
+
 /-- A family by name: the sequent, and its status. -/
 def family (name : String) (n : Nat) : Option (Seq × Bool) :=
   if name == "boxChain" then some (boxChain n, true)
   else if name == "kChain" then some (kChain n, true)
   else if name == "consis" then some (consis n, false)
   else if name == "binTree" then some (binTree n, false)
+  else if name == "lastChain" then some (lastChain n, true)
   else none
 
 /-- The kernel can run the search: validity decided with no certificate. -/

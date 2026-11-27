@@ -8,7 +8,6 @@ the fault.
 import GLS.Parse
 import GLS.Corpus.Basic
 import GLS.SetSearch
-import GLS.FastCheck
 import GLS.Screen
 import Lean
 
@@ -255,37 +254,6 @@ there, and the reader's reading is compared with Lean's. -/
 #guard !(reads "p, q ⇒ r" ([q, p] ⇒ [r]))
 #guard !(refusedAt "p q" 3)
 #guard !(refusedAt "p ⇒ q" 0)
-
-/-! ## The program's check of a tree of worlds
-
-`glsrun prove` checks a tree by the table of `GLS/FastCheck.lean` before
-it prints it; the kernel checks the printed tree by `Seq.refutedAt`.  The
-two are compared here: on the 1 024 small sequents of the screens at 200
-worlds, of which some refute and some do not; and on the tree the search
-over sets returns for each sequent of the corpus and of the families that
-is not derivable. -/
-
-#guard seqsSmall.length == 1024
-#guard ((worlds trees2).take 200).length == 200
-#guard seqsSmall.all fun j => ((worlds trees2).take 200).all fun w =>
-  FastCheck.refuted j w == j.refutedAt w
--- Both answers occur among them.
-#guard seqsSmall.any fun j => ((worlds trees2).take 200).any fun w => FastCheck.refuted j w
-#guard seqsSmall.any fun j => ((worlds trees2).take 200).any fun w => !FastCheck.refuted j w
-
-/-- The tree the search over sets returns, where it returns one. -/
-def treeOf (j : Seq) : Option Tree :=
-  match produceSet j with
-  | some (.inr t) => some t
-  | _ => none
-
-#guard ((entries.map (·.seq)) ++ [consis 3, consis 9, binTree 2, binTree 4]).all fun j =>
-  match treeOf j with
-  | some t => FastCheck.refuted j t && j.refutedAt t
-  | none => true
-#guard ((entries.map (·.seq)).filterMap treeOf).length == 8
--- The tree of one sequent does not refute another.
-#guard (treeOf (consis 3)).all fun t => !FastCheck.refuted (consis 4) t && !(consis 4).refutedAt t
 
 /-! ## The report of a fault -/
 

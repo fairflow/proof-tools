@@ -42,6 +42,11 @@ Four families that grow:
     consis n     ⇒ □ⁿ⁺¹⊥ → □ⁿ⊥                                  not derivable; a chain of n + 1 worlds
     binTree n    ⇒ Dₙ                                           not derivable; a binary tree of 2ⁿ⁺¹ − 1 worlds
 
+and a fifth, added 2026-11-27 for "The two checks" below (it is in none
+of Tables 1 and 2):
+
+    lastChain n  ⇒ □p → □ⁿq → □ⁿp                               derivable; GLR nested n deep, the p of IdP last in the antecedent
+
 ## Table 1: the search over multisets
 
 Measured at 09:53, before the search over sets existed. Loading the
@@ -212,8 +217,11 @@ Lean:
 was recorded): the compiled check of the tree of worlds by
 `Seq.refutedAt` did not end in the 10 s of the default deadline, where
 the search over sets finds the tree in a millisecond and the kernel
-checks it in 0.3 s. The program now checks a tree by a table
-(`GLS/FastCheck.lean`); the figures above are after that change. With
+checks it in 0.3 s. The program then checked a tree by a table
+(`GLS/FastCheck.lean`); the figures above are after that change.
+(2026-11-27: that table was a way round a fault of the check's
+definition, and is gone; the certifier's own check is now the one the
+program runs: "The two checks" below.) With
 it: `□ⁿ⁺¹⊥ → □ⁿ⊥` answered in 0.6 s at `n = 32`, 0.05 s at 128, 0.4 s at
 256 (one run each, the whole command).
 
@@ -230,3 +238,145 @@ agree with the recorded status, and 2 are flags at the deadline
 (`boxChain 32`, `consis 32`: the proved search is cut off there, Table
 1). One printed file of each verdict from it was elaborated (`axLob`,
 `notConverseK`).
+
+## The two checks: the definitions and the functions the certifiers run
+
+Added 2026-11-27 09:43 GMT. Why: `decisions.md`, the entry of the same date. Run by
+`python3 -I Corpus/measure_checks.py`, from `calculi/GLS/` after `lake
+build GLS glsrun`. Each certificate is the one the search over sets
+returns. *Compiled*: `glsrun check`, one run, the time of the one
+function, with a deadline of 20 s; the list replay is not run where a
+side would pass 40 000 000 formulas. *Kernel*: `lake env lean -M 8000`
+on a file that states the check `= true` by `decide +kernel`, less the
+time of the file with the imports and the certificate alone; a deadline
+of 120 s that ends the process group.
+
+* the definitions: `Seq.refutedAt` (a countermodel), `Cert.check` (a
+  tree of moves, with the sequents written out);
+* the certifiers' checks since this date: `noDerivable.check =
+  Seq.refutedT` (truth by the marks, S26), `treeCert.check =
+  Seq.countCheck` (the replay by counts, S27).
+
+**Table 3: at 16, 24, 32, 48, 64.**
+
+| member | certificate | definition, compiled | certifier's check, compiled | definition, kernel | certifier's check, kernel |
+|---|---|---|---|---|---|
+| `consis 16` | a tree of 17 worlds | 1.6 ms | 10 µs | 0.02 s | 0.02 s |
+| `consis 24` | a tree of 25 worlds | 371.0 ms | 17 µs | 0.04 s | 0.06 s |
+| `consis 32` | a tree of 33 worlds | no answer within 20 s | 26 µs | 0.08 s | 0.05 s |
+| `consis 48` | a tree of 49 worlds | no answer within 20 s | 75 µs | 0.31 s | 0.11 s |
+| `consis 64` | a tree of 65 worlds | no answer within 20 s | 117 µs | 0.77 s | 0.21 s |
+| `boxChain 16` | a tree of 19 moves | 5.2 ms | 19 µs | 0.04 s | 0.02 s |
+| `boxChain 24` | a tree of 27 moves | 1.54 s | 33 µs | 0.01 s | 0.02 s |
+| `boxChain 32` | a tree of 35 moves | not run: a side of more than 40 000 000 formulas | 56 µs | 0.01 s | 0.06 s |
+| `boxChain 48` | a tree of 51 moves | not run: a side of more than 40 000 000 formulas | 123 µs | 0.02 s | 0.03 s |
+| `boxChain 64` | a tree of 67 moves | not run: a side of more than 40 000 000 formulas | 231 µs | 0.02 s | 0.07 s |
+| `lastChain 16` | a tree of 19 moves | 5.7 ms | 27 µs | 10.27 s | 0.04 s |
+| `lastChain 24` | a tree of 27 moves | 1.68 s | 56 µs | stack overflow (after 23 s) | 0.08 s |
+| `lastChain 32` | a tree of 35 moves | not run: a side of more than 40 000 000 formulas | 106 µs | stack overflow (after 23 s) | 0.17 s |
+| `lastChain 48` | a tree of 51 moves | not run: a side of more than 40 000 000 formulas | 263 µs | stack overflow (after 23 s) | 0.36 s |
+| `lastChain 64` | a tree of 67 moves | not run: a side of more than 40 000 000 formulas | 500 µs | stack overflow (after 23 s) | 0.59 s |
+
+**Table 4: at 128 and 256**, with `kChain` (`python3 -I
+Corpus/measure_checks.py boxChain lastChain kChain consis 128 256`).
+
+| member | certificate | definition, compiled | certifier's check, compiled | definition, kernel | certifier's check, kernel |
+|---|---|---|---|---|---|
+| `boxChain 128` | a tree of 131 moves | not run: a side of more than 40 000 000 formulas | 1.7 ms | 0.03 s | 0.07 s |
+| `boxChain 256` | a tree of 259 moves | not run: a side of more than 40 000 000 formulas | 11.9 ms | 0.02 s | 0.10 s |
+| `lastChain 128` | a tree of 131 moves | not run: a side of more than 40 000 000 formulas | 4.0 ms | stack overflow (after 23 s) | 2.50 s |
+| `lastChain 256` | a tree of 259 moves | not run: a side of more than 40 000 000 formulas | 25.8 ms | stack overflow (after 23 s) | 11.00 s |
+| `kChain 128` | a tree of 387 moves | 342 µs | 348 µs | 0.90 s | 1.42 s |
+| `kChain 256` | a tree of 771 moves | 1.2 ms | 1.7 ms | 3.82 s | 5.67 s |
+| `consis 128` | a tree of 129 worlds | no answer within 20 s | 497 µs | 7.51 s | 0.97 s |
+| `consis 256` | a tree of 257 worlds | no answer within 20 s | 2.0 ms | over the cap on memory (after 91 s) | 4.56 s |
+
+Read by family:
+
+* **`consis n`** (`⇒ □ⁿ⁺¹⊥ → □ⁿ⊥`, refuted on a chain of `n + 1`
+  worlds). The definition compiled doubles with each box (1.6 ms at 16,
+  0.37 s at 24, no answer in 20 s from 32). The kernel on the definition
+  does not double, since it keeps what it has reduced, but it grows
+  fast: 0.8 s at 64, 7.5 s at 128, and over the cap on memory at 256.
+  The check by the marks: 2 ms compiled at 256; in the kernel 0.2 s at
+  64, 1.0 s at 128, 4.6 s at 256.
+* **`boxChain n`** (`⇒ □p → □ⁿ⁺¹p`). The list replay compiled doubles
+  (5 ms at 16, 1.5 s at 24, where the directing session measured 2.2 GB
+  of memory). The kernel on it shows no growth: the `p` that IdP asks
+  for is first in the antecedent, and the list is reduced no further.
+  The replay by counts: 12 ms compiled at 256, and 0.1 s in the kernel.
+* **`lastChain n`** (`⇒ □p → □ⁿq → □ⁿp`: `boxChain` with `□ⁿq` before
+  `□p`, so that the `p` is last). The kernel on the list replay: 10 s
+  at 16, and **a stack overflow from 24**. The replay by counts: 26 ms
+  compiled at 256; in the kernel 0.6 s at 64, 2.5 s at 128, 11 s at
+  256.
+* **`kChain n`** (one GLR, then `n` uses of ImpL on a side of `n`
+  formulas of one size). Neither replay grows fast. The replay by
+  counts is the slower in the kernel: 1.4 s against 0.9 s at 128, 5.7 s
+  against 3.8 s at 256.
+
+So the kernel's speed on the list replay was a property of `boxChain`.
+After the repair no check compiled is slower than the same check in the
+kernel, on any member measured, and each certifier's check was checked
+by the kernel at every size on every family, which neither definition
+was.
+
+**The first two forms of the replay by counts**, which are not kept
+(`decisions.md`). The statement proved was the same for each.
+
+| | compiled | kernel |
+|---|---|---|
+| first form (each formula looked up in the whole side) | 2.5 ms at `boxChain 64`, 40 ms at 128, 0.62 s at 256; 10 ms at `lastChain 64` | `boxChain`: 0.09, 0.21, 0.45, 1.53, 3.67 s at 16 to 64; over the cap on memory at 128 (after 47 s). `lastChain`: 0.25 to 15.1 s at 16 to 64. `kChain 128`: 11.7 s; 256: cut off at 120 s |
+| second form (in order of size, GLR by one merge, every formula added with a search among those of its size) | 1.7 ms at `boxChain 128`, 2.4 ms at `kChain 256` | `boxChain 256`: 0.08 s. `lastChain 256`: 11.0 s. `kChain 128`: 4.2 s; 256: cut off at 120 s (at 192: 15 s and 5.4 GB for the whole file, of which the certificate alone 5.6 s and 2.4 GB) |
+| the form kept (the formula of ImpR or ImpL added with no search) | Tables 3 and 4 | Tables 3 and 4 |
+
+**The corpus script after the change** (`python3 -I
+Corpus/prove_corpus.py --elaborate`): 25 sequents; by verdict derivable
+13, not derivable 12, flag 0, as before; disagreeing with the recorded
+status or among the three texts 0; printed files elaborated 25 of 25.
+By kind of answer: the derivation as data 13, a countermodel 12
+(`boxChain 32` was "the proposition only" under the cap of 4 096
+formulas and is now a derivation as data). The third kind, asked for by
+`--sets` on `axLob` and `boxChain 32`: both elaborated. Four files with
+the certificate altered, each refused by Lean: `axLob`, `boxChain_32`
+(data), `boxChain_32` with `--sets` (the proposition only), `notT` (a
+countermodel). With `--proved --deadline=5` on the same 25: 23 agree
+and 2 are flags at the deadline (`boxChain 32`, `consis 32`), as
+before.
+
+**Not repaired**, and why:
+
+* **The derivation as data is still `2ⁿ` large.** `treeCert.verdict s
+  c : Fam s` is a term of the family, whose sequents are those of GLS
+  written out; the kernel checks that it exists without reducing it,
+  and nothing here evaluates it. Compiled code that did would build the
+  sequents. The certificate (the tree of moves) is its short form.
+* **The search over multisets** (`proofOrRef`: the proved search, the
+  commands `run`, `cert`, `facts`, `status`, and `prove --proved`)
+  returns such a derivation, so it writes the sequents out: Table 1,
+  cut off at `boxChain 28`. Not a check, and not changed. It now runs
+  under the cap on the program's memory (8 GB): above it the program
+  leaves with a flag. Seen by asking for it: `glsrun run boxChain 30`
+  stopped after 8.2 s with "flag: more than 8000 MB of memory", having
+  held 9.4 GB at most (the program asks the system five times a
+  second).
+* **A script** (`scriptCert`) is replayed with its goals written out,
+  as the explorer shows them. No command runs that check compiled on a
+  member of a family; the kernel runs it on the files that `glsrun
+  cert` writes (Table 1, "the fact with its script"), where it has the
+  list replay's behaviour.
+* **The definitions themselves** (`Form.holds`, `Seq.refutedAt`,
+  `Cert.check`) are as they were, and compiled code that calls them
+  directly is as slow as before: the screens and tests do, on small
+  cases (the largest: `boxChain 12`), and `glsrun check` does to
+  measure them.
+* **`setCert`**, the check over sets, is the library's replay on
+  sequents with their repeated formulas removed: not changed, and
+  slower in the kernel than `treeCert` (Table 2).
+
+**Tables 1 and 2 were not measured again.** Their columns for
+`treeCert` and `noDerivable` are of the checks as they were on
+2026-11-25 (the definitions); Tables 3 and 4 are of the checks as they
+are. Not measured: memory, except where a cap was reached; `binTree`
+with the new checks beyond the corpus script's `binTree 4`; anything
+between 64 and 128 or beyond 256.
