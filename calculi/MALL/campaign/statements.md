@@ -465,6 +465,57 @@ immediate subformulas of one. For `∃p A` the two negations cancel
 (`Form.mem_lits_neg`, `Form.neg_neg`). Not read back by a cold reader.
 **PROVED.**
 
+### S27. A saturated set written in numbers is a certificate
+
+    ∀ (C : CodeCert) (Γ : List Form),
+      codeRefutes C Γ = true → refutedBy C.sequents Γ = true
+
+    noDerivableByCode : Certify.Certifier (List Form) CodeCert (fun Γ => Derivable Γ → False)
+    noValidByCode     : Certify.Certifier (List Form) CodeCert (fun Γ => Valid Γ → False)
+
+`CodeSoundness`, `MALL/Coded.lean`. Source: none. Entered on 2026-11-27,
+before its proof, by a task of the directing session at the reviewer's
+word: the kernel could not check a set of 119 sequents by `refutedBy`
+(S20) under 8 GB, and the cause was the definition
+(`measurements.md`, "Why the kernel could not check a set").
+A certificate `C : CodeCert` is a base `B`, a table of formulas (each
+entry its connective and how many entries later its two parts stand), a
+search tree of numbers, and the places of the formulas of the sequent.
+A number stands for the sequent in which the formula at place `i` occurs
+as many times as the digit of the number at `i` in base `B`
+(`dec B (forms C.table)`); `C.sequents` is the list of the sequents of
+the numbers of the tree. `codeRefutes C Γ` is a Boolean function: `Γ` is
+the list of the formulas at the places given, the sum of their units
+`B ^ i` is in the tree and the formulas can be taken out of it one by
+one leaving 0; and for every number `d` of the tree, every digit of `d`
+is less than `B - 2`, `d` has no digit beyond the table, `d` is not
+`⊢ a, a⊥` nor `⊢ 1`, and at each place `i` with a digit that is not 0 the
+condition of S20 holds of the formula there and the rest `d - B ^ i`,
+read in numbers: for ⊥ the rest is in the tree; for ⅋ the rest plus the
+units of the two parts; for & one of the two sums, for ⊕ both; for ⊗, for
+every way to choose at each place at most the digit of the rest, the
+chosen part plus the unit of the first part of the ⊗ is in the tree, or
+what is left of the rest plus the unit of the second; ⊤ fails. The
+statement is an implication and not an equality: `refutedBy` is not run
+on the decoded set by anyone, and the theorems of S20 then hold of that
+set (so `¬ Derivable Γ`, `¬ Valid Γ`, and the finite phase structure).
+Not claimed: that every saturated set has a certificate in numbers that
+passes (the producer `Encode.encode`, code, makes one, and it is checked
+case by case).
+Screened before the proof (`mallrun screen`, compiled): for the 15
+non-theorems of the corpus and ten members of the two families, the
+certificate and 45 998 alterations of it (the base changed; a number
+removed, changed by a unit at each place, or added; each entry of the
+table changed to 19 other entries, removed or doubled; a place of the
+sequent changed, removed or added; the tree put out of order): the check
+in numbers accepts 6 278, and for every one of those `refutedBy` accepts
+the decoded set. Two controls of the screen, the check weakened: without
+the bound on the digits, 18 accepted certificates decode to sets that
+`refutedBy` refuses; with the sequent's number taken as the sum of its
+units and nothing taken out, the alterations reach no failure, and one
+is made by hand (four times ⊤ at a base of 4: a negative test of
+`MALL/CodedTest.lean`). **OPEN** (entered; the proof follows).
+
 ### The reading back of S22 to S25
 
 Made on 2026-11-26 by a fresh agent given only an extract of 124 lines

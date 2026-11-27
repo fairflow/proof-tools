@@ -40,6 +40,17 @@ def isAx : List Form → Bool
   | [A, B] => B == Aᗮ
   | _ => false
 
+/-- The ways to divide a list in which equal formulas stand together, each
+way once: `k` copies of a formula are divided in `k + 1` ways, where
+`splits` (`MALL/Decide.lean`) gives the same pairs `2 ^ k` times over. -/
+partial def msplits : List Form → List (List Form × List Form)
+  | [] => [([], [])]
+  | a :: l =>
+    let k := (l.takeWhile (· == a)).length + 1
+    let sub := msplits (l.dropWhile (· == a))
+    (List.range (k + 1)).flatMap fun j =>
+      sub.map fun (p, q) => (List.replicate j a ++ p, List.replicate (k - j) a ++ q)
+
 mutual
 /-- Has the sequent a derivation without cut?  Every answer is kept. -/
 partial def der (Γ : List Form) : StateM Memo Bool := do
@@ -60,7 +71,7 @@ partial def derAt (k : List Form) : List (Form × List Form) → StateM Memo Boo
       | .par A C => der (A :: C :: Γ)
       | .wth A C => do if ← der (A :: Γ) then der (C :: Γ) else pure false
       | .plus A C => do if ← der (A :: Γ) then pure true else der (C :: Γ)
-      | .tensor A C => derSplits A C (splits Γ)
+      | .tensor A C => derSplits A C (msplits Γ)
       | _ => pure false
     if here then return true else derAt k ps
 
@@ -88,7 +99,7 @@ def witnesses (m : Memo) (d : List Form) : List (List Form) :=
     | .par A C => [A :: C :: Γ]
     | .wth A C => if no m (A :: Γ) then [A :: Γ] else [C :: Γ]
     | .plus A C => [A :: Γ, C :: Γ]
-    | .tensor A C => (splits Γ).map fun (Γ₁, Γ₂) =>
+    | .tensor A C => (msplits Γ).map fun (Γ₁, Γ₂) =>
         if no m (A :: Γ₁) then A :: Γ₁ else C :: Γ₂
     | _ => []
 

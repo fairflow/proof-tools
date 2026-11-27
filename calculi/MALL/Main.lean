@@ -39,6 +39,7 @@ when the file it wrote is elaborated.
 import MALL.Corpus.Basic
 import MALL.ModelRun
 import MALL.Refute
+import MALL.Encode
 import MALL.Parse
 
 open MALL MALL.Corpus ProofTools ProofTools.Explore
@@ -314,6 +315,110 @@ def main (args : List String) : IO UInt32 := do
     IO.println "end MALL.Corpus.Facts\n\n#axioms_within_file [propext, Quot.sound]"
     return 0
   | "prove" :: rest => prove rest
+  | ["screen"] =>
+    -- The statement "a certificate in numbers that passes stands for a set
+    -- that passes the check of `MALL/Saturated.lean`", tried on altered
+    -- certificates: every one that the check in numbers accepts is decoded
+    -- and given to the check of sets.
+    let mut total := 0
+    let mut accepted := 0
+    let mut bad := 0
+    let fams := (List.range 6).filterMap (fun n => (family "bots" n).map (·.1)) ++
+      (List.range 4).filterMap (fun n => (family "parbots" (n + 1)).map (·.1))
+    for Γ in (entries.filter (!·.derivable)).map (·.seq) ++ fams do
+      match refuteSet Γ with
+      | none => pure ()
+      | some D =>
+        let C := Encode.encode D Γ
+        let keys := C.tree.keys.toArray
+        let mk (ks : Array Nat) : Tree := Encode.build (ks.qsort (· < ·)) 0 ks.size
+        let n := C.table.length
+        let mut alts : Array CodeCert := #[C, { C with tree := Encode.build keys.reverse 0 keys.size }]
+        for b in [0, 1, 2, 3, C.B - 2, C.B - 1, C.B + 1, 2 * C.B] do
+          alts := alts.push { C with B := b }
+        for i in [0:keys.size] do
+          alts := alts.push { C with tree := mk (keys.eraseIdx! i) }
+          alts := alts.push { C with tree := mk (keys.set! i (keys[i]! + 1)) }
+          for j in [0:n + 2] do
+            alts := alts.push { C with tree := mk (keys.set! i (keys[i]! + C.B ^ j)) }
+            alts := alts.push { C with tree := mk (keys.push (keys[i]! + C.B ^ j)) }
+            alts := alts.push { C with tree := mk (keys.push (keys[i]! - C.B ^ j)) }
+        for j in [0:n + 2] do
+          alts := alts.push { C with tree := mk (keys.push (C.B ^ j)) }
+          alts := alts.push { C with tree := mk (keys.push (C.B ^ j + C.B ^ (j + 1))) }
+          alts := alts.push { C with tree := mk (keys.push (2 * C.B ^ j)) }
+          alts := alts.push { C with tree := mk (keys.push ((C.B - 1) * C.B ^ j)) }
+        alts := alts.push { C with tree := mk (keys.push 0) }
+        let kinds (a c : Nat) : List Node :=
+          [.atom a, .natom a, .atom c, .natom c, .one, .bot, .top, .zero, .tensor a c, .par a c,
+           .wth a c, .plus a c, .tensor c a, .par (a + 1) c, .wth a (c + 1), .plus (a + 1) (c + 1),
+           .tensor (a + n) c, .par 0 0, .tensor 0 0]
+        for i in [0:n] do
+          let (a, c) := match C.table.getD i .one with
+            | .tensor a c | .par a c | .wth a c | .plus a c => (a, c)
+            | .atom a | .natom a => (a, a + 1)
+            | _ => (0, 1)
+          for N in kinds a c do
+            alts := alts.push { C with table := C.table.set i N }
+          alts := alts.push { C with table := C.table.eraseIdx i }
+          alts := alts.push { C with table := C.table.take i ++ [C.table.getD i .one] ++ C.table.drop i }
+        for i in [0:C.goal.length] do
+          alts := alts.push { C with goal := C.goal.eraseIdx i }
+          for j in [0:n + 1] do
+            alts := alts.push { C with goal := C.goal.set i j }
+            alts := alts.push { C with goal := j :: C.goal }
+        for C' in alts do
+          total := total + 1
+          if codeRefutes C' Γ then
+            accepted := accepted + 1
+            unless refutedBy C'.sequents Γ do
+              bad := bad + 1
+              if bad ≤ 5 then
+                IO.println s!"FAILS: {showSeq Γ}\n  {Encode.showCert C'}"
+    IO.println s!"certificates tried: {total}; accepted by the check in numbers: {accepted}; \
+of those, decoded sets that the check of sets refuses: {bad}"
+    return (if bad == 0 then 0 else 1)
+  | "code" :: rest =>
+    -- provisional: the saturated set in numbers, with the times of the
+    -- producer and of the compiled checks
+    let old := rest.contains "--old"
+    let text := " ".intercalate (rest.filter (· != "--old"))
+    match Parse.parseSeq text with
+    | .error f => IO.eprintln s!"mallrun code: {f.report text}"; return 2
+    | .ok Γ =>
+      let t₀ ← IO.monoNanosNow
+      match ← IO.lazyPure (fun _ => refuteSet Γ) with
+      | none => IO.println "-- derivable"; return 0
+      | some D =>
+        let n := D.length
+        let t₁ ← IO.monoNanosNow
+        let C ← IO.lazyPure fun _ => Encode.encode D Γ
+        let k := C.tree.keys.length
+        let t₂ ← IO.monoNanosNow
+        let ok ← IO.lazyPure fun _ => codeRefutes C Γ
+        let t₃ ← IO.monoNanosNow
+        IO.println s!"-- set of {n} sequents ({k} numbers, table of {C.table.length}, base {C.B}); \
+found in {(t₁ - t₀) / 1000} µs, written in numbers in {(t₂ - t₁) / 1000} µs; \
+the compiled check in numbers: {ok}, {(t₃ - t₂) / 1000} µs"
+        if old then
+          let t₄ ← IO.monoNanosNow
+          let ok' ← IO.lazyPure fun _ => refutedBy D Γ
+          let t₅ ← IO.monoNanosNow
+          IO.println s!"-- the compiled check of the set as lists: {ok'}, {(t₅ - t₄) / 1000} µs"
+        IO.println s!"import MALL.Coded
+namespace MALL.Answer
+open MALL
+abbrev p : Form := .atom 0
+abbrev q : Form := .atom 1
+abbrev r : Form := .atom 2
+set_option maxRecDepth 1000000
+set_option maxHeartbeats 0
+def sequent : List Form := {srcForms Γ}
+def cert : CodeCert :=
+  {Encode.showCert C}
+theorem refuted : codeRefutes cert sequent = true := by decide +kernel
+end MALL.Answer"
+        return 0
   | ["corpus"] =>
     for e in entries do
       IO.println s!"{e.name}\t{if e.derivable then "derivable" else "not derivable"}\t{showSeq e.seq}\t{srcForms e.seq}\t{asciiSeq e.seq}"

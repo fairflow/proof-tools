@@ -117,6 +117,25 @@ def withTree (n : Nat) : List Form := [pᗮ, withs n]
 def slack (n : Nat) : List Form :=
   (ltr 0 ⊗ ⊤) :: (ltr 0)ᗮ :: ((List.range n).map fun i => ltr (i + 1))
 
+/-- `⊢ ((p ⊗ q) & (p ⊗ r))⊥, p ⊗ (q & r)` beside `n` copies of ⊥: the
+distribution that fails, so not derivable.  Its saturated set has
+`17 (n + 1)` sequents, and a ⊗ in it stands beside up to `n` equal
+formulas. -/
+def bots (n : Nat) : List Form :=
+  [((p ⊗ q) & (p ⊗ r))ᗮ, p ⊗ (q & r)] ++ List.replicate n ⊥
+
+/-- `⊥ ⅋ (⊥ ⅋ … ⅋ ⊥)`, `n + 1` times ⊥. -/
+def parBot : Nat → Form
+  | 0 => ⊥
+  | n + 1 => ⊥ ⅋ parBot n
+
+/-- The same sequent with the copies of ⊥ joined to its second formula by
+⅋: `⊢ ((p ⊗ q) & (p ⊗ r))⊥, (p ⊗ (q & r)) ⅋ ⊥ ⅋ … ⅋ ⊥`.  Not derivable.
+Its saturated set grows as the square of `n`. -/
+def parBots : Nat → List Form
+  | 0 => bots 0
+  | n + 1 => [((p ⊗ q) & (p ⊗ r))ᗮ, (p ⊗ (q & r)) ⅋ parBot n]
+
 /-- A family by its name: the sequent, and whether it is derivable. -/
 def family : String → Nat → Option (List Form × Bool)
   | "chain", n => some (chain n, true)
@@ -125,6 +144,8 @@ def family : String → Nat → Option (List Form × Bool)
   | "fanBad", n => some (fanBad n, false)
   | "withTree", n => some (withTree n, true)
   | "slack", n => some (slack n, true)
+  | "bots", n => some (bots n, false)
+  | "parbots", n => some (parBots n, false)
   | _, _ => none
 
 end MALL.Corpus
