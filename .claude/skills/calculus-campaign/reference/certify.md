@@ -472,7 +472,9 @@ certificate, whose notes are not in this repository).
   code builds every one (1.3 s and 2.2 GB at 24, so some 500 GB at
   32: a danger to the machine, not only a wait), and the kernel
   reduces only as far as each step's test looks (no measurable time at
-  48). The repairs: write the check as the algorithm one would run (a
+  48). That speed was a property of the family: with the formula that
+  the axiom needs put last in the antecedent, the kernel on the same
+  replay took 10 s at 16 and overflowed its stack from 24. The repairs: write the check as the algorithm one would run (a
   table over subformulas and worlds), proved sound, or prove it equal
   to the plain one and give it to compiled code by `@[csimp]` (the
   fast path of `lean-certify`); for a judgment that grows, check over
@@ -481,7 +483,16 @@ certificate, whose notes are not in this repository).
   against the certifier's is a stopgap: say so where it is used.
   Measure both sides on a family that grows before believing either:
   a check that is fast in the kernel has not been shown to be a good
-  algorithm.
+  algorithm, and "fast in the kernel" needs a second family made
+  against whatever is thought to make it fast. GLS's repair (both
+  checks proved equal to their definitions, the certifiers checking by
+  the new ones: 0.03 s for the whole command at 64) took three forms:
+  the first replay by counts was itself too slow in the kernel. A
+  proof of equality says nothing of cost, so a repaired check is
+  measured as the faulty one was, compiled and in the kernel, and one
+  size beyond. A deadline is not a cap on memory; and a timing taken
+  inside compiled code is compared with the time of the whole process
+  (one read 80 µs for work of 0.1 s).
 - *A certificate beyond the kernel.* A search can print in
   milliseconds a certificate that Lean does not check within the
   memory cap (MALL: a saturated set of 238 sequents, stopped at 8 GB).
