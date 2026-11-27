@@ -227,8 +227,10 @@ Stated, and not asked for.
   no person has typed them.
 * **To fill, if the method is to be costed**: requests, tokens and cost
   of the session ([cost-log.md](https://github.com/fairflow/proof-tools/blob/5850b99/calculi/DILL/campaign/cost-log.md)).
-* **Words of the reviewer during the campaign**: five (the cost log has
-  each): a correction ("I declined no such thing"); two rules on
+* **Words of the reviewer during the campaign**: five
+  ([decisions.md](https://github.com/fairflow/proof-tools/blob/main/calculi/DILL/campaign/decisions.md)
+  has each, with the words copied, in its entries of 15:13, 16:03, 16:19
+  and 16:22 GMT; corrected 2026-11-27, see "After the close"): a correction ("I declined no such thing"); two rules on
   builds, relayed, the second correcting the first; two questions about
   what the operator was waiting for. No stop was asked for by the
   operator's choice; one was taken wrongly (below).
@@ -296,7 +298,8 @@ two-zone and a one-zone system, which LNL's adjunction would repeat.
 ## After the close
 
 Added 2026-11-27. The page above is as it was delivered on 2026-11-26
-(the published copy is that one); two of its sentences no longer hold.
+(the published copy is that one); two of its sentences no longer hold,
+and one was wrong when written.
 
 * Section 1 gives two limits of the kernel: a tree of moves, "a chain of
   64 formulas in 8 s, not settled at 96", and a saturated set, "a set of 200
@@ -308,6 +311,13 @@ Added 2026-11-27. The page above is as it was delivered on 2026-11-26
   4 GB. The definitions are unchanged; what is run is proved against
   them (statements S19 and S20). `measurements.md` and
   `measurements-sat.md`, "The cost of the check"; method note 23.
+* Section 5, "Words of the reviewer during the campaign", said of the
+  five that "the cost log has each". It does not: the cost log's table
+  has two rows (the command that started the campaign, and the
+  correction of 15:13). `decisions.md` has all five with the words
+  copied, and the parenthesis now points there. Corrected 2026-11-27,
+  from the directing session's read of the campaign records; the cost
+  log's table is left as it was.
 * `dillrun prove '<sequent>'` (2026-11-26, evening) answers for a
   sequent typed at a shell and prints a Lean file with the facts; the
   user's guide, "From the command line"; method notes 21 and 22.
